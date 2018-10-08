@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export default styled.div`
   border-radius: 3px;
@@ -10,4 +10,4 @@ export default styled.div`
   &:hover {
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
   }
-`
+`;

@@ -1,3 +1,3 @@
-import { Text } from 'rebass';
+import { Text } from "rebass";
 
-export default (props) => <Text fontFamily="system" {...props} />
+export default props => <Text fontFamily="system" {...props} />;

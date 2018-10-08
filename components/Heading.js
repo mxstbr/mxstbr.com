@@ -1,3 +1,3 @@
-import { Heading } from 'rebass';
+import { Heading } from "rebass";
 
-export default (props) => <Heading fontFamily="system" {...props} />
+export default props => <Heading fontFamily="system" {...props} />;
