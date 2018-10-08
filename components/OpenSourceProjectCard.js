@@ -2,13 +2,13 @@ import React from "react";
 import styled, { css } from "styled-components";
 import timeout from "p-timeout";
 import {
-  Card,
   Link,
   Flex,
   Box,
   Text as RebassText,
   Heading as RebassHeading
 } from "rebass";
+import Card from "./Card";
 import Heading from "./Heading";
 import Text from "./Text";
 import { getGitHubRepo } from "../helpers/github-api";
@@ -26,14 +26,6 @@ const Wrapper = styled(Link).attrs({
   text-decoration: none;
   color: inherit;
   display: block;
-
-  ${Card} {
-    transition: box-shadow 150ms ease-in-out;
-  }
-
-  &:hover ${Card} {
-    box-shadow: rgba(0, 0, 0, 0.15) 0px 8px 24px 0px;
-  }
 
   &:hover ${RebassHeading} {
     text-decoration: underline;
@@ -75,9 +67,6 @@ class OpenSourceProjectCard extends React.Component {
     return (
       <Wrapper href={`https://github.com/${repo}`} light={light}>
         <Card
-          borderRadius={5}
-          boxShadow="rgba(0, 0, 0, 0.15) 0px 3px 8px 0px"
-          p={4}
           css={{
             height: `${212 - 64}px`,
             maxWidth: `${350 - 64}px`,
