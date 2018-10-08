@@ -92,7 +92,10 @@ class OpenSourceProjectCard extends React.Component {
             <Box>{children}</Box>
             <Flex justifyContent="space-between">
               <FinePrint>{repo}</FinePrint>
-              <FinePrint>{stateStars || stars} stars</FinePrint>
+              <FinePrint>
+                {stateStars || stars}
+                &nbsp;★
+              </FinePrint>
             </Flex>
           </Flex>
         </Card>

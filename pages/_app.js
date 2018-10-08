@@ -3,6 +3,7 @@ import App, { Container } from "next/app";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
 import reset from "styled-reset";
 import Layout from "../components/Layout";
+import Nav from "../components/Nav";
 
 const theme = {
   fonts: {
@@ -17,7 +18,8 @@ const theme = {
       "Apple Color Emoji",
       "Segoe UI Emoji",
       "Segoe UI Symbol"
-    ]
+    ],
+    serif: ["Georgia", "serif"]
   }
 };
 
@@ -31,10 +33,13 @@ export default class MyApp extends App {
     return (
       <Container>
         <ThemeProvider theme={theme}>
-          <Layout>
-            <GlobalStyle />
-            <Component {...pageProps} />
-          </Layout>
+          <>
+            <Nav />
+            <Layout pt={1}>
+              <GlobalStyle />
+              <Component {...pageProps} />
+            </Layout>
+          </>
         </ThemeProvider>
       </Container>
     );
