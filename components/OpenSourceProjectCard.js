@@ -34,6 +34,8 @@ const Wrapper = styled(Link).attrs({
   ${props =>
     props.light &&
     css`
+      border: none;
+
       ${RebassText} {
         color: #eee;
       }

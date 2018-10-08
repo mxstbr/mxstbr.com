@@ -5,6 +5,9 @@ import Heading from "../components/Heading";
 import Text from "../components/Text";
 import { getGitHubRepoStars } from "../helpers/github-api";
 import OSSProject from "../components/OpenSourceProjectCard";
+import Appearance from "../components/AppearanceCard";
+import appearances from "../appearances";
+import formatDate from "../utils/format-date";
 
 const H2 = props => <Heading fontSize={5} mb={3} mt={4} as="h2" {...props} />;
 
@@ -72,7 +75,34 @@ class Homepage extends React.Component {
             </OSSProject>
           </Flex>
         </Box>
-        <H2>Talks</H2>
+        <H2>Appearances</H2>
+        <Flex flexDirection="row" flexWrap="wrap">
+          {appearances.map((appearance, i) => (
+            <>
+              {!appearances[i - 1] ||
+              appearances[i - 1].date.getFullYear() !==
+                appearance.date.getFullYear() ? (
+                <Flex
+                  flexDirection="row"
+                  alignItems="center"
+                  width={734 - 16}
+                  my={3}
+                >
+                  <Heading fontSize={3} as="h3" mr={3} width={42 + 10}>
+                    {appearance.date.getFullYear()}
+                  </Heading>
+                  <Box
+                    css={{ background: "#BBB", width: "100%", height: "1px" }}
+                  />
+                </Flex>
+              ) : null}
+              <Appearance
+                key={appearance.title + appearance.city + appearance.site}
+                {...appearance}
+              />
+            </>
+          ))}
+        </Flex>
         <H2>Recent Posts</H2>
       </Box>
     );

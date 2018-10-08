@@ -25,6 +25,10 @@ const theme = {
 
 const GlobalStyle = createGlobalStyle`
   ${reset}
+
+  body {
+    background-color: #EEE;
+  }
 `;
 
 export default class MyApp extends App {
