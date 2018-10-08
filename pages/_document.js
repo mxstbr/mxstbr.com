@@ -20,7 +20,6 @@ export default class MyDocument extends Document {
             name="viewport"
             content="width=device-width, minimum-scale=1.0"
           />
-          <title>Max Stoiber (@mxstbr)</title>
           {this.props.styleTags}
         </Head>
         <body>

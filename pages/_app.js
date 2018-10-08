@@ -39,6 +39,7 @@ export default class MyApp extends App {
         <ThemeProvider theme={theme}>
           <>
             <Nav />
+            <title>Max Stoiber (@mxstbr)</title>
             <Layout pt={1}>
               <GlobalStyle />
               <Component {...pageProps} />
