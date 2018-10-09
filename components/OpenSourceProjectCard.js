@@ -21,7 +21,7 @@ const FinePrint = props => <Text color="#666" fontSize={1} {...props} />;
 
 const Wrapper = styled(Link).attrs({
   mr: 3,
-  my: 3
+  mb: 3
 })`
   text-decoration: none;
   color: inherit;
@@ -69,6 +69,7 @@ class OpenSourceProjectCard extends React.Component {
     return (
       <Wrapper href={`https://github.com/${repo}`} light={light}>
         <Card
+          p={4}
           css={{
             height: `${212 - 64}px`,
             maxWidth: `${350 - 64}px`,

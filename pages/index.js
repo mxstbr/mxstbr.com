@@ -1,20 +1,31 @@
 import React from "react";
 import timeout from "p-timeout";
-import { Card, Flex, Box, Link } from "rebass";
+import { Flex, Box, Link } from "rebass";
 import Octicon, { LinkExternal } from "@githubprimer/octicons-react";
+import Slider from "react-slick";
 import Heading from "../components/Heading";
 import Text from "../components/Text";
 import { getGitHubRepoStars } from "../helpers/github-api";
 import OSSProject from "../components/OpenSourceProjectCard";
+import Card from "../components/Card";
 import Appearance from "../components/AppearanceCard";
 import RestrictHeight from "../components/RestrictHeight";
 import appearances from "../appearances";
 import formatDate from "../utils/format-date";
 
-const H2 = props => <Heading fontSize={5} mb={3} mt={4} as="h2" {...props} />;
+const H2 = props => <Heading fontSize={5} mb={4} mt={4} as="h2" {...props} />;
 
 class Homepage extends React.Component {
+  static async getInitialProps() {
+    const data = await fetch("https://mxstbr.blog/feed.json").then(res =>
+      res.json()
+    );
+    return { posts: data?.items };
+  }
+
   render() {
+    const { posts } = this.props;
+
     return (
       <Box py={5}>
         <Box mb={4}>
@@ -98,8 +109,8 @@ class Homepage extends React.Component {
           </Box>
         </Box>
         <H2>Appearances</H2>
-        <Flex flexDirection="row" flexWrap="wrap" width={734 - 16}>
-          <RestrictHeight maxHeight="525px">
+        <Flex width={734 - 16}>
+          <RestrictHeight maxHeight="562.5px">
             {appearances.map((appearance, i) => (
               <React.Fragment key={appearance.title + appearance.site}>
                 {!appearances[i - 1] ||
@@ -109,7 +120,7 @@ class Homepage extends React.Component {
                     flexDirection="row"
                     alignItems="center"
                     width={734 - 16}
-                    my={3}
+                    mb={3}
                   >
                     <Heading fontSize={3} as="h3" mr={3} width={42 + 10}>
                       {appearance.date.getFullYear()}
@@ -124,7 +135,64 @@ class Homepage extends React.Component {
             ))}
           </RestrictHeight>
         </Flex>
-        <H2>Recent Posts</H2>
+        <H2>Recent Blog Posts</H2>
+        <Flex flexDirection="row" flexWrap="wrap" width={1}>
+          {posts.slice(0, 3).map((post, i) => {
+            const external = post["_external-site"];
+            const date = new Date(post.date_published);
+            return (
+              <Flex key={post.id} width={1 / 3}>
+                <Link
+                  href={post.url}
+                  target={!!external ? "_blank" : ""}
+                  css={{ textDecoration: "none", color: "inherit" }}
+                >
+                  <Card mr={3} mb={4}>
+                    <Card.Title>{post.title}</Card.Title>
+                    <Card.Body>{post.summary}</Card.Body>
+                    <Card.FinePrint>
+                      {date.getDate()}.{date.getMonth() + 1}.
+                      {date.getFullYear()}
+                      {!!external ? (
+                        <>
+                          {` • `}
+                          {external}
+                          <Box css={{ display: "inline-block" }} ml={2}>
+                            <Octicon>
+                              <LinkExternal />
+                            </Octicon>
+                          </Box>
+                        </>
+                      ) : (
+                        ""
+                      )}
+                    </Card.FinePrint>
+                  </Card>
+                </Link>
+              </Flex>
+            );
+          })}
+          <Box mt={3}>
+            <Link
+              css={{
+                textDecoration: "none",
+                ":hover": { textDecoration: "underline" },
+                display: "inline-block"
+              }}
+              href="https://mxstbr.blog"
+              target="_blank"
+            >
+              <Text fontWeight="bold">
+                View more on mxstbr.blog
+                <Box css={{ display: "inline-block" }} ml={2}>
+                  <Octicon>
+                    <LinkExternal />
+                  </Octicon>
+                </Box>
+              </Text>
+            </Link>
+          </Box>
+        </Flex>
       </Box>
     );
   }
