@@ -79,9 +79,13 @@ class Homepage extends React.Component {
             bg="linear-gradient(to bottom right, #6D6E72, #9EA0A6)"
           >
             <OSSProject.Title>react-boilerplate</OSSProject.Title>
+            <OSSProject.Description />
+          </OSSProject>
+          <OSSProject stars={4168} repo="styled-components/polished">
+            <OSSProject.Title>Polished</OSSProject.Title>
             <OSSProject.Description>
-              A highly scalable foundation with a focus on development
-              experience, performance and best practices
+              A lightweight toolset for writing styles in JavaScript. "The
+              lodash of CSS-in-JS."
             </OSSProject.Description>
           </OSSProject>
           <OSSProject stars={2101} repo="mxstbr/sharingbuttons.io">
@@ -95,13 +99,6 @@ class Homepage extends React.Component {
             <OSSProject.Title>Login Flow</OSSProject.Title>
             <OSSProject.Description>
               A login/register flow built with React and Redux
-            </OSSProject.Description>
-          </OSSProject>
-          <OSSProject stars={722} repo="micro-analytics/micro-analytics">
-            <OSSProject.Title>micro-analytics</OSSProject.Title>
-            <OSSProject.Description>
-              Public analytics as a Node.js microservice, no sysadmin experience
-              required
             </OSSProject.Description>
           </OSSProject>
         </Flex>
@@ -119,7 +116,7 @@ class Homepage extends React.Component {
           View all
         </ViewMoreLink>
         <H2 mt={5}>Recent Blog Posts</H2>
-        <Flex flexDirection="row" flexWrap="wrap" width={1} mb={3}>
+        <Flex flexDirection="row" flexWrap="wrap" width={1} mb={2}>
           {posts.slice(0, 3).map((post, i) => {
             const external = post["_external-site"];
             const date = new Date(post.date_published);
