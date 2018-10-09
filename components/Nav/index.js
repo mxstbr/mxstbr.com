@@ -98,6 +98,7 @@ const Wrapper = styled(Flex).attrs({
   width: 100%;
   background: #fff;
   transition: box-shadow 250ms ease-in-out;
+  z-index: 9;
 
   ${props =>
     props.showShadow &&

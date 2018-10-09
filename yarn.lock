@@ -662,6 +662,12 @@
   version "0.6.6"
   resolved "https://registry.yarnpkg.com/@emotion/memoize/-/memoize-0.6.6.tgz#004b98298d04c7ca3b4f50ca2035d4f60d2eed1b"
 
+"@githubprimer/octicons-react@^8.1.0":
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/@githubprimer/octicons-react/-/octicons-react-8.1.0.tgz#731c40b6b231dcee731f0f2d37c67e7ee857bd6a"
+  dependencies:
+    prop-types "^15.6.1"
+
 "@mdx-js/loader@^0.7.0":
   version "0.7.4"
   resolved "https://registry.yarnpkg.com/@mdx-js/loader/-/loader-0.7.4.tgz#d673e628b4d9ffcafaa8f8079468d6fc87ac1a7b"

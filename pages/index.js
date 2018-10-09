@@ -1,11 +1,13 @@
 import React from "react";
 import timeout from "p-timeout";
 import { Card, Flex, Box, Link } from "rebass";
+import Octicon, { LinkExternal } from "@githubprimer/octicons-react";
 import Heading from "../components/Heading";
 import Text from "../components/Text";
 import { getGitHubRepoStars } from "../helpers/github-api";
 import OSSProject from "../components/OpenSourceProjectCard";
 import Appearance from "../components/AppearanceCard";
+import RestrictHeight from "../components/RestrictHeight";
 import appearances from "../appearances";
 import formatDate from "../utils/format-date";
 
@@ -74,31 +76,53 @@ class Homepage extends React.Component {
               </OSSProject.Description>
             </OSSProject>
           </Flex>
+          <Box mt={3}>
+            <Link
+              css={{
+                textDecoration: "none",
+                ":hover": { textDecoration: "underline" },
+                display: "inline-block"
+              }}
+              href="https://github.com/mxstbr"
+              target="_blank"
+            >
+              <Text fontWeight="bold">
+                View more on GitHub
+                <Box css={{ display: "inline-block" }} ml={2}>
+                  <Octicon>
+                    <LinkExternal />
+                  </Octicon>
+                </Box>
+              </Text>
+            </Link>
+          </Box>
         </Box>
         <H2>Appearances</H2>
-        <Flex flexDirection="row" flexWrap="wrap">
-          {appearances.map((appearance, i) => (
-            <React.Fragment key={appearance.title + appearance.site}>
-              {!appearances[i - 1] ||
-              appearances[i - 1].date.getFullYear() !==
-                appearance.date.getFullYear() ? (
-                <Flex
-                  flexDirection="row"
-                  alignItems="center"
-                  width={734 - 16}
-                  my={3}
-                >
-                  <Heading fontSize={3} as="h3" mr={3} width={42 + 10}>
-                    {appearance.date.getFullYear()}
-                  </Heading>
-                  <Box
-                    css={{ background: "#BBB", width: "100%", height: "1px" }}
-                  />
-                </Flex>
-              ) : null}
-              <Appearance {...appearance} />
-            </React.Fragment>
-          ))}
+        <Flex flexDirection="row" flexWrap="wrap" width={734 - 16}>
+          <RestrictHeight maxHeight="525px">
+            {appearances.map((appearance, i) => (
+              <React.Fragment key={appearance.title + appearance.site}>
+                {!appearances[i - 1] ||
+                appearances[i - 1].date.getFullYear() !==
+                  appearance.date.getFullYear() ? (
+                  <Flex
+                    flexDirection="row"
+                    alignItems="center"
+                    width={734 - 16}
+                    my={3}
+                  >
+                    <Heading fontSize={3} as="h3" mr={3} width={42 + 10}>
+                      {appearance.date.getFullYear()}
+                    </Heading>
+                    <Box
+                      css={{ background: "#BBB", width: "100%", height: "1px" }}
+                    />
+                  </Flex>
+                ) : null}
+                <Appearance {...appearance} />
+              </React.Fragment>
+            ))}
+          </RestrictHeight>
         </Flex>
         <H2>Recent Posts</H2>
       </Box>

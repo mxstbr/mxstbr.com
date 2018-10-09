@@ -9,6 +9,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@githubprimer/octicons-react": "^8.1.0",
     "@mdx-js/mdx": "^0.15.0-2",
     "@zeit/next-mdx": "^1.1.0",
     "conditional-wrap": "^1.0.0",
