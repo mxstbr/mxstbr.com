@@ -78,7 +78,7 @@ class Homepage extends React.Component {
         <H2>Appearances</H2>
         <Flex flexDirection="row" flexWrap="wrap">
           {appearances.map((appearance, i) => (
-            <>
+            <React.Fragment key={appearance.title + appearance.site}>
               {!appearances[i - 1] ||
               appearances[i - 1].date.getFullYear() !==
                 appearance.date.getFullYear() ? (
@@ -87,7 +87,6 @@ class Homepage extends React.Component {
                   alignItems="center"
                   width={734 - 16}
                   my={3}
-                  key={`year-${appearance.date.getFullYear()}`}
                 >
                   <Heading fontSize={3} as="h3" mr={3} width={42 + 10}>
                     {appearance.date.getFullYear()}
@@ -97,11 +96,8 @@ class Homepage extends React.Component {
                   />
                 </Flex>
               ) : null}
-              <Appearance
-                key={appearance.title + appearance.city + appearance.site}
-                {...appearance}
-              />
-            </>
+              <Appearance {...appearance} />
+            </React.Fragment>
           ))}
         </Flex>
         <H2>Recent Posts</H2>
