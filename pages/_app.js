@@ -43,7 +43,7 @@ export default class MyApp extends App {
           <>
             <Nav />
             <title>Max Stoiber (@mxstbr)</title>
-            <Layout css={{ paddingTop: "106px" }}>
+            <Layout css={{ paddingTop: "80px" }}>
               <GlobalStyle />
               <Component {...pageProps} />
             </Layout>

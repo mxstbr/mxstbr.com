@@ -56,15 +56,12 @@ const Logo = () => (
       <Flex
         flexDirection="column"
         justifyContent="center"
-        alignItems="center"
         css={{ width: "144px" }}
       >
         <IsScrolled>
           {({ isScrolled }) => (
             <>
               <Heading
-                mt={isScrolled ? "16px" : 0}
-                ml={isScrolled ? "-36px" : 0}
                 css={{ transition: "margin 250ms ease-in-out" }}
                 as="h1"
                 fontSize={3}
@@ -99,11 +96,6 @@ const Logo = () => (
                   &nbsp;/&gt;
                 </Handle>
               </Heading>
-              <Handle scrolled={isScrolled} hideOnScroll>
-                <Text fontSize={2} fontWeight="normal">
-                  JavaScript Engineer
-                </Text>
-              </Handle>
             </>
           )}
         </IsScrolled>
@@ -130,7 +122,7 @@ class Nav extends React.Component {
     return (
       <IsScrolled>
         {({ isScrolled }) => (
-          <Wrapper py={isScrolled ? 2 : 3}>
+          <Wrapper py={3}>
             <Layout width={1}>
               <Flex alignItems="center" justifyContent="space-between">
                 <Logo />
