@@ -112,7 +112,6 @@ const Wrapper = styled(Flex).attrs({
   left: 0;
   width: 100%;
   background: #fff;
-  transition: box-shadow 250ms ease-in-out, padding 250ms ease-in-out;
   z-index: 9;
   box-shadow: rgba(0, 0, 0, 0.15) 0px 1px 4px 0px;
 `;
@@ -123,7 +122,7 @@ class Nav extends React.Component {
       <IsScrolled>
         {({ isScrolled }) => (
           <Wrapper py={3}>
-            <Layout width={1}>
+            <Layout py={1} width={1}>
               <Flex alignItems="center" justifyContent="space-between">
                 <Logo />
                 <Flex>
