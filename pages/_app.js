@@ -2,8 +2,10 @@ import React from "react";
 import App, { Container } from "next/app";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
 import reset from "styled-reset";
+import { Box } from "rebass";
 import Layout from "../components/Layout";
 import Nav from "../components/Nav";
+import Footer from "../components/Footer";
 
 const theme = {
   fonts: {
@@ -28,6 +30,7 @@ const GlobalStyle = createGlobalStyle`
 
   body {
     background-color: #EEE;
+    margin: 0;
   }
 `;
 
@@ -40,10 +43,11 @@ export default class MyApp extends App {
           <>
             <Nav />
             <title>Max Stoiber (@mxstbr)</title>
-            <Layout pt={1}>
+            <Layout css={{ paddingTop: "88px" }}>
               <GlobalStyle />
               <Component {...pageProps} />
             </Layout>
+            <Footer />
           </>
         </ThemeProvider>
       </Container>

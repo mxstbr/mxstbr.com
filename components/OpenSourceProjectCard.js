@@ -27,6 +27,10 @@ const Wrapper = styled(Link).attrs({
   color: inherit;
   display: block;
 
+  &:nth-child(3n) {
+    margin-right: 0;
+  }
+
   &:hover ${RebassHeading} {
     text-decoration: underline;
   }
@@ -72,7 +76,7 @@ class OpenSourceProjectCard extends React.Component {
           p={4}
           css={{
             height: `${212 - 64}px`,
-            maxWidth: `${350 - 64}px`,
+            maxWidth: `292px`,
             background: bg
           }}
         >

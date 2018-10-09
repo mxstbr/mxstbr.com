@@ -1,7 +1,7 @@
 import React from "react";
 import styled, { css } from "styled-components";
-import { Flex, Box } from "rebass";
-import Link from "next/link";
+import { Flex, Box, Link } from "rebass";
+import NextLink from "next/link";
 import IsScrolled from "../WithIsScrolled";
 import Text from "../Text";
 import Heading from "../Heading";
@@ -31,80 +31,96 @@ const Handle = styled.span`
   }};
 `;
 
+const NavItem = styled(props => (
+  <Box mr={4} className={props.className}>
+    <NextLink prefetch href={props.href}>
+      <Link
+        href={props.href}
+        css={{ textDecoration: "none", color: "inherit" }}
+      >
+        <Text color="#666">{props.title}</Text>
+      </Link>
+    </NextLink>
+  </Box>
+))`
+  &:last-of-type {
+    margin-right: 0;
+  }
+`;
+
 const Logo = () => (
-  <Flex
-    flexDirection="column"
-    justifyContent="center"
-    alignItems="center"
-    css={{ width: "144px" }}
-  >
-    <IsScrolled>
-      {({ isScrolled }) => (
-        <>
-          <Heading
-            mt={isScrolled ? "16px" : 0}
-            css={{ transition: "margin 250ms ease-in-out" }}
-            as="h1"
-            fontSize={3}
-            fontWeight="normal"
-            fontFamily="serif"
-          >
-            <Handle scrolled={isScrolled} showOnScroll>
-              &lt;
-            </Handle>
-            m
-            <Handle scrolled={isScrolled} hideOnScroll>
-              a
-            </Handle>
-            x
-            <Handle scrolled={isScrolled} hideOnScroll marginOnHide="-.2em">
-              &nbsp;
-            </Handle>
-            st
-            <Handle
-              scrolled={isScrolled}
-              hideOnScroll
-              marginOnHide="-.5em; margin-left: -0.34em;"
-            >
-              oi
-            </Handle>
-            b
-            <Handle scrolled={isScrolled} hideOnScroll>
-              e
-            </Handle>
-            r
-            <Handle scrolled={isScrolled} default={0} showOnScroll>
-              &nbsp;/&gt;
-            </Handle>
-          </Heading>
-          <Handle scrolled={isScrolled} hideOnScroll>
-            <Text fontSize={2} fontWeight="normal">
-              JavaScript Engineer
-            </Text>
-          </Handle>
-        </>
-      )}
-    </IsScrolled>
-  </Flex>
+  <NextLink prefetch href="/">
+    <Link href="/" css={{ textDecoration: "none", color: "inherit" }}>
+      <Flex
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        css={{ width: "144px" }}
+      >
+        <IsScrolled>
+          {({ isScrolled }) => (
+            <>
+              <Heading
+                mt={isScrolled ? "16px" : 0}
+                ml={isScrolled ? "-36px" : 0}
+                css={{ transition: "margin 250ms ease-in-out" }}
+                as="h1"
+                fontSize={3}
+                fontWeight="normal"
+                fontFamily="serif"
+              >
+                <Handle scrolled={isScrolled} showOnScroll>
+                  &lt;
+                </Handle>
+                m
+                <Handle scrolled={isScrolled} hideOnScroll>
+                  a
+                </Handle>
+                x
+                <Handle scrolled={isScrolled} hideOnScroll marginOnHide="-.2em">
+                  &nbsp;
+                </Handle>
+                st
+                <Handle
+                  scrolled={isScrolled}
+                  hideOnScroll
+                  marginOnHide="-.5em; margin-left: -0.34em;"
+                >
+                  oi
+                </Handle>
+                b
+                <Handle scrolled={isScrolled} hideOnScroll>
+                  e
+                </Handle>
+                r
+                <Handle scrolled={isScrolled} default={0} showOnScroll>
+                  &nbsp;/&gt;
+                </Handle>
+              </Heading>
+              <Handle scrolled={isScrolled} hideOnScroll>
+                <Text fontSize={2} fontWeight="normal">
+                  JavaScript Engineer
+                </Text>
+              </Handle>
+            </>
+          )}
+        </IsScrolled>
+      </Flex>
+    </Link>
+  </NextLink>
 );
 
 const Wrapper = styled(Flex).attrs({
-  as: "nav",
-  py: 1
+  as: "nav"
 })`
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   background: #fff;
-  transition: box-shadow 250ms ease-in-out;
+  transition: box-shadow 250ms ease-in-out, padding 250ms ease-in-out;
   z-index: 9;
-
-  ${props =>
-    props.showShadow &&
-    css`
-      box-shadow: rgba(0, 0, 0, 0.15) 0px 1px 4px 0px;
-    `};
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 1px 4px 0px;
 `;
 
 class Nav extends React.Component {
@@ -112,21 +128,15 @@ class Nav extends React.Component {
     return (
       <IsScrolled>
         {({ isScrolled }) => (
-          <Wrapper showShadow={isScrolled}>
+          <Wrapper py={isScrolled ? 2 : 3}>
             <Layout width={1}>
-              <Flex alignItems="center">
+              <Flex alignItems="center" justifyContent="space-between">
                 <Logo />
-                <Box mr={3} />
-                <Box mr={2}>
-                  <Link href="/about">
-                    <Text>About</Text>
-                  </Link>
-                </Box>
-                <Box mr={2}>
-                  <Link href="https://mxstbr.blog">
-                    <Text>Blog</Text>
-                  </Link>
-                </Box>
+                <Flex>
+                  <NavItem href="/about" title="About" />
+                  <NavItem href="/appearances" title="Appearances" />
+                  <NavItem href="https://mxstbr.blog" title="Blog" />
+                </Flex>
               </Flex>
             </Layout>
           </Wrapper>
