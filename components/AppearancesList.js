@@ -10,7 +10,13 @@ export default ({ appearances }) => (
         {!appearances[i - 1] ||
         appearances[i - 1].date.getFullYear() !==
           appearance.date.getFullYear() ? (
-          <Flex flexDirection="row" alignItems="center" width={734 - 16} mb={3}>
+          <Flex
+            flexDirection="row"
+            alignItems="center"
+            width={734 - 16}
+            mb={2}
+            mt={3}
+          >
             <Heading fontSize={3} as="h3" mr={3} width={42 + 10}>
               {appearance.date.getFullYear()}
             </Heading>

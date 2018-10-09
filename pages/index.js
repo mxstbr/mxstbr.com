@@ -1,7 +1,10 @@
 import React from "react";
 import timeout from "p-timeout";
 import { Flex, Box, Link } from "rebass";
-import Octicon, { LinkExternal } from "@githubprimer/octicons-react";
+import Octicon, {
+  LinkExternal,
+  ChevronRight
+} from "@githubprimer/octicons-react";
 import ConditionalWrap from "conditional-wrap";
 import NextLink from "next/link";
 import Heading from "../components/Heading";
@@ -79,26 +82,31 @@ class Homepage extends React.Component {
             bg="linear-gradient(to bottom right, #6D6E72, #9EA0A6)"
           >
             <OSSProject.Title>react-boilerplate</OSSProject.Title>
-            <OSSProject.Description />
+            <OSSProject.Description>
+              {" "}
+              A foundation for React apps with a focus on scalability, developer
+              experience and best practices.
+            </OSSProject.Description>
           </OSSProject>
           <OSSProject stars={4168} repo="styled-components/polished">
             <OSSProject.Title>Polished</OSSProject.Title>
             <OSSProject.Description>
-              A lightweight toolset for writing styles in JavaScript. "The
-              lodash of CSS-in-JS."
+              A lightweight toolset for writing styles in JavaScript, "the
+              lodash of CSS-in-JS".
             </OSSProject.Description>
           </OSSProject>
           <OSSProject stars={2101} repo="mxstbr/sharingbuttons.io">
             <OSSProject.Title>sharingbuttons.io</OSSProject.Title>
             <OSSProject.Description>
-              Super fast and easy Social Media Sharing Buttons. No JavaScript.
-              No tracking.
+              Super fast and easy social media sharing buttons without tracking
+              your users.
             </OSSProject.Description>
           </OSSProject>
           <OSSProject stars={1495} repo="mxstbr/login-flow">
             <OSSProject.Title>Login Flow</OSSProject.Title>
             <OSSProject.Description>
-              A login/register flow built with React and Redux
+              An example React and Redux implementation of a login/register
+              flow.
             </OSSProject.Description>
           </OSSProject>
         </Flex>
@@ -113,10 +121,13 @@ class Homepage extends React.Component {
         <H2 mt={5}>Recent Appearances</H2>
         <AppearancesList appearances={appearances.slice(0, 6)} />
         <ViewMoreLink internal href="/appearances" as={NextLink}>
-          View all
+          View all{" "}
+          <Octicon>
+            <ChevronRight />
+          </Octicon>
         </ViewMoreLink>
         <H2 mt={5}>Recent Blog Posts</H2>
-        <Flex flexDirection="row" flexWrap="wrap" width={1} mb={2}>
+        <Flex flexDirection="row" flexWrap="wrap" width={1} mb={3}>
           {posts.slice(0, 3).map((post, i) => {
             const external = post["_external-site"];
             const date = new Date(post.date_published);

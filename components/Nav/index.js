@@ -2,6 +2,7 @@ import React from "react";
 import styled, { css } from "styled-components";
 import { Flex, Box, Link } from "rebass";
 import NextLink from "next/link";
+import Octicon, { LinkExternal } from "@githubprimer/octicons-react";
 import IsScrolled from "../WithIsScrolled";
 import Text from "../Text";
 import Heading from "../Heading";
@@ -37,6 +38,7 @@ const NavItem = styled(props => (
       <Link
         href={props.href}
         css={{ textDecoration: "none", color: "inherit" }}
+        target={props.target}
       >
         <Text color="#666">{props.title}</Text>
       </Link>
@@ -136,7 +138,18 @@ class Nav extends React.Component {
                   <NavItem href="/about" title="About" />
                   <NavItem href="/appearances" title="Appearances" />
                   <NavItem href="/audits" title="Audits" />
-                  <NavItem href="https://mxstbr.blog" title="Blog" />
+                  <NavItem
+                    href="https://mxstbr.blog"
+                    target="_blank"
+                    title={
+                      <>
+                        Blog{" "}
+                        <Octicon>
+                          <LinkExternal />
+                        </Octicon>
+                      </>
+                    }
+                  />
                 </Flex>
               </Flex>
             </Layout>
