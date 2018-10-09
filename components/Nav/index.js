@@ -135,6 +135,7 @@ class Nav extends React.Component {
                 <Flex>
                   <NavItem href="/about" title="About" />
                   <NavItem href="/appearances" title="Appearances" />
+                  <NavItem href="/audits" title="Audits" />
                   <NavItem href="https://mxstbr.blog" title="Blog" />
                 </Flex>
               </Flex>

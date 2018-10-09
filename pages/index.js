@@ -2,6 +2,7 @@ import React from "react";
 import timeout from "p-timeout";
 import { Flex, Box, Link } from "rebass";
 import Octicon, { LinkExternal } from "@githubprimer/octicons-react";
+import ConditionalWrap from "conditional-wrap";
 import NextLink from "next/link";
 import Heading from "../components/Heading";
 import Text from "../components/Text";
@@ -10,8 +11,26 @@ import OSSProject from "../components/OpenSourceProjectCard";
 import Card from "../components/Card";
 import AppearancesList from "../components/AppearancesList";
 import RestrictHeight from "../components/RestrictHeight";
+import Button from "../components/Button";
 import appearances from "../appearances";
 import formatDate from "../utils/format-date";
+
+const ViewMoreLink = props => (
+  <Box mt={2}>
+    <ConditionalWrap
+      condition={props.internal}
+      wrap={children => <NextLink href={props.href}>{children}</NextLink>}
+    >
+      <Button
+        as="a"
+        href={props.href}
+        target={props.internal ? undefined : "_blank"}
+      >
+        <Text fontWeight="bold">{props.children}</Text>
+      </Button>
+    </ConditionalWrap>
+  </Box>
+);
 
 const H2 = props => <Heading fontSize={5} mb={4} mt={4} as="h2" {...props} />;
 
@@ -28,7 +47,7 @@ class Homepage extends React.Component {
 
     return (
       <Box as="main">
-        <H2 mt={0}>Open Source</H2>
+        <H2 mt={1}>Open Source</H2>
         <Flex flexWrap="wrap">
           <OSSProject
             light
@@ -86,51 +105,26 @@ class Homepage extends React.Component {
             </OSSProject.Description>
           </OSSProject>
         </Flex>
-        <Box mt={2}>
-          <Link
-            css={{
-              textDecoration: "none",
-              ":hover": { textDecoration: "underline" },
-              display: "inline-block"
-            }}
-            href="https://github.com/mxstbr"
-            target="_blank"
-          >
-            <Text fontWeight="bold">
-              View more on GitHub
-              <Box css={{ display: "inline-block" }} ml={2}>
-                <Octicon>
-                  <LinkExternal />
-                </Octicon>
-              </Box>
-            </Text>
-          </Link>
-        </Box>
-        <H2 mt={4}>Recent Appearances</H2>
+        <ViewMoreLink href="https://github.com/mxstbr">
+          View more on GitHub
+          <Box css={{ display: "inline-block" }} ml={2}>
+            <Octicon>
+              <LinkExternal />
+            </Octicon>
+          </Box>
+        </ViewMoreLink>
+        <H2 mt={5}>Recent Appearances</H2>
         <AppearancesList appearances={appearances.slice(0, 6)} />
-        <Box mt={2}>
-          <NextLink href="/appearances">
-            <a href="appearances">
-              <Text
-                css={{
-                  textDecoration: "none",
-                  ":hover": { textDecoration: "underline" },
-                  display: "inline-block"
-                }}
-                fontWeight="bold"
-              >
-                View all
-              </Text>
-            </a>
-          </NextLink>
-        </Box>
-        <H2>Recent Blog Posts</H2>
-        <Flex flexDirection="row" flexWrap="wrap" width={1}>
+        <ViewMoreLink internal href="/appearances" as={NextLink}>
+          View all
+        </ViewMoreLink>
+        <H2 mt={5}>Recent Blog Posts</H2>
+        <Flex flexDirection="row" flexWrap="wrap" width={1} mb={3}>
           {posts.slice(0, 3).map((post, i) => {
             const external = post["_external-site"];
             const date = new Date(post.date_published);
             return (
-              <Flex key={post.id} width="calc(33.33% - 16px)" mr={3} mb={4}>
+              <Flex key={post.id} width="calc(33.33% - 16px)" mr={3} mb={1}>
                 <Link
                   href={post.url}
                   target={!!external ? "_blank" : ""}
@@ -144,18 +138,14 @@ class Homepage extends React.Component {
                     <Card.FinePrint>
                       {date.getDate()}.{date.getMonth() + 1}.
                       {date.getFullYear()}
-                      {!!external ? (
-                        <>
-                          {` • `}
-                          {external}
-                          <Box css={{ display: "inline-block" }} ml={2}>
-                            <Octicon>
-                              <LinkExternal />
-                            </Octicon>
-                          </Box>
-                        </>
-                      ) : (
-                        ""
+                      {` on `}
+                      {!!external ? `the ${external}` : `mxstbr.blog`}
+                      {!!external && (
+                        <Box css={{ display: "inline-block" }} ml={2}>
+                          <Octicon>
+                            <LinkExternal />
+                          </Octicon>
+                        </Box>
                       )}
                     </Card.FinePrint>
                   </Card>
@@ -163,27 +153,15 @@ class Homepage extends React.Component {
               </Flex>
             );
           })}
-          <Box mt={3}>
-            <Link
-              css={{
-                textDecoration: "none",
-                ":hover": { textDecoration: "underline" },
-                display: "inline-block"
-              }}
-              href="https://mxstbr.blog"
-              target="_blank"
-            >
-              <Text fontWeight="bold">
-                View more on mxstbr.blog
-                <Box css={{ display: "inline-block" }} ml={2}>
-                  <Octicon>
-                    <LinkExternal />
-                  </Octicon>
-                </Box>
-              </Text>
-            </Link>
-          </Box>
         </Flex>
+        <ViewMoreLink href="https://mxstbr.blog">
+          View more on mxstbr.blog
+          <Box css={{ display: "inline-block" }} ml={2}>
+            <Octicon>
+              <LinkExternal />
+            </Octicon>
+          </Box>
+        </ViewMoreLink>
       </Box>
     );
   }

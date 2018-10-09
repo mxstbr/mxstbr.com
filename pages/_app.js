@@ -29,7 +29,7 @@ const GlobalStyle = createGlobalStyle`
   ${reset}
 
   body {
-    background-color: #EEE;
+    background-color: rgb(246, 247, 248);
     margin: 0;
   }
 `;
@@ -43,7 +43,7 @@ export default class MyApp extends App {
           <>
             <Nav />
             <title>Max Stoiber (@mxstbr)</title>
-            <Layout css={{ paddingTop: "88px" }}>
+            <Layout css={{ paddingTop: "106px" }}>
               <GlobalStyle />
               <Component {...pageProps} />
             </Layout>

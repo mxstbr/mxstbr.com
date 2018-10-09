@@ -5,7 +5,7 @@ import appearances from "../appearances";
 
 export default () => (
   <>
-    <Heading fontSize={5} as="h2" mb={4} mt={2}>
+    <Heading fontSize={5} as="h2" mb={4} mt={1}>
       Appearances
     </Heading>
     <AppearancesList appearances={appearances} />
