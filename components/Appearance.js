@@ -17,16 +17,6 @@ const ICONS = {
   meetup: Users
 };
 
-const Badge = styled(Box)`
-  border: 1px solid #999;
-  border-radius: 3px;
-  display: inline-flex;
-  color: #999;
-  align-items: center;
-  justify-content: center;
-  height: 1.1em;
-`;
-
 const Wrapper = styled(ListItem)`
   ${Link}:hover .title {
     text-decoration: underline;

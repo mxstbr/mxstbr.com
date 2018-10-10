@@ -7,7 +7,20 @@ import Layout from "../components/Layout";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 
+const colors = {
+  blue: "#3867d6",
+  greys: ["#EEE", "#BBB", "#999", "#666"],
+  white: "#FFF",
+  black: "#000"
+};
+
 const theme = {
+  colors: {
+    primary: colors.blue,
+    text: colors.black,
+    secondaryText: colors.greys[4],
+    ...colors
+  },
   fonts: {
     system: [
       "-apple-system",

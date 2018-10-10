@@ -10,7 +10,7 @@ const Title = styled(props => (
 
 const BaseCard = styled(Card)`
   border-radius: 5px;
-  background-color: #fff;
+  background-color: ${props => props.theme.colors.white};
 
   &:hover {
     ${Title} {
@@ -28,7 +28,7 @@ const C = props => (
 C.Title = Title;
 C.Body = props => (
   <Text
-    color="#666"
+    color="secondaryText"
     fontSize={2}
     lineHeight={1.25}
     px={4}
@@ -41,7 +41,7 @@ C.Image = props => (
   <Image {...props} css={{ borderRadius: "5px 5px 0 0", ...props.css }} />
 );
 C.FinePrint = props => (
-  <Text color="#666" pb={4} pl={4} pr={4} fontSize={1} {...props} />
+  <Text color="secondaryText" pb={4} pl={4} pr={4} fontSize={1} {...props} />
 );
 
 export default C;

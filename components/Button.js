@@ -3,6 +3,17 @@ import styled from "styled-components";
 import { Box } from "rebass";
 import BoxShadow from "./BoxShadow";
 
+export const TextButton = styled(Box).attrs({
+  as: props => props.as || "button"
+})`
+  text-decoration: none;
+  color: inherit;
+  display: inline-block;
+  color: ${props => props.theme.colors.primary};
+  letter-spacing: 0.03em;
+  font-weight: bold;
+`;
+
 const Button = styled(Box).attrs({
   as: props => props.as || "button",
   p: 3

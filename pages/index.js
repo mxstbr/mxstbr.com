@@ -12,15 +12,15 @@ import OSSProject from "../components/OpenSourceProjectCard";
 import Card from "../components/Card";
 import AppearancesList from "../components/AppearancesList";
 import RestrictHeight from "../components/RestrictHeight";
-import Button from "../components/Button";
+import { TextButton } from "../components/Button";
 import appearances from "../appearances";
 import formatDate from "../utils/format-date";
 
 const ViewMoreLink = props => (
-  <Box mt={2}>
-    <Button as={Link} href={props.href}>
+  <Box mt={3}>
+    <TextButton as={Link} href={props.href}>
       <Text fontSize={1}>{props.children}</Text>
-    </Button>
+    </TextButton>
   </Box>
 );
 
