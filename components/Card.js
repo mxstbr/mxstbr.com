@@ -28,7 +28,7 @@ const C = props => (
 C.Title = Title;
 C.Body = props => (
   <Text
-    color="secondaryText"
+    color="#666"
     fontSize={2}
     lineHeight={1.25}
     px={4}
@@ -41,7 +41,7 @@ C.Image = props => (
   <Image {...props} css={{ borderRadius: "5px 5px 0 0", ...props.css }} />
 );
 C.FinePrint = props => (
-  <Text color="secondaryText" pb={4} pl={4} pr={4} fontSize={1} {...props} />
+  <Text color="#666" pb={4} pl={4} pr={4} fontSize={1} {...props} />
 );
 
 export default C;

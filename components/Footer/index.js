@@ -31,7 +31,7 @@ export default props => (
   <Flex py={4} mt={5} as="footer">
     <Layout width={0.5}>
       <Flex justifyContent="space-around">
-        <Text mb={1}>
+        <Text color="#666">
           <FooterLink href="https://twitter.com/mxstbr">
             <Icon mr={2} ml={0}>
               <Twitter size="1em" />
@@ -39,7 +39,7 @@ export default props => (
             Twitter
           </FooterLink>
         </Text>
-        <Text mb={1}>
+        <Text mb={1} color="#666">
           <FooterLink href="https://github.com/mxstbr">
             <Icon mr={2} ml={0}>
               <Github size="1em" />
@@ -47,7 +47,7 @@ export default props => (
             GitHub
           </FooterLink>
         </Text>
-        <Text>
+        <Text color="#666">
           <FooterLink href="https://unsplash.com/@mxstbr">
             <Icon mr={2} ml={0}>
               <Camera size="1em" />
