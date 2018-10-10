@@ -4,6 +4,6 @@ import { Box } from "rebass";
 export default styled(Box)`
   max-width: 1100px;
   margin: 0 auto;
-  padding-left: 8px;
-  padding-right: 8px;
+  padding-left: 16px;
+  padding-right: 16px;
 `;

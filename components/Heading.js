@@ -1,7 +1,12 @@
 import { Heading } from "rebass";
 
 const BaseHeading = props => (
-  <Heading lineHeight={1.25} fontFamily="system" {...props} />
+  <Heading
+    lineHeight={1.25}
+    fontFamily="system"
+    alignSelf="flex-start"
+    {...props}
+  />
 );
 
 const H2 = props => (

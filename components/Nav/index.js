@@ -68,6 +68,7 @@ const Logo = () => (
                 fontSize={3}
                 fontWeight="normal"
                 fontFamily="serif"
+                alignSelf={["center", "flex-start"]}
               >
                 <Handle scrolled={isScrolled} showOnScroll>
                   &lt;

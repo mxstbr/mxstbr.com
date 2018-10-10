@@ -37,7 +37,11 @@ class Homepage extends React.Component {
     const { posts } = this.props;
 
     return (
-      <Box as="main">
+      <Flex
+        as="main"
+        flexDirection="column"
+        alignItems={["center", "flex-start"]}
+      >
         <H2 mt={4}>Open Source</H2>
         <CardGrid>
           <OSSProject
@@ -108,13 +112,13 @@ class Homepage extends React.Component {
         <Flex flexDirection="column" width={[1, 0.5]}>
           <H2>Recent Appearances</H2>
           <AppearancesList appearances={appearances.slice(0, 7)} />
-          <ViewMoreLink href="/appearances">
-            View all
-            <Icon>
-              <ChevronRight size="1em" />
-            </Icon>
-          </ViewMoreLink>
         </Flex>
+        <ViewMoreLink href="/appearances">
+          View all
+          <Icon>
+            <ChevronRight size="1em" />
+          </Icon>
+        </ViewMoreLink>
 
         <H2>Recent Blog Posts</H2>
         <CardGrid>
@@ -154,7 +158,7 @@ class Homepage extends React.Component {
             <ChevronRight size="1em" />
           </Icon>
         </ViewMoreLink>
-      </Box>
+      </Flex>
     );
   }
 }

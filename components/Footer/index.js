@@ -11,6 +11,8 @@ const footerLinkStyles = css`
   text-decoration: none;
   color: inherit;
   cursor: pointer;
+  display: flex;
+  margin: 0 1em;
 
   &:hover {
     text-decoration: underline;
@@ -28,7 +30,13 @@ const FooterLink = styled(Link).attrs({
 `;
 
 export default props => (
-  <Flex py={4} mt={5} as="footer">
+  <Flex
+    py={4}
+    mt={5}
+    as="footer"
+    css={{ borderTop: "1px solid #CCC" }}
+    bg="#EEE"
+  >
     <Layout width={0.5}>
       <Flex justifyContent="space-around">
         <Text color="#666">
