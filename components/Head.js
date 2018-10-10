@@ -4,10 +4,17 @@ import Head from "next/head";
 export default ({ title, description, image }) => (
   <Head>
     {/* DEFAULT */}
+
     {title && <title key="title">{title}</title>}
     {description && (
       <meta name="description" key="description" content={description} />
     )}
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="/static/images/favicon_new.png"
+    />
+    <link rel="apple-touch-icon" href="/static/images/favicon_new.png" />
 
     {/* OPEN GRAPH */}
     {title && <meta property="og:title" content={title} key="og:title" />}
