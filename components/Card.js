@@ -20,7 +20,7 @@ const BaseCard = styled(Card)`
 `;
 
 const C = props => (
-  <BoxShadow>
+  <BoxShadow borderRadius="5px">
     <BaseCard {...props} />
   </BoxShadow>
 );

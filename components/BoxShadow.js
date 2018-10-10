@@ -6,6 +6,7 @@ const BoxShadow = styled(Card)`
   display: inline-block;
   box-shadow: ${props => props.shadow || "rgba(0, 0, 0, 0.1) 0px 3px 8px 0px"};
   position: relative;
+  background: transparent;
 
   ${props =>
     props.hoverShadow !== false &&
@@ -13,7 +14,7 @@ const BoxShadow = styled(Card)`
       &:after {
         content: "";
         box-shadow: ${props.hoverShadow ||
-          "rgba(0, 0, 0, 0.1) 0px 8px 24px 0px"};
+          "rgba(0, 0, 0, 0.15) 0px 8px 24px 0px"};
         opacity: 0;
         transition: opacity 250ms ease-in-out;
         position: absolute;
@@ -22,6 +23,7 @@ const BoxShadow = styled(Card)`
         left: 0;
         width: 100%;
         height: 100%;
+        background: transparent;
       }
 
       &:hover::after {

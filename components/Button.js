@@ -21,7 +21,7 @@ const Button = styled(Box).attrs({
 `;
 
 export default props => (
-  <BoxShadow>
+  <BoxShadow borderRadius="5px">
     <Button {...props} />
   </BoxShadow>
 );
