@@ -27,7 +27,7 @@ const ViewMoreLink = props => (
         href={props.href}
         target={props.internal ? undefined : "_blank"}
       >
-        <Text fontWeight="bold">{props.children}</Text>
+        <Text fontSize={1}>{props.children}</Text>
       </Button>
     </ConditionalWrap>
   </Box>
