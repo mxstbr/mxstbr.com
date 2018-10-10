@@ -22,7 +22,7 @@
     "react-dom": "^16.5.2",
     "react-slick": "^0.23.1",
     "rebass": "^3.0.0-9",
-    "styled-components": "^4.0.0-beta.10",
+    "styled-components": "^4.0.0-beta.11.2",
     "styled-reset": "^1.5.1"
   },
   "devDependencies": {
