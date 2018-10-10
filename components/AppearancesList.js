@@ -17,7 +17,7 @@ export default ({ appearances }) => (
             mb={2}
             mt={3}
           >
-            <H3 mr={3} width={42 + 10}>
+            <H3 mr={3} width={50}>
               {appearance.date.getFullYear()}
             </H3>
             <Box css={{ background: "#BBB", width: "100%", height: "1px" }} />

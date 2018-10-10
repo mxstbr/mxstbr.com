@@ -279,14 +279,14 @@ module.exports = [
     title: "Styling React.js Applications Workshop",
     site: "JSChannel",
     type: "workshop",
-    location: "Bangalore, India",
+    city: "Bangalore, India",
     link: "https://www.youtube.com/watch?v=ftSzsghg2io",
     date: new Date(2017, 6)
   },
   {
     title: "From CSS preprocessors to styled-components",
     site: "Reactivate London",
-    location: "London, UK",
+    city: "London, UK",
     type: "meetup",
     link:
       "https://pusher.com/sessions/meetup/reactivate-london/from-css-preprocessors-to-styled-components",

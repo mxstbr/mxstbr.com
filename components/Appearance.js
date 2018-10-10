@@ -6,6 +6,17 @@ import Heading from "./Heading";
 import { getShortMonth } from "../utils/format-date";
 import ListItem from "./ListItem";
 
+import Icon from "./Icon";
+import { Radio, Mic, Monitor, Terminal, Users } from "react-feather";
+
+const ICONS = {
+  podcast: <Mic />,
+  interview: <Radio />,
+  conference: <Monitor />,
+  workshop: <Terminal />,
+  meetup: <Users />
+};
+
 const Badge = styled(Box)`
   border: 1px solid #999;
   border-radius: 3px;
@@ -24,12 +35,12 @@ const Wrapper = styled(ListItem)`
 
 const AppearanceCard = props => (
   <Wrapper link={props.link}>
-    <Flex mr={3} width={42 + 16}>
-      <Text color="#666" fontSize={2}>
-        {getShortMonth(props.date)}
-      </Text>
+    <Flex mr={3} width={50} justifyContent="center">
+      <Icon color="#666" title={props.type}>
+        {ICONS[props.type]}
+      </Icon>
     </Flex>
-    <Flex flexDirection="column" width={1}>
+    <Flex flexDirection="column" width={1} ml="4px">
       <Heading className="title" as="h4" fontSize={3} mb={1}>
         {props.title}
       </Heading>
@@ -37,9 +48,6 @@ const AppearanceCard = props => (
         {props.site} {!!props.city && `(${props.city})`}
       </Text>
     </Flex>
-    <Badge px={2}>
-      <Text fontSize={1}>{props.type}</Text>
-    </Badge>
   </Wrapper>
 );
 
