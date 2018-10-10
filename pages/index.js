@@ -99,7 +99,7 @@ class Homepage extends React.Component {
         </Flex>
         <ViewMoreLink href="https://github.com/mxstbr">
           View more on GitHub
-          <Icon ml={2}>
+          <Icon ml={2} css={{ verticalAlign: "text-bottom" }}>
             <LinkExternal size="1em" />
           </Icon>
         </ViewMoreLink>
@@ -107,7 +107,7 @@ class Homepage extends React.Component {
         <AppearancesList appearances={appearances.slice(0, 6)} />
         <ViewMoreLink href="/appearances">
           View all
-          <Icon css={{ verticalAlign: "middle" }}>
+          <Icon>
             <ChevronRight size="1em" />
           </Icon>
         </ViewMoreLink>
@@ -130,7 +130,7 @@ class Homepage extends React.Component {
                       {` on `}
                       {!!external ? `the ${external}` : `mxstbr.blog`}
                       {!!external && (
-                        <Icon>
+                        <Icon css={{ verticalAlign: "text-bottom" }}>
                           <LinkExternal size="1em" />
                         </Icon>
                       )}
@@ -143,7 +143,7 @@ class Homepage extends React.Component {
         </Flex>
         <ViewMoreLink href="https://mxstbr.blog">
           View more on mxstbr.blog
-          <Icon css={{ verticalAlign: "middle" }}>
+          <Icon>
             <ChevronRight size="1em" />
           </Icon>
         </ViewMoreLink>

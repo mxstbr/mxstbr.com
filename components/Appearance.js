@@ -10,11 +10,11 @@ import Icon from "./Icon";
 import { Radio, Mic, Monitor, Terminal, Users } from "react-feather";
 
 const ICONS = {
-  podcast: <Mic />,
-  interview: <Radio />,
-  conference: <Monitor />,
-  workshop: <Terminal />,
-  meetup: <Users />
+  podcast: Mic,
+  interview: Radio,
+  conference: Monitor,
+  workshop: Terminal,
+  meetup: Users
 };
 
 const Badge = styled(Box)`
@@ -33,22 +33,25 @@ const Wrapper = styled(ListItem)`
   }
 `;
 
-const AppearanceCard = props => (
-  <Wrapper link={props.link}>
-    <Flex mr={3} width={50} justifyContent="center">
-      <Icon color="#666" title={props.type}>
-        {ICONS[props.type]}
-      </Icon>
-    </Flex>
-    <Flex flexDirection="column" width={1} ml="4px">
-      <Heading className="title" as="h4" fontSize={3} mb={1}>
-        {props.title}
-      </Heading>
-      <Text color="#666" fontSize={2}>
-        {props.site} {!!props.city && `(${props.city})`}
-      </Text>
-    </Flex>
-  </Wrapper>
-);
+const AppearanceCard = props => {
+  const TypeIcon = ICONS[props.type];
+  return (
+    <Wrapper link={props.link}>
+      <Flex mr={3} width={50} justifyContent="center">
+        <Icon color="#666" title={props.type}>
+          <TypeIcon strokeWidth={1.5} />
+        </Icon>
+      </Flex>
+      <Flex flexDirection="column" width={1} ml="4px">
+        <Heading className="title" as="h4" fontSize={3} mb={1}>
+          {props.title}
+        </Heading>
+        <Text color="#666" fontSize={2}>
+          {props.site} {!!props.city && `(${props.city})`}
+        </Text>
+      </Flex>
+    </Wrapper>
+  );
+};
 
 export default AppearanceCard;

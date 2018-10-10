@@ -6,7 +6,7 @@ export default props => (
     ml={1}
     {...props}
     css={{
-      verticalAlign: "text-bottom",
+      verticalAlign: "middle",
       display: "inline-block",
       ...props.css
     }}
