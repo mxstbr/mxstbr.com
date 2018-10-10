@@ -109,7 +109,7 @@ class Homepage extends React.Component {
           </Icon>
         </ViewMoreLink>
 
-        <Flex flexDirection="column" width={[1, 0.5]}>
+        <Flex flexDirection="column" width={[1, 0.75, 0.5]}>
           <H2>Recent Appearances</H2>
           <AppearancesList appearances={appearances.slice(0, 7)} />
         </Flex>

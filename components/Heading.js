@@ -1,12 +1,28 @@
 import { Heading } from "rebass";
 
 const BaseHeading = props => (
-  <Heading
-    lineHeight={1.25}
-    fontFamily="system"
-    alignSelf="flex-start"
-    {...props}
-  />
+  <>
+    {(typeof props.children === "string" ||
+      typeof props.children === "number") && (
+      <span
+        style={{
+          marginTop: "-65px",
+          paddingBottom: "65px",
+          display: "block",
+          position: "absolute"
+        }}
+        id={String(props.children)
+          .toLowerCase()
+          .replace(/\s/g, "-")}
+      />
+    )}
+    <Heading
+      lineHeight={1.25}
+      fontFamily="system"
+      alignSelf="flex-start"
+      {...props}
+    />
+  </>
 );
 
 const H2 = props => (

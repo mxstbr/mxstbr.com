@@ -4,16 +4,7 @@ import { Link } from "rebass";
 import NextLink from "next/link";
 import ConditionalWrap from "conditional-wrap";
 
-const StyledLink = styled(Link)`
-  text-decoration: none;
-  color: inherit;
-
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-
-export default props => {
+const UniversalLink = props => {
   const external =
     props.href.indexOf("//") !== -1 && props.href.indexOf("mxstbr.blog") === -1;
   return (
@@ -25,7 +16,16 @@ export default props => {
         </NextLink>
       )}
     >
-      <StyledLink target={external ? "_blank" : undefined} {...props} />
+      <Link target={external ? "_blank" : undefined} {...props} />
     </ConditionalWrap>
   );
 };
+
+export default styled(UniversalLink)`
+  text-decoration: none;
+  color: inherit;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
