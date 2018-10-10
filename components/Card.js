@@ -2,25 +2,28 @@ import styled from "styled-components";
 import { Card, Image } from "rebass";
 import { H3 } from "./Heading";
 import Text from "./Text";
+import BoxShadow from "./BoxShadow";
 
 const Title = styled(props => (
   <H3 pl={4} pr={4} pt={4} mb={2} mt={0} {...props} />
 ))``;
 
-const C = styled(Card)`
-  transition: box-shadow 150ms ease-in-out;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 8px 0px;
+const BaseCard = styled(Card)`
   border-radius: 5px;
   background-color: #fff;
 
   &:hover {
-    box-shadow: rgba(0, 0, 0, 0.15) 0px 8px 24px 0px;
-
     ${Title} {
       text-decoration: underline;
     }
   }
 `;
+
+const C = props => (
+  <BoxShadow>
+    <BaseCard {...props} />
+  </BoxShadow>
+);
 
 C.Title = Title;
 C.Body = props => (

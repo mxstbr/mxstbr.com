@@ -1,8 +1,9 @@
 import React from "react";
 import styled from "styled-components";
 import { Box } from "rebass";
+import BoxShadow from "./BoxShadow";
 
-export default styled(Box).attrs({
+const Button = styled(Box).attrs({
   as: props => props.as || "button",
   p: 3
 })`
@@ -18,3 +19,9 @@ export default styled(Box).attrs({
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 8px 0px;
   }
 `;
+
+export default props => (
+  <BoxShadow>
+    <Button {...props} />
+  </BoxShadow>
+);
