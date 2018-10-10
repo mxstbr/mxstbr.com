@@ -25,7 +25,7 @@ export default props => {
         </NextLink>
       )}
     >
-      <StyledLink target={external && "_blank"} {...props} />
+      <StyledLink target={external ? "_blank" : undefined} {...props} />
     </ConditionalWrap>
   );
 };
