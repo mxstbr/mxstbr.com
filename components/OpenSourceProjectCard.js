@@ -20,16 +20,11 @@ const Description = props => (
 const FinePrint = props => <Text color="#666" fontSize={1} {...props} />;
 
 const Wrapper = styled(Link).attrs({
-  mr: 3,
-  mb: 3
+  m: 2
 })`
   text-decoration: none;
   color: inherit;
   display: block;
-
-  &:nth-child(3n) {
-    margin-right: 0;
-  }
 
   &:hover ${RebassHeading} {
     text-decoration: underline;

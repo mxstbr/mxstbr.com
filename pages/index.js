@@ -38,7 +38,7 @@ class Homepage extends React.Component {
     return (
       <Box as="main">
         <H2 mt={4}>Open Source</H2>
-        <Flex flexWrap="wrap">
+        <Flex flexWrap="wrap" css={{ margin: "-8px -8px" }}>
           <OSSProject
             light
             stars={4676}
