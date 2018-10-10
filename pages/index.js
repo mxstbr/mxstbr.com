@@ -8,6 +8,7 @@ import Icon from "../components/Icon";
 import { H2 } from "../components/Heading";
 import Text from "../components/Text";
 import { getGitHubRepoStars } from "../helpers/github-api";
+import CardGrid from "../components/CardGrid";
 import OSSProject from "../components/OpenSourceProjectCard";
 import Card from "../components/Card";
 import AppearancesList from "../components/AppearancesList";
@@ -38,7 +39,7 @@ class Homepage extends React.Component {
     return (
       <Box as="main">
         <H2 mt={4}>Open Source</H2>
-        <Flex flexWrap="wrap" m={[-1, -2]}>
+        <CardGrid>
           <OSSProject
             light
             stars={4676}
@@ -96,7 +97,7 @@ class Homepage extends React.Component {
               flow.
             </OSSProject.Description>
           </OSSProject>
-        </Flex>
+        </CardGrid>
         <ViewMoreLink href="https://github.com/mxstbr">
           View more on GitHub
           <Icon ml={2} css={{ verticalAlign: "text-bottom" }}>
@@ -116,7 +117,7 @@ class Homepage extends React.Component {
         </Flex>
 
         <H2>Recent Blog Posts</H2>
-        <Flex flexDirection="row" flexWrap="wrap" width={1} m={[-1, -2]}>
+        <CardGrid>
           {posts.slice(0, 3).map((post, i) => {
             const external = post["_external-site"];
             const date = new Date(post.date_published);
@@ -124,7 +125,7 @@ class Homepage extends React.Component {
               <Link
                 href={post.url}
                 key={post.id}
-                width={[1, "calc(33.3% - 16px)"]}
+                width={[1, "calc(50% - 16px)", "calc(33.3% - 16px)"]}
                 m={[1, 2]}
               >
                 <Card>
@@ -146,7 +147,7 @@ class Homepage extends React.Component {
               </Link>
             );
           })}
-        </Flex>
+        </CardGrid>
         <ViewMoreLink href="https://mxstbr.blog">
           View more on mxstbr.blog
           <Icon>

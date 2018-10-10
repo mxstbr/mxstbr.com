@@ -68,21 +68,20 @@ class OpenSourceProjectCard extends React.Component {
     return (
       <Wrapper
         width={[1, "calc(50% - 16px)", "calc(33.3% - 16px)"]}
-        css={{ maxWidth: "355px" }}
         href={`https://github.com/${repo}`}
         light={light}
       >
         <Card
           p={[3, 4]}
           css={{
-            height: `${212 - 64}px`,
+            minHeight: `${212 - 64}px`,
             background: bg
           }}
         >
           <Flex
             flexDirection="column"
             justifyContent="space-between"
-            css={{ height: "100%" }}
+            css={{ height: "100%", minHeight: `${212 - 64}px` }}
           >
             <Box>{children}</Box>
             <Flex justifyContent="space-between">
