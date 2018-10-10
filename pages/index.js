@@ -1,12 +1,10 @@
 import React from "react";
 import timeout from "p-timeout";
 import { Flex, Box, Link } from "rebass";
-import Octicon, {
-  LinkExternal,
-  ChevronRight
-} from "@githubprimer/octicons-react";
+import { ExternalLink as LinkExternal, ChevronRight } from "react-feather";
 import ConditionalWrap from "conditional-wrap";
 import NextLink from "next/link";
+import Icon from "../components/Icon";
 import { H2 } from "../components/Heading";
 import Text from "../components/Text";
 import { getGitHubRepoStars } from "../helpers/github-api";
@@ -110,19 +108,17 @@ class Homepage extends React.Component {
         </Flex>
         <ViewMoreLink href="https://github.com/mxstbr">
           View more on GitHub
-          <Box css={{ display: "inline-block" }} ml={2}>
-            <Octicon>
-              <LinkExternal />
-            </Octicon>
-          </Box>
+          <Icon>
+            <LinkExternal size="1em" />
+          </Icon>
         </ViewMoreLink>
         <H2>Recent Appearances</H2>
         <AppearancesList appearances={appearances.slice(0, 6)} />
         <ViewMoreLink internal href="/appearances" as={NextLink}>
           View all{" "}
-          <Octicon>
-            <ChevronRight />
-          </Octicon>
+          <Icon css={{ verticalAlign: "middle" }} ml={0}>
+            <ChevronRight size="1em" />
+          </Icon>
         </ViewMoreLink>
         <H2>Recent Blog Posts</H2>
         <Flex flexDirection="row" flexWrap="wrap" width={1} mb={3}>
@@ -147,11 +143,9 @@ class Homepage extends React.Component {
                       {` on `}
                       {!!external ? `the ${external}` : `mxstbr.blog`}
                       {!!external && (
-                        <Box css={{ display: "inline-block" }} ml={2}>
-                          <Octicon>
-                            <LinkExternal />
-                          </Octicon>
-                        </Box>
+                        <Icon ml={1}>
+                          <LinkExternal size="1em" />
+                        </Icon>
                       )}
                     </Card.FinePrint>
                   </Card>
@@ -162,11 +156,9 @@ class Homepage extends React.Component {
         </Flex>
         <ViewMoreLink href="https://mxstbr.blog">
           View more on mxstbr.blog
-          <Box css={{ display: "inline-block" }} ml={2}>
-            <Octicon>
-              <LinkExternal />
-            </Octicon>
-          </Box>
+          <Icon>
+            <LinkExternal size="1em" />
+          </Icon>
         </ViewMoreLink>
       </Box>
     );

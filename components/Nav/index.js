@@ -2,7 +2,8 @@ import React from "react";
 import styled, { css } from "styled-components";
 import { Flex, Box, Link } from "rebass";
 import NextLink from "next/link";
-import Octicon, { LinkExternal } from "@githubprimer/octicons-react";
+import Icon from "../Icon";
+import { ExternalLink as LinkExternal } from "react-feather";
 import IsScrolled from "../WithIsScrolled";
 import Text from "../Text";
 import Heading from "../Heading";
@@ -135,9 +136,9 @@ class Nav extends React.Component {
                     title={
                       <>
                         Blog{" "}
-                        <Octicon>
-                          <LinkExternal />
-                        </Octicon>
+                        <Icon ml={1}>
+                          <LinkExternal size="1em" />
+                        </Icon>
                       </>
                     }
                   />
