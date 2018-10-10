@@ -125,9 +125,14 @@ class Nav extends React.Component {
         {({ isScrolled }) => (
           <Wrapper py={3}>
             <Layout py={1} width={1}>
-              <Flex alignItems="center" justifyContent="space-between">
+              <Flex
+                alignItems="center"
+                justifyContent={["center", "space-between"]}
+              >
                 <Logo />
-                <Flex>
+                <Flex
+                  css={{ "@media (max-width: 700px)": { display: "none" } }}
+                >
                   <NavItem href="/about" title="About" />
                   <NavItem href="/appearances" title="Appearances" />
                   <NavItem href="/audits" title="Audits" />
