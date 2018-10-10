@@ -3,7 +3,7 @@ import { Box } from "rebass";
 
 export default props => (
   <Box
-    ml={2}
+    ml={1}
     {...props}
     css={{
       verticalAlign: "text-bottom",

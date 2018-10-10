@@ -1,9 +1,9 @@
 import React from "react";
 import timeout from "p-timeout";
-import { Flex, Box, Link } from "rebass";
+import { Flex, Box } from "rebass";
 import { ExternalLink as LinkExternal, ChevronRight } from "react-feather";
 import ConditionalWrap from "conditional-wrap";
-import NextLink from "next/link";
+import Link from "../components/Link";
 import Icon from "../components/Icon";
 import { H2 } from "../components/Heading";
 import Text from "../components/Text";
@@ -18,18 +18,9 @@ import formatDate from "../utils/format-date";
 
 const ViewMoreLink = props => (
   <Box mt={2}>
-    <ConditionalWrap
-      condition={props.internal}
-      wrap={children => <NextLink href={props.href}>{children}</NextLink>}
-    >
-      <Button
-        as="a"
-        href={props.href}
-        target={props.internal ? undefined : "_blank"}
-      >
-        <Text fontSize={1}>{props.children}</Text>
-      </Button>
-    </ConditionalWrap>
+    <Button as={Link} href={props.href}>
+      <Text fontSize={1}>{props.children}</Text>
+    </Button>
   </Box>
 );
 
@@ -108,15 +99,15 @@ class Homepage extends React.Component {
         </Flex>
         <ViewMoreLink href="https://github.com/mxstbr">
           View more on GitHub
-          <Icon>
+          <Icon ml={2}>
             <LinkExternal size="1em" />
           </Icon>
         </ViewMoreLink>
         <H2>Recent Appearances</H2>
         <AppearancesList appearances={appearances.slice(0, 6)} />
-        <ViewMoreLink internal href="/appearances" as={NextLink}>
-          View all{" "}
-          <Icon css={{ verticalAlign: "middle" }} ml={0}>
+        <ViewMoreLink href="/appearances">
+          View all
+          <Icon css={{ verticalAlign: "middle" }}>
             <ChevronRight size="1em" />
           </Icon>
         </ViewMoreLink>
@@ -127,11 +118,7 @@ class Homepage extends React.Component {
             const date = new Date(post.date_published);
             return (
               <Flex key={post.id} width="calc(33.33% - 16px)" mr={3} mb={1}>
-                <Link
-                  href={post.url}
-                  target={!!external ? "_blank" : ""}
-                  css={{ textDecoration: "none", color: "inherit" }}
-                >
+                <Link href={post.url}>
                   <Card>
                     <Card.Title>{post.title}</Card.Title>
                     <Card.Body css={{ maxHeight: "5em", overflow: "hidden" }}>
@@ -143,7 +130,7 @@ class Homepage extends React.Component {
                       {` on `}
                       {!!external ? `the ${external}` : `mxstbr.blog`}
                       {!!external && (
-                        <Icon ml={1}>
+                        <Icon>
                           <LinkExternal size="1em" />
                         </Icon>
                       )}
@@ -156,8 +143,8 @@ class Homepage extends React.Component {
         </Flex>
         <ViewMoreLink href="https://mxstbr.blog">
           View more on mxstbr.blog
-          <Icon>
-            <LinkExternal size="1em" />
+          <Icon css={{ verticalAlign: "middle" }}>
+            <ChevronRight size="1em" />
           </Icon>
         </ViewMoreLink>
       </Box>
