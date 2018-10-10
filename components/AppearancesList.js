@@ -4,7 +4,7 @@ import { H3 } from "./Heading";
 import Appearance from "./Appearance";
 
 export default ({ appearances }) => (
-  <Flex flexDirection="column" width={0.5}>
+  <Flex flexDirection="column">
     {appearances.map((appearance, i) => (
       <React.Fragment key={appearance.title + appearance.site}>
         {!appearances[i - 1] ||

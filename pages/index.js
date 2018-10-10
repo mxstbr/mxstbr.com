@@ -103,14 +103,18 @@ class Homepage extends React.Component {
             <LinkExternal size="1em" />
           </Icon>
         </ViewMoreLink>
-        <H2>Recent Appearances</H2>
-        <AppearancesList appearances={appearances.slice(0, 6)} />
-        <ViewMoreLink href="/appearances">
-          View all
-          <Icon>
-            <ChevronRight size="1em" />
-          </Icon>
-        </ViewMoreLink>
+
+        <Flex flexDirection="column" width={0.5}>
+          <H2>Recent Appearances</H2>
+          <AppearancesList appearances={appearances.slice(0, 7)} />
+          <ViewMoreLink href="/appearances">
+            View all
+            <Icon>
+              <ChevronRight size="1em" />
+            </Icon>
+          </ViewMoreLink>
+        </Flex>
+
         <H2>Recent Blog Posts</H2>
         <Flex flexDirection="row" flexWrap="wrap" width={1} mb={3}>
           {posts.slice(0, 3).map((post, i) => {
