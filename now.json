@@ -1,4 +1,5 @@
 {
+  "alias": "mxstbr-beta.now.sh",
   "type": "static",
   "static": {
     "directoryListing": false,
