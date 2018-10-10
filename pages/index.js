@@ -63,7 +63,7 @@ class Homepage extends React.Component {
             </OSSProject.Description>
           </OSSProject>
           <OSSProject
-            stars={19984}
+            stars={20009}
             repo="react-boilerplate/react-boilerplate"
             light
             bg="linear-gradient(to bottom right, #6D6E72, #9EA0A6)"

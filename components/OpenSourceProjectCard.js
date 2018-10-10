@@ -89,7 +89,7 @@ class OpenSourceProjectCard extends React.Component {
             <Flex justifyContent="space-between">
               <FinePrint>{repo}</FinePrint>
               <FinePrint>
-                {stateStars || stars}
+                {(stateStars || stars).toLocaleString("en")}
                 &nbsp;★
               </FinePrint>
             </Flex>
