@@ -1,13 +1,11 @@
 import React from "react";
 import AppearancesList from "../components/AppearancesList";
-import Heading from "../components/Heading";
+import { H2 } from "../components/Heading";
 import appearances from "../appearances";
 
 export default () => (
   <>
-    <Heading fontSize={5} as="h2" mb={4} mt={1}>
-      Appearances
-    </Heading>
+    <H2 mt={1}>Appearances</H2>
     <AppearancesList appearances={appearances} />
   </>
 );

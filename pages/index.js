@@ -7,7 +7,7 @@ import Octicon, {
 } from "@githubprimer/octicons-react";
 import ConditionalWrap from "conditional-wrap";
 import NextLink from "next/link";
-import Heading from "../components/Heading";
+import { H2 } from "../components/Heading";
 import Text from "../components/Text";
 import { getGitHubRepoStars } from "../helpers/github-api";
 import OSSProject from "../components/OpenSourceProjectCard";
@@ -34,8 +34,6 @@ const ViewMoreLink = props => (
     </ConditionalWrap>
   </Box>
 );
-
-const H2 = props => <Heading fontSize={5} mb={4} mt={4} as="h2" {...props} />;
 
 class Homepage extends React.Component {
   static async getInitialProps() {
@@ -118,7 +116,7 @@ class Homepage extends React.Component {
             </Octicon>
           </Box>
         </ViewMoreLink>
-        <H2 mt={5}>Recent Appearances</H2>
+        <H2>Recent Appearances</H2>
         <AppearancesList appearances={appearances.slice(0, 6)} />
         <ViewMoreLink internal href="/appearances" as={NextLink}>
           View all{" "}
@@ -126,7 +124,7 @@ class Homepage extends React.Component {
             <ChevronRight />
           </Octicon>
         </ViewMoreLink>
-        <H2 mt={5}>Recent Blog Posts</H2>
+        <H2>Recent Blog Posts</H2>
         <Flex flexDirection="row" flexWrap="wrap" width={1} mb={3}>
           {posts.slice(0, 3).map((post, i) => {
             const external = post["_external-site"];

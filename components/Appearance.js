@@ -24,8 +24,8 @@ const Wrapper = styled(ListItem)`
 
 const AppearanceCard = props => (
   <Wrapper link={props.link}>
-    <Flex flexDirection="column" mr={3} width={42 + 16}>
-      <Text color="#666" fontSize={3} mb={1} css={{ letterSpacing: "0.075em" }}>
+    <Flex mr={3} width={42 + 16}>
+      <Text color="#666" fontSize={2}>
         {getShortMonth(props.date)}
       </Text>
     </Flex>

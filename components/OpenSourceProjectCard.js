@@ -9,11 +9,11 @@ import {
   Heading as RebassHeading
 } from "rebass";
 import Card from "./Card";
-import Heading from "./Heading";
+import { H3 } from "./Heading";
 import Text from "./Text";
 import { getGitHubRepo } from "../helpers/github-api";
 
-const Title = props => <Heading fontSize={3} as="h3" {...props} mb={2} />;
+const Title = props => <H3 {...props} mb={2} mt={0} />;
 const Description = props => (
   <Text color="#666" fontSize={2} lineHeight={1.25} {...props} mb={4} />
 );

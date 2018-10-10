@@ -1,7 +1,7 @@
 import React from "react";
 import { Flex, Box } from "rebass";
-import Heading from "./Heading";
-import Appearance from "./AppearanceCard";
+import { H3 } from "./Heading";
+import Appearance from "./Appearance";
 
 export default ({ appearances }) => (
   <Flex flexDirection="column" width={734 - 16}>
@@ -17,9 +17,9 @@ export default ({ appearances }) => (
             mb={2}
             mt={3}
           >
-            <Heading fontSize={3} as="h3" mr={3} width={42 + 10}>
+            <H3 mr={3} width={42 + 10}>
               {appearance.date.getFullYear()}
-            </Heading>
+            </H3>
             <Box css={{ background: "#BBB", width: "100%", height: "1px" }} />
           </Flex>
         ) : null}

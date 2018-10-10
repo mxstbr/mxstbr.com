@@ -1,10 +1,10 @@
 import styled from "styled-components";
 import { Card, Image } from "rebass";
-import Heading from "./Heading";
+import { H3 } from "./Heading";
 import Text from "./Text";
 
 const Title = styled(props => (
-  <Heading fontSize={3} as="h3" pl={4} pr={4} pt={4} mb={2} {...props} />
+  <H3 pl={4} pr={4} pt={4} mb={2} mt={0} {...props} />
 ))``;
 
 const C = styled(Card)`
