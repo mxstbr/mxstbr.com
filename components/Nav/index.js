@@ -115,6 +115,7 @@ const Wrapper = styled(Flex).attrs({
   background: #fff;
   z-index: 9;
   box-shadow: rgba(0, 0, 0, 0.15) 0px 1px 4px 0px;
+  overflow-y: scroll;
 `;
 
 class Nav extends React.Component {

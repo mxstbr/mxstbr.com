@@ -22,6 +22,7 @@ const theme = {
     secondaryText: colors.greys[4],
     ...colors
   },
+  breakpoints: ["768px", "1100px", "64em"],
   fonts: {
     system: [
       "-apple-system",
@@ -68,7 +69,13 @@ export default class MyApp extends App {
               description={DEFAULT_DESCRIPTION}
               image={DEFAULT_IMAGE}
             />
-            <Layout css={{ paddingTop: `${NAV_HEIGHT}px` }}>
+            <Layout
+              css={{
+                paddingTop: `${NAV_HEIGHT}px`,
+                paddingLeft: "8px",
+                paddingRight: "8px"
+              }}
+            >
               <GlobalStyle />
               <Component {...pageProps} />
             </Layout>

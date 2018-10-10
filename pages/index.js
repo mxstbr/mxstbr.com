@@ -38,7 +38,7 @@ class Homepage extends React.Component {
     return (
       <Box as="main">
         <H2 mt={4}>Open Source</H2>
-        <Flex flexWrap="wrap" css={{ margin: "-8px -8px" }}>
+        <Flex flexWrap="wrap" m={[-1, -2]}>
           <OSSProject
             light
             stars={4676}
@@ -59,7 +59,7 @@ class Homepage extends React.Component {
             <OSSProject.Title>styled-components</OSSProject.Title>
             <OSSProject.Description>
               Visual primitives for the component age. Use the best bits of ES6
-              and CSS to style your apps without stress 💅
+              and CSS to style your apps without stress
             </OSSProject.Description>
           </OSSProject>
           <OSSProject
@@ -104,7 +104,7 @@ class Homepage extends React.Component {
           </Icon>
         </ViewMoreLink>
 
-        <Flex flexDirection="column" width={0.5}>
+        <Flex flexDirection="column" width={[1, 0.5]}>
           <H2>Recent Appearances</H2>
           <AppearancesList appearances={appearances.slice(0, 7)} />
           <ViewMoreLink href="/appearances">
@@ -116,32 +116,34 @@ class Homepage extends React.Component {
         </Flex>
 
         <H2>Recent Blog Posts</H2>
-        <Flex flexDirection="row" flexWrap="wrap" width={1} mb={3}>
+        <Flex flexDirection="row" flexWrap="wrap" width={1} m={[-1, -2]}>
           {posts.slice(0, 3).map((post, i) => {
             const external = post["_external-site"];
             const date = new Date(post.date_published);
             return (
-              <Flex key={post.id} width="calc(33.33% - 16px)" mr={3} mb={1}>
-                <Link href={post.url}>
-                  <Card>
-                    <Card.Title>{post.title}</Card.Title>
-                    <Card.Body css={{ maxHeight: "5em", overflow: "hidden" }}>
-                      {post.summary}
-                    </Card.Body>
-                    <Card.FinePrint>
-                      {date.getDate()}.{date.getMonth() + 1}.
-                      {date.getFullYear()}
-                      {` on `}
-                      {!!external ? `the ${external}` : `mxstbr.blog`}
-                      {!!external && (
-                        <Icon css={{ verticalAlign: "text-bottom" }}>
-                          <LinkExternal size="1em" />
-                        </Icon>
-                      )}
-                    </Card.FinePrint>
-                  </Card>
-                </Link>
-              </Flex>
+              <Link
+                href={post.url}
+                key={post.id}
+                width={[1, "calc(33.3% - 16px)"]}
+                m={[1, 2]}
+              >
+                <Card>
+                  <Card.Title>{post.title}</Card.Title>
+                  <Card.Body css={{ maxHeight: "5em", overflow: "hidden" }}>
+                    {post.summary}
+                  </Card.Body>
+                  <Card.FinePrint>
+                    {date.getDate()}.{date.getMonth() + 1}.{date.getFullYear()}
+                    {` on `}
+                    {!!external ? `the ${external}` : `mxstbr.blog`}
+                    {!!external && (
+                      <Icon css={{ verticalAlign: "text-bottom" }}>
+                        <LinkExternal size="1em" />
+                      </Icon>
+                    )}
+                  </Card.FinePrint>
+                </Card>
+              </Link>
             );
           })}
         </Flex>

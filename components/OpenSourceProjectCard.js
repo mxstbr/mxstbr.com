@@ -20,7 +20,7 @@ const Description = props => (
 const FinePrint = props => <Text color="#666" fontSize={1} {...props} />;
 
 const Wrapper = styled(Link).attrs({
-  m: 2
+  m: [1, 2]
 })`
   text-decoration: none;
   color: inherit;
@@ -66,12 +66,16 @@ class OpenSourceProjectCard extends React.Component {
     const { stateStars = stars } = this.state;
 
     return (
-      <Wrapper href={`https://github.com/${repo}`} light={light}>
+      <Wrapper
+        width={[1, "calc(50% - 16px)", "calc(33.3% - 16px)"]}
+        css={{ maxWidth: "355px" }}
+        href={`https://github.com/${repo}`}
+        light={light}
+      >
         <Card
-          p={4}
+          p={[3, 4]}
           css={{
             height: `${212 - 64}px`,
-            maxWidth: `292px`,
             background: bg
           }}
         >
