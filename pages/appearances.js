@@ -5,7 +5,7 @@ import appearances from "../appearances";
 
 export default () => (
   <>
-    <H2 mt={1}>Appearances</H2>
+    <H2 mt={4}>Appearances</H2>
     <AppearancesList appearances={appearances} />
   </>
 );

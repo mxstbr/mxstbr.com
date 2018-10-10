@@ -5,6 +5,6 @@ import Text from "../components/Text";
 
 export default () => (
   <>
-    <H2 mt={1}>About me</H2>
+    <H2 mt={4}>About me</H2>
   </>
 );

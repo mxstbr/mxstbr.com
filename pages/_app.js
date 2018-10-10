@@ -47,6 +47,8 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
+const NAV_HEIGHT = 65;
+
 export default class MyApp extends App {
   render() {
     const { Component, pageProps } = this.props;
@@ -56,7 +58,7 @@ export default class MyApp extends App {
           <>
             <Nav />
             <title>Max Stoiber (@mxstbr)</title>
-            <Layout css={{ paddingTop: "80px" }}>
+            <Layout css={{ paddingTop: `${NAV_HEIGHT}px` }}>
               <GlobalStyle />
               <Component {...pageProps} />
             </Layout>

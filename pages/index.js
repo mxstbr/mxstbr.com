@@ -37,7 +37,7 @@ class Homepage extends React.Component {
 
     return (
       <Box as="main">
-        <H2 mt={1}>Open Source</H2>
+        <H2 mt={4}>Open Source</H2>
         <Flex flexWrap="wrap">
           <OSSProject
             light
