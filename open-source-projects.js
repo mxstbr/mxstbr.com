@@ -2,7 +2,8 @@ export default [
   {
     repo: "withspectrum/spectrum",
     name: "Spectrum",
-    description: "Simple, online communities in a unified platform.",
+    description:
+      "The community platform for the future. Grow safe, successful online communities that are built to last.",
     stars: 4676,
     background: "linear-gradient(to top right, #7213FB, #4F16EE)",
     featured: true
