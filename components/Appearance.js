@@ -4,7 +4,7 @@ import ConditionalWrap from "conditional-wrap";
 import Text from "./Text";
 import Heading from "./Heading";
 import { getShortMonth } from "../utils/format-date";
-import ListItem from "./ListItem";
+import { ListItem } from "./Lists";
 
 import Icon from "./Icon";
 import { Radio, Mic, Monitor, Terminal, Users } from "react-feather";
