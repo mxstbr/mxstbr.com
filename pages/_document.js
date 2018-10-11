@@ -22,7 +22,12 @@ export default class MyDocument extends Document {
           />
           {this.props.styleTags}
         </Head>
-        <body>
+        <body className="no-js">
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `document.body.classList.remove('no-js');`
+            }}
+          />
           <Main />
           <NextScript />
         </body>

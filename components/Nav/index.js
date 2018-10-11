@@ -71,6 +71,11 @@ const Wrapper = styled(Flex).attrs({
   overflow-y: scroll;
   transition: background 250ms ease-in-out, box-shadow 250ms ease-in-out;
 
+  .no-js & {
+    background: #fff;
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 1px 4px 0px;
+  }
+
   @media screen and (max-width: 700px) {
     background: #fff;
     box-shadow: rgba(0, 0, 0, 0.15) 0px 1px 4px 0px;
