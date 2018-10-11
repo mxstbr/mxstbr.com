@@ -5,6 +5,11 @@ import ConditionalWrap from "conditional-wrap";
 const Item = styled(Flex)`
   max-width: 100%;
   width: 100%;
+
+  &:last-of-type,
+  &:last-of-type ${Link} {
+    padding-bottom: 0;
+  }
 `;
 
 export default props => (
