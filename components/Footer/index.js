@@ -16,7 +16,7 @@ export default props => (
     bg="#EEE"
   >
     <Layout width={[1, 0.5]}>
-      <Flex justifyContent="space-around">
+      <Flex justifyContent={["space-around", "space-between"]}>
         <Text color="#666">
           <Link href="https://twitter.com/mxstbr">
             <Icon mr={2} ml={0}>
@@ -26,7 +26,7 @@ export default props => (
           </Link>
         </Text>
         <Text mb={1} color="#666">
-          <Link href="https://github.com/mxstbr">
+          <Link href="https://github.com/mxstbr/mxstbr.com">
             <Icon mr={2} ml={0}>
               <Github size="1em" />
             </Icon>
