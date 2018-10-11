@@ -1,27 +1,12 @@
 import { Heading } from "rebass";
-import slug from "slugg";
 
 const BaseHeading = props => (
-  <>
-    {(typeof props.children === "string" ||
-      typeof props.children === "number") && (
-      <span
-        style={{
-          marginTop: "-65px",
-          paddingBottom: "65px",
-          display: "block",
-          position: "absolute"
-        }}
-        id={slug(props.children)}
-      />
-    )}
-    <Heading
-      lineHeight={1.25}
-      fontFamily="system"
-      alignSelf="flex-start"
-      {...props}
-    />
-  </>
+  <Heading
+    lineHeight={1.25}
+    fontFamily="system"
+    alignSelf="flex-start"
+    {...props}
+  />
 );
 
 const H2 = props => (
