@@ -10,8 +10,9 @@ module.exports = withMDX({
   pageExtensions: ["js", "jsx", "mdx"],
   exportPathMap: async function(
     defaultPathMap,
-    { dir, outDir, distDir, buildId }
+    { dev, dir, outDir, distDir, buildId }
   ) {
+    if (dev) return defaultPathMap;
     await Promise.all(
       staticFilesToCopy.map(file =>
         copyFile(join(dir, file), join(outDir, file))
