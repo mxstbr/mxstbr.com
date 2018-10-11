@@ -159,6 +159,11 @@ class Nav extends React.Component {
                 </Toggle>
                 <MobileMenu flexDirection="column">
                   <MobileNavItem
+                    href="/home"
+                    title="Home"
+                    onClick={this.closeMenu}
+                  />
+                  <MobileNavItem
                     href="/appearances"
                     title="Appearances"
                     onClick={this.closeMenu}
