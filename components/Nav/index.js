@@ -37,8 +37,10 @@ const Desktop = styled(Flex)`
 
 const NavItem = styled(props => (
   <Box mr={4} className={props.className}>
-    <Link prefetch href={props.href}>
-      <Text color="#666">{props.title}</Text>
+    <Link itemProp="url" prefetch href={props.href}>
+      <Text color="#666" itemProp="name">
+        {props.title}
+      </Text>
     </Link>
   </Box>
 ))`
@@ -101,7 +103,10 @@ class Nav extends React.Component {
                   justifyContent={["center", "space-between"]}
                 >
                   <Logo />
-                  <Desktop>
+                  <Desktop
+                    itemScope
+                    itemType="http://www.schema.org/SiteNavigationElement"
+                  >
                     <NavItem href="/appearances" title="Appearances" />
                     {/* <NavItem href="/audits" title="Audits" /> */}
                     <NavItem

@@ -1,5 +1,6 @@
 import React from "react";
 import Head from "next/head";
+import JsonLD from "./JsonLD";
 
 export default ({ title, description, image }) => (
   <Head>
@@ -44,5 +45,29 @@ export default ({ title, description, image }) => (
       />
     )}
     {image && <meta name="twitter:image" key="twitter:image" content={image} />}
+    <JsonLD
+      data={{
+        "@context": "http://schema.org",
+        "@type": "Person",
+        email: "mailto:contact@mxstbr.com",
+        image: "/static/images/headshot.jpeg",
+        jobTitle: "JavaScript Engineer",
+        familyName: "Stoiber",
+        givenName: "Max",
+        birthPlace: "Vienna, Austria",
+        birthDate: "1997.01.04",
+        height: "185 cm",
+        gender: "male",
+        nationality: "Austria",
+        url: "https://mxstbr.com",
+        sameAs: [
+          "https://mxstbr.blog",
+          "https://www.facebook.com/mxstbr",
+          "https://www.linkedin.com/in/max-stoiber-46698678",
+          "http://twitter.com/mxstbr",
+          "http://instagram.com/mxstbr"
+        ]
+      }}
+    />
   </Head>
 );
