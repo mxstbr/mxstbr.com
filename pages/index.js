@@ -17,12 +17,13 @@ import RestrictHeight from "../components/RestrictHeight";
 import { TextButton } from "../components/Button";
 import Image from "../components/Image";
 import appearances from "../appearances";
+import projects from "../open-source-projects";
 import formatDate from "../utils/format-date";
 
 const ViewMoreLink = props => (
-  <Box mt={3}>
+  <Box mt={4}>
     <TextButton as={Link} href={props.href}>
-      <Text fontSize={1}>{props.children}</Text>
+      <Text fontSize={2}>{props.children}</Text>
     </TextButton>
   </Box>
 );
@@ -50,9 +51,9 @@ class Homepage extends React.Component {
               Hey, I'm Max! 👋
             </H2>
             <Paragraph>
-              I'm a JavaScript Engineer from Austria 🇦🇹 (no kangaroos in
-              Austria!) and I love React and Node. I'm the technical co-founder
-              of <Link href="https://spectrum.chat">Spectrum</Link>, where we're
+              I'm a JavaScript Engineer from Austria 🇦🇹 and I love React and
+              Node. I'm the technical co-founder of{" "}
+              <Link href="https://spectrum.chat">Spectrum</Link>, where we're
               making it easier to start, grow and nurture large online
               communities.
             </Paragraph>
@@ -70,63 +71,20 @@ class Homepage extends React.Component {
         </Flex>
         <H2>My Open Source Projects</H2>
         <CardGrid>
-          <OSSProject
-            light
-            stars={4676}
-            repo="withspectrum/spectrum"
-            bg="linear-gradient(to top right, #7213FB, #4F16EE)"
-          >
-            <OSSProject.Title>Spectrum</OSSProject.Title>
-            <OSSProject.Description>
-              Simple, powerful online communities in a unified platform.
-            </OSSProject.Description>
-          </OSSProject>
-          <OSSProject
-            stars={19445}
-            repo="styled-components/styled-components"
-            light
-            bg="linear-gradient(to top right, #DB7093, #DAA357)"
-          >
-            <OSSProject.Title>styled-components</OSSProject.Title>
-            <OSSProject.Description>
-              Visual primitives for the component age. Use the best bits of ES6
-              and CSS to style your apps without stress
-            </OSSProject.Description>
-          </OSSProject>
-          <OSSProject
-            stars={20009}
-            repo="react-boilerplate/react-boilerplate"
-            light
-            bg="linear-gradient(to bottom right, #6D6E72, #9EA0A6)"
-          >
-            <OSSProject.Title>react-boilerplate</OSSProject.Title>
-            <OSSProject.Description>
-              {" "}
-              A foundation for React apps with a focus on scalability, developer
-              experience and best practices.
-            </OSSProject.Description>
-          </OSSProject>
-          <OSSProject stars={4168} repo="styled-components/polished">
-            <OSSProject.Title>Polished</OSSProject.Title>
-            <OSSProject.Description>
-              A lightweight toolset for writing styles in JavaScript, "the
-              lodash of CSS-in-JS".
-            </OSSProject.Description>
-          </OSSProject>
-          <OSSProject stars={2101} repo="mxstbr/sharingbuttons.io">
-            <OSSProject.Title>sharingbuttons.io</OSSProject.Title>
-            <OSSProject.Description>
-              Super fast and easy social media sharing buttons without tracking
-              your users.
-            </OSSProject.Description>
-          </OSSProject>
-          <OSSProject stars={1495} repo="mxstbr/login-flow">
-            <OSSProject.Title>Login Flow</OSSProject.Title>
-            <OSSProject.Description>
-              An example React and Redux implementation of a login/register
-              flow.
-            </OSSProject.Description>
-          </OSSProject>
+          {projects.map(project => (
+            <OSSProject
+              key={project.repo}
+              light={!!project.background}
+              repo={project.repo}
+              bg={project.background}
+              stars={project.stars}
+            >
+              <OSSProject.Title>{project.name}</OSSProject.Title>
+              <OSSProject.Description>
+                {project.description}
+              </OSSProject.Description>
+            </OSSProject>
+          ))}
         </CardGrid>
         <ViewMoreLink href="https://github.com/mxstbr">
           View more on GitHub
