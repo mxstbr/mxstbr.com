@@ -15,7 +15,7 @@ export default props => (
     css={{ borderTop: "1px solid #CCC" }}
     bg="#EEE"
   >
-    <Layout width={0.5}>
+    <Layout width={[1, 0.5]}>
       <Flex justifyContent="space-around">
         <Text color="#666">
           <Link href="https://twitter.com/mxstbr">
