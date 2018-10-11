@@ -3,7 +3,6 @@ import styled from "styled-components";
 import ConditionalWrap from "conditional-wrap";
 import Text from "./Text";
 import Heading from "./Heading";
-import { getShortMonth } from "../utils/format-date";
 import { ListItem } from "./Lists";
 
 import Icon from "./Icon";

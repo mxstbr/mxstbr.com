@@ -50,14 +50,14 @@ class Homepage extends React.Component {
             <H2 alignSelf="center" mt={[4, 5]}>
               Hey, I'm Max! 👋
             </H2>
-            <Paragraph>
+            <Paragraph centered>
               I'm a JavaScript Engineer from Austria 🇦🇹 and I love React and
               Node. I'm the technical co-founder of{" "}
               <Link href="https://spectrum.chat">Spectrum</Link>, where we're
               making it easier to start, grow and nurture large online
               communities.
             </Paragraph>
-            <Paragraph>
+            <Paragraph centered>
               If I'm not coding or{" "}
               <Link href="https://twitter.com/mxstbr">tweeting</Link>, I'm
               likely brewing coffee on my espresso machine (I'm a huge{" "}
@@ -69,9 +69,9 @@ class Homepage extends React.Component {
             </Paragraph>
           </Flex>
         </Flex>
-        <H2>My Open Source Projects</H2>
+        <H2>Featured Open Source Projects</H2>
         <CardGrid>
-          {projects.map(project => (
+          {projects.filter(project => project.featured).map(project => (
             <OSSProject
               key={project.repo}
               light={!!project.background}
@@ -86,10 +86,10 @@ class Homepage extends React.Component {
             </OSSProject>
           ))}
         </CardGrid>
-        <ViewMoreLink href="https://github.com/mxstbr">
-          View more on GitHub
-          <Icon ml={2} css={{ verticalAlign: "text-bottom" }}>
-            <LinkExternal size="1em" />
+        <ViewMoreLink href="/oss">
+          View all
+          <Icon>
+            <ChevronRight size="1em" />
           </Icon>
         </ViewMoreLink>
 
