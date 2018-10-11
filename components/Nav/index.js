@@ -3,7 +3,7 @@ import styled, { css } from "styled-components";
 import { Flex, Box } from "rebass";
 import Link from "../Link";
 import Icon from "../Icon";
-import { ExternalLink as LinkExternal, Menu, X } from "react-feather";
+import { ExternalLink as LinkExternal, Menu, X, Twitter } from "react-feather";
 import IsScrolled from "../WithIsScrolled";
 import Text from "../Text";
 import Heading from "../Heading";
@@ -133,14 +133,13 @@ class Nav extends React.Component {
                         title="Appearances"
                         onClick={this.closeMenu}
                       />
-                      <MobileNavItem
+                      {/* <MobileNavItem
                         href="/audits"
                         title="Audits"
                         onClick={this.closeMenu}
-                      />
+                      /> */}
                       <MobileNavItem
                         href="https://mxstbr.blog"
-                        target="_blank"
                         onClick={this.closeMenu}
                         title={
                           <>
@@ -151,12 +150,24 @@ class Nav extends React.Component {
                           </>
                         }
                       />
+                      <MobileNavItem
+                        href="https://twitter.com/mxstbr"
+                        onClick={this.closeMenu}
+                        title={
+                          <>
+                            @mxstbr{" "}
+                            <Icon ml={1}>
+                              <Twitter size="1em" />
+                            </Icon>
+                          </>
+                        }
+                      />
                     </MobileMenu>
                   </Display>
                 </MobileOnly>
                 <Desktop>
                   <NavItem href="/appearances" title="Appearances" />
-                  <NavItem href="/audits" title="Audits" />
+                  {/* <NavItem href="/audits" title="Audits" /> */}
                   <NavItem
                     href="https://mxstbr.blog"
                     target="_blank"
