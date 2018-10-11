@@ -3,12 +3,37 @@ import styled, { css } from "styled-components";
 import { Flex, Box } from "rebass";
 import Link from "../Link";
 import Icon from "../Icon";
-import { ExternalLink as LinkExternal } from "react-feather";
+import { ExternalLink as LinkExternal, Menu, X } from "react-feather";
 import IsScrolled from "../WithIsScrolled";
 import Text from "../Text";
 import Heading from "../Heading";
 import Layout from "../Layout";
 import Logo from "./Logo";
+import { createToggle } from "../Toggle";
+
+const { Toggle, State, Display } = createToggle("mobile-menu");
+
+const MobileMenu = styled(Flex)`
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  width: 100%;
+  height: 100%;
+`;
+
+const MobileOnly = styled(Flex)`
+  display: none;
+
+  @media screen and (max-width: ${props => props.theme.breakpoints[0]}) {
+    display: flex;
+  }
+`;
+
+const Desktop = styled(Flex)`
+  @media (max-width: 700px) {
+    display: none;
+  }
+`;
 
 const NavItem = styled(props => (
   <Box mr={4} className={props.className}>
@@ -21,6 +46,16 @@ const NavItem = styled(props => (
     margin-right: 0;
   }
 `;
+
+const MobileNavItem = props => (
+  <Box p={3} onClick={props.onClick}>
+    <Link prefetch href={props.href}>
+      <Text color="#333" fontSize={4} fontWeight="bold">
+        {props.title}
+      </Text>
+    </Link>
+  </Box>
+);
 
 const Wrapper = styled(Flex).attrs({
   as: "nav"
@@ -48,6 +83,12 @@ const Wrapper = styled(Flex).attrs({
 `;
 
 class Nav extends React.Component {
+  closeMenu = () => {
+    console.log("close menu");
+    console.log(this.menu);
+    if (this.menu) this.menu.checked = false;
+  };
+
   render() {
     return (
       <IsScrolled>
@@ -59,9 +100,61 @@ class Nav extends React.Component {
                 justifyContent={["center", "space-between"]}
               >
                 <Logo />
-                <Flex
-                  css={{ "@media (max-width: 700px)": { display: "none" } }}
-                >
+                <MobileOnly css={{ position: "absolute", right: "16px" }}>
+                  <State ref={elem => (this.menu = elem)} />
+                  <Toggle>
+                    <Icon>
+                      <Menu style={{ verticalAlign: "bottom" }} />
+                    </Icon>
+                  </Toggle>
+                  <Display
+                    css={{
+                      position: "fixed",
+                      top: 0,
+                      bottom: 0,
+                      left: 0,
+                      right: 0
+                    }}
+                  >
+                    <Toggle>
+                      <Icon
+                        css={{
+                          position: "absolute",
+                          right: "16px",
+                          top: "21px"
+                        }}
+                      >
+                        <X style={{ verticalAlign: "bottom" }} />
+                      </Icon>
+                    </Toggle>
+                    <MobileMenu flexDirection="column">
+                      <MobileNavItem
+                        href="/appearances"
+                        title="Appearances"
+                        onClick={this.closeMenu}
+                      />
+                      <MobileNavItem
+                        href="/audits"
+                        title="Audits"
+                        onClick={this.closeMenu}
+                      />
+                      <MobileNavItem
+                        href="https://mxstbr.blog"
+                        target="_blank"
+                        onClick={this.closeMenu}
+                        title={
+                          <>
+                            Blog{" "}
+                            <Icon ml={1}>
+                              <LinkExternal size="1em" />
+                            </Icon>
+                          </>
+                        }
+                      />
+                    </MobileMenu>
+                  </Display>
+                </MobileOnly>
+                <Desktop>
                   <NavItem href="/appearances" title="Appearances" />
                   <NavItem href="/audits" title="Audits" />
                   <NavItem
@@ -76,7 +169,7 @@ class Nav extends React.Component {
                       </>
                     }
                   />
-                </Flex>
+                </Desktop>
               </Flex>
             </Layout>
           </Wrapper>

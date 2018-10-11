@@ -20,7 +20,8 @@ const Description = props => (
 const FinePrint = props => <Text color="#666" fontSize={1} {...props} />;
 
 const Wrapper = styled(Link).attrs({
-  m: [1, 2]
+  m: [1, 2],
+  mb: 2
 })`
   text-decoration: none;
   color: inherit;

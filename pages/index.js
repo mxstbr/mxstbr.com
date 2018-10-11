@@ -113,6 +113,7 @@ class Homepage extends React.Component {
                 key={post.id}
                 width={[1, "calc(50% - 16px)", "calc(33.3% - 16px)"]}
                 m={[1, 2]}
+                mb={2}
               >
                 <Card>
                   <Card.Title>{post.title}</Card.Title>
