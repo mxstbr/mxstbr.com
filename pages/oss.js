@@ -7,6 +7,7 @@ import { ListItem } from "../components/Lists";
 import Text from "../components/Text";
 import Paragraph from "../components/Paragraph";
 import Link from "../components/Link";
+import Head from "../components/Head";
 import Heading, { H2, H3 } from "../components/Heading";
 import OSSProject from "../components/OpenSourceProjectCard";
 import CardGrid from "../components/CardGrid";
@@ -83,6 +84,10 @@ const Table = props => (
 
 export default () => (
   <Flex flexDirection="column">
+    <Head
+      title="My Open Source Projects - Max Stoiber (@mxstbr)"
+      description="A list of most of the open source projects I've (co-) created and/or maintained."
+    />
     <H2 mb={3}>My Open Source Projects </H2>
     <Paragraph mb={3}>
       These are most of the open source projects I've (co-) created and am
