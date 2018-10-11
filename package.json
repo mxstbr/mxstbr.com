@@ -7,7 +7,8 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "export": "next build && next export"
+    "export": "next build && next export",
+    "flow": "flow"
   },
   "dependencies": {
     "@mdx-js/mdx": "^0.15.0-2",
@@ -31,7 +32,10 @@
   "devDependencies": {
     "@babel/plugin-proposal-optional-chaining": "^7.0.0-beta.55",
     "@babel/plugin-transform-react-constant-elements": "^7.0.0",
+    "@babel/preset-flow": "^7.0.0",
     "babel-plugin-styled-components": "^1.5.1",
+    "flow-bin": "^0.82.0",
+    "flow-typed": "^2.5.1",
     "husky": "^1.1.1",
     "lint-staged": "^7.3.0",
     "prettier": "^1.14.3"

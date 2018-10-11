@@ -26,7 +26,7 @@ const OpenSourceProjectTableRow = ({ project }) => (
   <>
     <Flex
       mb={[2, 0]}
-      width={[1, "200px"]}
+      width={[1, "260px"]}
       alignItems={["flex-start", "center"]}
       justifyContent={["space-between", "initial"]}
       height={1}

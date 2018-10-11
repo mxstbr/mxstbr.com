@@ -1,4 +1,4 @@
-{ 
-  "presets": ["next/babel"],
+{
+  "presets": ["next/babel", "@babel/flow"],
   "plugins": ["styled-components", "@babel/plugin-proposal-optional-chaining"]
 }
