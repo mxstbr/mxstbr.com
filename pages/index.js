@@ -46,7 +46,7 @@ class Homepage extends React.Component {
         alignItems={["center", "flex-start"]}
       >
         <Flex flexDirection="row" width={1} justifyContent="center">
-          <Flex width={0.5} flexDirection="column">
+          <Flex width={[1, 0.5]} flexDirection="column">
             <H2 alignSelf="center">Hey, I'm Max! 👋</H2>
             <Paragraph>
               I'm a JavaScript Engineer from Austria 🇦🇹 and I love React and
