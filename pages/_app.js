@@ -71,8 +71,8 @@ export default class MyApp extends App {
               image={DEFAULT_IMAGE}
             />
             <Layout
+              pt={[`${NAV_HEIGHT}px`, `${NAV_HEIGHT / 2}px`]}
               css={{
-                paddingTop: `${NAV_HEIGHT / 2}px`,
                 paddingLeft: "8px",
                 paddingRight: "8px"
               }}
