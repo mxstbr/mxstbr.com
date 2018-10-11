@@ -35,10 +35,17 @@ const Wrapper = styled(Flex).attrs({
   top: 0;
   left: 0;
   width: 100%;
-  background: #fff;
+  background: ${props => props.theme.colors.background};
   z-index: 9;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 1px 4px 0px;
   overflow-y: scroll;
+  transition: background 250ms ease-in-out, box-shadow 250ms ease-in-out;
+
+  ${props =>
+    props.isScrolled &&
+    css`
+      background: #fff;
+      box-shadow: rgba(0, 0, 0, 0.15) 0px 1px 4px 0px;
+    `};
 `;
 
 class Nav extends React.Component {
@@ -46,7 +53,7 @@ class Nav extends React.Component {
     return (
       <IsScrolled>
         {({ isScrolled }) => (
-          <Wrapper py={3}>
+          <Wrapper isScrolled={isScrolled} py={3}>
             <Layout py={1} width={1}>
               <Flex
                 alignItems="center"

@@ -19,6 +19,7 @@ const theme = {
   colors: {
     primary: colors.blue,
     text: colors.black,
+    background: "rgb(246, 247, 248)",
     secondaryText: colors.greys[4],
     ...colors
   },
@@ -44,7 +45,7 @@ const GlobalStyle = createGlobalStyle`
   ${reset}
 
   body {
-    background-color: rgb(246, 247, 248);
+    background-color: ${props => props.theme.colors.background};
     margin: 0;
   }
 `;
@@ -71,7 +72,7 @@ export default class MyApp extends App {
             />
             <Layout
               css={{
-                paddingTop: `${NAV_HEIGHT}px`,
+                paddingTop: `${NAV_HEIGHT / 2}px`,
                 paddingLeft: "8px",
                 paddingRight: "8px"
               }}
