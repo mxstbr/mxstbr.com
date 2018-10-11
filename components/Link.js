@@ -16,7 +16,11 @@ const UniversalLink = props => {
         </NextLink>
       )}
     >
-      <Link target={external ? "_blank" : undefined} {...props} />
+      <Link
+        target={external ? "_blank" : undefined}
+        rel={external ? "noopener" : undefined}
+        {...props}
+      />
     </ConditionalWrap>
   );
 };
