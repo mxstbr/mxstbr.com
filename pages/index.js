@@ -3,6 +3,7 @@ import timeout from "p-timeout";
 import { Flex, Box } from "rebass";
 import { ExternalLink as LinkExternal, ChevronRight } from "react-feather";
 import ConditionalWrap from "conditional-wrap";
+import { parse, format } from "date-fns";
 import Link from "../components/Link";
 import Icon from "../components/Icon";
 import { H2 } from "../components/Heading";
@@ -108,7 +109,7 @@ class Homepage extends React.Component {
         <CardGrid>
           {posts.slice(0, 3).map((post, i) => {
             const external = post["_external-site"];
-            const date = new Date(post.date_published);
+            const date = parse(post.date_published);
             return (
               <Link
                 href={post.url}
@@ -123,7 +124,7 @@ class Homepage extends React.Component {
                     {post.summary}
                   </Card.Body>
                   <Card.FinePrint>
-                    {date.getDate()}.{date.getMonth() + 1}.{date.getFullYear()}
+                    {format(date, "Do MMM")}
                     {` on `}
                     {!!external ? `the ${external}` : `mxstbr.blog`}
                     {!!external && (
