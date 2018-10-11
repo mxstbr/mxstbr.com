@@ -94,9 +94,9 @@ export default () => (
         .filter(p => p.active !== false)
         .sort((a, b) => b.stars - a.stars)}
     />
-    <H3 my={null} mt={4} mb={3}>
+    <H2 my={null} mt={4} mb={3} fontSize={3}>
       Past Open Source Projects
-    </H3>
+    </H2>
     <Paragraph mb={3}>
       I used to work on these projects, but am either no longer involved with
       them or they are archived.
