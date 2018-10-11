@@ -19,7 +19,6 @@ import { TextButton } from "../components/Button";
 import Image from "../components/Image";
 import appearances from "../appearances";
 import projects from "../open-source-projects";
-import formatDate from "../utils/format-date";
 
 const ViewMoreLink = props => (
   <Box mt={4}>
