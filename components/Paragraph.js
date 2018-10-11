@@ -15,6 +15,6 @@ const Wrapper = styled(Box)`
 
 export default props => (
   <Wrapper>
-    <Text {...props} mb={2} fontSize={2} lineHeight={1.7} />
+    <Text {...props} color="#333" mb={3} fontSize="18px" lineHeight={1.6} />
   </Wrapper>
 );

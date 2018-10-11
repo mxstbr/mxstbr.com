@@ -15,6 +15,7 @@ import Card from "../components/Card";
 import AppearancesList from "../components/AppearancesList";
 import RestrictHeight from "../components/RestrictHeight";
 import { TextButton } from "../components/Button";
+import Image from "../components/Image";
 import appearances from "../appearances";
 import formatDate from "../utils/format-date";
 
@@ -43,23 +44,30 @@ class Homepage extends React.Component {
         flexDirection="column"
         alignItems={["center", "flex-start"]}
       >
-        <H2 mt={4}>Hey, I'm Max! 👋</H2>
-        <Paragraph>
-          I'm a JavaScript Engineer from Austria 🇦🇹 (no kangaroos in Austria!)
-          and I love React and Node. I'm the technical co-founder of{" "}
-          <Link href="https://spectrum.chat">Spectrum</Link>, where we're making
-          it easier to grow communities around open source projects.
-        </Paragraph>
-        <Paragraph>
-          If I'm not coding or{" "}
-          <Link href="https://twitter.com/mxstbr">tweeting</Link>, I'm likely
-          brewing coffee on my espresso machine (I'm a huge{" "}
-          <Link href="https://github.com/mxstbr/ama/issues/46">
-            speciality coffee geek
-          </Link>
-          ), exploring the world or skiing. My drug of choice? Fresh, white
-          powder. 🤙
-        </Paragraph>
+        <Flex flexDirection="row" width={1} justifyContent="center">
+          <Flex width={0.5} flexDirection="column">
+            <H2 alignSelf="center" mb={4}>
+              Hey, I'm Max! 👋
+            </H2>
+            <Paragraph>
+              I'm a JavaScript Engineer from Austria 🇦🇹 (no kangaroos in
+              Austria!) and I love React and Node. I'm the technical co-founder
+              of <Link href="https://spectrum.chat">Spectrum</Link>, where we're
+              making it easier to start, grow and nurture large online
+              communities.
+            </Paragraph>
+            <Paragraph>
+              If I'm not coding or{" "}
+              <Link href="https://twitter.com/mxstbr">tweeting</Link>, I'm
+              likely brewing coffee on my espresso machine (I'm a huge{" "}
+              <Link href="https://github.com/mxstbr/ama/issues/46">
+                speciality coffee geek
+              </Link>
+              ), exploring the world or skiing. My drug of choice? Fresh, white
+              powder. 🤙
+            </Paragraph>
+          </Flex>
+        </Flex>
         <H2>My Open Source Projects</H2>
         <CardGrid>
           <OSSProject

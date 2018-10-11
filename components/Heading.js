@@ -1,4 +1,5 @@
 import { Heading } from "rebass";
+import slug from "slugg";
 
 const BaseHeading = props => (
   <>
@@ -11,9 +12,7 @@ const BaseHeading = props => (
           display: "block",
           position: "absolute"
         }}
-        id={String(props.children)
-          .toLowerCase()
-          .replace(/\s/g, "-")}
+        id={slug(props.children)}
       />
     )}
     <Heading
