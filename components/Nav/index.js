@@ -56,7 +56,6 @@ class Nav extends React.Component {
                 <Flex
                   css={{ "@media (max-width: 700px)": { display: "none" } }}
                 >
-                  <NavItem href="/about" title="About" />
                   <NavItem href="/appearances" title="Appearances" />
                   <NavItem href="/audits" title="Audits" />
                   <NavItem
