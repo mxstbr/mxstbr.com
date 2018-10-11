@@ -14,6 +14,6 @@ const Wrapper = styled(Box)`
 
 export default props => (
   <Wrapper centered={props.centered}>
-    <Text {...props} color="#333" mb={3} fontSize="18px" lineHeight={1.6} />
+    <Text color="#333" mb={3} fontSize="18px" lineHeight={1.6} {...props} />
   </Wrapper>
 );

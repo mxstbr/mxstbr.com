@@ -84,7 +84,7 @@ const Table = props => (
 export default () => (
   <Flex flexDirection="column">
     <H2 mb={3}>My Open Source Projects </H2>
-    <Paragraph>
+    <Paragraph mb={3}>
       These are most of the open source projects I've (co-) created and am
       somewhat actively involved in or using. For the full list visit{" "}
       <Link href="https://github.com/mxstbr">my GitHub profile (@mxstbr)</Link>.
@@ -94,10 +94,10 @@ export default () => (
         .filter(p => p.active !== false)
         .sort((a, b) => b.stars - a.stars)}
     />
-    <H3 my={null} mt={4} mb={2}>
+    <H3 my={null} mt={4} mb={3}>
       Past Open Source Projects
     </H3>
-    <Paragraph>
+    <Paragraph mb={3}>
       I used to work on these projects, but am either no longer involved with
       them or they are archived.
     </Paragraph>
