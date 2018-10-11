@@ -47,9 +47,7 @@ class Homepage extends React.Component {
       >
         <Flex flexDirection="row" width={1} justifyContent="center">
           <Flex width={0.5} flexDirection="column">
-            <H2 alignSelf="center" mb={4}>
-              Hey, I'm Max! 👋
-            </H2>
+            <H2 alignSelf="center">Hey, I'm Max! 👋</H2>
             <Paragraph>
               I'm a JavaScript Engineer from Austria 🇦🇹 and I love React and
               Node. I'm the technical co-founder of{" "}

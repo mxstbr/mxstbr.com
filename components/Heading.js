@@ -25,7 +25,7 @@ const BaseHeading = props => (
 );
 
 const H2 = props => (
-  <BaseHeading fontSize={5} as="h2" mb={3} mt={5} {...props} />
+  <BaseHeading fontSize={5} as="h2" mb={4} mt={5} {...props} />
 );
 const H3 = props => <BaseHeading fontSize={3} as="h3" my={1} {...props} />;
 
