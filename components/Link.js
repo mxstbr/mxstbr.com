@@ -30,6 +30,6 @@ export default styled(UniversalLink)`
   color: inherit;
 
   &:hover {
-    text-decoration: underline;
+    text-decoration: ${props => props.underline !== false && "underline"};
   }
 `;
