@@ -1,7 +1,7 @@
 import React from "react";
 import styled, { css } from "styled-components";
-import { Flex, Box, Link } from "rebass";
-import NextLink from "next/link";
+import { Flex, Box } from "rebass";
+import Link from "../Link";
 import Icon from "../Icon";
 import { ExternalLink as LinkExternal } from "react-feather";
 import IsScrolled from "../WithIsScrolled";
@@ -12,15 +12,9 @@ import Logo from "./Logo";
 
 const NavItem = styled(props => (
   <Box mr={4} className={props.className}>
-    <NextLink prefetch href={props.href}>
-      <Link
-        href={props.href}
-        css={{ textDecoration: "none", color: "inherit" }}
-        target={props.target}
-      >
-        <Text color="#666">{props.title}</Text>
-      </Link>
-    </NextLink>
+    <Link prefetch href={props.href}>
+      <Text color="#666">{props.title}</Text>
+    </Link>
   </Box>
 ))`
   &:last-of-type {
