@@ -93,84 +93,84 @@ class Nav extends React.Component {
     return (
       <IsScrolled>
         {({ isScrolled }) => (
-          <Wrapper isScrolled={isScrolled} py={3}>
-            <Layout py={1} width={1}>
-              <Flex
-                alignItems="center"
-                justifyContent={["center", "space-between"]}
+          <>
+            <Wrapper isScrolled={isScrolled} py={3}>
+              <Layout py={1} width={1}>
+                <Flex
+                  alignItems="center"
+                  justifyContent={["center", "space-between"]}
+                >
+                  <Logo />
+                  <Desktop>
+                    <NavItem href="/appearances" title="Appearances" />
+                    {/* <NavItem href="/audits" title="Audits" /> */}
+                    <NavItem
+                      href="https://mxstbr.blog"
+                      target="_blank"
+                      title={
+                        <>
+                          Blog{" "}
+                          <Icon ml={1}>
+                            <LinkExternal size="1em" />
+                          </Icon>
+                        </>
+                      }
+                    />
+                  </Desktop>
+                </Flex>
+              </Layout>
+            </Wrapper>
+            <MobileOnly
+              css={{
+                position: "fixed",
+                top: "21px",
+                right: "16px",
+                zIndex: 10
+              }}
+            >
+              <Toggle>
+                <Icon>
+                  <Menu style={{ verticalAlign: "bottom" }} />
+                </Icon>
+              </Toggle>
+            </MobileOnly>
+            <MobileOnly>
+              <State ref={elem => (this.menu = elem)} />
+              <Display
+                css={{
+                  position: "fixed",
+                  top: 0,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  zIndex: 11
+                }}
               >
-                <Logo />
-                <MobileOnly css={{ position: "absolute", right: "16px" }}>
-                  <State ref={elem => (this.menu = elem)} />
-                  <Toggle>
-                    <Icon>
-                      <Menu style={{ verticalAlign: "bottom" }} />
-                    </Icon>
-                  </Toggle>
-                  <Display
+                <Toggle>
+                  <Icon
                     css={{
-                      position: "fixed",
-                      top: 0,
-                      bottom: 0,
-                      left: 0,
-                      right: 0
+                      position: "absolute",
+                      right: "16px",
+                      top: "21px"
                     }}
                   >
-                    <Toggle>
-                      <Icon
-                        css={{
-                          position: "absolute",
-                          right: "16px",
-                          top: "21px"
-                        }}
-                      >
-                        <X style={{ verticalAlign: "bottom" }} />
-                      </Icon>
-                    </Toggle>
-                    <MobileMenu flexDirection="column">
-                      <MobileNavItem
-                        href="/appearances"
-                        title="Appearances"
-                        onClick={this.closeMenu}
-                      />
-                      {/* <MobileNavItem
-                        href="/audits"
-                        title="Audits"
-                        onClick={this.closeMenu}
-                      /> */}
-                      <MobileNavItem
-                        href="https://mxstbr.blog"
-                        onClick={this.closeMenu}
-                        title={
-                          <>
-                            Blog{" "}
-                            <Icon ml={1}>
-                              <LinkExternal size="1em" />
-                            </Icon>
-                          </>
-                        }
-                      />
-                      <MobileNavItem
-                        href="https://twitter.com/mxstbr"
-                        onClick={this.closeMenu}
-                        title={
-                          <>
-                            @mxstbr{" "}
-                            <Icon ml={1}>
-                              <Twitter size="1em" />
-                            </Icon>
-                          </>
-                        }
-                      />
-                    </MobileMenu>
-                  </Display>
-                </MobileOnly>
-                <Desktop>
-                  <NavItem href="/appearances" title="Appearances" />
-                  {/* <NavItem href="/audits" title="Audits" /> */}
-                  <NavItem
+                    <X style={{ verticalAlign: "bottom" }} />
+                  </Icon>
+                </Toggle>
+                <MobileMenu flexDirection="column">
+                  <MobileNavItem
+                    href="/appearances"
+                    title="Appearances"
+                    onClick={this.closeMenu}
+                  />
+                  {/* <MobileNavItem
+                          href="/audits"
+                          title="Audits"
+                          onClick={this.closeMenu}
+                        /> */}
+                  <MobileNavItem
                     href="https://mxstbr.blog"
-                    target="_blank"
+                    onClick={this.closeMenu}
                     title={
                       <>
                         Blog{" "}
@@ -180,10 +180,22 @@ class Nav extends React.Component {
                       </>
                     }
                   />
-                </Desktop>
-              </Flex>
-            </Layout>
-          </Wrapper>
+                  <MobileNavItem
+                    href="https://twitter.com/mxstbr"
+                    onClick={this.closeMenu}
+                    title={
+                      <>
+                        @mxstbr{" "}
+                        <Icon ml={1}>
+                          <Twitter size="1em" />
+                        </Icon>
+                      </>
+                    }
+                  />
+                </MobileMenu>
+              </Display>
+            </MobileOnly>
+          </>
         )}
       </IsScrolled>
     );
