@@ -17,6 +17,8 @@ import Heading, { H2, H3 } from "../components/Heading";
 import OSSProject from "../components/OpenSourceProjectCard";
 import CardGrid from "../components/CardGrid";
 import BoxShadow from "../components/BoxShadow";
+import Main from "../components/Main";
+import PageHeader from "../components/PageHeader";
 
 const Row = styled(Flex)`
   &:hover ${RebassHeading} {
@@ -105,17 +107,24 @@ const Table = props => (
 );
 
 export default () => (
-  <Flex flexDirection="column">
+  <Main>
     <Head
       title="My Open Source Projects - Max Stoiber (@mxstbr)"
       description="A list of most of the open source projects I've (co-) created and/or maintained."
     />
-    <H2 mb={3}>My Open Source Projects </H2>
-    <Paragraph mb={3}>
-      These are most of the open source projects I've (co-) created and am
-      somewhat actively involved in or using. For the full list visit{" "}
-      <Link href="https://github.com/mxstbr">my GitHub profile (@mxstbr)</Link>.
-    </Paragraph>
+    <PageHeader>
+      <H2 alignSelf="center" mt={[4, 5]}>
+        My Open Source Projects{" "}
+      </H2>
+      <Paragraph centered>
+        These are most of the open source projects I've (co-) created and am
+        somewhat actively involved in or using. For the full list visit{" "}
+        <Link href="https://github.com/mxstbr">
+          my GitHub profile (@mxstbr)
+        </Link>
+        .
+      </Paragraph>
+    </PageHeader>
     <Table
       projects={projects
         .filter(p => p.active !== false)
@@ -133,5 +142,5 @@ export default () => (
         .filter(p => p.active === false)
         .sort((a, b) => b.stars - a.stars)}
     />
-  </Flex>
+  </Main>
 );

@@ -17,6 +17,9 @@ import AppearancesList from "../components/AppearancesList";
 import RestrictHeight from "../components/RestrictHeight";
 import { TextButton } from "../components/Button";
 import Image from "../components/Image";
+import Main from "../components/Main";
+import PageHeader from "../components/PageHeader";
+
 import appearances from "../appearances";
 import projects from "../open-source-projects";
 
@@ -40,35 +43,29 @@ class Homepage extends React.Component {
     const { posts } = this.props;
 
     return (
-      <Flex
-        as="main"
-        flexDirection="column"
-        alignItems={["center", "flex-start"]}
-      >
-        <Flex flexDirection="row" width={1} justifyContent="center">
-          <Flex width={[1, 1, 0.5]} flexDirection="column">
-            <H2 alignSelf="center" mt={[4, 5]}>
-              Hey, I'm Max! 👋
-            </H2>
-            <Paragraph centered>
-              I'm a JavaScript Engineer from Austria 🇦🇹 and I love React and
-              Node. I'm the technical co-founder of{" "}
-              <Link href="https://spectrum.chat">Spectrum</Link>, where we're
-              making it easier to start, grow and nurture large online
-              communities.
-            </Paragraph>
-            <Paragraph centered>
-              If I'm not coding or{" "}
-              <Link href="https://twitter.com/mxstbr">tweeting</Link>, I'm
-              likely brewing coffee on my espresso machine (I'm a huge{" "}
-              <Link href="https://github.com/mxstbr/ama/issues/46">
-                speciality coffee geek
-              </Link>
-              ), exploring the world or skiing. My drug of choice? Fresh, white
-              powder. 🤙
-            </Paragraph>
-          </Flex>
-        </Flex>
+      <Main>
+        <PageHeader>
+          <H2 alignSelf="center" mt={[4, 5]}>
+            Hey, I'm Max! 👋
+          </H2>
+          <Paragraph centered>
+            I'm a JavaScript Engineer from Austria 🇦🇹 and I love React and Node.
+            I'm the technical co-founder of{" "}
+            <Link href="https://spectrum.chat">Spectrum</Link>, where we're
+            making it easier to start, grow and nurture large online
+            communities.
+          </Paragraph>
+          <Paragraph centered>
+            If I'm not coding or{" "}
+            <Link href="https://twitter.com/mxstbr">tweeting</Link>, I'm likely
+            brewing coffee on my espresso machine (I'm a huge{" "}
+            <Link href="https://github.com/mxstbr/ama/issues/46">
+              speciality coffee geek
+            </Link>
+            ), exploring the world or skiing. My drug of choice? Fresh, white
+            powder. 🤙
+          </Paragraph>
+        </PageHeader>
         <H2>Featured Open Source Projects</H2>
         <CardGrid>
           {projects.filter(project => project.featured).map(project => (
@@ -143,7 +140,7 @@ class Homepage extends React.Component {
             <ChevronRight size="1em" />
           </Icon>
         </ViewMoreLink>
-      </Flex>
+      </Main>
     );
   }
 }
