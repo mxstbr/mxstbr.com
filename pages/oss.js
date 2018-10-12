@@ -1,6 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 import { Flex } from "rebass";
+import { Star } from "react-feather";
+import Icon from "../components/Icon";
 import Text from "../components/Text";
 import Paragraph from "../components/Paragraph";
 import Link from "../components/Link";
@@ -13,6 +15,12 @@ import MobileOnly from "../components/MobileOnly";
 import DesktopOnly from "../components/DesktopOnly";
 
 import projects from "../open-source-projects";
+
+const StarIcon = props => (
+  <Icon css={{ verticalAlign: "text-bottom" }} ml={1}>
+    <Star size="1em" />
+  </Icon>
+);
 
 const OpenSourceProjectTableRow = ({ project }) => (
   <>
@@ -29,13 +37,13 @@ const OpenSourceProjectTableRow = ({ project }) => (
       <MobileOnly>
         <Text color="#666" mt="6px" fontSize={1} ml="1em">
           {project.stars.toLocaleString()}
-          &nbsp;★
+          <StarIcon />
         </Text>
       </MobileOnly>
     </Flex>
     <Flex
       alignItems={["flex-start", "center"]}
-      width={[1, 0.75]}
+      width={[1, 0.74]}
       px={[0, 3]}
       mb={[2, 0]}
     >
@@ -44,12 +52,12 @@ const OpenSourceProjectTableRow = ({ project }) => (
     <Flex
       alignItems="center"
       justifyContent={["flex-start", "flex-end"]}
-      width={[1, 0.06]}
+      width={[1, 0.07]}
     >
       <DesktopOnly>
         <Text color="#666" fontSize={1}>
           {project.stars.toLocaleString()}
-          &nbsp;★
+          <StarIcon />
         </Text>
       </DesktopOnly>
     </Flex>
@@ -67,12 +75,10 @@ export default () => (
         My Open Source Projects{" "}
       </H2>
       <Paragraph centered>
-        These are most of the open source projects I've (co-) created and am
-        somewhat actively involved in or using. For the full list visit{" "}
-        <Link href="https://github.com/mxstbr">
-          my GitHub profile (@mxstbr)
-        </Link>
-        .
+        These are all the open source projects I've (co-) created and am
+        actively maintaining or using. (see{" "}
+        <Link href="https://github.com/mxstbr">my GitHub profile</Link> for all
+        contributions)
       </Paragraph>
     </PageHeader>
     <Table
@@ -86,12 +92,12 @@ export default () => (
         }))}
       render={row => <OpenSourceProjectTableRow project={row} />}
     />
-    <Text color="#666" mt={3} fontSize={2}>
+    <Text color="#666" mt={4} fontSize={2}>
       Total:{" "}
       {projects
         .filter(p => p.active !== false)
         .reduce((total, { stars }) => total + stars, 0)}
-      &nbsp;★
+      <StarIcon />
     </Text>
     <H2 my={null} mt={4} mb={3} fontSize={3}>
       Past Open Source Projects

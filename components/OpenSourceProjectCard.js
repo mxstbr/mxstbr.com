@@ -8,11 +8,18 @@ import {
   Text as RebassText,
   Heading as RebassHeading
 } from "rebass";
+import { Star } from "react-feather";
+import Icon from "./Icon";
 import Card from "./Card";
 import { H3 } from "./Heading";
 import Text from "./Text";
 import { getGitHubRepo } from "../helpers/github-api";
 
+const StarIcon = props => (
+  <Icon css={{ verticalAlign: "text-bottom" }} ml={1}>
+    <Star size="1em" />
+  </Icon>
+);
 const Title = props => <H3 {...props} lineHeight={1} my={0} />;
 const Description = props => (
   <Text color="#666" fontSize={2} lineHeight={1.25} {...props} mb={4} mt={2} />
@@ -87,9 +94,9 @@ class OpenSourceProjectCard extends React.Component {
             <Box>{children}</Box>
             <Flex justifyContent="space-between">
               <FinePrint>{repo}</FinePrint>
-              <FinePrint>
+              <FinePrint width="5em" textAlign="right">
                 {(stateStars || stars).toLocaleString("en")}
-                &nbsp;★
+                <StarIcon />
               </FinePrint>
             </Flex>
           </Flex>
