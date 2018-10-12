@@ -6,14 +6,14 @@ import Heading from "./Heading";
 import { ListItem } from "./Lists";
 
 import Icon from "./Icon";
-import { Radio, Mic, Monitor, Terminal, Users, Award } from "react-feather";
+import { Radio, Mic, Terminal, Award, Film, Zap } from "react-feather";
 
 const ICONS = {
   podcast: Mic,
   interview: Radio,
-  conference: Monitor,
+  talk: Film,
+  "lightning-talk": Zap,
   workshop: Terminal,
-  meetup: Users,
   award: Award
 };
 

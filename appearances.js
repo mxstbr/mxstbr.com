@@ -4,7 +4,7 @@ module.exports = [
     site: "AgentConf",
     date: new Date(2017, 0),
     city: "Dornbirn, Austria",
-    type: "conference",
+    type: "talk",
     link: "https://www.agent.sh/"
   },
   {
@@ -12,7 +12,7 @@ module.exports = [
     site: "ViennaJS",
     date: new Date(2015, 7),
     city: "Vienna, Austria",
-    type: "meetup",
+    type: "talk",
     link: "https://www.youtube.com/watch?v=TGwjgmAqNRo"
   },
   {
@@ -20,7 +20,7 @@ module.exports = [
     site: "ViennaJS",
     date: new Date(2015, 9),
     city: "Vienna, Austria",
-    type: "meetup",
+    type: "talk",
     link: "https://www.youtube.com/watch?v=-_gIKdHYP3E"
   },
   {
@@ -28,7 +28,7 @@ module.exports = [
     site: "ReactVienna",
     date: new Date(2016, 0),
     city: "Vienna, Austria",
-    type: "meetup",
+    type: "talk",
     link: "https://speakerdeck.com/mxstbr/testing-react-dot-js-applications"
   },
   {
@@ -36,7 +36,7 @@ module.exports = [
     site: "ViennaJS",
     date: new Date(2016, 0),
     city: "Vienna, Austria",
-    type: "meetup",
+    type: "talk",
     link: "https://www.elastic.co/videos/exploring-es6-by-max-stoiber"
   },
   {
@@ -103,7 +103,7 @@ module.exports = [
     site: "JSConf Belgium",
     city: "Bruges, Belgium",
     link: "https://speakerdeck.com/mxstbr/offline-is-the-new-black",
-    type: "conference",
+    type: "talk",
     date: new Date(2016, 4, 1)
   },
   {
@@ -111,7 +111,7 @@ module.exports = [
     site: "At The Frontend",
     city: "Copenhagen, Denmark",
     link: "https://vimeo.com/168648012",
-    type: "conference",
+    type: "talk",
     date: new Date(2016, 4, 21)
   },
   {
@@ -119,7 +119,7 @@ module.exports = [
     site: "React Europe with Nik Graf",
     city: "Paris, France",
     link: "https://www.youtube.com/watch?v=0IkWuXeKPV0",
-    type: "conference",
+    type: "talk",
     date: new Date(2016, 6)
   },
   {
@@ -127,7 +127,7 @@ module.exports = [
     site: "NDC Oslo",
     city: "Oslo, Norway",
     link: "https://vimeo.com/171317290",
-    type: "conference",
+    type: "talk",
     date: new Date(2016, 5, 1)
   },
   {
@@ -135,7 +135,7 @@ module.exports = [
     site: "PolyConf",
     city: "Poznan, Poland",
     link: "https://www.youtube.com/watch?v=iNNiqWZtUHg",
-    type: "conference",
+    type: "talk",
     date: new Date(2016, 5, 20)
   },
   {
@@ -143,7 +143,7 @@ module.exports = [
     site: "RuhrJS",
     city: "Bochum, Germany",
     link: "https://www.youtube.com/watch?v=52Vt8Fg3ZPY",
-    type: "conference",
+    type: "talk",
     date: new Date(2016, 6)
   },
   {
@@ -151,7 +151,7 @@ module.exports = [
     site: "Frontend Conf Zurich",
     city: "Zurich, Switzerland",
     link: "https://vimeo.com/181328887",
-    type: "conference",
+    type: "talk",
     date: new Date(2016, 7)
   },
   {
@@ -160,7 +160,7 @@ module.exports = [
     city: "Washington DC, USA",
     link:
       "https://speakerdeck.com/mxstbr/scaling-react-dot-js-applications-short-version",
-    type: "conference",
+    type: "talk",
     date: new Date(2016, 8)
   },
   {
@@ -168,7 +168,7 @@ module.exports = [
     site: "ReactNL",
     city: "Amsterdam, Netherlands",
     link: "https://www.youtube.com/watch?v=19gqsBc_Cx0",
-    type: "conference",
+    type: "talk",
     date: new Date(2016, 9, 1)
   },
   {
@@ -176,7 +176,7 @@ module.exports = [
     site: "VoxxedDays",
     city: "Thessaloniki, Greece",
     link: "https://www.youtube.com/watch?v=KjEmJqJgBCI",
-    type: "conference",
+    type: "talk",
     date: new Date(2016, 9, 5)
   },
   {
@@ -184,7 +184,7 @@ module.exports = [
     site: "ReactiveConf",
     city: "Bratislava, Slovakia",
     link: "https://www.youtube.com/watch?v=jaqDA7Btm3c",
-    type: "conference",
+    type: "talk",
     date: new Date(2016, 9, 10)
   },
   {
@@ -192,7 +192,7 @@ module.exports = [
     site: "NewStore Tech Talks",
     city: "Berlin, Germany",
     link: "https://www.youtube.com/watch?v=59Ndb3YkLKA",
-    type: "conference",
+    type: "talk",
     date: new Date(2016, 10, 1)
   },
   {
@@ -200,7 +200,7 @@ module.exports = [
     site: "Topconf Tallinn",
     city: "Tallinn, Estonia",
     link: "https://www.youtube.com/watch?v=6LMnV_NyxuM",
-    type: "conference",
+    type: "talk",
     date: new Date(2016, 10, 2)
   },
   {
@@ -208,7 +208,7 @@ module.exports = [
     site: "Topconf Tallinn",
     city: "Tallinn, Estonia",
     link: "https://www.youtube.com/watch?v=iV-_aGb6Ms8",
-    type: "conference",
+    type: "talk",
     date: new Date(2016, 10, 3)
   },
   {
@@ -216,7 +216,7 @@ module.exports = [
     site: "HolyJS",
     city: "Moskow, Russia",
     link: "https://www.youtube.com/watch?v=pjr6VJdDcHQ",
-    type: "conference",
+    type: "talk",
     date: new Date(2016, 11, 1)
   },
   {
@@ -225,7 +225,7 @@ module.exports = [
     city: "Darmstadt, Germany",
     link:
       "https://channel9.msdn.com/Events/microsoft-techncial-summit/Technical-Summit-2016/Introduction-to-Reactjs",
-    type: "conference",
+    type: "talk",
     date: new Date(2016, 11, 2)
   },
   {
@@ -239,7 +239,7 @@ module.exports = [
   {
     title: "Road to styled-components",
     site: "ReactLondon",
-    type: "conference",
+    type: "talk",
     city: "London, UK",
     link: "https://www.youtube.com/watch?v=2j9rSur_mnk",
     date: new Date(2017, 2, 2)
@@ -247,7 +247,7 @@ module.exports = [
   {
     title: "Styling React.js Applications",
     site: "ReactAmsterdam",
-    type: "conference",
+    type: "talk",
     city: "Amsterdam, Netherlands",
     link: "https://www.youtube.com/watch?v=bIK2NwoK9xk",
     date: new Date(2017, 3, 1)
@@ -262,7 +262,7 @@ module.exports = [
   {
     title: "I want you to contribute to open source",
     site: "ReactRally",
-    type: "conference",
+    type: "talk",
     city: "Salt Lake City, Utah, USA",
     link: "https://www.youtube.com/watch?v=hwdeUG_gySI",
     date: new Date(2017, 7)
@@ -270,7 +270,7 @@ module.exports = [
   {
     title: "The road to styled-components",
     site: "ReactConf",
-    type: "conference",
+    type: "lightning-talk",
     city: "San Jose, California, USA",
     link: "https://www.youtube.com/watch?v=jjN2yURa_uM",
     date: new Date(2017, 2)
@@ -287,15 +287,15 @@ module.exports = [
     title: "From CSS preprocessors to styled-components",
     site: "Reactivate London",
     city: "London, UK",
-    type: "meetup",
+    type: "talk",
     link:
-      "https://pusher.com/sessions/meetup/reactivate-london/from-css-preprocessors-to-styled-components",
+      "https://pusher.com/sessions/talk/reactivate-london/from-css-preprocessors-to-styled-components",
     date: new Date(2017, 2, 1)
   },
   {
     title: "styled-components",
     site: ".concat()",
-    type: "conference",
+    type: "talk",
     city: "Salzburg, Austria",
     link: "https://www.youtube.com/watch?v=1AuEnDiuRs4",
     date: new Date(2018, 2)
@@ -304,7 +304,7 @@ module.exports = [
     title: "The road to styled-components",
     site: "WeAreDevelopers",
     city: "Vienna, Austria",
-    type: "conference",
+    type: "talk",
     link: "https://www.youtube.com/watch?v=BkgU_-KGK9w",
     date: new Date(2018, 4)
   },
@@ -312,7 +312,7 @@ module.exports = [
     title: "I want you to contribute to open source",
     site: "AgentConf",
     city: "Dornbirn, Austria",
-    type: "conference",
+    type: "talk",
     link: "https://www.youtube.com/watch?v=PUPEptN5MtM",
     date: new Date(2018, 0)
   },
