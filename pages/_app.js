@@ -1,4 +1,4 @@
-import React from "react";
+import React, { StrictMode } from "react";
 import App, { Container } from "next/app";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
 import reset from "styled-reset";
@@ -61,29 +61,32 @@ export default class MyApp extends App {
   render() {
     const { Component, pageProps } = this.props;
     return (
-      <Container>
-        <ThemeProvider theme={theme}>
-          <>
-            <Nav />
-            <Head
-              title={DEFAULT_TITLE}
-              description={DEFAULT_DESCRIPTION}
-              image={DEFAULT_IMAGE}
-            />
-            <Layout
-              pt={[`${NAV_HEIGHT}px`, `${NAV_HEIGHT / 2}px`]}
-              css={{
-                paddingLeft: "8px",
-                paddingRight: "8px"
-              }}
-            >
-              <GlobalStyle />
-              <Component {...pageProps} />
-            </Layout>
-            <Footer />
-          </>
-        </ThemeProvider>
-      </Container>
+      <StrictMode>
+        {" "}
+        <Container>
+          <ThemeProvider theme={theme}>
+            <>
+              <Nav />
+              <Head
+                title={DEFAULT_TITLE}
+                description={DEFAULT_DESCRIPTION}
+                image={DEFAULT_IMAGE}
+              />
+              <Layout
+                pt={[`${NAV_HEIGHT}px`, `${NAV_HEIGHT / 2}px`]}
+                css={{
+                  paddingLeft: "8px",
+                  paddingRight: "8px"
+                }}
+              >
+                <GlobalStyle />
+                <Component {...pageProps} />
+              </Layout>
+              <Footer />
+            </>
+          </ThemeProvider>
+        </Container>
+      </StrictMode>
     );
   }
 }
