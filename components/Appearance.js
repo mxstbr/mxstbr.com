@@ -6,14 +6,15 @@ import Heading from "./Heading";
 import { ListItem } from "./Lists";
 
 import Icon from "./Icon";
-import { Radio, Mic, Monitor, Terminal, Users } from "react-feather";
+import { Radio, Mic, Monitor, Terminal, Users, Award } from "react-feather";
 
 const ICONS = {
   podcast: Mic,
   interview: Radio,
   conference: Monitor,
   workshop: Terminal,
-  meetup: Users
+  meetup: Users,
+  award: Award
 };
 
 const Wrapper = styled(ListItem)`

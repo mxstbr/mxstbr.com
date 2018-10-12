@@ -60,13 +60,13 @@ class Homepage extends React.Component {
             <Link href="https://twitter.com/mxstbr">tweeting</Link>, I'm likely
             brewing coffee on my espresso machine (I'm a huge{" "}
             <Link href="https://github.com/mxstbr/ama/issues/46">
-              speciality coffee geek
+              specialty coffee geek
             </Link>
             ), exploring the world or skiing. My drug of choice? Fresh, white
             powder. 🤙
           </Paragraph>
         </PageHeader>
-        <H2>Featured Open Source Projects</H2>
+        <H2 mt={3}>Featured Open Source Projects</H2>
         <CardGrid>
           {projects.filter(project => project.featured).map(project => (
             <OSSProject

@@ -16,14 +16,15 @@ export default () => (
         My Appearances
       </H2>
       <Paragraph centered>
-        These are all the talks I've given, podcasts I've recorded, meetups I've
-        spoken at and interviews I've been a part of of the past couple years.
+        These are all the talks I've given, podcasts I've recorded, awards I've
+        gotten, meetups I've spoken at and interviews I've been a part of of the
+        past couple years.
       </Paragraph>
     </PageHeader>
     <SmallLayout m="0 auto">
       <Head
         title="My Appearances - Max Stoiber (@mxstbr)"
-        description="All my talks, podcasts and interviews of the past couple years in one place."
+        description="All my talks, podcasts, awards and interviews of the past couple years in one place."
       />
       <AppearancesList appearances={appearances} />
     </SmallLayout>

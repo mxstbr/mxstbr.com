@@ -315,5 +315,12 @@ module.exports = [
     type: "conference",
     link: "https://www.youtube.com/watch?v=PUPEptN5MtM",
     date: new Date(2018, 0)
+  },
+  {
+    title: "30 Under 30",
+    site: "Forbes Austria",
+    type: "award",
+    link: "https://www.forbes.at/artikel/maximilian-stoiber.html",
+    date: new Date(2018, 5)
   }
 ].sort((a, b) => b.date - a.date);
