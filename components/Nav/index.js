@@ -11,6 +11,7 @@ import Layout from "../Layout";
 import Logo from "./Logo";
 import { createToggle } from "../Toggle";
 import MobileOnly from "../MobileOnly";
+import DesktopOnly from "../DesktopOnly";
 
 const { Toggle, State, Display } = createToggle("mobile-menu");
 
@@ -20,12 +21,6 @@ const MobileMenu = styled(Flex)`
   background: #fff;
   width: 100%;
   height: 100%;
-`;
-
-const Desktop = styled(Flex)`
-  @media (max-width: 700px) {
-    display: none;
-  }
 `;
 
 const NavItem = styled(props => (
@@ -101,7 +96,7 @@ class Nav extends React.Component {
                   justifyContent={["center", "space-between"]}
                 >
                   <Logo />
-                  <Desktop
+                  <DesktopOnly
                     itemScope
                     itemType="http://www.schema.org/SiteNavigationElement"
                   >
@@ -120,7 +115,7 @@ class Nav extends React.Component {
                         </>
                       }
                     />
-                  </Desktop>
+                  </DesktopOnly>
                 </Flex>
               </Layout>
             </Wrapper>
