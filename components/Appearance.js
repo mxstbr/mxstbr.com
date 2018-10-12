@@ -7,6 +7,7 @@ import { ListItem } from "./Lists";
 
 import Icon from "./Icon";
 import { Radio, Mic, Terminal, Award, Film, Zap } from "react-feather";
+import type { Appearance } from "../appearances";
 
 const ICONS = {
   podcast: Mic,
@@ -23,7 +24,11 @@ const Wrapper = styled(ListItem)`
   }
 `;
 
-const AppearanceCard = props => {
+type Props = {
+  ...$Exact<Appearance>
+};
+
+const AppearanceCard = (props: Props) => {
   const TypeIcon = ICONS[props.type];
   return (
     <Wrapper link={props.link}>
@@ -37,7 +42,7 @@ const AppearanceCard = props => {
           {props.title}
         </Heading>
         <Text color="#666" fontSize={2}>
-          {props.site} {!!props.city && `(${props.city})`}
+          {props.site} {props.city != undefined && `(${props.city})`}
         </Text>
       </Flex>
     </Wrapper>

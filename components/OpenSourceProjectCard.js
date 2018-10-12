@@ -53,7 +53,24 @@ const Wrapper = styled(Link).attrs({
     `};
 `;
 
-class OpenSourceProjectCard extends React.Component {
+type Props = {
+  repo: string,
+  width?: number,
+  stars?: number,
+  children: React$Node,
+  light?: boolean,
+  bg?: string
+};
+
+type State = {
+  stars: ?number,
+  data: ?{}
+};
+
+class OpenSourceProjectCard extends React.Component<Props, State> {
+  static Title: typeof Title;
+  static Description: typeof Description;
+
   state = {
     stars: null,
     data: null
@@ -70,8 +87,9 @@ class OpenSourceProjectCard extends React.Component {
   }
 
   render() {
-    const { repo, width, stars, children, light, bg } = this.props;
-    const { stateStars = stars } = this.state;
+    const { repo, width, children, light, bg } = this.props;
+    const stars =
+      this.state.stars != undefined ? this.state.stars : this.props.stars;
 
     return (
       <Wrapper
@@ -94,10 +112,12 @@ class OpenSourceProjectCard extends React.Component {
             <Box>{children}</Box>
             <Flex justifyContent="space-between">
               <FinePrint>{repo}</FinePrint>
-              <FinePrint width="5em" textAlign="right">
-                {(stateStars || stars).toLocaleString("en")}
-                <StarIcon />
-              </FinePrint>
+              {stars != undefined && (
+                <FinePrint width="5em" textAlign="right">
+                  {stars.toLocaleString("en")}
+                  <StarIcon />
+                </FinePrint>
+              )}
             </Flex>
           </Flex>
         </Card>

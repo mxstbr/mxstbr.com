@@ -1,5 +1,5 @@
 import React from "react";
-import { Box } from "rebass";
+import { Box, type RebassProps } from "rebass";
 import styled from "styled-components";
 import Text from "./Text";
 import Link from "./Link";
@@ -12,7 +12,12 @@ const Wrapper = styled(Box)`
   }
 `;
 
-export default props => (
+type Props = {
+  ...$Exact<RebassProps>,
+  centered?: boolean
+};
+
+export default (props: Props) => (
   <Wrapper centered={props.centered}>
     <Text color="#333" mb={3} fontSize="18px" lineHeight={1.6} {...props} />
   </Wrapper>

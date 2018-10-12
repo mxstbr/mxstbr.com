@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Card, Image } from "rebass";
+import { Card, Image, type RebassProps } from "rebass";
 import { H3 } from "./Heading";
 import Text from "./Text";
 import BoxShadow from "./BoxShadow";
@@ -19,7 +19,7 @@ const BaseCard = styled(Card)`
   }
 `;
 
-const C = props => (
+const C = (props: RebassProps) => (
   <BoxShadow borderRadius="5px">
     <BaseCard {...props} />
   </BoxShadow>

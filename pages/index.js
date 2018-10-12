@@ -9,12 +9,10 @@ import Icon from "../components/Icon";
 import { H2 } from "../components/Heading";
 import Text from "../components/Text";
 import Paragraph from "../components/Paragraph";
-import { getGitHubRepoStars } from "../helpers/github-api";
 import CardGrid from "../components/CardGrid";
 import OSSProject from "../components/OpenSourceProjectCard";
 import Card from "../components/Card";
 import AppearancesList from "../components/AppearancesList";
-import RestrictHeight from "../components/RestrictHeight";
 import { TextButton } from "../components/Button";
 import Image from "../components/Image";
 import Main from "../components/Main";
@@ -31,7 +29,21 @@ const ViewMoreLink = props => (
   </Box>
 );
 
-class Homepage extends React.Component {
+type BlogPost = {
+  id: string,
+  title: string,
+  url: string,
+  summary: string,
+  banner_image?: string,
+  "_external-site"?: string,
+  date_published: string
+};
+
+type Props = {
+  posts: Array<BlogPost>
+};
+
+class Homepage extends React.Component<Props> {
   static async getInitialProps() {
     const data = await fetch("https://mxstbr.blog/feed.json")
       .then(res => res.json())
@@ -122,8 +134,8 @@ class Homepage extends React.Component {
                   <Card.FinePrint>
                     {format(date, "Do MMM")}
                     {` on `}
-                    {!!external ? `the ${external}` : `mxstbr.blog`}
-                    {!!external && (
+                    {external != undefined ? `the ${external}` : `mxstbr.blog`}
+                    {external == undefined && (
                       <Icon css={{ verticalAlign: "text-bottom" }}>
                         <LinkExternal size="1em" />
                       </Icon>

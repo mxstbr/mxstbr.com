@@ -54,7 +54,15 @@ const RowLink = styled(Link)`
   }
 `;
 
-const Table = props => (
+// $FlowIssue ref https://github.com/facebook/flow/issues/6308
+type RowType = *;
+
+type Props = {
+  rows: Array<RowType>,
+  render: (row: RowType) => React$Node
+};
+
+const Table = (props: Props) => (
   <Flex width={1}>
     <BoxShadow hoverShadow="none" width={1}>
       <Flex

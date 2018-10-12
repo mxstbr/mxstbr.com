@@ -12,15 +12,21 @@ const Item = styled(Flex)`
   }
 `;
 
-export default props => (
+type Props = {
+  className?: string,
+  link?: string,
+  children: React$Node
+};
+
+export default (props: Props) => (
   <Item
     className={props.className}
-    py={!!props.link ? 0 : 3}
+    py={props.link != undefined ? 0 : 3}
     flexDirection="row"
     alignItems="center"
   >
     <ConditionalWrap
-      condition={!!props.link}
+      condition={props.link != undefined}
       wrap={children => (
         <Link
           py={3}

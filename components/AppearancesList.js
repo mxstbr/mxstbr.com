@@ -3,8 +3,13 @@ import { Flex } from "rebass";
 import { H3 } from "./Heading";
 import Appearance from "./Appearance";
 import { ListDivider } from "./Lists";
+import type { Appearance as AppearanceType } from "../appearances";
 
-export default ({ appearances }) => (
+type Props = {
+  appearances: Array<AppearanceType>
+};
+
+export default ({ appearances }: Props) => (
   <Flex flexDirection="column">
     {appearances.map((appearance, i) => (
       <React.Fragment key={appearance.title + appearance.site}>

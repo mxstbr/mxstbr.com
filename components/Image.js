@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { Image } from "rebass";
+import { Image, type RebassProps } from "rebass";
 
 const Img = styled(Image)`
   max-width: 100%;
@@ -8,4 +8,4 @@ const Img = styled(Image)`
   max-height: 100%;
 `;
 
-export default props => <Img {...props} />;
+export default (props: RebassProps) => <Img {...props} />;

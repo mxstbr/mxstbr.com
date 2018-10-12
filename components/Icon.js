@@ -1,7 +1,7 @@
 import React from "react";
-import { Box } from "rebass";
+import { Box, type RebassProps } from "rebass";
 
-export default props => (
+export default (props: RebassProps) => (
   <Box
     ml={1}
     {...props}

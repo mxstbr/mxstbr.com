@@ -2,7 +2,7 @@ import React from "react";
 import styled, { css } from "styled-components";
 import { Box } from "rebass";
 
-export const createToggle = name => {
+export const createToggle = (name: string) => {
   const Toggle = styled.label.attrs({
     htmlFor: name
   })``;

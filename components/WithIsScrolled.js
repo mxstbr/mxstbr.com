@@ -1,19 +1,19 @@
 // Taken from the styled-components website
 // @see https://github.com/styled-components/styled-components-website/blob/a9418dd2d6843e1f0efdb0a6869a954a79bf088b/components/WithIsScrolled.js
 import { Component } from "react";
-import invariant from "invariant";
 
-class WithIsScrolled extends Component {
+type State = {
+  isScrolled: boolean
+};
+
+type Props = {
+  children: State => React$Node
+};
+
+class WithIsScrolled extends Component<Props, State> {
   state = {
     isScrolled: false
   };
-
-  componentWillMount() {
-    invariant(
-      typeof this.props.children === "function",
-      "The children prop is expected to be a function"
-    );
-  }
 
   componentDidMount() {
     // Learn more about how { passive: true } improves scrolling performance
@@ -26,7 +26,8 @@ class WithIsScrolled extends Component {
   }
 
   onScroll = () => {
-    const isScrolled = (window.pageYOffset || document.body.scrollTop) > 0;
+    const scrollTop = document.body != undefined ? document.body.scrollTop : 0;
+    const isScrolled = (window.pageYOffset || scrollTop) > 0;
 
     if (isScrolled !== this.state.isScrolled) {
       this.setState({ isScrolled });

@@ -1,7 +1,9 @@
 import Document, { Head, Main, NextScript } from "next/document";
 import { ServerStyleSheet } from "styled-components";
 
+// $FlowIssue
 export default class MyDocument extends Document {
+  // $FlowIssue
   static getInitialProps({ renderPage }) {
     const sheet = new ServerStyleSheet();
     const page = renderPage(App => props =>

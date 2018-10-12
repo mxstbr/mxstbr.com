@@ -7,7 +7,7 @@ import Text from "../Text";
 import Layout from "../Layout";
 import Icon from "../Icon";
 
-export default props => (
+export default (props: {}) => (
   <Flex
     py={4}
     mt={5}

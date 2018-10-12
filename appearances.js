@@ -1,4 +1,23 @@
-module.exports = [
+// @flow
+
+export type AppearanceType =
+  | "talk"
+  | "lightning-talk"
+  | "interview"
+  | "award"
+  | "podcast"
+  | "workshop";
+
+export type Appearance = {
+  title: string,
+  site: string,
+  date: Date,
+  city?: string,
+  type: AppearanceType,
+  link?: string
+};
+
+const appearances: Array<Appearance> = [
   {
     title: "Building third-party component libraries",
     site: "AgentConf",
@@ -390,3 +409,5 @@ module.exports = [
     date: new Date(2015, 12)
   }
 ].sort((a, b) => b.date - a.date);
+
+export default appearances;

@@ -1,4 +1,14 @@
-export default [
+export type OpenSourceProject = {
+  repo: string,
+  name: string,
+  description: string,
+  stars: number,
+  background?: string,
+  featured?: boolean,
+  active?: boolean
+};
+
+const projects: Array<OpenSourceProject> = [
   {
     repo: "withspectrum/spectrum",
     name: "Spectrum",
@@ -241,3 +251,5 @@ export default [
     name: p.repo.split("/")[1]
   };
 });
+
+export default projects;

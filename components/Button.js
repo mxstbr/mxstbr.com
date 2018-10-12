@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { Box } from "rebass";
+import { Box, type RebassProps } from "rebass";
 import BoxShadow from "./BoxShadow";
 
 export const TextButton = styled(Box).attrs({
@@ -31,7 +31,11 @@ const Button = styled(Box).attrs({
   }
 `;
 
-export default props => (
+type Props = {
+  as: string | React$Component<{}>
+};
+
+export default (props: RebassProps) => (
   <BoxShadow borderRadius="5px">
     <Button {...props} />
   </BoxShadow>

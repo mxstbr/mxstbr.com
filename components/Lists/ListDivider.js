@@ -8,7 +8,11 @@ const ListDividerWrapper = styled(Flex)`
   }
 `;
 
-const ListDivider = props => (
+type Props = {
+  children: React$Node
+};
+
+const ListDivider = (props: Props) => (
   <ListDividerWrapper
     flexDirection="row"
     alignItems="center"

@@ -2,12 +2,18 @@ import React from "react";
 import Head from "next/head";
 import JsonLD from "./JsonLD";
 
-export default ({ title, description, image }) => (
+type Props = {
+  title?: string,
+  description?: string,
+  image?: string
+};
+
+export default ({ title, description, image }: Props) => (
   <Head>
     {/* DEFAULT */}
 
-    {title && <title key="title">{title}</title>}
-    {description && (
+    {title == undefined && <title key="title">{title}</title>}
+    {description == undefined && (
       <meta name="description" key="description" content={description} />
     )}
     <link
@@ -18,15 +24,19 @@ export default ({ title, description, image }) => (
     <link rel="apple-touch-icon" href="/static/images/favicon_new.png" />
 
     {/* OPEN GRAPH */}
-    {title && <meta property="og:title" content={title} key="og:title" />}
-    {description && (
+    {title == undefined && (
+      <meta property="og:title" content={title} key="og:title" />
+    )}
+    {description == undefined && (
       <meta
         property="og:description"
         key="og:description"
         content={description}
       />
     )}
-    {image && <meta property="og:image" key="og:image" content={image} />}
+    {image == undefined && (
+      <meta property="og:image" key="og:image" content={image} />
+    )}
 
     {/* TWITTER */}
     <meta
@@ -36,15 +46,19 @@ export default ({ title, description, image }) => (
     />
     <meta name="twitter:site" key="twitter:site" content="@mxstbr" />
     <meta name="twitter:creator" key="twitter:creator" content="@mxstbr" />
-    {title && <meta name="twitter:title" key="twitter:title" content={title} />}
-    {description && (
+    {title == undefined && (
+      <meta name="twitter:title" key="twitter:title" content={title} />
+    )}
+    {description == undefined && (
       <meta
         name="twitter:description"
         key="twitter:description"
         content={description}
       />
     )}
-    {image && <meta name="twitter:image" key="twitter:image" content={image} />}
+    {image == undefined && (
+      <meta name="twitter:image" key="twitter:image" content={image} />
+    )}
     <JsonLD
       data={{
         "@context": "http://schema.org",
