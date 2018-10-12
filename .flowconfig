@@ -19,5 +19,6 @@ sketchy-null
 
 [options]
 all=true
+suppress_comment=\\(.\\|\n\\)*\\$FlowIssue
 esproposal.optional_chaining=enable
 

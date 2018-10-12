@@ -17,6 +17,8 @@ declare module 'rebass' {
   declare module.exports: any;
 }
 
+export type RebassProps = any;
+
 /**
  * We include stubs for each file inside this npm package in case you need to
  * require those files directly. Feel free to delete any files that aren't
