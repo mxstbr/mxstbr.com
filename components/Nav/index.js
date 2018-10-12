@@ -10,6 +10,7 @@ import Heading from "../Heading";
 import Layout from "../Layout";
 import Logo from "./Logo";
 import { createToggle } from "../Toggle";
+import MobileOnly from "../MobileOnly";
 
 const { Toggle, State, Display } = createToggle("mobile-menu");
 
@@ -19,14 +20,6 @@ const MobileMenu = styled(Flex)`
   background: #fff;
   width: 100%;
   height: 100%;
-`;
-
-const MobileOnly = styled(Flex)`
-  display: none;
-
-  @media screen and (max-width: ${props => props.theme.breakpoints[0]}) {
-    display: flex;
-  }
 `;
 
 const Desktop = styled(Flex)`
