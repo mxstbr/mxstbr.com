@@ -322,5 +322,71 @@ module.exports = [
     type: "award",
     link: "https://www.forbes.at/artikel/maximilian-stoiber.html",
     date: new Date(2018, 5)
+  },
+  {
+    title: "Open Source Wunder",
+    site: "Forbes Austria",
+    type: "interview",
+    city: "German",
+    link: "https://www.forbes.at/artikel/open-source-wunder.html",
+    date: new Date(2016, 11)
+  },
+  {
+    title: "Site of the Month",
+    site: "CSS Winner",
+    type: "award",
+    city: "Frankensim",
+    link: "https://www.csswinner.com/details/frankensim/9805",
+    date: new Date(2015, 8, 2)
+  },
+  {
+    title: "2016 Honoree",
+    site: "Webby Awards",
+    type: "award",
+    city: "Frankensim",
+    link:
+      "https://www.webbyawards.com/winners/2016/websites/general-website/weird/frankensim/",
+    date: new Date(2016, 0)
+  },
+  {
+    title: "Site of the Day",
+    site: "Awwwards",
+    type: "award",
+    city: "Frankensim",
+    link: "https://www.awwwards.com/sites/frankensim",
+    date: new Date(2015, 8, 1)
+  },
+  {
+    title: "Winner",
+    site: "The Lovie Awards",
+    type: "award",
+    city: "Frankensim",
+    link: "https://animade.tv/notes/double-win-in-the-lovie-awards",
+    date: new Date(2016, 9, 1)
+  },
+  {
+    title: "Winner",
+    site: "10th Annual Pixel Awards",
+    type: "award",
+    city: "Frankensim",
+    link: "https://pixelawards.com/winners",
+    date: new Date(2016, 1, 1)
+  },
+  {
+    title: "FWA of the Day",
+    site: "FWA",
+    type: "award",
+    city: "Frankensim",
+    link: "https://thefwa.com/cases/frankensim",
+    date: new Date(2016, 7, 26)
+  },
+  {
+    title: "Most liked Instagram of the Year",
+    site: "It's Nice That",
+    city: "Frankensim",
+    type: "award",
+    link:
+      "https://www.itsnicethat.com/features/review-of-the-year-2015-top-10-instagram",
+    date: new Date(2015, 12)
   }
 ].sort((a, b) => b.date - a.date);
