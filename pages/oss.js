@@ -9,24 +9,49 @@ import Heading, { H2, H3 } from "../components/Heading";
 import Main from "../components/Main";
 import PageHeader from "../components/PageHeader";
 import Table from "../components/Table";
+import MobileOnly from "../components/MobileOnly";
+import DesktopOnly from "../components/DesktopOnly";
 
 import projects from "../open-source-projects";
 
 const OpenSourceProjectTableRow = ({ project }) => (
   <>
-    <Flex width={0.2} alignItems="center" height={1}>
-      <Heading as="h4" fontSize={2} alignSelf="center">
+    <Flex
+      mb={[2, 0]}
+      width={[1, 0.2]}
+      alignItems={["flex-start", "center"]}
+      justifyContent={["space-between", "initial"]}
+      height={1}
+    >
+      <Heading as="h4" fontSize={[3, 2]} alignSelf={["flex-start", "center"]}>
         {project.name}
       </Heading>
+      <MobileOnly>
+        <Text color="#666" mt="6px" fontSize={1} ml="1em">
+          {project.stars.toLocaleString()}
+          &nbsp;★
+        </Text>
+      </MobileOnly>
     </Flex>
-    <Flex alignItems="center" width={0.75} px={3}>
+    <Flex
+      alignItems={["flex-start", "center"]}
+      width={[1, 0.75]}
+      px={[0, 3]}
+      mb={[2, 0]}
+    >
       <Text color="#666">{project.description}</Text>
     </Flex>
-    <Flex alignItems="center" justifyContent="flex-end" width={0.06}>
-      <Text textAlign="right" color="#666" fontSize={1}>
-        {project.stars.toLocaleString()}
-        &nbsp;★
-      </Text>
+    <Flex
+      alignItems="center"
+      justifyContent={["flex-start", "flex-end"]}
+      width={[1, 0.06]}
+    >
+      <DesktopOnly>
+        <Text color="#666" fontSize={1}>
+          {project.stars.toLocaleString()}
+          &nbsp;★
+        </Text>
+      </DesktopOnly>
     </Flex>
   </>
 );

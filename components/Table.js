@@ -65,7 +65,7 @@ const Table = props => (
       >
         {props.rows.map(row => (
           <RowLink py={3} px={3} key={row.id} href={row.href} underline={false}>
-            <Flex>{props.render(row)}</Flex>
+            <Flex flexDirection={["column", "row"]}>{props.render(row)}</Flex>
           </RowLink>
         ))}
       </Flex>
