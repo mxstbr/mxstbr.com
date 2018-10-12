@@ -12,8 +12,8 @@ export default ({ title, description, image }: Props) => (
   <Head>
     {/* DEFAULT */}
 
-    {title == undefined && <title key="title">{title}</title>}
-    {description == undefined && (
+    {title != undefined && <title key="title">{title}</title>}
+    {description != undefined && (
       <meta name="description" key="description" content={description} />
     )}
     <link
@@ -24,17 +24,17 @@ export default ({ title, description, image }: Props) => (
     <link rel="apple-touch-icon" href="/static/images/favicon_new.png" />
 
     {/* OPEN GRAPH */}
-    {title == undefined && (
+    {title != undefined && (
       <meta property="og:title" content={title} key="og:title" />
     )}
-    {description == undefined && (
+    {description != undefined && (
       <meta
         property="og:description"
         key="og:description"
         content={description}
       />
     )}
-    {image == undefined && (
+    {image != undefined && (
       <meta property="og:image" key="og:image" content={image} />
     )}
 
@@ -46,17 +46,17 @@ export default ({ title, description, image }: Props) => (
     />
     <meta name="twitter:site" key="twitter:site" content="@mxstbr" />
     <meta name="twitter:creator" key="twitter:creator" content="@mxstbr" />
-    {title == undefined && (
+    {title != undefined && (
       <meta name="twitter:title" key="twitter:title" content={title} />
     )}
-    {description == undefined && (
+    {description != undefined && (
       <meta
         name="twitter:description"
         key="twitter:description"
         content={description}
       />
     )}
-    {image == undefined && (
+    {image != undefined && (
       <meta name="twitter:image" key="twitter:image" content={image} />
     )}
     <JsonLD

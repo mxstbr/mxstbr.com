@@ -135,7 +135,7 @@ class Homepage extends React.Component<Props> {
                     {format(date, "Do MMM")}
                     {` on `}
                     {external != undefined ? `the ${external}` : `mxstbr.blog`}
-                    {external == undefined && (
+                    {external != undefined && (
                       <Icon css={{ verticalAlign: "text-bottom" }}>
                         <LinkExternal size="1em" />
                       </Icon>
