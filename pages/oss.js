@@ -26,7 +26,7 @@ const OpenSourceProjectTableRow = ({ project }) => (
   <>
     <Flex
       mb={[2, 0]}
-      width={[1, 0.2]}
+      width={[1, "200px"]}
       alignItems={["flex-start", "center"]}
       justifyContent={["space-between", "initial"]}
       height={1}
@@ -43,7 +43,7 @@ const OpenSourceProjectTableRow = ({ project }) => (
     </Flex>
     <Flex
       alignItems={["flex-start", "center"]}
-      width={[1, 0.74]}
+      width={1}
       px={[0, 3]}
       mb={[2, 0]}
     >
@@ -52,7 +52,7 @@ const OpenSourceProjectTableRow = ({ project }) => (
     <Flex
       alignItems="center"
       justifyContent={["flex-start", "flex-end"]}
-      width={[1, 0.07]}
+      width={[1, "6em"]}
     >
       <DesktopOnly>
         <Text color="#666" fontSize={1}>
