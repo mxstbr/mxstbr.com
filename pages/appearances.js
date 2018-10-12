@@ -17,8 +17,8 @@ export default () => (
       </H2>
       <Paragraph centered>
         These are all the talks I've given, podcasts I've recorded, awards I've
-        gotten, meetups I've spoken at and interviews I've been a part of of the
-        past couple years.
+        gotten, meetups I've spoken at and interviews I've been a part of over
+        the past couple years.
       </Paragraph>
     </PageHeader>
     <SmallLayout m="0 auto">
