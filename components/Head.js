@@ -65,7 +65,7 @@ export default ({ title, description, image }: Props) => (
         "@type": "Person",
         email: "mailto:contact@mxstbr.com",
         image: "/static/images/headshot.jpeg",
-        jobTitle: "JavaScript Engineer",
+        jobTitle: "Senior Software Engineer",
         familyName: "Stoiber",
         givenName: "Max",
         birthPlace: "Vienna, Austria",

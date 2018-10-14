@@ -57,10 +57,7 @@ class Homepage extends React.Component<Props> {
 
     return (
       <Main>
-        <PageHeader>
-          <H2 alignSelf="center" mt={[4, 5]}>
-            Hey, I'm Max! 👋
-          </H2>
+        <PageHeader title="Hey, I'm Max! 👋">
           <Paragraph centered>
             I'm a JavaScript Engineer from Austria 🇦🇹 and I love React and Node.
             I'm the technical co-founder of{" "}

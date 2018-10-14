@@ -13,10 +13,7 @@ import appearances from "../appearances";
 
 export default () => (
   <>
-    <PageHeader>
-      <H2 alignSelf="center" mt={[4, 5]}>
-        My Appearances
-      </H2>
+    <PageHeader title="My Appearances">
       <Paragraph centered>
         These are all the{" "}
         <Zap style={{ verticalAlign: "text-top" }} size="1em" /> lightning &{" "}

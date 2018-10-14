@@ -71,10 +71,7 @@ export default () => (
       title="My Open Source Projects - Max Stoiber (@mxstbr)"
       description="A list of most of the open source projects I've (co-) created and/or maintained."
     />
-    <PageHeader>
-      <H2 alignSelf="center" mt={[4, 5]}>
-        My Open Source Projects{" "}
-      </H2>
+    <PageHeader title="My Open Source Projects">
       <Paragraph centered>
         These are all the open source projects I've (co-) created and am
         actively maintaining or using. (see{" "}

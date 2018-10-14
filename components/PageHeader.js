@@ -1,10 +1,12 @@
 import React from "react";
 import { Flex, type RebassProps } from "rebass";
 import SmallLayout from "./SmallLayout";
+import { H2 } from "./Heading";
 
 type Props = {
   ...$Exact<RebassProps>,
-  children: React$Node
+  children: React$Node,
+  title: string
 };
 
 export default (props: Props) => (
@@ -12,9 +14,13 @@ export default (props: Props) => (
     flexDirection="column"
     width={1}
     mb={4}
+    mt={[4, 5]}
     justifyContent="center"
-    {...props}
+    {...{ ...props, title: undefined }}
   >
+    <H2 alignSelf="center" mt={0}>
+      {props.title}
+    </H2>
     {props.children}
   </Flex>
 );
