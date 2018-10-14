@@ -45,6 +45,7 @@
   },
   "lint-staged": {
     "*.js": [
+      "yarn run flow",
       "prettier --write",
       "git add"
     ]
