@@ -17,6 +17,7 @@ import { TextButton } from "../components/Button";
 import Image from "../components/Image";
 import Main from "../components/Main";
 import PageHeader from "../components/PageHeader";
+import WideSection from "../components/WideSection";
 
 import appearances from "../appearances";
 import projects from "../open-source-projects";
@@ -79,22 +80,24 @@ class Homepage extends React.Component<Props> {
           </Paragraph>
         </PageHeader>
         <H2 mt={3}>Featured Open Source Projects</H2>
-        <CardGrid>
-          {projects.filter(project => project.featured).map(project => (
-            <OSSProject
-              key={project.repo}
-              light={!!project.background}
-              repo={project.repo}
-              bg={project.background}
-              stars={project.stars}
-            >
-              <OSSProject.Title>{project.name}</OSSProject.Title>
-              <OSSProject.Description>
-                {project.description}
-              </OSSProject.Description>
-            </OSSProject>
-          ))}
-        </CardGrid>
+        <WideSection>
+          <CardGrid>
+            {projects.filter(project => project.featured).map(project => (
+              <OSSProject
+                key={project.repo}
+                light={!!project.background}
+                repo={project.repo}
+                bg={project.background}
+                stars={project.stars}
+              >
+                <OSSProject.Title>{project.name}</OSSProject.Title>
+                <OSSProject.Description>
+                  {project.description}
+                </OSSProject.Description>
+              </OSSProject>
+            ))}
+          </CardGrid>
+        </WideSection>
         <ViewMoreLink href="/oss">
           View all
           <Icon>
@@ -102,7 +105,7 @@ class Homepage extends React.Component<Props> {
           </Icon>
         </ViewMoreLink>
 
-        <Flex flexDirection="column" width={[1, 0.75, 0.5]}>
+        <Flex flexDirection="column" width={1}>
           <H2>Recent Appearances</H2>
           <AppearancesList appearances={appearances.slice(0, 7)} />
         </Flex>
@@ -114,38 +117,42 @@ class Homepage extends React.Component<Props> {
         </ViewMoreLink>
 
         <H2>Recent Blog Posts</H2>
-        <CardGrid>
-          {posts.slice(0, 3).map((post, i) => {
-            const external = post["_external-site"];
-            const date = parse(post.date_published);
-            return (
-              <Link
-                href={post.url}
-                key={post.id}
-                width={[1, "calc(50% - 16px)", "calc(33.3% - 16px)"]}
-                m={[1, 2]}
-                mb={2}
-              >
-                <Card>
-                  <Card.Title>{post.title}</Card.Title>
-                  <Card.Body css={{ maxHeight: "5em", overflow: "hidden" }}>
-                    {post.summary}
-                  </Card.Body>
-                  <Card.FinePrint>
-                    {format(date, "Do MMM")}
-                    {` on `}
-                    {external != undefined ? `the ${external}` : `mxstbr.blog`}
-                    {external != undefined && (
-                      <Icon css={{ verticalAlign: "text-bottom" }}>
-                        <LinkExternal size="1em" />
-                      </Icon>
-                    )}
-                  </Card.FinePrint>
-                </Card>
-              </Link>
-            );
-          })}
-        </CardGrid>
+        <WideSection>
+          <CardGrid>
+            {posts.slice(0, 3).map((post, i) => {
+              const external = post["_external-site"];
+              const date = parse(post.date_published);
+              return (
+                <Link
+                  href={post.url}
+                  key={post.id}
+                  width={[1, "calc(50% - 16px)", "calc(33.3% - 16px)"]}
+                  m={[1, 2]}
+                  mb={2}
+                >
+                  <Card>
+                    <Card.Title>{post.title}</Card.Title>
+                    <Card.Body css={{ maxHeight: "5em", overflow: "hidden" }}>
+                      {post.summary}
+                    </Card.Body>
+                    <Card.FinePrint>
+                      {format(date, "Do MMM")}
+                      {` on `}
+                      {external != undefined
+                        ? `the ${external}`
+                        : `mxstbr.blog`}
+                      {external != undefined && (
+                        <Icon css={{ verticalAlign: "text-bottom" }}>
+                          <LinkExternal size="1em" />
+                        </Icon>
+                      )}
+                    </Card.FinePrint>
+                  </Card>
+                </Link>
+              );
+            })}
+          </CardGrid>
+        </WideSection>
         <ViewMoreLink href="https://mxstbr.blog">
           View more on mxstbr.blog
           <Icon>

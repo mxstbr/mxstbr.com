@@ -29,12 +29,10 @@ export default () => (
         I've been a part of over the past couple years.
       </Paragraph>
     </PageHeader>
-    <SmallLayout m="0 auto">
-      <Head
-        title="My Appearances - Max Stoiber @mxstbr)"
-        description="All my talks, podcasts, awards and interviews of the past couple years in one place."
-      />
-      <AppearancesList appearances={appearances} />
-    </SmallLayout>
+    <Head
+      title="My Appearances - Max Stoiber @mxstbr)"
+      description="All my talks, podcasts, awards and interviews of the past couple years in one place."
+    />
+    <AppearancesList appearances={appearances} />
   </>
 );

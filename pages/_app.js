@@ -23,7 +23,7 @@ const theme = {
     secondaryText: colors.greys[4],
     ...colors
   },
-  breakpoints: ["700px", "1100px", "64em"],
+  breakpoints: ["850px", "1100px", "64em"],
   fonts: {
     system: [
       "-apple-system",

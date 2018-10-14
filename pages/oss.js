@@ -13,6 +13,7 @@ import PageHeader from "../components/PageHeader";
 import Table from "../components/Table";
 import MobileOnly from "../components/MobileOnly";
 import DesktopOnly from "../components/DesktopOnly";
+import WideSection from "../components/WideSection";
 
 import projects from "../open-source-projects";
 
@@ -81,17 +82,19 @@ export default () => (
         contributions)
       </Paragraph>
     </PageHeader>
-    <Table
-      rows={projects
-        .filter(p => p.active !== false)
-        .sort((a, b) => b.stars - a.stars)
-        .map(p => ({
-          ...p,
-          id: p.repo,
-          href: `https://github.com/${p.repo}`
-        }))}
-      render={row => <OpenSourceProjectTableRow project={row} />}
-    />
+    <WideSection>
+      <Table
+        rows={projects
+          .filter(p => p.active !== false)
+          .sort((a, b) => b.stars - a.stars)
+          .map(p => ({
+            ...p,
+            id: p.repo,
+            href: `https://github.com/${p.repo}`
+          }))}
+        render={row => <OpenSourceProjectTableRow project={row} />}
+      />
+    </WideSection>
     <Text color="#666" mt={4} fontSize={2}>
       Total:{" "}
       {projects
@@ -106,16 +109,18 @@ export default () => (
       I used to work on these projects, but am either no longer involved with
       them or they are archived.
     </Paragraph>
-    <Table
-      rows={projects
-        .filter(p => p.active === false)
-        .sort((a, b) => b.stars - a.stars)
-        .map(p => ({
-          ...p,
-          id: p.repo,
-          href: `https://github.com/${p.repo}`
-        }))}
-      render={row => <OpenSourceProjectTableRow project={row} />}
-    />
+    <WideSection>
+      <Table
+        rows={projects
+          .filter(p => p.active === false)
+          .sort((a, b) => b.stars - a.stars)
+          .map(p => ({
+            ...p,
+            id: p.repo,
+            href: `https://github.com/${p.repo}`
+          }))}
+        render={row => <OpenSourceProjectTableRow project={row} />}
+      />
+    </WideSection>
   </Main>
 );

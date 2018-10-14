@@ -64,7 +64,7 @@ const Wrapper = styled(Flex).attrs({
     box-shadow: rgba(0, 0, 0, 0.15) 0px 1px 4px 0px;
   }
 
-  @media screen and (max-width: 700px) {
+  @media screen and (max-width: ${props => props.theme.breakpoints[0]}) {
     background: #fff;
     box-shadow: rgba(0, 0, 0, 0.15) 0px 1px 4px 0px;
   }

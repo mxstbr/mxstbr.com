@@ -8,7 +8,13 @@ type Props = {
 };
 
 export default (props: Props) => (
-  <Flex flexDirection="row" width={1} mb={4} justifyContent="center" {...props}>
-    <SmallLayout>{props.children}</SmallLayout>
+  <Flex
+    flexDirection="column"
+    width={1}
+    mb={4}
+    justifyContent="center"
+    {...props}
+  >
+    {props.children}
   </Flex>
 );
