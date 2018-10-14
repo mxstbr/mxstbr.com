@@ -1,3 +1,4 @@
+// $FlowIssue StrictMode isn't typed yet
 import React, { StrictMode } from "react";
 import App, { Container } from "next/app";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
