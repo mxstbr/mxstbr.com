@@ -5,6 +5,7 @@ import { ExternalLink as LinkExternal, ChevronRight } from "react-feather";
 import ConditionalWrap from "conditional-wrap";
 import { parse, format } from "date-fns";
 import styled from "styled-components";
+import fetch from "isomorphic-unfetch";
 import Link from "../components/Link";
 import Icon from "../components/Icon";
 import { H2 } from "../components/Heading";
