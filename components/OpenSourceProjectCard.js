@@ -13,7 +13,6 @@ import Icon from "./Icon";
 import Card from "./Card";
 import { H3 } from "./Heading";
 import Text from "./Text";
-import { getGitHubRepo } from "../helpers/github-api";
 
 const StarIcon = props => (
   <Icon css={{ verticalAlign: "text-bottom" }} ml={1}>
@@ -56,7 +55,7 @@ const Wrapper = styled(Link).attrs({
 type Props = {
   repo: string,
   width?: number,
-  stars?: number,
+  stars: number,
   children: React$Node,
   light?: boolean,
   bg?: string
@@ -71,25 +70,8 @@ class OpenSourceProjectCard extends React.Component<Props, State> {
   static Title: typeof Title;
   static Description: typeof Description;
 
-  state = {
-    stars: null,
-    data: null
-  };
-
-  componentDidMount() {
-    getGitHubRepo(this.props.repo)
-      .then(data => {
-        if (data) this.setState({ stars: data?.stargazers_count, data });
-      })
-      .catch(err => {
-        console.error(err);
-      });
-  }
-
   render() {
     const { repo, width, children, light, bg } = this.props;
-    const stars =
-      this.state.stars != undefined ? this.state.stars : this.props.stars;
 
     return (
       <Wrapper
@@ -112,9 +94,9 @@ class OpenSourceProjectCard extends React.Component<Props, State> {
             <Box>{children}</Box>
             <Flex justifyContent="space-between">
               <FinePrint>{repo}</FinePrint>
-              {stars != undefined && (
+              {this.props.stars != undefined && (
                 <FinePrint width="5em" textAlign="right">
-                  {stars.toLocaleString("en")}
+                  {this.props.stars.toLocaleString("en")}
                   <StarIcon />
                 </FinePrint>
               )}
