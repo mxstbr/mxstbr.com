@@ -14,7 +14,7 @@ const projects: Array<OpenSourceProject> = [
     name: "Spectrum",
     description:
       "The community platform for the future. Grow safe, successful online communities that are built to last.",
-    stars: 4676,
+    stars: 4709,
     background: "linear-gradient(to top right, #7213FB, #4F16EE)",
     featured: true
   },
@@ -23,7 +23,7 @@ const projects: Array<OpenSourceProject> = [
     name: "styled-components",
     description:
       "Visual primitives for the component age. Use the best bits of ES6 and CSS to style your apps without stress",
-    stars: 19529,
+    stars: 19608,
     background: "linear-gradient(to top right, #DB7093, #DAA357)",
     featured: true
   },
@@ -32,7 +32,7 @@ const projects: Array<OpenSourceProject> = [
     name: "react-boilerplate",
     description:
       "A foundation for React apps with a focus on scalability, developer experience and best practices.",
-    stars: 20009,
+    stars: 20095,
     background: "linear-gradient(to bottom right, #6D6E72, #9EA0A6)",
     featured: true
   },
@@ -41,7 +41,7 @@ const projects: Array<OpenSourceProject> = [
     name: "Polished",
     description:
       'A lightweight toolset for writing styles in JavaScript, the "Lodash of CSS-in-JS"',
-    stars: 4168,
+    stars: 4180,
     featured: true
   },
   {
@@ -49,7 +49,7 @@ const projects: Array<OpenSourceProject> = [
     name: "sharingbuttons.io",
     description:
       "Quickly generate social media sharing buttons that don't track your users.",
-    stars: 2101,
+    stars: 2110,
     featured: true
   },
   {
