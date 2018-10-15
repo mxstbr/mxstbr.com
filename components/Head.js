@@ -77,7 +77,7 @@ export default withRouter(({ title, description, image, router }: Props) => (
         familyName: "Stoiber",
         givenName: "Max",
         birthPlace: "Vienna, Austria",
-        birthDate: "1997.01.04",
+        birthDate: "1997-01-04",
         height: "185 cm",
         gender: "male",
         nationality: "Austria",
