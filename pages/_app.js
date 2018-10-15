@@ -49,6 +49,10 @@ const GlobalStyle = createGlobalStyle`
     background-color: ${props => props.theme.colors.background};
     margin: 0;
   }
+
+  strong {
+    font-weight: bold;
+  }
 `;
 
 const NAV_HEIGHT = 65;

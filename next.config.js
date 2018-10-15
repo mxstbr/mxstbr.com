@@ -1,4 +1,6 @@
-const withMDX = require("@zeit/next-mdx")();
+const withMDX = require("@zeit/next-mdx")({
+  extension: /\.mdx?$/
+});
 const fs = require("fs");
 const { join } = require("path");
 const { promisify } = require("util");
@@ -7,7 +9,7 @@ const copyFile = promisify(fs.copyFile);
 const staticFilesToCopy = ["now.json", "favicon.ico"];
 
 module.exports = withMDX({
-  pageExtensions: ["js", "jsx", "mdx"],
+  pageExtensions: ["js", "jsx", "mdx", "md"],
   exportPathMap: async function(
     defaultPathMap,
     { dev, dir, outDir, distDir, buildId }

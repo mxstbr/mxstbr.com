@@ -4,6 +4,7 @@ import { Flex, Box } from "rebass";
 import { ExternalLink as LinkExternal, ChevronRight } from "react-feather";
 import ConditionalWrap from "conditional-wrap";
 import { parse, format } from "date-fns";
+import styled from "styled-components";
 import Link from "../components/Link";
 import Icon from "../components/Icon";
 import { H2 } from "../components/Heading";
@@ -22,12 +23,22 @@ import WideSection from "../components/WideSection";
 import appearances from "../appearances";
 import projects from "../open-source-projects";
 
+const ViewMoreLinkWrapper = styled(Box)`
+  ${Icon} {
+    transition: transform 50ms ease-in-out;
+  }
+
+  &:hover ${Icon} {
+    transform: translateX(4px);
+  }
+`;
+
 const ViewMoreLink = props => (
-  <Box mt={4}>
+  <ViewMoreLinkWrapper mt={4}>
     <TextButton as={Link} href={props.href}>
       <Text fontSize={2}>{props.children}</Text>
     </TextButton>
-  </Box>
+  </ViewMoreLinkWrapper>
 );
 
 type BlogPost = {

@@ -18,7 +18,7 @@ export default (props: Props) => (
     justifyContent="center"
     {...{ ...props, title: undefined }}
   >
-    <H2 alignSelf="center" mt={0}>
+    <H2 alignSelf="center" textAlign="center" mt={0}>
       {props.title}
     </H2>
     {props.children}

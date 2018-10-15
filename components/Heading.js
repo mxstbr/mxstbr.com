@@ -13,7 +13,7 @@ const H2 = (props: RebassProps) => (
   <BaseHeading fontSize={5} as="h2" mb={4} mt={5} {...props} />
 );
 const H3 = (props: RebassProps) => (
-  <BaseHeading fontSize={3} as="h3" my={1} {...props} />
+  <BaseHeading fontSize={3} as="h3" mb={1} mt={1} {...props} />
 );
 
 export { H2, H3 };
