@@ -29,7 +29,7 @@ declare module "next/error" {
 }
 
 declare module "next/router" {
-  declare module.exports: {
+  declare export type Router = {
     route: string;
     pathname: string;
     query: Object;
@@ -38,7 +38,10 @@ declare module "next/router" {
     onRouteChangeError: ?((err: Error & {cancelled: boolean}, url: string) => void);
     push(url: string, as: ?string): Promise<boolean>;
     replace(url: string, as: ?string): Promise<boolean>
-  };
+  }
+
+  declare export var withRouter: <Props: {}>(component: React.ComponentType<Props>) => React.ComponentType<$Diff<Props, { router: Router }>>;
+  declare export default Router;
 }
 
 declare module "next/app" {

@@ -1,14 +1,16 @@
 import React from "react";
 import Head from "next/head";
+import { withRouter, type Router } from "next/router";
 import JsonLD from "./JsonLD";
 
 type Props = {
   title?: string,
   description?: string,
-  image?: string
+  image?: string,
+  router: Router
 };
 
-export default ({ title, description, image }: Props) => (
+export default withRouter(({ title, description, image, router }: Props) => (
   <Head>
     {/* DEFAULT */}
 
@@ -24,6 +26,12 @@ export default ({ title, description, image }: Props) => (
     <link rel="apple-touch-icon" href="/static/images/favicon_new.png" />
 
     {/* OPEN GRAPH */}
+    <meta property="og:type" key="og:type" content="website" />
+    <meta
+      property="og:url"
+      key="og:url"
+      content={`https://mxstbr.com${router.pathname}`}
+    />
     {title != undefined && (
       <meta property="og:title" content={title} key="og:title" />
     )}
@@ -84,4 +92,4 @@ export default ({ title, description, image }: Props) => (
       }}
     />
   </Head>
-);
+));
