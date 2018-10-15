@@ -56,7 +56,6 @@ const Wrapper = styled(Flex).attrs({
   width: 100%;
   background: ${props => props.theme.colors.background};
   z-index: 9;
-  overflow-y: scroll;
   transition: background 250ms ease-in-out, box-shadow 250ms ease-in-out;
 
   .no-js & {
