@@ -242,6 +242,11 @@ const projects: Array<OpenSourceProject> = [
     stars: 66,
     description: "The PostCSS website.",
     active: false
+  },
+  {
+    repo: "mxstbr/mxstbr.com",
+    stars: 11,
+    description: "This very website's source code!"
   }
 ].map(p => {
   if (p.name) return p;
