@@ -1,12 +1,14 @@
----
-published: true
-hidden: false
-title: "A deep dive into children in React"
-tags: react deepdive
-twitter_large: true
-image: family.jpg
-custom_excerpt: "We can manipulate children in React using the power of JavaScript. Let's explore children in-depth and see how they can make our lives easier!"
----
+export const frontmatter = {
+  "published": true,
+  "hidden": false,
+  "title": "A deep dive into children in React",
+  "tags": "react deepdive",
+  "twitter_large": true,
+  "image": "family.jpg",
+  "custom_excerpt": "We can manipulate children in React using the power of JavaScript. Let's explore children in-depth and see how they can make our lives easier!"
+};
+
+
 
 The core of React is components. You can nest these components like you would nest HTML tags, which makes is easy to write JSX since it resembles markup.
 

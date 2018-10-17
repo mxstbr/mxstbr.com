@@ -1,12 +1,14 @@
----
-published: true
-hidden: false
-title: "Build your first Node.js microservice"
-tags: node micro zeit
-twitter_large: true
-image: micro-meta-image.png
-custom_excerpt: "A microservice is a single, self-contained unit which, together with many others, makes up a large application. Let's write our first microservice in JavaScript!"
----
+export const frontmatter = {
+  "published": true,
+  "hidden": false,
+  "title": "Build your first Node.js microservice",
+  "tags": "node micro zeit",
+  "twitter_large": true,
+  "image": "micro-meta-image.png",
+  "custom_excerpt": "A microservice is a single, self-contained unit which, together with many others, makes up a large application. Let's write our first microservice in JavaScript!"
+};
+
+
 
 A microservice is a single self-contained unit which, together with many others, makes up a large application. By splitting your app into small units every part of it is independently deployable and scalable, can be written by different teams and in different programming languages and can be tested individually.
 

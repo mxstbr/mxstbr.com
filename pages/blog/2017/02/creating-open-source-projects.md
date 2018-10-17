@@ -1,10 +1,12 @@
----
-published: true
-hidden: false
-title: "How to create open source projects"
-tags: open-source
-custom_excerpt: "Have you been wondering how to create or contribute to your first open source project? This post is for you."
----
+export const frontmatter = {
+  "published": true,
+  "hidden": false,
+  "title": "How to create open source projects",
+  "tags": "open-source",
+  "custom_excerpt": "Have you been wondering how to create or contribute to your first open source project? This post is for you."
+};
+
+
 
 As the maintainer of a fair amount of [open source projects](https://github.com/mxstbr) I get asked frequently "How do I create my first open source project?".
 

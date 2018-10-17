@@ -1,8 +1,10 @@
----
-published: true
-title: Sending encrypted emails with Ruby on Rails
-tags: rubyonrails privacy encryption
----
+export const frontmatter = {
+  "published": true,
+  "title": "Sending encrypted emails with Ruby on Rails",
+  "tags": "rubyonrails privacy encryption"
+};
+
+
 
 For the [new pgp.asc website](http://www.pgpasc.org), I wanted users to add themselves to the [Hall of Fame](http://www.pgpasc.org/halloffame) without any intervention by me. Previously, they would send me an email that they wanted to be added, I would send them an encrypted mail with the key they provide at theirdomain.com/pgp.asc and if they could answer the mail I would add them. A very tedious and unnecessary process. 
 

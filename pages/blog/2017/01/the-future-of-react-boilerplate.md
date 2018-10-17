@@ -1,12 +1,14 @@
----
-published: true
-hidden: false
-title: "The future of react-boilerplate"
-tags: react-boilerplate oss react
-twitter_large: true
-image: react-boilerplate-rust.png
-custom_excerpt: "For the past year react-boilerplate has evolved beyond my ideas and code to being a true community effort, so I'm moving it to its own organisation on GitHub."
----
+export const frontmatter = {
+  "published": true,
+  "hidden": false,
+  "title": "The future of react-boilerplate",
+  "tags": "react-boilerplate oss react",
+  "twitter_large": true,
+  "image": "react-boilerplate-rust.png",
+  "custom_excerpt": "For the past year react-boilerplate has evolved beyond my ideas and code to being a true community effort, so I'm moving it to its own organisation on GitHub."
+};
+
+
 
 For the past year `react-boilerplate` has evolved beyond my ideas and code to being a true community effort. There is a team of collaborators who make sure issues are taken care of, features introduced and new releases prepared. In fact, for the past few months I have barely, if even, done 1% of the work.
 

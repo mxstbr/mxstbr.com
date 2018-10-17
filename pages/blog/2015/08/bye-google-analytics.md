@@ -1,8 +1,10 @@
----
-published: true
-title: Bye Bye Google Analytics
-tags: privacy google analytics
----
+export const frontmatter = {
+  "published": true,
+  "title": "Bye Bye Google Analytics",
+  "tags": "privacy google analytics"
+};
+
+
 
 A few days ago, I got rid of Google Analytics on [all of my websites](https://github.com/mxstbr), and moved all my analytics needs to a self–hosted instance of [Open Web Analytics](https://github.com/padams/Open-Web-Analytics).
 

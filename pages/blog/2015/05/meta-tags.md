@@ -1,8 +1,10 @@
----
-published: false
-title: Meta tags
-tags: html meta
----
+export const frontmatter = {
+  "published": false,
+  "title": "Meta tags",
+  "tags": "html meta"
+};
+
+
 
 Meta tags are annoying. There is a lot of them, and I definitely don't remember which ones I can include. This post serves as a documentation to quickly look up which meta tags one can include.
 

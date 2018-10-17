@@ -1,9 +1,11 @@
----
-published: true
-title: Writing your styles in JS ≠ writing inline styles
-tags: styling react inline css-in-js
-custom_excerpt: Many people don't realise is that there's a difference between what's called "inline styles" and what's called "CSS-in-JS". Do you know?
----
+export const frontmatter = {
+  "published": true,
+  "title": "Writing your styles in JS ≠ writing inline styles",
+  "tags": "styling react inline css-in-js",
+  "custom_excerpt": "Many people don't realise is that there's a difference between what's called \"inline styles\" and what's called \"CSS-in-JS\". Do you know?"
+};
+
+
 
 With the emergence and popularity of libraries like Radium, JSS, Aphrodite and `styled-components` everybody has been talking about writing styles in JavaScript. What many people don't realise is that there's a difference between what's called "inline styles" and what's called "CSS-in-JS".
 

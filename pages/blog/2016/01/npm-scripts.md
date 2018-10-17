@@ -1,9 +1,11 @@
----
-published: true
-title: npm scripts
-tags: nodejs npm tooling
-custom_excerpt: npm has support for the scripts property in package.json — one of the most used, but also one of the most overlooked features of npm! Let's explore the power of npm scripts.
----
+export const frontmatter = {
+  "published": true,
+  "title": "npm scripts",
+  "tags": "nodejs npm tooling",
+  "custom_excerpt": "npm has support for the scripts property in package.json — one of the most used, but also one of the most overlooked features of npm! Let's explore the power of npm scripts."
+};
+
+
 
 `npm` has support for the `scripts` property in `package.json` — one of the most used, but also one of the most overlooked features of `npm`!
 

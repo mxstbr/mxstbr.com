@@ -1,8 +1,10 @@
----
-published: false
-title: WebAudio APwhat?
-tags: JavaScript tech WebAudio
----
+export const frontmatter = {
+  "published": false,
+  "title": "WebAudio APwhat?",
+  "tags": "JavaScript tech WebAudio"
+};
+
+
 
 Raise your hand if you’ve ever used an audio tag with dynamic sources to add audio to a web project. You just want to play some background music, a few feedback sounds, maybe add stereo sound - and suddenly, the possibilities of the audio tag are exceeded.
 

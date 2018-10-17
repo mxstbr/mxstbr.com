@@ -1,8 +1,10 @@
----
-published: true
-title: Fade in a React.js component
-tags: react.js snippet jquery
----
+export const frontmatter = {
+  "published": true,
+  "title": "Fade in a React.js component",
+  "tags": "react.js snippet jquery"
+};
+
+
 
 While making [sharingbuttons.io](http://sharingbuttons.io), I was searching for a way to fade in a component once it has finished loading. Thankfully, React calls the `componentDidMount` function after the initial render, so this is what I ended up hooking into.
 

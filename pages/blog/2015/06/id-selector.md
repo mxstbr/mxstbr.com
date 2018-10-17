@@ -1,8 +1,10 @@
----
-published: true
-title: A little known way to escape CSS ID selector hell
-tags: css specificity
----
+export const frontmatter = {
+  "published": true,
+  "title": "A little known way to escape CSS ID selector hell",
+  "tags": "css specificity"
+};
+
+
 
 Specificity in CSS is a b*tch. If you have ever had to fix a nasty styling bug caused by an ID selector or unhealthy amounts of nesting, my heartfelt sympathy.
 

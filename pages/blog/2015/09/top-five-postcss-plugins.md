@@ -1,8 +1,10 @@
----
-published: true
-title: My Top 5 PostCSS Plugins
-tags: css postcss
----
+export const frontmatter = {
+  "published": true,
+  "title": "My Top 5 PostCSS Plugins",
+  "tags": "css postcss"
+};
+
+
 
 There has been a lot of talk recently about a new CSS preprocessor called PostCSS.[^1] PostCSS is a wrapper for plugins which exposes an easy to use, but powerful API. Plugins can then use this API to change something in your CSS – or not. This makes PostCSS modular and extensible. While it is possible to [replicate other preprocessors features](https://github.com/jonathantneal/precss), PostCSS [can](https://github.com/anandthakker/doiuse) [do](https://github.com/MohammadYounes/rtlcss) [so](https://github.com/jonathantneal/postcss-font-magician) [much](https://github.com/postcss/autoprefixer) [more](http://cssnano.co/optimisations/).
 

@@ -1,12 +1,14 @@
----
-published: true
-hidden: false
-title: "DangerJS: The open source maintainers best friend"
-tags: oss javascript
-twitter_large: true
-image: danger-meta.png
-custom_excerpt: "Danger checks that incoming PRs have the right style. She helps avoid cultural mishaps and common issues, and is an indispensable tool for any open source maintainer."
----
+export const frontmatter = {
+  "published": true,
+  "hidden": false,
+  "title": "DangerJS: The open source maintainers best friend",
+  "tags": "oss javascript",
+  "twitter_large": true,
+  "image": "danger-meta.png",
+  "custom_excerpt": "Danger checks that incoming PRs have the right style. She helps avoid cultural mishaps and common issues, and is an indispensable tool for any open source maintainer."
+};
+
+
 
 Often users don't realise how much time open source maintainers spend triaging incoming Pull Requests. While it's very much appreciated and welcome, the mental overhead of reviewing a tiny code change is non-trivial. The long-term roadmap, release schedule, test situation, change type (patch/minor/major) and many other factors have to be taken into consideration and make for quite a lot of context switching.
 

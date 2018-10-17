@@ -1,10 +1,12 @@
----
-published: true
-hidden: false
-title: "Integrations as first class citizens"
-tags: atom git
-custom_excerpt: "Why I use Atom as my editor of choice, even though other editors may be faster, simpler or better."
----
+export const frontmatter = {
+  "published": true,
+  "hidden": false,
+  "title": "Integrations as first class citizens",
+  "tags": "atom git",
+  "custom_excerpt": "Why I use Atom as my editor of choice, even though other editors may be faster, simpler or better."
+};
+
+
 
 I was a Sublime Text user until I gave Atom a try. After using it exclusively for a few weeks there was no way for me to go back to Sublime Text, mainly due to a single feature: the git tree view integration.
 

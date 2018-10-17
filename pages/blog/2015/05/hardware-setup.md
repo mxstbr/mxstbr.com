@@ -1,8 +1,10 @@
----
-published: false
-title: My Gear
-tags: setup hardware
----
+export const frontmatter = {
+  "published": false,
+  "title": "My Gear",
+  "tags": "setup hardware"
+};
+
+
 
 I am always interested in other peoples tech stacks, both software and hardware wise, so I thought I might as well share mine. (The software one will come soon^(tm))
 

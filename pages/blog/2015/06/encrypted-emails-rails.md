@@ -1,8 +1,10 @@
----
-published: false
-title: Sending encrypted emails with Rails
-tags: cryptography rails
----
+export const frontmatter = {
+  "published": false,
+  "title": "Sending encrypted emails with Rails",
+  "tags": "cryptography rails"
+};
+
+
 
 For the new website of the [pgp.asc](http://pgpasc.org) initiative, I wanted to make Hall of Fame entry automatic with no human intervention needed. For those who haven't heard of it, pgp.asc aims to decentralise public PGP keys. In practice you put your PGP key in the root folder of your server, so it is accessible by going to `http://yourdomain.com/pgp.asc`.
 

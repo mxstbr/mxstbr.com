@@ -1,12 +1,14 @@
----
-published: true
-hidden: false
-title: The magic behind 💅 styled-components
-tags: styling react styled-components
-twitter_large: true
-image: styled-components-magic.png
-custom_excerpt: Never seen that magic backtick styled.div`` notation? It's actually just JavaScript, no fancy transpiler needed! What that is, how it works and what it does? Let's find out!
----
+export const frontmatter = {
+  "published": true,
+  "hidden": false,
+  "title": "The magic behind 💅 styled-components",
+  "tags": "styling react styled-components",
+  "twitter_large": true,
+  "image": "styled-components-magic.png",
+  "custom_excerpt": "Never seen that magic backtick styled.div`` notation? It's actually just JavaScript, no fancy transpiler needed! What that is, how it works and what it does? Let's find out!"
+};
+
+
 
 If you've never seen [`styled-components`](https://styled-components.com) before, this is what a styled React component looks like:
 

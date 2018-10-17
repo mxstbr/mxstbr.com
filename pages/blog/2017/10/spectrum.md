@@ -1,12 +1,14 @@
----
-published: true
-hidden: false
-title: "Starting something new: Introducing Spectrum"
-tags: spectrum personal
-twitter_large: true
-image: spectrum.png
-custom_excerpt: "Seven months ago I quietly started working on a new project: not an open source or side project, but a product and a company. Say hello to Spectrum!"
----
+export const frontmatter = {
+  "published": true,
+  "hidden": false,
+  "title": "Starting something new: Introducing Spectrum",
+  "tags": "spectrum personal",
+  "twitter_large": true,
+  "image": "spectrum.png",
+  "custom_excerpt": "Seven months ago I quietly started working on a new project: not an open source or side project, but a product and a company. Say hello to Spectrum!"
+};
+
+
 
 Seven months ago I quietly started working on a new project: not an open source or side project, but a product and a company. It’s called [Spectrum](https://spectrum.chat).
 

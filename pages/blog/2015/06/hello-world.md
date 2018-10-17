@@ -1,8 +1,10 @@
----
-layout: post
-title:  "Hello World"
-tags: hello world
----
+export const frontmatter = {
+  "layout": "post",
+  "title": "Hello World",
+  "tags": "hello world"
+};
+
+
 
 Welcome to my new blog! This is its fourth or fifth redesign. Know how many blog posts I have released up until now? One.
 

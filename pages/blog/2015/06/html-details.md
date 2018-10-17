@@ -1,8 +1,10 @@
----
-published: true
-title: <details>
-tags: html
----
+export const frontmatter = {
+  "published": true,
+  "title": "<details>",
+  "tags": "html"
+};
+
+
 
 Toggling the visibility of content used to be quite tricky to do. Either you used some wonky CSS hacks with hidden checkboxes and labels, or you used JavaScript. Well, this is about to change thanks to a new HTML5 element called `details`.
 

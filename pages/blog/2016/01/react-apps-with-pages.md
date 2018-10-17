@@ -1,8 +1,10 @@
----
-published: true
-title: React.js Apps with Pages
-tags: react react-router webpack
----
+export const frontmatter = {
+  "published": true,
+  "title": "React.js Apps with Pages",
+  "tags": "react react-router webpack"
+};
+
+
 
 If you've ever made a Single Page Application with a JavaScript framework, chances are you used routing. Routing lets you pretend that your application has "pages". Users can go to `yourdomain.com/about` and get a "page" that shows information about the company.
 

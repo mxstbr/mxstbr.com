@@ -1,8 +1,10 @@
----
-published: true
-title: My Top 3 Lifelogging Apps
-tags: lifelogging apps
----
+export const frontmatter = {
+  "published": true,
+  "title": "My Top 3 Lifelogging Apps",
+  "tags": "lifelogging apps"
+};
+
+
 
 I am a big fan of the Quantified Self movement. As a lover of statistics, being able to analyse my life is the best thing ever. Knowing how many kilometres I walk, what websites and programs I spend the most time on and which places I visit for each day is really interesting, and totally gets rid of the need to write a diary. 
 

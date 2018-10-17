@@ -1,8 +1,10 @@
----
-published: true
-title: Rem Font Sizing
-tags: css sass mixin
----
+export const frontmatter = {
+  "published": true,
+  "title": "Rem Font Sizing",
+  "tags": "css sass mixin"
+};
+
+
 
 I love using `rem` units for font-sizing on my web pages. It makes responsiveness much easier to implement, and you cannot get tangled up in a mess of nested `em`s. In fact, have a look at the source code of this blog — `rem` everywhere! The easiest way to use `rem`s is to set the base font-size to 62.5%.
 

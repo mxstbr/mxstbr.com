@@ -1,12 +1,14 @@
----
-published: true
-hidden: false
-title: "2016 in review: A dream come true"
-tags: 2016 review
-twitter_large: true
-image: open-source-sentry.jpg
-custom_excerpt: "What happened in 2016? This is my story, full of open source, travel and tweets. How did react-boilerplate, styled-components and Carte Blanche come to be?"
----
+export const frontmatter = {
+  "published": true,
+  "hidden": false,
+  "title": "2016 in review: A dream come true",
+  "tags": "2016 review",
+  "twitter_large": true,
+  "image": "open-source-sentry.jpg",
+  "custom_excerpt": "What happened in 2016? This is my story, full of open source, travel and tweets. How did react-boilerplate, styled-components and Carte Blanche come to be?"
+};
+
+
 
 Originally this review was meant to solely be about 2016, but as it started coming along I noticed that the narrative didn't make any sense without any context. So, I'll start from the beginning, my time in London, to explain how react-boilerplate, styled-components and more came to be.
 

@@ -1,8 +1,10 @@
----
-published: true
-title: CSS3 Animation Events in JavaScript
-tags: javascript css animation
----
+export const frontmatter = {
+  "published": true,
+  "title": "CSS3 Animation Events in JavaScript",
+  "tags": "javascript css animation"
+};
+
+
 
 I first came in contact with these events while revamping my personal website, http://mxstbr.com. The loading animation is an infinite animation that gets stopped as soon as the webpage has loaded. To achieve the border—closing effect, I used the `animationiteration` event and a few `setTimout`s. 
 

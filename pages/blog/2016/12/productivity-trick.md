@@ -1,10 +1,12 @@
----
-published: true
-hidden: false
-title: My one weird trick to be more productive
-tags: productivity hack
-custom_excerpt: Sometimes, I have unproductive days, doing nothing except watching videos all day long. During a particularly bad week, I noticed a tiny thing that helps me stay on track.
----
+export const frontmatter = {
+  "published": true,
+  "hidden": false,
+  "title": "My one weird trick to be more productive",
+  "tags": "productivity hack",
+  "custom_excerpt": "Sometimes, I have unproductive days, doing nothing except watching videos all day long. During a particularly bad week, I noticed a tiny thing that helps me stay on track."
+};
+
+
 
 Sometimes, I have unproductive days, doing nothing except watching videos all day long. (My girlfriend can attest to that...) After one of those I always feel horrible for procrastinating and not getting anything done.
 
