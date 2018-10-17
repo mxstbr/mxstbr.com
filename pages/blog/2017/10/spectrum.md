@@ -1,3 +1,5 @@
+import PageHeader from '../../../../components/PageHeader'
+
 export const frontmatter = {
   "published": true,
   "hidden": false,
@@ -8,7 +10,7 @@ export const frontmatter = {
   "custom_excerpt": "Seven months ago I quietly started working on a new project: not an open source or side project, but a product and a company. Say hello to Spectrum!"
 };
 
-
+<PageHeader title="Starting something new: Introducing Spectrum" />
 
 Seven months ago I quietly started working on a new project: not an open source or side project, but a product and a company. It’s called [Spectrum](https://spectrum.chat).
 
