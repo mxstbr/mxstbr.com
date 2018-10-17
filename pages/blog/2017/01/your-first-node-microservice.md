@@ -60,7 +60,7 @@ $ micro index.js
 
 Open the page in your browser and this is what you'll see:
 
-![A browser page showing "Hello World! 👋"](/img/micro-hello-world.png)
+![A browser page showing "Hello World! 👋"](/static/images/micro-hello-world.png)
 
 ## Building something useful
 
@@ -120,7 +120,7 @@ module.exports = function (request, response) {
 
 Restart the service again, open `localhost:3000/foo` in your browser and refresh a bunch of times. This what you'll see:
 
-![A webpage showing "This page has 5 visits!"](/img/micro-visit-counter.png)
+![A webpage showing "This page has 5 visits!"](/static/images/micro-visit-counter.png)
 
 > This is basically how I ended up building [`micro-analytics`](https://github.com/mxstbr/micro-analytics) in a few hours. It's the same concept, with a few more features, and once I knew what I was building the code to build it was easy.
 

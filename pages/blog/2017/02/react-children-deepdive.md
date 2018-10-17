@@ -43,7 +43,7 @@ Let's say we have a `<Grid />` component which can contain `<Row />` components.
 
 <figure>
   <a target="_blank" href="http://www.webpackbin.com/Ekg_vyjPz">
-    <img alt="The rendered components, one Grid containing three rows" src="/img/react-children-grid-row.png" />
+    <img alt="The rendered components, one Grid containing three rows" src="/static/images/react-children-grid-row.png" />
     <figcaption><a target="_blank" href="http://www.webpackbin.com/Ekg_vyjPz">(Live demo)</a></figcaption>
   </a>
 </figure>
@@ -82,7 +82,7 @@ Children in React don't have to be components, they can be anything. For example
 
 <figure>
   <a target="_blank" href="http://www.webpackbin.com/N1FUPocvz">
-    <img alt="The grid component rendering 'Hello world!'" src="/img/react-children-grid-string.png" />
+    <img alt="The grid component rendering 'Hello world!'" src="/static/images/react-children-grid-string.png" />
     <figcaption><a target="_blank" href="http://www.webpackbin.com/N1FUPocvz">(Live demo)</a></figcaption>
   </a>
 </figure>
@@ -122,7 +122,7 @@ You can also mix and match multiple types of children perfectly fine:
 
 <figure>
   <a target="_blank" href="http://www.webpackbin.com/E1IpLQ3PM">
-    <img alt="The grid component rendering two rows and some text" src="/img/react-children-grid-mixed.png" />
+    <img alt="The grid component rendering two rows and some text" src="/static/images/react-children-grid-mixed.png" />
     <figcaption><a target="_blank" href="http://www.webpackbin.com/E1IpLQ3PM">(Live demo)</a></figcaption>
   </a>
 </figure>
@@ -203,14 +203,14 @@ The `<IgnoreFirstChild />` component here maps over all its children, ignoring t
 
 <figure>
   <a target="_blank" href="http://www.webpackbin.com/NyfgFQ2wz">
-    <img alt="Some text saying 'Second'" src="/img/react-children-map.png" />
+    <img alt="Some text saying 'Second'" src="/static/images/react-children-map.png" />
     <figcaption><a target="_blank" href="http://www.webpackbin.com/NyfgFQ2wz">(Live demo)</a></figcaption>
   </a>
 </figure>
 
 In this case, we could've also used `this.props.children.map`. But what would've happened if somebody passed a function as a child? `this.props.children` would've been a function instead of an array, and we would've had an error! 😱
 
-![TypeError: this.props.children.map is not a function](/img/react-children-error.png)
+![TypeError: this.props.children.map is not a function](/static/images/react-children-error.png)
 
 With the `React.Children.map` function though, this is no problem whatsoever:
 
@@ -282,7 +282,7 @@ The above example renders the strings, but sorted:
 
 <figure>
   <a target="_blank" href="http://www.webpackbin.com/NyE2TQhwz">
-    <img alt="apples bananas oranges" src="/img/react-children-apples-bananas-oranges.png" />
+    <img alt="apples bananas oranges" src="/static/images/react-children-apples-bananas-oranges.png" />
     <figcaption><a target="_blank" href="http://www.webpackbin.com/NyE2TQhwz">(Live demo)</a></figcaption>
   </a>
 </figure>
@@ -343,7 +343,7 @@ There is an issue with this code though. The `input`s aren't grouped, which lead
 
 <figure>
   <a target="_blank" href="http://www.webpackbin.com/Vk-Vt_VawM">
-    <img alt="Three radio buttons, all selected" src="/img/react-children-radio-bug.png" />
+    <img alt="Three radio buttons, all selected" src="/static/images/react-children-radio-bug.png" />
     <figcaption><a target="_blank" href="http://www.webpackbin.com/Vk-Vt_VawM">(Live demo)</a></figcaption>
   </a>
 </figure>
@@ -437,7 +437,7 @@ The last step is to pass a unique `name` to our `RadioGroup`:
 
 <figure>
   <a target="_blank" href="http://www.webpackbin.com/41gz34aDM">
-    <img alt="Three radio buttons, one of them selected" src="/img/react-children-radio-done.png" />
+    <img alt="Three radio buttons, one of them selected" src="/static/images/react-children-radio-done.png" />
     <figcaption><a target="_blank" href="http://www.webpackbin.com/41gz34aDM">(Live demo)</a></figcaption>
   </a>
 </figure>
@@ -448,4 +448,4 @@ It works! 🎉 Instead of manually having to set the `name` attribute on every `
 
 Children make React components feel like markup instead of disjointed entities. Using the power of JavaScript and some React helper functions we can work with them to create declarative APIs and make our lives easier.
 
-<small class="footnote">Thanks to [Karl Horky](https://twitter.com/karlhorky){:target="_blank"} and [Jake Trent](http://jaketrent.com/post/send-props-to-children-react/){:target="_blank"}.</small>
+<small class="footnote">Thanks to [Karl Horky](https://twitter.com/karlhorky) and [Jake Trent](http://jaketrent.com/post/send-props-to-children-react/).</small>

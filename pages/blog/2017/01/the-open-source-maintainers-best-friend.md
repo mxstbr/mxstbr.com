@@ -42,7 +42,7 @@ if (!changelogEdited) {
 
 This is what it ends up looking like:
 
-![Danger commenting on GitHub with the above text](/img/danger-changelog-error.png)
+![Danger commenting on GitHub with the above text](/static/images/danger-changelog-error.png)
 
 > See the [DangerJS repo](https://github.com/danger/danger-js) for instructions how to connect this to your CI service
 

@@ -91,7 +91,7 @@ This is where it gets really interesting; as you can see we didn't just get a si
 
 We still get an array as the first argument, which now has two elements: the `I like` part right before the interpolation as the first element and the `.` part after the interpolation as the second element. The interpolated content `favoriteFood` is passed as the second argument.
 
-<pre><code><img alt="The above explanation graphically displayed" src="/img/logargs-explanation.png" /></code></pre>
+<pre><code><img alt="The above explanation graphically displayed" src="/static/images/logargs-explanation.png" /></code></pre>
 
 As you can see, the big difference is that by calling `logArgs` as a tagged template literal we get our template literal all split up, with the raw text first in an array and then the interpolation.
 

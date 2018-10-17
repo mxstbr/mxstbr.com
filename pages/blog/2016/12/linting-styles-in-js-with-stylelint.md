@@ -90,7 +90,7 @@ In the `result` step I then replace each mention of "brace" in all error message
 
 This is what that looks like now that it's done 🎉
 
-<video width="100%" height="334.5px" loop controls id="stylelint-video" data-src="/img/stylelint-processor.mov"></video>
+<video width="100%" height="334.5px" loop controls id="stylelint-video" data-src="/static/images/stylelint-processor.mov"></video>
 
 While it _works_, as you can imagine there's quite a few edge cases and I definitely haven't fixed all of them yet. Feel free to take a look [at the source](https://github.com/styled-components/stylelint-processor-styled-components) and if you use `styled-components` please try it out and let me know how it went!
 

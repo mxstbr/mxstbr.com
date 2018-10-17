@@ -26,6 +26,6 @@ The worst thing that can happen by pushing something to GitHub is that you've no
 
 Eventually you will create something that other people find valuable and use and it'll be a "real" open source project with stars, issues, pull requests and whatnot. But that’s a by-product of you solving your own problems and exercising your open source muscle.
 
-<small class="footnote">Thanks to [Karl Horky](https://twitter.com/karlhorky){:target="_blank"} and [Nik Graf](https://twitter.com/nikgraf){:target="_blank"}.</small>
+<small class="footnote">Thanks to [Karl Horky](https://twitter.com/karlhorky) and [Nik Graf](https://twitter.com/nikgraf).</small>
 
 [^1]: Please make sure your company allows you to do this, and that you add unit tests, document the public API, add a license etc.
