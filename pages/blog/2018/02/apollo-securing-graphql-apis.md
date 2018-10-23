@@ -9,5 +9,3 @@ export const frontmatter = {
   "twitter_large": true,
   "custom_excerpt": "Working with GraphQL is amazing, but also has complex security implications. Let’s dig into some essential protections for your API, from simple size limiting through depth limiting to query analysis."
 };
-
-

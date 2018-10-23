@@ -19,7 +19,7 @@ export const OrderedList = styled.ol`
   ${baseListStyles};
 `;
 const ListItemText = styled(Paragraph).attrs({
-  mb: 2
+  my: 1
 })``;
 export const ListItem = (props: RebassProps) => (
   <li>

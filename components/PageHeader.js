@@ -13,7 +13,7 @@ export default (props: Props) => (
   <Flex
     flexDirection="column"
     width={1}
-    mb={4}
+    mb={props.children ? 4 : 3}
     mt={[4, 5]}
     justifyContent="center"
     {...{ ...props, title: undefined }}

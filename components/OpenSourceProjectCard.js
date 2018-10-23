@@ -19,7 +19,7 @@ const StarIcon = props => (
     <Star size="1em" />
   </Icon>
 );
-const Title = props => <H3 {...props} lineHeight={1} my={0} />;
+const Title = props => <H3 {...props} fontSize={3} lineHeight={1} my={0} />;
 const Description = props => (
   <Text color="#666" fontSize={2} lineHeight={1.25} {...props} mb={4} mt={2} />
 );

@@ -1,3 +1,5 @@
+import PageHeader from '../../../../components/PageHeader'
+
 export const frontmatter = {
   "published": true,
   "hidden": false,
@@ -8,13 +10,13 @@ export const frontmatter = {
   "custom_excerpt": "A microservice is a single, self-contained unit which, together with many others, makes up a large application. Let's write our first microservice in JavaScript!"
 };
 
-
+<PageHeader title="Build your first Node.js microservice" />
 
 A microservice is a single self-contained unit which, together with many others, makes up a large application. By splitting your app into small units every part of it is independently deployable and scalable, can be written by different teams and in different programming languages and can be tested individually.
 
 [`micro`](https://github.com/zeit/micro) is a tiny (~100 LoC) module that makes writing a microservice in Node.js a joy. It's easy to use and super fast. No matter if you've used Node.js before or not, after this post you'll be able to write your own microservices!
 
-## The Setup
+### The Setup
 
 There are two tiny steps needed for the setup, first we need to install `micro`:
 
@@ -30,7 +32,7 @@ And second we need to create a file that will contain our microservice. Let's ca
 touch index.js
 ```
 
-## The First Steps
+### The First Steps
 
 Our `index.js` file needs to export a single function, which `micro` will pass the incoming request and a response object to:
 
@@ -64,7 +66,7 @@ Open the page in your browser and this is what you'll see:
 
 ![A browser page showing "Hello World! 👋"](/static/images/micro-hello-world.png)
 
-## Building something useful
+### Building something useful
 
 Since that's quite boring, let's build something useful! We want to make a microservice which remembers how many times a certain path has been requested. So when the first request to `/foo` comes in, it should return `1`. When another request to `/foo` comes in, it should return `2`, and so on.
 
@@ -126,7 +128,7 @@ Restart the service again, open `localhost:3000/foo` in your browser and refresh
 
 > This is basically how I ended up building [`micro-analytics`](https://github.com/mxstbr/micro-analytics) in a few hours. It's the same concept, with a few more features, and once I knew what I was building the code to build it was easy.
 
-## Persisting Data
+### Persisting Data
 
 Something you might notice about our service is that the data is deleted whenever we restart the server. We don't save the visits to a database, they solely exists in memory. Let's fix that!
 

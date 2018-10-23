@@ -4,11 +4,11 @@ export const frontmatter = {
   "tags": "javascript css animation"
 };
 
-
+## CSS3 Animation Events in JavaScript
 
 I first came in contact with these events while revamping my personal website, http://mxstbr.com. The loading animation is an infinite animation that gets stopped as soon as the webpage has loaded. To achieve the border—closing effect, I used the `animationiteration` event and a few `setTimout`s. 
 
-## Basics
+### Basics
 There are 3 CSS3 animation events you can bind in JavaScript:
 
 1. `animationstart` — fires when the animation starts
@@ -17,7 +17,7 @@ There are 3 CSS3 animation events you can bind in JavaScript:
 
 Even though these events are supported by most browsers, prefixes have to be included for Safari, IE and Opera. To make our life even worse, the prefixed versions are camelCased, while the normal version is not. 
 
-## Prefixing
+### Prefixing
 With help by the great [Rachel Nabors](https://twitter.com/RachelNabors), I created a handy snippet to make using those events easier. They will save the correctly prefixed version in the global `animationStart`, `animationIteration` and `animationEnd` variables, which you can then use to bind the event.
 
 ```JavaScript

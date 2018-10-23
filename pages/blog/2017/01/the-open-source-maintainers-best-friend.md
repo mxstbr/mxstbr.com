@@ -1,3 +1,5 @@
+import PageHeader from '../../../../components/PageHeader'
+
 export const frontmatter = {
   "published": true,
   "hidden": false,
@@ -8,7 +10,7 @@ export const frontmatter = {
   "custom_excerpt": "Danger checks that incoming PRs have the right style. She helps avoid cultural mishaps and common issues, and is an indispensable tool for any open source maintainer."
 };
 
-
+<PageHeader title="DangerJS: The open source maintainers best friend" />
 
 Often users don't realise how much time open source maintainers spend triaging incoming Pull Requests. While it's very much appreciated and welcome, the mental overhead of reviewing a tiny code change is non-trivial. The long-term roadmap, release schedule, test situation, change type (patch/minor/major) and many other factors have to be taken into consideration and make for quite a lot of context switching.
 
@@ -20,7 +22,7 @@ None of these are related to the change at hand and distract not only from the c
 
 I'm sure if you're a maintainer of an open source project you've experienced this before, and maybe even thought "Wouldn't it be nice to automate this?". I know I have.
 
-## Danger
+### Danger
 
 The good news, that's exactly what Danger does! 🎉
 

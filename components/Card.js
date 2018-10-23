@@ -5,7 +5,15 @@ import Text from "./Text";
 import BoxShadow from "./BoxShadow";
 
 const Title = styled(props => (
-  <H3 pl={[3, 4]} pr={[3, 4]} pt={[3, 4]} my={0} lineHeight={1} {...props} />
+  <H3
+    pl={[3, 4]}
+    pr={[3, 4]}
+    pt={[3, 4]}
+    my={0}
+    lineHeight={1}
+    fontSize={3}
+    {...props}
+  />
 ))``;
 
 const BaseCard = styled(Card)`
