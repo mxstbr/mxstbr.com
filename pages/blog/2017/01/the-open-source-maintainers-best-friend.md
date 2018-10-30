@@ -10,7 +10,7 @@ export const frontmatter = {
   "custom_excerpt": "Danger checks that incoming PRs have the right style. She helps avoid cultural mishaps and common issues, and is an indispensable tool for any open source maintainer."
 };
 
-<PageHeader title="DangerJS: The open source maintainers best friend" />
+<PageHeader title="DangerJS: The open source maintainers best friend" image="/static/images/danger-meta.png" />
 
 Often users don't realise how much time open source maintainers spend triaging incoming Pull Requests. While it's very much appreciated and welcome, the mental overhead of reviewing a tiny code change is non-trivial. The long-term roadmap, release schedule, test situation, change type (patch/minor/major) and many other factors have to be taken into consideration and make for quite a lot of context switching.
 

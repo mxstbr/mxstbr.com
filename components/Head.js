@@ -43,7 +43,11 @@ export default withRouter(({ title, description, image, router }: Props) => (
       />
     )}
     {image != undefined && (
-      <meta property="og:image" key="og:image" content={image} />
+      <meta
+        property="og:image"
+        key="og:image"
+        content={`https://mxstbr.com${image}`}
+      />
     )}
 
     {/* TWITTER */}

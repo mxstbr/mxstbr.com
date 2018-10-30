@@ -11,9 +11,14 @@ const Code = styled(Box).attrs({
   fontSize: 2
 })`
   line-height: 1.4;
-  font-family: Consolas, Monaco, monospace;
+  font-family: Inconsolata, Monaco, monospace;
   color: ${props => props.theme.colors.text};
   border-radius: 3px;
+`;
+
+const InlineCode = styled(Code)`
+  background-color: ${props => props.theme.colors.greys[0]};
+  ${"" /* border: 1px solid ${props => props.theme.colors.greys[1]}; */} padding: 0 0.25em;
 `;
 
 const Pre = styled(Box).attrs({
@@ -41,7 +46,7 @@ export default {
   ol: OrderedList,
   li: ListItem,
   img: Image,
-  pre: props => <Pre {...props} />,
-  code: props => <Code {...props} />,
-  inlineCode: props => <code {...props} />
+  pre: Pre,
+  code: Code,
+  inlineCode: InlineCode
 };

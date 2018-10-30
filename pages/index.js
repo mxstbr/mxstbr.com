@@ -20,6 +20,8 @@ import Image from "../components/Image";
 import Main from "../components/Main";
 import PageHeader from "../components/PageHeader";
 import WideSection from "../components/WideSection";
+import Head from "../components/Head";
+import { DEFAULT_TITLE } from "./_app";
 
 import appearances from "../appearances";
 import projects from "../open-source-projects";
@@ -88,6 +90,8 @@ class Homepage extends React.Component<Props> {
             powder. 🤙
           </Paragraph>
         </PageHeader>
+        {/* Render default title */}
+        <Head title={DEFAULT_TITLE} />
         <H2 mt={3}>Featured Open Source Projects</H2>
         <WideSection>
           <CardGrid>
