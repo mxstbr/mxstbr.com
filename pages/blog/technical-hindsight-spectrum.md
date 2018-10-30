@@ -1,16 +1,18 @@
 import PageHeader from '../../components/PageHeader';
 
-<PageHeader title="CTO Regrets: What I'd do differently" />
+<PageHeader title="CTO Regrets: What I'd Do Differently" />
 
-I'm the technical cofounder of [Spectrum](https://spectrum.chat) ([learn more about it](/blog/2017/10/spectrum)). With the benefit of hindsight, here's some technical decisions I'd change if we were to start over.
+In case you're new here, 👋 hey I'm Max, the technical cofounder of [Spectrum](https://spectrum.chat). Spectrum is a real-time, public, threaded chat app for large-scale communities. We're a team of three who all code, and we've been working on Spectrum for almost two years. It's also [fully open source](https://github.com/withspectrum/spectrum), so feel free to check out our code for more context.
 
-### Go mobile-first with react-native-web
+With the benefit of hindsight, here's some technical decisions I'd change if we were to start over.
 
-Not choosing [react-native-web](https://github.com/necolas/react-native-web) is the biggest regret I have. People use apps on their phone so much more than web apps, especially chat apps like Spectrum.
+### Go mobile-first and use react-native-web
 
-Our bet on search-indexed public chat paid off, so going web-first was the right call. We should've used react-native-web and optimised our web app for mobile though. We could've then shipped the same codebase as native apps!
+People use apps on their phone so much more than web apps, especially for chatting. For us, going web-first was still the right call as we correctly bet on search-indexing being important.
 
-The posterchild of this approach is the new and awesome [mobile.twitter.com](https://mobile.twitter.com). It's so much better that the current Twitter website that they're going to move it to twitter.com soon.
+Having said that, we should've optimised our web app for mobile. Lots of frequent users use Spectrum on their phones, and it's not a great experience at the moment. 
+
+If we'd done that and used [react-native-web](https://github.com/necolas/react-native-web) we could've quickly shipped the same codebase as native apps. That would've been a huge win for us and our users!
 
 ### Use Next.js for server-side rendering
 
@@ -52,19 +54,27 @@ const Query = {
 
 While that's great, there's a new kid on the block and it's even more awesome: [Prisma](https://prisma.io).
 
-Prisma is _amazing_. We are already using GraphQL for our API, so using the GraphQL SDL to define our db schema would have been a natural fit. That abstraction in turn allows for some phenomal developer experience enhancements:
+We are already using GraphQL for our API, so using the GraphQL SDL to define our db schema would have been a natural fit. On top of that, Prisma automatically generates(!) type-safe(!!) database queries and migrations(!!!)—a phenomenal developer experience! Let's look at the same GraphQL resolver again, but this time using Prisma:
 
-- Auto-generated, type-safe (!) database queries
-- Automatic migrations when you change the db schema
-- A sensational developer experience in Node:
-
-  ```JS
-  const Query = {
-    User: {
-      threads: ({ id }, { after, first }, { prisma }) => 
-        prisma.user({ id }).threads({ first, after }),
-    }
+```JS
+const Query = {
+  User: {
+    threads: ({ id }, { after, first }, { prisma }) => 
+      prisma.user({ id }).threads({ first, after }),
   }
-  ```
+}
+```
 
-Using Prisma would have saved us so much time and from so many bugs. Automatically generated and fully type safe database queries? Automatically generated migrations?! Yes please!
+Using Prisma would have let us move much quicker and avoid many bugs.
+
+### Summary
+
+To summarise, if we were to start over, I would:
+
+- ...optimise for mobile first
+- ...use react-native-web to quickly ship native apps
+- ...use Next.js for the web app
+- ...leverage a more established database
+- ...use Prisma as the "ORM"
+
+I'd love to know what your current stack is and what you'd like to change about it! Ping me [on Twitter](https://twitter.com/mxstbr) and tell me about your project.
