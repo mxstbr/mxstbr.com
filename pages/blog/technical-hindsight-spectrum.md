@@ -2,6 +2,11 @@ import PageHeader from '../../components/PageHeader';
 
 <PageHeader title="CTO Regrets: What I'd Do Differently" />
 
+export const frontmatter = {
+  published: false,
+  hidden: true
+}
+
 In case you're new here, 👋 hey I'm Max, the technical cofounder of [Spectrum](https://spectrum.chat). Spectrum is a real-time, public, threaded chat app for large-scale communities. We're a team of three who all code, and we've been working on Spectrum for almost two years. It's also [fully open source](https://github.com/withspectrum/spectrum), so feel free to check out our code for more context.
 
 With the benefit of hindsight, here's some technical decisions I'd change if we were to start over.
