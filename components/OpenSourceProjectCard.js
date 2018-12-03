@@ -95,7 +95,7 @@ class OpenSourceProjectCard extends React.Component<Props, State> {
             <Flex justifyContent="space-between">
               <FinePrint>{repo}</FinePrint>
               {this.props.stars != undefined && (
-                <FinePrint width="5em" textAlign="right">
+                <FinePrint width="5.1em" textAlign="right">
                   {this.props.stars.toLocaleString("en")}
                   <StarIcon />
                 </FinePrint>
