@@ -1,7 +1,7 @@
 import React from "react";
 import styled, { css } from "styled-components";
 import { Flex } from "rebass";
-import { Twitter, Github, Camera } from "react-feather";
+import { Twitter, GitHub, Camera } from "react-feather";
 import Link from "../Link";
 import Text from "../Text";
 import Layout from "../Layout";
@@ -28,7 +28,7 @@ export default (props: {}) => (
         <Text mb={1} color="#666">
           <Link href="https://github.com/mxstbr/mxstbr.com">
             <Icon mr={2} ml={0}>
-              <Github size="1em" />
+              <GitHub size="1em" />
             </Icon>
             View Source
           </Link>
