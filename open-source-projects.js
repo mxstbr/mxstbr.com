@@ -14,7 +14,7 @@ const projects: Array<OpenSourceProject> = [
     name: "Spectrum",
     description:
       "The community platform for the future. Grow safe, successful online communities that are built to last.",
-    stars: 4936,
+    stars: 5448,
     background: "linear-gradient(to top right, #7213FB, #4F16EE)",
     featured: true
   },
@@ -23,7 +23,7 @@ const projects: Array<OpenSourceProject> = [
     name: "styled-components",
     description:
       "Visual primitives for the component age. Use the best bits of ES6 and CSS to style your apps without stress",
-    stars: 20329,
+    stars: 20673,
     background: "linear-gradient(to top right, #DB7093, #DAA357)",
     featured: true
   },
@@ -32,7 +32,7 @@ const projects: Array<OpenSourceProject> = [
     name: "react-boilerplate",
     description:
       "A foundation for React apps with a focus on scalability, developer experience and best practices.",
-    stars: 20436,
+    stars: 20624,
     background: "linear-gradient(to bottom right, #6D6E72, #9EA0A6)",
     featured: true
   },
