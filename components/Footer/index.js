@@ -30,7 +30,7 @@ export default (props: {}) => (
             <Icon mr={2} ml={0}>
               <Github size="1em" />
             </Icon>
-            GitHub
+            View Source
           </Link>
         </Text>
         <Text color="#666">
