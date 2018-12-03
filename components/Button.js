@@ -3,9 +3,9 @@ import styled from "styled-components";
 import { Box, type RebassProps } from "rebass";
 import BoxShadow from "./BoxShadow";
 
-export const TextButton = styled(Box).attrs({
-  as: props => props.as || "button"
-})`
+export const TextButton = styled(Box).attrs(props => ({
+  as: props.as || "button"
+}))`
   text-decoration: none;
   color: inherit;
   display: inline-block;
@@ -14,10 +14,10 @@ export const TextButton = styled(Box).attrs({
   font-weight: bold;
 `;
 
-const Button = styled(Box).attrs({
-  as: props => props.as || "button",
+const Button = styled(Box).attrs(props => ({
+  as: props.as || "button",
   p: 3
-})`
+}))`
   background-color: #fff;
   border-radius: 5px;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 0px 0px;
