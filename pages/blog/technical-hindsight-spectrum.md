@@ -15,38 +15,38 @@ With the benefit of hindsight, here's some technical decisions I'd change if we 
 
 People use chat apps on their phone a lot more than on desktop. We still built a web app before native apps, as a big part of the allure of Spectrum is the search-indexing of the chats.
 
-Having said that, we should've optimised our web app for mobile first. A large part of our users view Spectrum on their phones anyway, and a good mobile experience on desktop is bearable. A crappy mobile experience isn't.
+Having said that, we should've optimised our web app for mobile first. A large part of our users view Spectrum on their phones, and a good mobile experience on desktop is bearable. A desktop or crappy mobile experience on mobile isn't.
 
-If we'd then used [react-native-web](https://github.com/necolas/react-native-web) we could've quickly shipped nice native apps, our users' most requested feature, from the same codebase—a big win!
+Native apps are our users most requested feature, but starting them from scratch slowed us down and proved too time consuming. If we'd used [react-native-web](https://github.com/necolas/react-native-web) to build our base component library we could've quickly shipped native apps—a big win for our users!
 
 ### Use Next.js for server-side rendering
 
-We knew we needed server-side rendering for SEO purposes (no, [client-side rendering doesn't cut it](https://twitter.com/mxstbr/status/985188986414161921)), but already had  a MVP of the app built with create-react-app. We thought about switching to [Next.js](https://nextjs.org), but reworking the routing setup seemed like a lot of effort. Building our own server-side rendering server, how hard could that be, right? 
+We knew we needed server-side rendering for SEO purposes (no, [client-side rendering doesn't cut it](https://twitter.com/mxstbr/status/985188986414161921)), but already had a MVP of the app built with create-react-app. We thought about switching to [Next.js](https://nextjs.org), but reworking the routing setup seemed like a lot of effort. Building our own server-side rendering server, how hard could that be, right? 🤔
 
-We should've switched to Next.js. Writing a production-ready SSR server is hard and requires a lot of maintenance. We didn't get the development experience right either, which hurt our development velocity. Next.js does so much for you out of the box, from fast performance all the way to a great development experience, that it's always worth using if you need SSR.
+We should've switched to Next.js. Writing a production-ready SSR server is hard and requires a lot of maintenance. We didn't get the development experience right either, which hurt our development momentum. Next.js does so much for you out of the box, from the amazing DX to fast performance, that it's always worth using if you need SSR.
 
 ### Leverage a well-known database
 
-We chose RethinkDB as our primary data store, mostly because of changefeeds. Changefeeds allow you to listen to live updates on (almost) any RethinkDB query. Since Spectrum has to be real-time, this seemed like a great feature to have.
+We chose RethinkDB as our primary data store, mainly because of changefeeds. Changefeeds allow you to listen to live updates on (almost) any query. Since Spectrum is a chat app, this promised to reduce complexity by avoiding a separate PubSub layer from our database for live updates (e.g. Redis). 🏎
 
-Unfortunately, we've had a lot of troubles with RethinkDB. Since it's not very widely used, there isn't much of a community around it and there is little documentation around query performance and operating a server cluster. Debugging slow queries or connection issues feels like shooting in the dark.
+Unfortunately, we've had a lot of troubles with RethinkDB. There isn't much of a community around it since it's not widely used, so there is little documentation around query performance and operations. Debugging slow queries or connection issues is often shooting in the dark, and we've had many outages and sleepless nights due to RethinkDB.
 
-We also quickly realised that changefeeds do not scale at all, you can only run few concurrently. The feature that made us chose RethinkDB in the first place turned out not to be useful in practice! While we managed to work around that eventually, we shouldn't have had to.
+It also turns out that changefeeds do not scale at all, their implementation is imperformant and they start breaking after a couple hundred concurrent ones. The feature that made us chose RethinkDB in the first place turned out not to be useful in practice! While we managed to work around it, we shouldn't have had to.
 
-If we were to do it over again, I would go with a more established database, most likely Postgres.
+If we were to do it over again, I would choose a more established database, most likely Postgres.
 
 #### ...and use Prisma as the ORM
 
-One of the other reasons we went with RethinkDB is that the Node API is incredible. See for example this GraphQL resolver, which loads the threads a user posted:
+One of the other reasons we went with RethinkDB is the Node.js driver—the API is beautiful. For example, check out this GraphQL resolver which loads a paginated list of the threads a specific user has posted:
 
 ```JS
-const getThreadsByUser = (userId: string, after?: number, first?: number) => {
+const getThreadsByUser = (userId, skip, limit) => {
   return db
     .table('threads')
     .getAll(userId, { index: 'userId' })
     .orderBy(r.desc('createdAt'))
-    .skip(after || 0)
-    .limit(first || 10)
+    .skip(skip || 0)
+    .limit(limit || 10)
     .run();
 }
 
@@ -57,7 +57,7 @@ const Query = {
 }
 ```
 
-While that's great, there's a new kid on the block and it's even more awesome: [Prisma](https://prisma.io).
+That's one pretty API! Buutttt, there's a new kid on the block and it's even better: [Prisma](https://prisma.io).
 
 We are already using GraphQL for our API, so using the GraphQL SDL to define our db schema would have been a natural fit. On top of that, Prisma automatically generates(!) type-safe(!!) database queries and migrations(!!!)—a phenomenal developer experience! Let's look at the same GraphQL resolver again, but this time using Prisma:
 
@@ -70,7 +70,9 @@ const Query = {
 }
 ```
 
-Using Prisma would have let us move quicker, be more consistent and avoid more bugs.
+😍😍😍
+
+If we were to start over I would take a good look at Prisma. While it might be too immature and cutting edge, it's worth evaluating as the DX promises to be great.
 
 ### No WYSIWYG
 
