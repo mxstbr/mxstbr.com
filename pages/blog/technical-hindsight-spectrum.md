@@ -13,9 +13,9 @@ With the benefit of hindsight, here's some technical decisions I'd change if we 
 
 ### Go mobile-first and use react-native-web
 
-In general, people prefer mobile apps over desktop apps for chatting with others. However, a big part of the allure of Spectrum is that our content is fully search-indexed. For this reason, we built out a web and desktop experience first, making it easy for crawlers to index pages and help people discover Spectrum through their own searching.
+In general, people prefer mobile apps over desktop apps for chatting with others. However, a big part of the allure of Spectrum is that the content is fully search-indexed. For this reason, we built out the web experience first, making it easy for crawlers to index pages and help people discover the threads on Spectrum.
 
-In hindsight, we should have optimised our web app for mobile first. A good responsive-mobile experience on desktop is bearable, but a desktop experience on mobile or a crappy mobile experience isn't.
+In hindsight, we should have optimised our web app for mobile first. A good mobile experience on desktop is bearable, but a desktop experience on mobile or a crappy mobile experience isn't.
 
 We still want to build native apps, but starting from scratch has proved too time consuming and we still haven't finished development. If we'd used [react-native-web](https://github.com/necolas/react-native-web) from the start to build our base component library, we could have quickly shipped native apps based on our existing web app—a big win when you're trying to move fast! 💯
 
