@@ -7,31 +7,31 @@ export const frontmatter = {
   hidden: true
 }
 
-A little bit of background: 👋 I'm Max, the technical cofounder of [Spectrum](https://spectrum.chat). Spectrum is a public, [open source](https://github.com/withspectrum/spectrum), threaded chat app for large online communities and was recently acquired by GitHub. We're a team of three, and have worked on it for almost two years.
+👋 I'm Max, the technical cofounder of [Spectrum](https://spectrum.chat). Spectrum is a public, [open source](https://github.com/withspectrum/spectrum), threaded chat app for large online communities and was recently acquired by GitHub. We're a team of three, and have worked on it for almost two years.
 
 With the benefit of hindsight, here's some technical decisions I'd change if we were to start over.
 
 ### Go mobile-first and use react-native-web
 
-People use chat apps on their phone a lot more than on desktop. We still built a web app before native apps, as a big part of the allure of Spectrum is that the content is fully search indexed.
+In general, people prefer mobile apps over desktop apps for chatting with others. However, a big part of the allure of Spectrum is that our content is fully search-indexed. For this reason, we built out a web and desktop experience first, making it easy for crawlers to index pages and help people discover Spectrum through their own searching.
 
-Having said that, we should've optimised our web app for mobile first. A good mobile experience on desktop is bearable, but a desktop experience on mobile or a crappy mobile experience isn't.
+In hindsight, we should have optimised our web app for mobile first. A good responsive-mobile experience on desktop is bearable, but a desktop experience on mobile or a crappy mobile experience isn't.
 
-We still wanted to build native apps, but starting them from scratch proved too time consuming and we still haven't finished them. If we'd used [react-native-web](https://github.com/necolas/react-native-web) to build our base component library we could've quickly shipped native apps based on our existing web app—a big win when you're trying to move fast! 💯
+We still want to build native apps, but starting from scratch has proved too time consuming and we still haven't finished development. If we'd used [react-native-web](https://github.com/necolas/react-native-web) from the start to build our base component library, we could have quickly shipped native apps based on our existing web app—a big win when you're trying to move fast! 💯
 
 ### Use Next.js for server-side rendering
 
-We knew we needed server-side rendering for SEO purposes (no, [client-side rendering doesn't cut it](https://twitter.com/mxstbr/status/985188986414161921)), but already had a MVP of the app built with create-react-app. We thought about switching to [Next.js](https://nextjs.org), but reworking the routing setup seemed like a lot of effort. Building our own production-ready server-side rendering server, how hard could that be, right? 🤔
+We knew we needed server-side rendering for SEO purposes (no, [client-side rendering doesn't cut it](https://twitter.com/mxstbr/status/985188986414161921)), but already had a MVP of the app built with [create-react-app](https://github.com/facebook/create-react-app). We thought about switching to [Next.js](https://nextjs.org), but reworking the routing setup seemed like a lot of effort. Building our own [production-ready server-side rendering server](https://github.com/withspectrum/spectrum/tree/alpha/hyperion), how hard could that be, right? 🤔
 
-Turns out, it's tough. The development experience (DX) is difficult to get right (we didn't, which hurt our momentum) and it requires a lot of maintenance. Next.js deals with so much out of the box, from the amazing DX, seamless upgrades and great community all the way to fast performance, that I'd use it in a heartbeat.
+Turns out, it's tough. The development experience (DX) is difficult to get right (we didn't, which hurt our momentum) and it requires a lot of maintenance. Next.js deals with so much out of the box, from the amazing DX, seamless upgrades and great community all the way to fast performance, that I'd use it in a heartbeat if I were starting over today.
 
 ### Leverage a well-known database
 
-We chose RethinkDB as our primary data store, mainly because of changefeeds. Changefeeds allow you to listen to live updates on (almost) any query. Since Spectrum is a chat app, this promised to reduce complexity by avoiding a separate PubSub layer for live updates.
+We chose [RethinkDB](https://www.rethinkdb.com) as our primary data store, mainly because of [changefeeds](https://rethinkdb.com/docs/changefeeds/javascript/). Changefeeds allow you to listen to live updates on (almost) any query. Since Spectrum is a chat app, this promised to reduce complexity by avoiding a separate PubSub layer for live updates.
 
 Unfortunately, we've had a lot of troubles with RethinkDB. There isn't much of a community around it since it's not widely used, so there is little documentation around query performance and operations. Debugging slow queries or connection issues often feels like shooting in the dark, and we've had many sleepless nights due to unexpected outages.
 
-It also turns out that changefeeds do not scale at all. Their implementation is imperformant and start breaking down if you have more than a couple hundred concurrent ones. The feature that made us chose RethinkDB in the first place turned out not to be useful in practice! While we've managed to work around it with some effort, we shouldn't have had to. 😕
+It also turns out that changefeeds do not scale as well as promised. Their implementation is imperformant and start breaking down if you have more than a couple hundred concurrent listeners. The feature that made us choose RethinkDB in the first place turned out not to be useful in practice! While we've managed to work around it with some effort, it slowed us down considerably. 😕
 
 If we were to do it over again, I would choose a more established database, most likely Postgres.
 
@@ -72,25 +72,25 @@ const Query = {
 
 😍😍😍
 
-If we were to start over I would take a good look at Prisma. While it might be too immature and cutting edge, it's worth evaluating as the DX promises to be great.
+If we were to start over I would take a good look at Prisma. While it might still be immature and on the cutting edge, it's worth evaluating.
 
 ### No WYSIWYG
 
-The main action users do on Spectrum is writing, so we wanted that experience to be as nice as possible. We decided to replace our MVP plain text markdown input with a custom WYSIWYG editor based on [Draft.js](https://draft-js.org).
+The main action users perform on Spectrum is writing content, so we wanted that experience to be as nice as possible. We decided to replace our MVP plaintext + Markdown input with a custom WYSIWYG editor based on [Draft.js](https://draft-js.org).
 
-Unfortunately, the writing experience sucks. Even after months of work it's not as good as our users deserve and we constantly hear complaints about it. DraftJS also has bad cross-browser support, so we need to fall back to plain text on Android anyway. 👎
+Unfortunately, the writing experience on Spectrum is buggy and breaks between browsers and operating systems. Even after months of work it's not as good as our users deserve and we constantly hear complaints about it. The lack of great cross-browser support meant that in some cases we had to fall back to a plaintext input anyways. 👎
 
-We should've stuck with the plain text + markdown input we had at the start. While non-technical folks might not be familiar with markdown, most of our users are anyway, so we should've focussed other, more important features instead of WYSIWYG editing.
+We should've stuck with the plaintext + Markdown input we had at the start. This decision would have allowed us to work on more important features instead of WYSIWYG editing.
 
 ### Summary
 
 To summarise, if we were to start over, I would:
 
-- ...optimise for mobile first
-- ...use react-native-web to quickly ship native apps
-- ...use Next.js for the web app
-- ...leverage a more established database
-- ...use Prisma as the "ORM"
-- ...not build a WYSIWYG editor
+- optimise for mobile first
+- use react-native-web to quickly ship native apps
+- use Next.js for the web app
+- leverage a more established database
+- use Prisma as the "ORM"
+- not build a WYSIWYG editor
 
 What is your current stack and what would you change about it? 🧐 Ping me [on Twitter](https://twitter.com/mxstbr) and tell me about it!
