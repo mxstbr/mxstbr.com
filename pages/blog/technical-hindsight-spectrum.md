@@ -13,11 +13,11 @@ With the benefit of hindsight, here's some technical decisions I'd change if we 
 
 ### Go mobile-first and use react-native-web
 
-People use chat apps on their phone a lot more than on desktop. We still built a web app before native apps, as a big part of the allure of Spectrum is the search-indexing of the chats.
+People use chat apps on their phone a lot more than on desktop. We still built a web app before native apps, as a big part of the allure of Spectrum is that the content is fully search indexed.
 
-Having said that, we should've optimised our web app for mobile first. A large part of our users view Spectrum on their phones, and a good mobile experience on desktop is bearable. A desktop or crappy mobile experience on mobile isn't.
+Having said that, we should've optimised our web app for mobile first. A good mobile experience on desktop is bearable, but a desktop experience on mobile or a crappy mobile experience isn't.
 
-Native apps are our users most requested feature, but starting them from scratch slowed us down and proved too time consuming. If we'd used [react-native-web](https://github.com/necolas/react-native-web) to build our base component library we could've quickly shipped native apps—a big win for our users!
+We still wanted to build native apps, but starting them from scratch proved too time consuming and we still haven't finished them. If we'd used [react-native-web](https://github.com/necolas/react-native-web) to build our base component library and optimized for mobile first we could've quickly shipped native apps based on our existing web app!
 
 ### Use Next.js for server-side rendering
 
