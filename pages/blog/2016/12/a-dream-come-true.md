@@ -87,7 +87,7 @@ As it turns out, building a webpack plugin is not an easy thing to do; even less
 
 We spent two months before the conference frantically working 60+ hours per week trying to get this done and ready for launch. With a lot of help by Jan we got it to a presentable state shortly before the trip. We went to Paris, and pretty much the only thing I remember from the conference is sitting in the back and hacking away to get that last minute polish in — and some karaoke.
 
-<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">One more interesting stat from the Carte Blanche launch…<br><br>(taken on my Github profile) <a href="https://t.co/mBannTZwyP">pic.twitter.com/mBannTZwyP</a></p>&mdash; Max Stoiber (@mxstbr) <a href="https://twitter.com/mxstbr/status/741231688076931072">June 10, 2016</a></blockquote>
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">One more interesting stat from the Carte Blanche launch…<br/><br/>(taken on my Github profile) <a href="https://t.co/mBannTZwyP">pic.twitter.com/mBannTZwyP</a></p>&mdash; Max Stoiber (@mxstbr) <a href="https://twitter.com/mxstbr/status/741231688076931072">June 10, 2016</a></blockquote>
 
 <small class="caption">(that's 307 commits to one repo in less than a month)</small>
 
@@ -127,7 +127,7 @@ It turns out, the timing could not have been any better. As ReactNL got closer, 
 
 To top it off, Glen had the idea to do a Steve Jobs-style "One more thing..." reveal of the new library – [which I did](https://youtu.be/19gqsBc_Cx0?t=25m48s)!
 
-<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">🎉 Super excited to announce styled-components with <a href="https://twitter.com/glenmaddern">@glenmaddern</a>!<br><br>&lt;💅&gt; Visual primitives for the component age.<br><br>👉 <a href="https://t.co/MKSw3QREiN">https://t.co/MKSw3QREiN</a> <a href="https://t.co/3fdtWCIpm7">pic.twitter.com/3fdtWCIpm7</a></p>&mdash; Max Stoiber (@mxstbr) <a href="https://twitter.com/mxstbr/status/786478628829814784">October 13, 2016</a></blockquote>
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">🎉 Super excited to announce styled-components with <a href="https://twitter.com/glenmaddern">@glenmaddern</a>!<br/><br/>&lt;💅&gt; Visual primitives for the component age.<br/><br/>👉 <a href="https://t.co/MKSw3QREiN">https://t.co/MKSw3QREiN</a> <a href="https://t.co/3fdtWCIpm7">pic.twitter.com/3fdtWCIpm7</a></p>&mdash; Max Stoiber (@mxstbr) <a href="https://twitter.com/mxstbr/status/786478628829814784">October 13, 2016</a></blockquote>
 
 The library was well received and is now used by a lot of people all around the globe which is great! We aren't nearly done yet though, there's some big things on the horizon for early 2017 that I'm super excited about and can't wait to show you!
 
@@ -135,7 +135,7 @@ The library was well received and is now used by a lot of people all around the 
 
 In October, Forbes Austria picked up on my story. They asked some friends, and then featured me in the November issue:
 
-<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">I&#39;m featured in the new <a href="https://twitter.com/Forbesaustria">@ForbesAustria</a> issue! 🎉😍✨<br><br>Get in in your local Trafik or on <a href="https://t.co/MpNDLY5ncZ">https://t.co/MpNDLY5ncZ</a> and send me a pic! (print only) <a href="https://t.co/Dld4G2KXf6">pic.twitter.com/Dld4G2KXf6</a></p>&mdash; Max Stoiber @ 🇦🇹 (@mxstbr) <a href="https://twitter.com/mxstbr/status/795555176203620353">November 7, 2016</a></blockquote>
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">I&#39;m featured in the new <a href="https://twitter.com/Forbesaustria">@ForbesAustria</a> issue! 🎉😍✨<br/><br/>Get in in your local Trafik or on <a href="https://t.co/MpNDLY5ncZ">https://t.co/MpNDLY5ncZ</a> and send me a pic! (print only) <a href="https://t.co/Dld4G2KXf6">pic.twitter.com/Dld4G2KXf6</a></p>&mdash; Max Stoiber @ 🇦🇹 (@mxstbr) <a href="https://twitter.com/mxstbr/status/795555176203620353">November 7, 2016</a></blockquote>
 
 To this day this feels totally unreal to me. Even though it happened and is awesome it boggles my mind.
 
@@ -182,11 +182,12 @@ I love looking at random statistics, so here are some numbers from this year:
 
 <small class="footnote">Thanks to [Sebastian McKenzie](https://medium.com/@sebmck/2015-in-review-51ac7035e272#.om2h2rnae), [Karl Horky](https://twitter.com/karlhorky), [Nik Graf](https://twitter.com/nikgraf) and [Kitze](https://twitter.com/thekitze).</small>
 
-<script>
+<script>{`
 	window.addEventListener('load', function() {
 		var elem = document.createElement('script'); elem.type = 'text/javascript'; elem.defer = true;
 		elem.src = '//platform.twitter.com/widgets.js';
 		elem.charset = 'utf-8';
 		document.body.appendChild(elem);
 	}, false);
+	`}
 </script>

@@ -100,13 +100,14 @@ And the result:
                 <summary class="bcd"></summary>
                 <p>This content is hidden from view, and only visible on click.</p>
             </details>
-            <style>
+            <style>{`
                  .bcd:after {
                      content: "Show content";
                  }
                  .abc[open] .bcd:after {
                      content: "Hide content";
                  }
+                 `}
             </style>
     </div>
 </div>
@@ -148,32 +149,34 @@ Here is the result with animation:
                 <p>This content is hidden from view, and only visible on click.</p>
             </details>
             <style>
-                 .cde p {
-                     animation: fadein 250ms ease-out;
-                     -webkit-animation: fadein 250ms ease-out;
-                 }
-                 .def:after {
-                     content: "Show content";
-                 }
-                 .cde[open] .def:after {
-                     content: "Hide content";
-                 }
-                 @-webkit-keyframes fadein {
-                     from {
-                         opacity: 0;
-                     }
-                     to {
-                         opacity: 1;
-                     }
-                 }
-                 @keyframes fadein {
-                     from {
-                         opacity: 0;
-                     }
-                     to {
-                         opacity: 1;
-                     }
-                 }
+                {`
+                    .cde p {
+                        animation: fadein 250ms ease-out;
+                        -webkit-animation: fadein 250ms ease-out;
+                    }
+                    .def:after {
+                        content: "Show content";
+                    }
+                    .cde[open] .def:after {
+                        content: "Hide content";
+                    }
+                    @-webkit-keyframes fadein {
+                        from {
+                            opacity: 0;
+                        }
+                        to {
+                            opacity: 1;
+                        }
+                    }
+                    @keyframes fadein {
+                        from {
+                            opacity: 0;
+                        }
+                        to {
+                            opacity: 1;
+                        }
+                    }
+                `}
             </style>
     </div>
 </div>
