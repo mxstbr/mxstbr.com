@@ -93,4 +93,4 @@ To summarise, if we were to start over, I would:
 - ...use Prisma as the "ORM"
 - ...not build a WYSIWYG editor
 
-What is your current stack and what would you change about it? Ping me [on Twitter](https://twitter.com/mxstbr) and tell me about it!
+What is your current stack and what would you change about it? 🧐 Ping me [on Twitter](https://twitter.com/mxstbr) and tell me about it!
