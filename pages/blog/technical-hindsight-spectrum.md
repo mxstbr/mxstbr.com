@@ -7,7 +7,7 @@ export const frontmatter = {
   hidden: true
 }
 
-A little bit of background: I'm Max, the technical cofounder of [Spectrum](https://spectrum.chat). Spectrum is a public, [open source](https://github.com/withspectrum/spectrum), threaded chat app for large online communities and was recently acquired by GitHub. We're a team of three, and have worked on it for almost two years.
+A little bit of background: 👋 I'm Max, the technical cofounder of [Spectrum](https://spectrum.chat). Spectrum is a public, [open source](https://github.com/withspectrum/spectrum), threaded chat app for large online communities and was recently acquired by GitHub. We're a team of three, and have worked on it for almost two years.
 
 With the benefit of hindsight, here's some technical decisions I'd change if we were to start over.
 
@@ -17,21 +17,21 @@ People use chat apps on their phone a lot more than on desktop. We still built a
 
 Having said that, we should've optimised our web app for mobile first. A good mobile experience on desktop is bearable, but a desktop experience on mobile or a crappy mobile experience isn't.
 
-We still wanted to build native apps, but starting them from scratch proved too time consuming and we still haven't finished them. If we'd used [react-native-web](https://github.com/necolas/react-native-web) to build our base component library and optimized for mobile first we could've quickly shipped native apps based on our existing web app—a big win when you're trying to move fast!
+We still wanted to build native apps, but starting them from scratch proved too time consuming and we still haven't finished them. If we'd used [react-native-web](https://github.com/necolas/react-native-web) to build our base component library we could've quickly shipped native apps based on our existing web app—a big win when you're trying to move fast! 💯
 
 ### Use Next.js for server-side rendering
 
-We knew we needed server-side rendering for SEO purposes (no, [client-side rendering doesn't cut it](https://twitter.com/mxstbr/status/985188986414161921)), but already had a MVP of the app built with create-react-app. We thought about switching to [Next.js](https://nextjs.org), but reworking the routing setup seemed like a lot of effort. Building our own server-side rendering server, how hard could that be, right? 🤔
+We knew we needed server-side rendering for SEO purposes (no, [client-side rendering doesn't cut it](https://twitter.com/mxstbr/status/985188986414161921)), but already had a MVP of the app built with create-react-app. We thought about switching to [Next.js](https://nextjs.org), but reworking the routing setup seemed like a lot of effort. Building our own production-ready server-side rendering server, how hard could that be, right? 🤔
 
-We should've switched to Next.js. Writing a production-ready SSR server is hard and requires a lot of maintenance. We didn't get the development experience right either, which hurt our momentum. Next.js does so much for you out of the box, from the amazing DX to fast performance, that it's always worth using if you need SSR.
+Turns out, it's tough. The development experience (DX) is difficult to get right (we didn't, which hurt our momentum) and it requires a lot of maintenance. Next.js deals with so much out of the box, from the amazing DX, seamless upgrades and great community all the way to fast performance, that I'd use it in a heartbeat.
 
 ### Leverage a well-known database
 
-We chose RethinkDB as our primary data store, mainly because of changefeeds. Changefeeds allow you to listen to live updates on (almost) any query. Since Spectrum is a chat app, this promised to reduce complexity by avoiding a separate PubSub layer for live updates. 🏎
+We chose RethinkDB as our primary data store, mainly because of changefeeds. Changefeeds allow you to listen to live updates on (almost) any query. Since Spectrum is a chat app, this promised to reduce complexity by avoiding a separate PubSub layer for live updates.
 
 Unfortunately, we've had a lot of troubles with RethinkDB. There isn't much of a community around it since it's not widely used, so there is little documentation around query performance and operations. Debugging slow queries or connection issues often feels like shooting in the dark, and we've had many sleepless nights due to unexpected outages.
 
-It also turns out that changefeeds do not scale at all. Their implementation is imperformant and start breaking down if you have more than a couple hundred concurrent ones. The feature that made us chose RethinkDB in the first place turned out not to be useful in practice! While we've managed to work around it with some effort, we shouldn't have had to.
+It also turns out that changefeeds do not scale at all. Their implementation is imperformant and start breaking down if you have more than a couple hundred concurrent ones. The feature that made us chose RethinkDB in the first place turned out not to be useful in practice! While we've managed to work around it with some effort, we shouldn't have had to. 😕
 
 If we were to do it over again, I would choose a more established database, most likely Postgres.
 
@@ -78,7 +78,7 @@ If we were to start over I would take a good look at Prisma. While it might be t
 
 The main action users do on Spectrum is writing, so we wanted that experience to be as nice as possible. We decided to replace our MVP plain text markdown input with a custom WYSIWYG editor based on [Draft.js](https://draft-js.org).
 
-Unfortunately, the writing experience sucks. Even after months of work it's not as good as our users deserve and we constantly hear complaints about it. DraftJS also has bad cross-browser support, so we need to fall back to plain text on Android anyway.
+Unfortunately, the writing experience sucks. Even after months of work it's not as good as our users deserve and we constantly hear complaints about it. DraftJS also has bad cross-browser support, so we need to fall back to plain text on Android anyway. 👎
 
 We should've stuck with the plain text + markdown input we had at the start. While non-technical folks might not be familiar with markdown, most of our users are anyway, so we should've focussed other, more important features instead of WYSIWYG editing.
 
