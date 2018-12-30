@@ -13,7 +13,7 @@ With the benefit of hindsight, here are the technical decisions I would change i
 
 ### Go mobile-first and use react-native-web
 
-Most people prefer mobile apps for chatting with others. Yet, we knew that a big part of the appeal of Spectrum is that all the content is public and search-indexed, so we had to build the web app first.
+Most people prefer mobile apps for chatting with others. Yet, a big part of the appeal of Spectrum is that all the content is public and search-indexed, so we had to build the web app first.
 
 Although that was the right choice, we should have optimised our web app for mobile first. While a good mobile experience on desktop is bearable, a desktop experience on mobile or a crappy mobile experience is not.
 
@@ -21,7 +21,7 @@ We are building native apps, but starting from scratch is time consuming. If we 
 
 ### Use Next.js for server-side rendering
 
-We needed server-side rendering for SEO purposes ([client-side rendering does not cut it](https://twitter.com/mxstbr/status/985188986414161921)), but had already built a first version of the app with [create-react-app](https://github.com/facebook/create-react-app). We thought about switching to [Next.js](https://nextjs.org) but reworking the routing setup seemed like a lot of effort. I mean, how hard can it be to bolt a server-side rendering setup onto create-react-app?! 🤔
+We needed server-side rendering for SEO purposes ([client-side rendering does not cut it](https://twitter.com/mxstbr/status/985188986414161921)), but had already built a first version of the app with [create-react-app](https://github.com/facebook/create-react-app). We thought about switching to [Next.js](https://nextjs.org) but reworking the routing setup seemed like a lot of effort. I mean, how hard can it be to bolt a SSR setup onto create-react-app?! 🤔
 
 Turns out it is tough. It takes a lot of work and it is difficult to provide a good experience, for both developers and users. 
 
@@ -33,7 +33,7 @@ We chose [RethinkDB](https://www.rethinkdb.com) as our primary data store mainly
 
 Unfortunately, we have had a lot of troubles with RethinkDB. Since it is not widely used, there is little documentation on query performance and operations. We have had many database outages and debugging them often feels like shooting in the dark.
 
-It also turns out that changefeeds do not scale as well as we had expected. While we managed to work around that, it took us a long time. 😕
+It also turns out that changefeeds do not scale as well as we had expected. While we managed to work around it, we should not have had to. 😕
 
 Nowadays, I would choose a more established database and build a PubSub system on top.
 
@@ -54,7 +54,7 @@ const getThreadsByUser = (id, skip, limit) => {
 
 That is one pretty API! 😍 But there is a new kid on the block and it looks even better: [Prisma](https://prisma.io).
 
-With Prisma, you define your database schema with the GraphQL Schema Definition Language. It takes the schema and automatically generates type-safe database queries—a phenomenal developer experience! It would also have been a natural fit for our GraphQL-based API.
+With Prisma, you define your database schema with the GraphQL Schema Definition Language. It then automatically generates type-safe database queries—a phenomenal developer experience! It would also have been a natural fit for our GraphQL-based API.
 
 Let's look at the same query again, but this time using Prisma (and do not forget, it is fully type-safe!):
 
@@ -73,13 +73,13 @@ const getThreadsByUser = (id, after, first) => {
 
 I regret not taking a better look at Prisma, it could have helped us move faster and avoid a lot of bugs at the same time.
 
-### No WYSIWYG
+### Avoid WYSIWYG editing
 
 The main action users perform on Spectrum is writing content, so we wanted it to be as nice as possible. We decided to replace our plaintext markdown input with a custom WYSIWYG editor based on [Draft.js](https://draft-js.org).
 
-Unfortunately it is really buggy. Even after months of work it is not as good as our users need it to be—we constantly hear complaints about it. The lack of cross-browser support also means that we have to fall back to a plaintext input in some cases after all. 👎
+Unfortunately it is really buggy. Even after months of work it is not as good as our users need it to be—we constantly hear complaints about it. The lack of cross-browser support also means that we had to keep the plaintext input around as a fallback. 👎
 
-We should have stuck with the plaintext markdown input we had at the start. While another WYSIWYG framework might've been less buggy, we should have focused on more pressing features instead.
+While another WYSIWYG framework might have worked, we should have focused on more pressing features instead of working on polish—the plaintext markdown input was fine.
 
 ### Summary
 
