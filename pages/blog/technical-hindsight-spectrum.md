@@ -71,7 +71,7 @@ const getThreadsByUser = (id, after, first) => {
 
 😍😍😍
 
-I regret not taking a better look at Prisma, it could have helped us move faster and avoid a lot of bugs at the same time.
+Unfortunately Prisma didn't exist yet when we were starting out, it could have helped us move faster and avoid a lot of bugs at the same time.
 
 ### Avoid WYSIWYG editing
 
