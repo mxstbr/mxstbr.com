@@ -33,7 +33,6 @@ const Pre = styled(Box).attrs({
   word-wrap: break-word;
   background-color: #edeff1;
   border-radius: 3px;
-  overflow-x: scroll;
 `;
 
 export default {

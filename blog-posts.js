@@ -13,7 +13,12 @@ const posts = files
       throw new Error(
         "Blog posts need to have a publishedAt date in their metadata."
       );
-    return meta;
+
+    const path = `/blog/${file.replace(/\.mdx?$/, "")}`;
+    return {
+      ...meta,
+      path
+    };
   })
   .filter(meta => meta.published)
   .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
