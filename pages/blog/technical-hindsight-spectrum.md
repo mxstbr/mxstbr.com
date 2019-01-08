@@ -2,9 +2,9 @@ import PageHeader from '../../components/PageHeader';
 
 <PageHeader title="Spectrum in Hindsight: Bad Tech Decisions" />
 
-export const frontmatter = {
+export const meta = {
   published: false,
-  hidden: true
+  publishedAt: '2018-01-10'
 }
 
 👋 I am Max, the technical co-founder of [Spectrum](https://spectrum.chat). Spectrum is an [open source](https://github.com/withspectrum/spectrum) chat app for large online communities and was recently acquired by GitHub. We are a team of three with a predominantly frontend and design background and have worked on it for close to two years.

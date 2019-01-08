@@ -1,32 +1,21 @@
-const fs = require("fs");
-const path = require("path");
+import preval from "babel-plugin-preval/macro";
 
-function walkDir(dir, callback) {
-  fs.readdirSync(dir).forEach(f => {
-    let dirPath = path.join(dir, f);
-    let isDirectory = fs.statSync(dirPath).isDirectory();
-    isDirectory ? walkDir(dirPath, callback) : callback(path.join(dir, f));
-  });
-}
+const files = preval`
+  module.exports = require('fs').readdirSync('./pages/blog').filter(file => file.endsWith('.md') || file.endsWith('.mdx'));
+`;
 
-const FRONTMATTER = /export const frontmatter = ({(.|\n)+?})/;
+const posts = files
+  .map(file => {
+    // $FlowIssue
+    const { meta } = require(`./pages/blog/${file}`);
+    if (!meta) throw new Error("Blog posts need to `export const meta = {}`!");
+    if (!meta.publishedAt)
+      throw new Error(
+        "Blog posts need to have a publishedAt date in their metadata."
+      );
+    return meta;
+  })
+  .filter(meta => meta.published)
+  .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
 
-let posts = [];
-
-walkDir(path.join(__dirname, "./pages/blog"), file => {
-  if (path.extname(file) !== ".md") return;
-  const post = fs.readFileSync(file, "utf8");
-  let frontmatter;
-  try {
-    frontmatter = JSON.parse(post.match(FRONTMATTER)[1]);
-  } catch (err) {
-    console.log("error in", file);
-    throw err;
-  }
-
-  if (!frontmatter.published) return;
-
-  posts.push(frontmatter);
-});
-
-module.exports = posts.reverse();
+module.exports = posts;

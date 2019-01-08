@@ -1,18 +1,16 @@
 import React from "react";
 import PageHeader from "../../components/PageHeader";
+import posts from "../../blog-posts";
 
-export default () => null;
-
-// const preval = require("babel-plugin-preval/macro");
-// const posts = preval`module.exports = require('../../blog-posts.js')`;
-
-// export default () => (
-//   <>
-//     <PageHeader title="Blog" />
-//     <>
-//       {posts.map(post => (
-//         <p>{post.title}</p>
-//       ))}
-//     </>
-//   </>
-// );
+export default () => (
+  <>
+    <PageHeader title="Blog" />
+    <>
+      <div>
+        {posts.map(post => (
+          <p>{post.title}</p>
+        ))}
+      </div>
+    </>
+  </>
+);
