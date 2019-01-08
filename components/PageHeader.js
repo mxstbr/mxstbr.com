@@ -8,6 +8,7 @@ type Props = {
   ...$Exact<RebassProps>,
   children: React$Node,
   title: string,
+  description?: string,
   image?: string
 };
 
@@ -20,7 +21,11 @@ export default (props: Props) => (
     justifyContent="center"
     {...{ ...props, title: undefined }}
   >
-    <Head title={props.title} image={props.image} />
+    <Head
+      title={props.title}
+      description={props.description}
+      image={props.image}
+    />
     <H2 alignSelf="center" textAlign="center" mt={0}>
       {props.title}
     </H2>

@@ -16,7 +16,8 @@ export const TextButton = styled(Box).attrs({
 
 const Button = styled(Box).attrs({
   as: props => props.as || "button",
-  p: 3
+  px: 3,
+  py: 2
 })`
   background-color: #fff;
   border-radius: 5px;
@@ -25,6 +26,8 @@ const Button = styled(Box).attrs({
   color: inherit;
   display: inline-block;
   transition: box-shadow 250ms ease-in-out;
+  font-size: 1em;
+  cursor: pointer;
 
   &:hover {
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 8px 0px;
@@ -36,7 +39,7 @@ type Props = {
 };
 
 export default (props: RebassProps) => (
-  <BoxShadow borderRadius="5px">
+  <BoxShadow borderRadius="5px" my={2}>
     <Button {...props} />
   </BoxShadow>
 );

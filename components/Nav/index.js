@@ -104,18 +104,7 @@ class Nav extends React.Component<{}> {
                     <NavItem href="/appearances" title="Appearances" />
                     <NavItem href="/oss" title="OSS" />
                     {/* <NavItem href="/audits" title="Audits" /> */}
-                    <NavItem
-                      href="https://mxstbr.blog"
-                      target="_blank"
-                      title={
-                        <>
-                          Blog{" "}
-                          <Icon ml={1}>
-                            <LinkExternal size="1em" />
-                          </Icon>
-                        </>
-                      }
-                    />
+                    <NavItem href="/blog" title="Blog" />
                   </DesktopOnly>
                 </Flex>
               </Layout>

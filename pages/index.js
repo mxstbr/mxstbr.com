@@ -6,6 +6,7 @@ import ConditionalWrap from "conditional-wrap";
 import { parse, format } from "date-fns";
 import styled from "styled-components";
 import fetch from "isomorphic-unfetch";
+import blogposts from "../blog-posts";
 import Link from "../components/Link";
 import Icon from "../components/Icon";
 import { H2 } from "../components/Heading";
@@ -20,42 +21,17 @@ import Image from "../components/Image";
 import Main from "../components/Main";
 import PageHeader from "../components/PageHeader";
 import WideSection from "../components/WideSection";
+import BlogPostCard from "../components/BlogPostCard";
 import Head from "../components/Head";
+import ViewMoreLink from "../components/ViewMoreLink";
 import { DEFAULT_TITLE } from "./_app";
+import type { OldBlogPost } from "../blog-posts";
 
 import appearances from "../appearances";
 import projects from "../open-source-projects";
 
-const ViewMoreLinkWrapper = styled(Box)`
-  ${Icon} {
-    transition: transform 50ms ease-in-out;
-  }
-
-  &:hover ${Icon} {
-    transform: translateX(4px);
-  }
-`;
-
-const ViewMoreLink = props => (
-  <ViewMoreLinkWrapper mt={4}>
-    <TextButton as={Link} href={props.href}>
-      <Text fontSize={2}>{props.children}</Text>
-    </TextButton>
-  </ViewMoreLinkWrapper>
-);
-
-type BlogPost = {
-  id: string,
-  title: string,
-  url: string,
-  summary: string,
-  banner_image?: string,
-  "_external-site"?: string,
-  date_published: string
-};
-
 type Props = {
-  posts: Array<BlogPost>
+  oldPosts: Array<OldBlogPost>
 };
 
 class Homepage extends React.Component<Props> {
@@ -63,11 +39,12 @@ class Homepage extends React.Component<Props> {
     const data = await fetch("https://mxstbr.blog/feed.json")
       .then(res => res.json())
       .catch(err => {});
-    return { posts: data?.items || [] };
+    return { oldPosts: data?.items || [] };
   }
 
   render() {
-    const { posts } = this.props;
+    const { oldPosts } = this.props;
+    const posts = [...blogposts, ...oldPosts];
 
     return (
       <Main>
@@ -132,42 +109,13 @@ class Homepage extends React.Component<Props> {
         <H2>Recent Blog Posts</H2>
         <WideSection>
           <CardGrid>
-            {posts.slice(0, 3).map((post, i) => {
-              const external = post["_external-site"];
-              const date = parse(post.date_published);
-              return (
-                <Link
-                  href={post.url}
-                  key={post.id}
-                  width={[1, "calc(50% - 16px)", "calc(33.3% - 16px)"]}
-                  m={[1, 2]}
-                  mb={2}
-                >
-                  <Card>
-                    <Card.Title>{post.title}</Card.Title>
-                    <Card.Body css={{ maxHeight: "5em", overflow: "hidden" }}>
-                      {post.summary}
-                    </Card.Body>
-                    <Card.FinePrint>
-                      {format(date, "Do MMM")}
-                      {` on `}
-                      {external != undefined
-                        ? `the ${external}`
-                        : `mxstbr.blog`}
-                      {external != undefined && (
-                        <Icon css={{ verticalAlign: "text-bottom" }}>
-                          <LinkExternal size="1em" />
-                        </Icon>
-                      )}
-                    </Card.FinePrint>
-                  </Card>
-                </Link>
-              );
-            })}
+            {posts.slice(0, 3).map((post, i) => (
+              <BlogPostCard key={post.title} post={post} />
+            ))}
           </CardGrid>
         </WideSection>
-        <ViewMoreLink href="https://mxstbr.blog">
-          View more on mxstbr.blog
+        <ViewMoreLink href="/blog">
+          View more
           <Icon>
             <ChevronRight size="1em" />
           </Icon>

@@ -1,12 +1,14 @@
-import PageHeader from '../../components/PageHeader';
-
-<PageHeader title="Spectrum in Hindsight: Bad Tech Decisions" />
+import BlogPost from '../../components/BlogPost';
 
 export const meta = {
   published: true,
   publishedAt: '2018-01-10',
   title: 'Spectrum in Hindsight: Bad Tech Decisions',
+  path: '/blog/technical-hindsight-spectrum',
+  summary: 'Spectrum is an open source chat app for large online communities. With the benefit of hindsight after two years, here are the technical decisions I would change if we were starting over'
 }
+
+export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
 
 👋 I am Max, the technical co-founder of [Spectrum](https://spectrum.chat). Spectrum is an [open source](https://github.com/withspectrum/spectrum) chat app for large online communities and was recently acquired by GitHub. We are a team of three with a predominantly frontend and design background and have worked on it for close to two years.
 

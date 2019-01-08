@@ -57,6 +57,11 @@ const GlobalStyle = createGlobalStyle`
   strong {
     font-weight: bold;
   }
+
+  hr {
+    margin: 2em 0;
+    border-color: ${colors.greys[0]};
+  }
 `;
 
 const NAV_HEIGHT = 65;
