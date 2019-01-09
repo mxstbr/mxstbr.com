@@ -13,11 +13,7 @@ const FooterColumn = (props: {
   last?: boolean,
   children: React$Node
 }) => (
-  <Flex
-    flexDirection="column"
-    mr={props.last === true ? 0 : 4}
-    width={props.width}
-  >
+  <Flex flexDirection="column" flex={1} mr={props.last === true ? 0 : 4}>
     <Text mb={3} fontWeight="bold" color="#333">
       {props.title}
     </Text>
@@ -55,7 +51,7 @@ export default (props: {}) => (
     `}
   >
     <Layout width={[1, 0.5]}>
-      <Flex flexDirection="row" justifyContent="space-between">
+      <Flex flexDirection="row">
         <FooterColumn title="About this place" width={0.5}>
           <Text color="#666" lineHeight={1.5}>
             Welcome to my personal website! I'm @mxstbr, a JavaScript Engineer
