@@ -1,11 +1,12 @@
 import React from "react";
+import fetch from "isomorphic-unfetch";
 import PageHeader from "../../components/PageHeader";
 import Paragraph from "../../components/Paragraph";
 import Link from "../../components/Link";
-import CardGrid from "../../components/CardGrid";
+import { H3 } from "../../components/Heading";
 import BlogPostCard from "../../components/BlogPostCard";
+import { ListDivider } from "../../components/Lists";
 import blogposts from "../../blog-posts";
-import WideSection from "../../components/WideSection";
 import type { OldBlogPost } from "../../blog-posts";
 
 type Props = {
@@ -21,7 +22,6 @@ export default class BlogIndex extends React.Component<Props> {
   }
 
   render() {
-    const posts = [...blogposts, ...this.props.oldPosts];
     return (
       <>
         <PageHeader title="Blog">
@@ -34,13 +34,17 @@ export default class BlogIndex extends React.Component<Props> {
             to be notified when I publish something new.
           </Paragraph>
         </PageHeader>
-        <WideSection>
-          <CardGrid>
-            {posts.map(post => (
-              <BlogPostCard key={post.title} post={post} />
-            ))}
-          </CardGrid>
-        </WideSection>
+        {blogposts.map(post => (
+          <BlogPostCard key={post.title} post={post} />
+        ))}
+        <ListDivider>
+          <H3 mr={3} mt={2} mb={2}>
+            Archive
+          </H3>
+        </ListDivider>
+        {this.props.oldPosts.map(post => (
+          <BlogPostCard key={post.title} post={post} />
+        ))}
       </>
     );
   }

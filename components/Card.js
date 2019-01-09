@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { Card, Image, type RebassProps } from "rebass";
 import { H3 } from "./Heading";
 import Text from "./Text";
@@ -19,16 +19,21 @@ const Title = styled(props => (
 const BaseCard = styled(Card)`
   border-radius: 5px;
   background-color: ${props => props.theme.colors.white};
+  height: 100%;
 
-  &:hover {
-    ${Title} {
-      text-decoration: underline;
-    }
-  }
+  ${props =>
+    props.hover !== false &&
+    css`
+      &:hover {
+        ${Title} {
+          text-decoration: underline;
+        }
+      }
+    `};
 `;
 
 const C = (props: RebassProps) => (
-  <BoxShadow borderRadius="5px">
+  <BoxShadow hoverShadow={props.hover} borderRadius="5px" display="block">
     <BaseCard {...props} />
   </BoxShadow>
 );

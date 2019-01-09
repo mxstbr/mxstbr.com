@@ -3,7 +3,7 @@ import styled, { css } from "styled-components";
 import { Card } from "rebass";
 
 const BoxShadow = styled(Card)`
-  display: inline-block;
+  display: ${props => props.display || "inline-block"};
   box-shadow: ${props => props.shadow || "rgba(0, 0, 0, 0.1) 0px 3px 8px 0px"};
   position: relative;
   background: transparent;

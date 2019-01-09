@@ -28,6 +28,7 @@ export default (props: Props) => {
       href={typeof post.url === "string" ? post.url : post.path}
       target={external != undefined ? "_blank" : undefined}
       width={[1, "calc(50% - 16px)", "calc(33.3% - 16px)"]}
+      css="&:hover&:hover { text-decoration: none; }"
       m={[1, 2]}
       mb={2}
     >
