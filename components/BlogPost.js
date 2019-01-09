@@ -1,6 +1,7 @@
 import React from "react";
 import { Flex, Box } from "rebass";
 import styled from "styled-components";
+import { withRouter, type Router } from "next/router";
 import { parse, format } from "date-fns";
 import Button from "./Button";
 import Head from "./Head";
@@ -16,7 +17,8 @@ import type { NewBlogPost } from "../blog-posts";
 
 type Props = {
   meta: NewBlogPost,
-  children: React$Node
+  children: React$Node,
+  router: Router
 };
 
 const EmailInput = styled(Box).attrs({
@@ -48,7 +50,7 @@ const NewsletterForm = () => (
   </Box>
 );
 
-export default ({ meta, children }: Props) => (
+export default withRouter(({ router, meta, children }: Props) => (
   <>
     <Head title={meta.title} description={meta.summary} image={meta.image} />
     <H2 mb={3}>{meta.title}</H2>
@@ -72,7 +74,7 @@ export default ({ meta, children }: Props) => (
     <Paragraph>
       <Link
         href={`https://mobile.twitter.com/search?q=${encodeURIComponent(
-          `https://mxstbr.com${meta.path}`
+          `https://mxstbr.com${router.pathname}`
         )}`}
       >
         Discuss on Twitter
@@ -80,12 +82,12 @@ export default ({ meta, children }: Props) => (
       •{" "}
       <Link
         href={`https://github.com/mxstbr/mxstbr.com/edit/master/pages${
-          meta.path
+          router.pathname
         }.md`}
       >
         Edit on GitHub
       </Link>
     </Paragraph>
-    <ViewMoreLink href="/blog">View all posts</ViewMoreLink>
+    <ViewMoreLink href="/thoughts">View all posts</ViewMoreLink>
   </>
-);
+));

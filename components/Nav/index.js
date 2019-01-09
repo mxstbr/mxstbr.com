@@ -104,7 +104,7 @@ class Nav extends React.Component<{}> {
                     <NavItem href="/appearances" title="Appearances" />
                     <NavItem href="/oss" title="OSS" />
                     {/* <NavItem href="/audits" title="Audits" /> */}
-                    <NavItem href="/blog" title="Blog" />
+                    <NavItem href="/thoughts" title="Blog" />
                   </DesktopOnly>
                 </Flex>
               </Layout>
@@ -168,16 +168,9 @@ class Nav extends React.Component<{}> {
                           onClick={this.closeMenu}
                         /> */}
                   <MobileNavItem
-                    href="https://mxstbr.blog"
+                    href="/thoughts"
                     onClick={this.closeMenu}
-                    title={
-                      <>
-                        Blog{" "}
-                        <Icon ml={1}>
-                          <LinkExternal size="1em" />
-                        </Icon>
-                      </>
-                    }
+                    title="Blog"
                   />
                   <MobileNavItem
                     href="https://twitter.com/mxstbr"

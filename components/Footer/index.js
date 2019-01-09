@@ -58,12 +58,6 @@ export default (props: {}) => (
             from Austria 🇦🇹 and I love React and Node.
           </Text>
         </FooterColumn>
-        {/* <FooterColumn title="Max Stoiber">
-          <FooterListItem href="/">Home</FooterListItem>
-          <FooterListItem href="/appearances">Appearances</FooterListItem>
-          <FooterListItem href="/oss">Open Source</FooterListItem>
-          <FooterListItem href="/blog">Blog</FooterListItem>
-        </FooterColumn> */}
         <FooterColumn last title="Social Stuff">
           <FooterListItem
             Icon={GitHub}

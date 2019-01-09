@@ -1,3 +1,14 @@
+import BlogPost from '../../components/BlogPost';
+
+export const meta = {
+  published: false,
+  publishedAt: '2019-01-20',
+  title: 'Spectrum in Hindsight: Good Tech Decisions',
+  summary: 'Spectrum is an open source chat app for large online communities. With the benefit of hindsight after two years, here are the great technical decisions we made'
+}
+
+export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
+
 ### React
 
 Well duh

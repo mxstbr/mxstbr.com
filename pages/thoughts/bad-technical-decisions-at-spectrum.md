@@ -4,7 +4,6 @@ export const meta = {
   published: true,
   publishedAt: '2019-01-10',
   title: 'Spectrum in Hindsight: Bad Tech Decisions',
-  path: '/blog/technical-hindsight-spectrum',
   summary: 'Spectrum is an open source chat app for large online communities. With the benefit of hindsight after two years, here are the technical decisions I would change if we were starting over'
 }
 

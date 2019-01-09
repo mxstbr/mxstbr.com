@@ -114,7 +114,7 @@ class Homepage extends React.Component<Props> {
             ))}
           </CardGrid>
         </WideSection>
-        <ViewMoreLink href="/blog">
+        <ViewMoreLink href="/thoughts">
           View more
           <Icon>
             <ChevronRight size="1em" />

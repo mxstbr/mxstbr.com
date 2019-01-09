@@ -22,20 +22,23 @@ export type NewBlogPost = {|
 export type BlogPost = OldBlogPost | NewBlogPost;
 
 const files = preval`
-  module.exports = require('fs').readdirSync('./pages/blog').filter(file => file.endsWith('.md') || file.endsWith('.mdx'));
+  module.exports = require('fs').readdirSync('./pages/thoughts').filter(file => file.endsWith('.md') || file.endsWith('.mdx'));
 `;
 
 const posts: Array<NewBlogPost> = files
   .map(file => {
     // $FlowIssue
-    const { meta } = require(`./pages/blog/${file}`);
+    const { meta } = require(`./pages/thoughts/${file}`);
     if (!meta) throw new Error("Blog posts need to `export const meta = {}`!");
     if (!meta.publishedAt)
       throw new Error(
         "Blog posts need to have a publishedAt date in their metadata."
       );
 
-    return meta;
+    return {
+      ...meta,
+      path: `/thoughts/${file.replace(/\.mdx?$/, "")}`
+    };
   })
   .filter(meta => meta.published)
   .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));

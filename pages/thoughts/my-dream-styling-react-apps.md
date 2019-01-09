@@ -4,7 +4,6 @@ export const meta = {
   published: false,
   publishedAt: '2019-01-17',
   title: 'How I dream of styling my React apps',
-  path: '/blog/my-dream-styling-react-apps',
   summary: ''
 }
 
