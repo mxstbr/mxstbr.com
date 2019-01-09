@@ -19,52 +19,46 @@ This is it, folks, this is how I dream of styling my React apps:
 />
 ```
 
-Look closely, there's some interesting things going on. Here's the overview:
+Look closely, there are some interesting things going on:
 
-- Consistency built in
-- Simple composition of styles
+- Enforced consistency via a built-in scale
 - Per-value media queries
-- Easy moving of styles
-- Minimal abstraction
+- Simple composition of styles
 - Statically typed styles
-- Learn once, write anywhere
+- Moving styles around is easy
+- Minimal abstraction
+- It's learn once, write anywhere just like React
+- Only for folks with JS experience
 
-Let's deconstruct!
+Let's examine the tradeoffs!
 
 ### Style Objects
 
-I want to use objects to write styling. Tradeoffs compared to writing strings a la styled-components: 
+Compared to strings (a la styled-components), objects are easier to compose and statically analyse, but are less friendly to JavaScript newbies and have a learning curve.
 
-- Objects are easier to compose
-- Objects are easier to statically analyze
-- Strings are more friendly to people without JavaScript background
-- Strings don't have a learning curve when already knowing CSS
+I prefer objects. 
 
-These tradeoffs might not apply to everybody, but I've started preferring objects.
+> Note for context: my team consists of people who know JavaScript and can handle the learning curve.
 
 ### Prop Based
 
-Second, you'll notice that I'm passing the style object to a prop called `styles`. 
+Second, you'll notice that I'm passing the style object to a prop called `styles`. Why a prop and not the familiar `styled.x` API or even a `withStyles` HOC? 
 
-Why a prop compared to styled components or a JSS-like `withStyles` HOC? Copy and pasting JSX around is easy and creating [style components](http://style-components.com) (not a typo) is simple since everything is based on standard React components, i.e. functions. 
+With a prop, copy and pasting JSX around is easy and creating [style components](http://style-components.com) (not a typo) is simple since everything is based on standard React components, i.e. functions. You have all the benefits of the `styled.x` API too!
 
-I called it `styles` vs. the currently more common `css` because that makes it learn once, write anywhere just like React itself (web + native + VR + ...). 
-
-It's a small, simple, nice abstraction that works.
+I called it `styles` vs. the currently more common `css` because that makes it learn once, write anywhere just like React itself. Styling your React Native or React VR apps with a `css` prop doesn't make much sense since they don't support CSS.
 
 #### Inline Styles?
 
 No, this is not inline styles.
 
-Inline styles for web usage are fairly imperformant when used across a whole app, compiling to actual CSS that's injected into the DOM is faster, especially when using the CSSOM `insertRule` API.
+Inline styles are imperformant when used across an app. Compiling to actual CSS that's injected into the DOM is faster, much faster.
 
 ### Built-in Scale
 
-Rather than specifying arbitrary values (`margin: '16px'` or `margin: 16`), only scale values from 1 to 10 (tbd) can be specified.
+Rather than specifying arbitrary values (`margin: '16px'` or `margin: 16`), only values from 1 to 10 can be specified. There is a global scale (e.g. 4-based: `4px 8px 16px 32px 64px...` 4 * 2 ^ n) and the value defines which step on the scale is used. For example, `margin: 2` mean you have an `8px` margin.
 
-There is a global scale (e.g. 4-based: `4px 8px 16px 32px 64px...` 4 * 2 ^ n) and the value defines which step on the scale is used. For example, `margin: 2` would end up as `margin: 8px`.
-
-Consistency built-in! :tada: 
+Automatic consistency!
 
 All your spacing is now based on a single scale, so it'll always look proportional. You no longer decide between `3px`, `4px` and `5px` margin (which are all the same anyway), you decide between three steps on the scale, each of which makes a big difference. There's always a winner!
 
