@@ -1,11 +1,14 @@
-import PageHeader from '../../components/PageHeader';
-
-<PageHeader title="How I dream of styling my React apps" />
+import BlogPost from '../../components/BlogPost';
 
 export const meta = {
-  published: true,
-  title: 'How I dream of styling my React apps'
+  published: false,
+  publishedAt: '2019-01-17',
+  title: 'How I dream of styling my React apps',
+  path: '/blog/my-dream-styling-react-apps',
+  summary: ''
 }
+
+export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
 
 This is it, folks, this is how I dream of styling my React apps:
 
@@ -95,8 +98,8 @@ The style objects can be fully statically typed with TypeScript or Flow!
  
 ### Inspiration / Further Reading
 
-- mrmrs.cc/writing/2018/06/18/component-styling-api by @mrmrs
-- jxnblk.com/writing/posts/patterns-for-style-composition-in-react by @jxnblk
-- style-components.com by @chantastic
-  - especially medium.learnreact.com/scale-fud-and-style-components-c0ce87ec9772
-- github.com/threepointone/glam by @threepointone
+- https://mrmrs.cc/writing/2018/06/18/component-styling-api by @mrmrs
+- https://jxnblk.com/writing/posts/patterns-for-style-composition-in-react by @jxnblk
+- https://style-components.com by @chantastic
+  - especially https://medium.learnreact.com/scale-fud-and-style-components-c0ce87ec9772
+- https://github.com/threepointone/glam by @threepointone
