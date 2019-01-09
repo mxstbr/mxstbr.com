@@ -39,7 +39,7 @@ export default {
   h2: H2,
   h3: H3,
   h4: H4,
-  p: Paragraph,
+  p: props => <Paragraph fontFamily="serif" {...props} />,
   a: Link,
   ul: UnorderedList,
   ol: OrderedList,

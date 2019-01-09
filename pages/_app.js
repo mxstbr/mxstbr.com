@@ -25,7 +25,8 @@ const theme = {
     primary: colors.blue,
     text: colors.black,
     background: "rgb(246, 247, 248)",
-    secondaryText: colors.greys[4],
+    secondary: colors.greys[4],
+    tertiary: colors.greys[3],
     ...colors
   },
   breakpoints: ["850px", "1100px", "64em"],

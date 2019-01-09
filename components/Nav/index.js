@@ -40,7 +40,7 @@ const NavItem = styled(props => (
 const MobileNavItem = props => (
   <Box p={3} onClick={props.onClick}>
     <Link prefetch href={props.href}>
-      <Text color="#333" fontSize={4} fontWeight="bold">
+      <Text color="#333" as="div" fontSize={4} fontWeight="bold">
         {props.title}
       </Text>
     </Link>

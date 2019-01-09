@@ -1,9 +1,10 @@
 import React from "react";
 import { Flex, Box } from "rebass";
 import styled from "styled-components";
+import { parse, format } from "date-fns";
 import Button from "./Button";
-import PageHeader from "./PageHeader";
-import { H3 } from "./Heading";
+import Head from "./Head";
+import { H3, H2 } from "./Heading";
 import Text from "./Text";
 import Paragraph from "./Paragraph";
 import Link from "./Link";
@@ -49,11 +50,11 @@ const NewsletterForm = () => (
 
 export default ({ meta, children }: Props) => (
   <>
-    <PageHeader
-      title={meta.title}
-      description={meta.summary}
-      image={meta.image}
-    />
+    <Head title={meta.title} description={meta.summary} image={meta.image} />
+    <H2 mb={3}>{meta.title}</H2>
+    <Text mt={3} mb={4} color="tertiary">
+      Published {format(parse(meta.publishedAt), "MMMM Do, YYYY")}
+    </Text>
     {children}
     <hr />
     <Card hover={false} my={4}>

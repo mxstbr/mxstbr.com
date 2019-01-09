@@ -28,7 +28,7 @@ type ListItemProps = {
 };
 
 const FooterListItem = ({ Icon: IconComp, children, href }: ListItemProps) => (
-  <Text my={1} color="#666">
+  <Text as="div" my={1} color="#666">
     <Link href={href}>
       {IconComp && (
         <Icon mr={2} ml={0}>
