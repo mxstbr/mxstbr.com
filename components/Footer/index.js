@@ -13,7 +13,7 @@ const FooterColumn = (props: {
   last?: boolean,
   children: React$Node
 }) => (
-  <Flex flexDirection="column" flex={1} mr={props.last === true ? 0 : 4}>
+  <Flex flexDirection="column" flex={1} mb={4} mr={props.last === true ? 0 : 4}>
     <Text mb={3} fontWeight="bold" color="#333">
       {props.title}
     </Text>
@@ -47,11 +47,11 @@ export default (props: {}) => (
     as="footer"
     bg="#fff"
     css={css`
-      border-top: 1px solid ${props => props.theme.colors.greys[1]};
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
     `}
   >
     <Layout width={[1, 0.5]}>
-      <Flex flexDirection="row">
+      <Flex flexDirection={["column", "row"]}>
         <FooterColumn title="About this place" width={0.5}>
           <Text color="#666" lineHeight={1.5}>
             Welcome to my personal website! I'm @mxstbr, a JavaScript Engineer

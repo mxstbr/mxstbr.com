@@ -23,9 +23,10 @@ const Button = styled(Box).attrs({
   border-radius: 5px;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 0px 0px;
   text-decoration: none;
-  color: inherit;
+  color: ${props => props.color || "inherit"};
   display: inline-block;
   transition: box-shadow 250ms ease-in-out;
+  border: 1px solid rgba(0, 0, 0, 0.1);
   font-size: 1em;
   cursor: pointer;
 

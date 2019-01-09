@@ -27,6 +27,7 @@ const theme = {
     background: "rgb(246, 247, 248)",
     secondary: colors.greys[4],
     tertiary: colors.greys[3],
+    quaternary: colors.greys[2],
     ...colors
   },
   breakpoints: ["850px", "1100px", "64em"],
@@ -61,7 +62,7 @@ const GlobalStyle = createGlobalStyle`
 
   hr {
     margin: 2em 0;
-    border-color: ${colors.greys[0]};
+    border-color: rgba(0, 0, 0, 0.1);
   }
 `;
 

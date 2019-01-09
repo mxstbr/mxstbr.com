@@ -12,6 +12,7 @@ import Link from "./Link";
 import Icon from "./Icon";
 import Card from "./Card";
 import ViewMoreLink from "./ViewMoreLink";
+import BreadcrumbLink from "./BreadcrumbLink";
 import { ChevronLeft, Send } from "react-feather";
 import type { NewBlogPost } from "../blog-posts";
 
@@ -46,15 +47,27 @@ const NewsletterForm = () => (
   >
     <EmailInput name="email" id="bd-email" placeholder="contact@mxstbr.com" />
     <input type="hidden" value="1" name="embed" />
-    <Button as="input" type="submit" value="Subscribe" />
+    <Button color="tertiary" as="input" type="submit" value="Subscribe" />
   </Box>
+);
+
+const BackToBlog = props => (
+  <BreadcrumbLink {...props} color="primary" href="/thoughts">
+    <Icon ml={0} mr={1}>
+      <ChevronLeft size="1em" />
+    </Icon>
+    BACK TO BLOG
+  </BreadcrumbLink>
 );
 
 export default withRouter(({ router, meta, children }: Props) => (
   <>
     <Head title={meta.title} description={meta.summary} image={meta.image} />
-    <H2 mb={3}>{meta.title}</H2>
-    <Text mt={3} mb={4} color="tertiary">
+    <BackToBlog mb={4} mt={5} />
+    <H2 mb={3} mt={4}>
+      {meta.title}
+    </H2>
+    <Text mt={3} mb={4} color="quaternary">
       Published {format(parse(meta.publishedAt), "MMMM Do, YYYY")}
     </Text>
     {children}
@@ -79,7 +92,7 @@ export default withRouter(({ router, meta, children }: Props) => (
       >
         Discuss on Twitter
       </Link>{" "}
-      •{" "}
+      ·{" "}
       <Link
         href={`https://github.com/mxstbr/mxstbr.com/edit/master/pages${
           router.pathname
@@ -88,6 +101,5 @@ export default withRouter(({ router, meta, children }: Props) => (
         Edit on GitHub
       </Link>
     </Paragraph>
-    <ViewMoreLink href="/thoughts">View all posts</ViewMoreLink>
   </>
 ));
