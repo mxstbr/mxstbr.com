@@ -55,6 +55,7 @@ export default ({ meta, children }: Props) => (
       image={meta.image}
     />
     {children}
+    <hr />
     <Card hover={false} my={4}>
       <Card.Title css="margin-top: 0;">
         Subscribe to the newsletter{" "}
