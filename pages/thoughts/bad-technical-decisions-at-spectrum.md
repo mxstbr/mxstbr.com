@@ -31,7 +31,7 @@ Next.js offers an amazing development experience and fast performance out of the
 
 ### Leverage a well-known database
 
-We chose [RethinkDB](https://www.rethinkdb.com) as our primary data store mainly because of [changefeeds](https://rethinkdb.com/docs/changefeeds/javascript/). They allow you to listen to live updates on (almost) any query. I thought this would reduce complexity by avoiding a separate PubSub system for real-time functionality.
+I chose [RethinkDB](https://www.rethinkdb.com) as our primary data store mainly because of [changefeeds](https://rethinkdb.com/docs/changefeeds/javascript/). They allow you to listen to live updates on (almost) any query. I thought this would reduce complexity by avoiding a separate PubSub system for real-time functionality.
 
 Unfortunately, we have had a lot of troubles with RethinkDB. Since it is not widely used, there is little documentation and knowledge about operations. We have had many database outages and debugging them often feels like shooting in the dark.
 
@@ -56,7 +56,7 @@ const getThreadsByUser = (id, skip, limit) => {
 
 That is one pretty API! 😍 But there is a new kid on the block and it looks even better: [Prisma](https://prisma.io).
 
-With Prisma, you define your database schema with the GraphQL Schema Definition Language. It then automatically generates a custom database driver with type-safe SQL queries—a phenomenal developer experience! It would also have been a natural fit for our GraphQL-based API.
+With Prisma, you define your database schema with the GraphQL Schema Definition Language. It then automatically generates a custom database driver with type-safe queries—a phenomenal developer experience! It would also have been a natural fit for our GraphQL-based API.
 
 Let's look at the same query again, but this time using Prisma:
 
@@ -77,7 +77,7 @@ Unfortunately Prisma didn't exist when we were starting out. It could have helpe
 
 ### Avoid WYSIWYG editing
 
-Writing is the primary activity on Spectrum, so we wanted the experience to be great. I decided to replace our plaintext markdown input with a custom WYSIWYG editor based on [Draft.js](https://draft-js.org).
+Writing is one of the primary activities on Spectrum, so we wanted the experience to be great. I decided to replace our plaintext markdown input with a custom WYSIWYG editor based on [Draft.js](https://draft-js.org).
 
 Unfortunately it did not work out well. The editor is really buggy, even after months of work our users rightfully complain about it constantly. On top of that, the library makes up a majority of our JavaScript bundle size and the lack of cross-browser support means that we had to keep the plaintext input around as a fallback. 👎
 
@@ -94,4 +94,12 @@ To summarise, this is what I would change if we were starting over today:
 - use Prisma as the "ORM"
 - avoid WYSIWYG editing
 
-What is your current stack and what would you change about it? 🧐 Ping me [on Twitter](https://twitter.com/mxstbr) and let me know!
+### Takeaways
+
+These are my personal lessons about choosing technologies from the experience of building Spectrum:
+
+1. Conservative choices are conservative for a reason: they work.
+2. Community size and active maintenance are vital, especially in unfamiliar territory.
+3. Building good products is all about experimenting, optimise for iteration speed and flexibility.
+4. Interesting technological problems are best left to other people, the focus needs to be on the users problems.
+5. Carefully choose technologies that are hard to change later. Move faster on choices that are easily undone.

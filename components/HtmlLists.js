@@ -17,6 +17,7 @@ export const UnorderedList = styled(Box).attrs({
 `;
 export const OrderedList = styled.ol`
   ${baseListStyles};
+  list-style: decimal;
 `;
 const ListItemText = styled(Paragraph).attrs({
   my: 1

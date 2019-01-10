@@ -77,16 +77,19 @@ export default withRouter(({ router, meta, children }: Props) => (
       Published {format(parse(meta.publishedAt), "MMMM Do, YYYY")}
     </Text>
     {children}
-    <hr />
+    <Box my={5}>
+      <hr />
+    </Box>
     <Card hover={false} my={4}>
       <Card.Title css="margin-top: 0;">
         Subscribe to the newsletter{" "}
         <Icon>
-          <Send size="1em" />
+          <Send color="#666" size="1em" />
         </Icon>
       </Card.Title>
       <Card.Body mb={2}>
-        Be the first to know when I post something new!
+        Be the first to know when I post something new! Candid thoughts about
+        React.js, Node.js, startups and other interesting things.
       </Card.Body>
       <NewsletterForm />
     </Card>
