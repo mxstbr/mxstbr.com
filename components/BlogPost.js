@@ -25,7 +25,7 @@ type Props = {
 const EmailInput = styled(Box).attrs({
   type: "email",
   as: "input",
-  mt: 2,
+  my: 2,
   mr: 2
 })`
   font-size: 1em;
@@ -36,19 +36,25 @@ const EmailInput = styled(Box).attrs({
 `;
 
 const NewsletterForm = () => (
-  <Box
+  <Flex
     m={4}
     mt={2}
     as="form"
     action="https://buttondown.email/api/emails/embed-subscribe/mxstbr"
     method="post"
     target="popupwindow"
-    onSubmit="window.open('https://buttondown.email/mxstbr', 'popupwindow')"
+    onsubmit="window.open('https://buttondown.email/mxstbr', 'popupwindow')"
+    alignItems="center"
   >
-    <EmailInput name="email" id="bd-email" placeholder="contact@mxstbr.com" />
+    <EmailInput
+      flex={1}
+      name="email"
+      id="bd-email"
+      placeholder="contact@mxstbr.com"
+    />
     <input type="hidden" value="1" name="embed" />
     <Button color="tertiary" as="input" type="submit" value="Subscribe" />
-  </Box>
+  </Flex>
 );
 
 const BackToBlog = props => (

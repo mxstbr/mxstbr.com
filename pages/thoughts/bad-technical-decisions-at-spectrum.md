@@ -3,8 +3,8 @@ import BlogPost from '../../components/BlogPost';
 export const meta = {
   published: true,
   publishedAt: '2019-01-10',
-  title: 'Spectrum in Hindsight: Bad Tech Decisions',
-  summary: 'Spectrum is an open source chat app for large online communities. With the benefit of hindsight after two years, here are the technical decisions I would change if we were starting over'
+  title: 'Bad Tech Decisions I made at Spectrum',
+  summary: 'Spectrum is an open source chat app for large online communities. With the benefit of hindsight, here are the technical decisions I would change if we were starting over.'
 }
 
 export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
@@ -17,17 +17,17 @@ With the benefit of hindsight, here are the technical decisions I would change i
 
 Most people prefer mobile apps for chatting with others. Yet, a big part of the appeal of Spectrum is that all the content is public and search-indexed, so we had to build the web app first.
 
-Although the search indexing worked out, we should have optimised our web app for mobile first. While a good mobile experience on desktop is bearable, a desktop experience on mobile or a crappy mobile experience is not.
+Although the search indexing was a success, we should have optimised our web app for mobile first. While a good mobile experience on desktop is bearable, a desktop experience on mobile or a crappy mobile experience is not.
 
 We are building native apps, but starting from scratch is time consuming. If we had used [react-native-web](https://github.com/necolas/react-native-web) to build the base components for the web app we could have reused them for the native apps—a big win for moving fast! 💯
 
 ### Use Next.js for server-side rendering
 
-We needed server-side rendering for SEO purposes ([client-side rendering does not cut it](https://twitter.com/mxstbr/status/985188986414161921)) but had already built a first version of the app with [create-react-app](https://github.com/facebook/create-react-app). We thought about switching to [Next.js](https://nextjs.org) but reworking the routing setup seemed like a lot of effort. I mean, how hard can it be to build a server-side rendering setup from scratch?! 🤔
+We needed server-side rendering for SEO purposes ([client-side rendering does not cut it](https://twitter.com/mxstbr/status/985188986414161921)) but had already built a first version of the app with [create-react-app](https://github.com/facebook/create-react-app). We thought about switching to [Next.js](https://nextjs.org), but I decided that reworking the routing and data fetching would be more effort than building our own server-side rendering server.
 
-Turns out it is tough. It takes a lot of work and it is difficult to provide a good experience, for both developers and users. 
+Turns out, building your own production-ready SSR setup is tough. It takes a lot of work and it is difficult to provide a good experience, for both developers and users. 
 
-Next.js offers an amazing development experience and fast performance out of the box, not to mention the great community and excellent documentation. I would use it in a heartbeat if we started over today (in fact, [this website is built with Next.js](https://github.com/mxstbr/mxstbr.com)).
+Next.js offers an amazing development experience and fast performance out of the box, not to mention the great community and excellent documentation. I would use it in a heartbeat if we started over today (in fact, [this website is built with Next.js](https://github.com/mxstbr/mxstbr.com) 😍).
 
 ### Leverage a well-known database
 
@@ -37,7 +37,7 @@ Unfortunately, we have had a lot of troubles with RethinkDB. Since it is not wid
 
 It also turns out that changefeeds do not scale as well as we had expected. While we managed to work around it, we should not have had to. 😕
 
-Nowadays, I would choose a more established database and build a PubSub system on top.
+Nowadays, I would choose a more established database (Postgres?) and build a PubSub system on top.
 
 #### ...and use Prisma as the ORM
 
@@ -56,9 +56,9 @@ const getThreadsByUser = (id, skip, limit) => {
 
 That is one pretty API! 😍 But there is a new kid on the block and it looks even better: [Prisma](https://prisma.io).
 
-With Prisma, you define your database schema with the GraphQL Schema Definition Language. It then automatically generates type-safe SQL queries—a phenomenal developer experience! It would also have been a natural fit for our GraphQL-based API.
+With Prisma, you define your database schema with the GraphQL Schema Definition Language. It then automatically generates a custom database driver with type-safe SQL queries—a phenomenal developer experience! It would also have been a natural fit for our GraphQL-based API.
 
-Let's look at the same query again, but this time using Prisma (and do not forget, it is fully type-safe!):
+Let's look at the same query again, but this time using Prisma:
 
 ```JS
 const getThreadsByUser = (id, after, first) => {
@@ -73,15 +73,15 @@ const getThreadsByUser = (id, after, first) => {
 
 😍😍😍
 
-Unfortunately Prisma didn't exist yet when we were starting out, it could have helped us move faster and avoid a lot of bugs at the same time.
+Unfortunately Prisma didn't exist when we were starting out. It could have helped us move faster and avoid bugs at the same time.
 
 ### Avoid WYSIWYG editing
 
-The main action users perform on Spectrum is writing content, so we wanted it to be as nice as possible. We decided to replace our plaintext markdown input with a custom WYSIWYG editor based on [Draft.js](https://draft-js.org).
+Writing is the primary activity on Spectrum, so we wanted the experience to be great. I decided to replace our plaintext markdown input with a custom WYSIWYG editor based on [Draft.js](https://draft-js.org).
 
-Unfortunately it is really buggy. Even after months of work it is not as good as our users need it to be—we constantly hear complaints about it. The lack of cross-browser support also means that we had to keep the plaintext input around as a fallback. 👎
+Unfortunately it did not work out well. The editor is really buggy, even after months of work our users rightfully complain about it constantly. On top of that, the library makes up a majority of our JavaScript bundle size and the lack of cross-browser support means that we had to keep the plaintext input around as a fallback. 👎
 
-While another WYSIWYG framework might have worked, we should have focused on more pressing features instead of working on polish—the plaintext markdown input was fine.
+While another WYSIWYG framework might have worked, we should have focused on more pressing features—the plaintext markdown input was fine.
 
 ### Summary
 

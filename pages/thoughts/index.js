@@ -26,7 +26,7 @@ export default class BlogIndex extends React.Component<Props> {
       <>
         <PageHeader title="Blog">
           <Paragraph>
-            Thoughts about JavaScript, React, Node, Startups and anything else
+            Candid thoughts about React.js, Node.js, startups and anything else
             that interests me.{" "}
             <Link href="https://buttondown.email/mxstbr">
               Subscribe to the newsletter
