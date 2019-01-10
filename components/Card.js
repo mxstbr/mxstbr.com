@@ -47,6 +47,7 @@ C.Body = props => (
     px={[3, 4]}
     mb={[3, 4]}
     mt={2}
+    as="div"
     {...props}
   />
 );
@@ -60,6 +61,7 @@ C.FinePrint = props => (
     pl={[3, 4]}
     pr={[3, 4]}
     fontSize={1}
+    as="div"
     {...props}
   />
 );
