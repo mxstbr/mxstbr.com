@@ -14,9 +14,10 @@ This is it, folks, this is how I dream of styling my React apps:
 ```JS
 <div
   styles={{
+    flexDirection: ['column', 'row'],
     margin: [1, 2],
     padding: 1,
-    color: colors.primary
+    color: 'primary'
   }}
 />
 ```
@@ -63,6 +64,8 @@ Rather than specifying arbitrary values (`margin: '16px'` or `margin: 16`), only
 Automatic consistency!
 
 All your spacing is now based on a single scale, so it'll always look proportional. You no longer decide between `3px`, `4px` and `5px` margin (which are all the same anyway), you decide between three steps on the scale, each of which makes a big difference. There's always a winner!
+
+TK: Color scale
 
 > TODO: ugly escape hatch for edge cases? maybe `import { __raw }; { margin: __raw('13px') };`
 
