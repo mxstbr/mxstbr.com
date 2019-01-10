@@ -32,4 +32,6 @@ export default styled(UniversalLink)`
   &:hover {
     text-decoration: ${props => props.underline !== false && "underline"};
   }
+
+  ${props => props.css};
 `;

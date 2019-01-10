@@ -1,9 +1,13 @@
 import React from "react";
+import { css } from "styled-components";
 import fetch from "isomorphic-unfetch";
+import { parse, format } from "date-fns";
+import { Heading } from "rebass";
 import PageHeader from "../../components/PageHeader";
 import Paragraph from "../../components/Paragraph";
 import Link from "../../components/Link";
-import { H3 } from "../../components/Heading";
+import Text from "../../components/Text";
+import { H3, H4 } from "../../components/Heading";
 import BlogPostCard from "../../components/BlogPostCard";
 import { ListDivider } from "../../components/Lists";
 import blogposts from "../../blog-posts";
@@ -12,6 +16,30 @@ import type { OldBlogPost } from "../../blog-posts";
 type Props = {
   oldPosts: Array<OldBlogPost>
 };
+
+const BlogPostListItem = ({ post, small, last }) => (
+  <Link
+    href={post.path}
+    mt={small ? 3 : 4}
+    pb={small ? 3 : 4}
+    css={css`
+      display: block;
+      ${!last && "border-bottom: 2px solid rgba(0, 0, 0, 0.1);"} &:hover {
+        text-decoration: none;
+        ${Heading} {
+          text-decoration: underline;
+        }
+      }
+    `}
+  >
+    <H3 mt={0} fontSize={small ? 2 : 4} mb={2}>
+      {post.title}
+    </H3>
+    <Text color="quaternary" fontSize={small ? 1 : 2}>
+      {format(parse(post.publishedAt), "MMMM Do, YYYY")}
+    </Text>
+  </Link>
+);
 
 export default class BlogIndex extends React.Component<Props> {
   static async getInitialProps() {
@@ -34,16 +62,31 @@ export default class BlogIndex extends React.Component<Props> {
             to be notified when I publish something new.
           </Paragraph>
         </PageHeader>
-        {blogposts.map(post => (
-          <BlogPostCard key={post.title} post={post} />
+        {blogposts.map((post, index) => (
+          <BlogPostListItem
+            small={false}
+            last={index === blogposts.length - 1}
+            post={post}
+          />
         ))}
-        <ListDivider>
-          <H3 mr={3} mt={2} mb={2}>
-            Archive
-          </H3>
-        </ListDivider>
-        {this.props.oldPosts.map(post => (
-          <BlogPostCard key={post.title} old={post} />
+        <H3 fontSize={3} mr={3} mt={4} mb={2}>
+          Archive
+        </H3>
+        <Paragraph color="#666" mb={4}>
+          In 2019 I rebuilt my blog. Below are links to my favorite posts from
+          the previous iteration. (they are all preserved on{" "}
+          <Link href="https://mxstbr.blog">mxstbr.blog</Link>)
+        </Paragraph>
+        {this.props.oldPosts.slice(0, 16).map((post, index) => (
+          <BlogPostListItem
+            small
+            post={{
+              title: post.title,
+              publishedAt: post.date_published,
+              path: post.url
+            }}
+            last={index === 15}
+          />
         ))}
       </>
     );
