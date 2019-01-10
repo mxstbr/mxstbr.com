@@ -94,9 +94,7 @@ To summarise, this is what I would change if we were starting over today:
 - use Prisma as the "ORM"
 - avoid WYSIWYG editing
 
-### Takeaways
-
-These are my personal lessons about choosing technologies from the experience of building Spectrum:
+### Personal Takeaways
 
 1. Conservative choices are conservative for a reason: they work.
 2. Community size and active maintenance are vital, especially in unfamiliar territory.

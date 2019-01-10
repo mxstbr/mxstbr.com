@@ -87,6 +87,7 @@ export default withRouter(({ router, meta, children }: Props) => (
           <Send color="#666" size="1em" />
         </Icon>
       </Card.Title>
+      {/* $FlowIssue */}
       <Card.Body mb={2}>
         Be the first to know when I post something new! Candid thoughts about
         React.js, Node.js, startups and other interesting things.

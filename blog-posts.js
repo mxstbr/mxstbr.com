@@ -19,7 +19,7 @@ export type NewBlogPost = {|
   path: string
 |};
 
-export type BlogPost = OldBlogPost | NewBlogPost;
+export type BlogPost = $Exact<OldBlogPost> | $Exact<NewBlogPost>;
 
 const files = preval`
   module.exports = require('fs').readdirSync('./pages/thoughts').filter(file => file.endsWith('.md') || file.endsWith('.mdx'));

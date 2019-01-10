@@ -43,9 +43,6 @@ class Homepage extends React.Component<Props> {
   }
 
   render() {
-    const { oldPosts } = this.props;
-    const posts = [...blogposts, ...oldPosts];
-
     return (
       <Main>
         <PageHeader title="Hey, I'm Max! 👋">
@@ -109,9 +106,14 @@ class Homepage extends React.Component<Props> {
         <H2>Recent Blog Posts</H2>
         <WideSection>
           <CardGrid>
-            {posts.slice(0, 3).map((post, i) => (
+            {blogposts.slice(0, 3).map((post, i) => (
               <BlogPostCard key={post.title} post={post} />
             ))}
+            {this.props.oldPosts
+              .slice(0, 3 - blogposts.length)
+              .map((post, i) => (
+                <BlogPostCard key={post.title} old={post} />
+              ))}
           </CardGrid>
         </WideSection>
         <ViewMoreLink href="/thoughts">

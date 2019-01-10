@@ -1,31 +1,38 @@
+// @noflow
 import React from "react";
 import { ExternalLink as LinkExternal } from "react-feather";
 import { parse, format } from "date-fns";
 import Link from "./Link";
 import Card from "./Card";
 import Icon from "./Icon";
-import type { BlogPost } from "../blog-posts";
+import type { NewBlogPost, OldBlogPost } from "../blog-posts";
 
-type Props = {
-  post: BlogPost
-};
+type OldBlogPostProps = {|
+  old: OldBlogPost
+|};
+
+type NewBlogPostProps = {|
+  post: NewBlogPost
+|};
+
+type Props = OldBlogPostProps | NewBlogPostProps;
 
 export default (props: Props) => {
-  const { post } = props;
-  const external =
-    typeof post["_external-site"] === "string"
-      ? post["_external-site"]
-      : typeof post.url === "string"
-        ? "mxstbr.blog"
-        : undefined;
-  const date = parse(
-    typeof post.date_published === "string"
-      ? post.date_published
-      : post.publishedAt
-  );
+  let external;
+  const date = props.old
+    ? parse(props.old.date_published)
+    : parse(props.post.publishedAt);
+  const href = props.old ? props.old.url : props.post.path;
+  if (props.old) {
+    external =
+      typeof props.old["_external-site"] === "string"
+        ? props.old["_external-site"]
+        : "mxstbr.blog";
+  }
+  const post = props.old || props.post;
   return (
     <Link
-      href={typeof post.url === "string" ? post.url : post.path}
+      href={href}
       target={external != undefined ? "_blank" : undefined}
       width={[1, "calc(50% - 16px)", "calc(33.3% - 16px)"]}
       css="&:hover&:hover { text-decoration: none; }"

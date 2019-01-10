@@ -43,7 +43,7 @@ export default class BlogIndex extends React.Component<Props> {
           </H3>
         </ListDivider>
         {this.props.oldPosts.map(post => (
-          <BlogPostCard key={post.title} post={post} />
+          <BlogPostCard key={post.title} old={post} />
         ))}
       </>
     );
