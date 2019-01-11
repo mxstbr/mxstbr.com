@@ -94,10 +94,10 @@ To summarise, this is what I would change if we were starting over today:
 - use Prisma as the "ORM"
 - avoid WYSIWYG editing
 
-### Personal Takeaways
+### Lessons Learned
 
-1. Conservative choices are conservative for a reason: they work.
+1. Conservative choices are usually good choices.
 2. Community size and active maintenance are vital, especially in unfamiliar territory.
-3. Building good products is all about experimenting, optimise for iteration speed and flexibility.
-4. Interesting technological problems are best left to other people, the focus needs to be on the users problems.
+3. Building good products is all about experimenting. Optimise for iteration speed and flexibility.
+4. Leave interesting technological problems to other people.
 5. Carefully choose technologies that are hard to change later. Move faster on choices that are easily undone.
