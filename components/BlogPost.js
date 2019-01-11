@@ -11,10 +11,11 @@ import Paragraph from "./Paragraph";
 import Link from "./Link";
 import Icon from "./Icon";
 import Card from "./Card";
+import NextPost from "./NextPost";
 import ViewMoreLink from "./ViewMoreLink";
 import BreadcrumbLink from "./BreadcrumbLink";
-import { ChevronLeft, Send } from "react-feather";
 import blogposts from "../blog-posts";
+import { ChevronLeft, Send } from "react-feather";
 import type { NewBlogPost } from "../blog-posts";
 
 type Props = {
@@ -38,7 +39,8 @@ const EmailInput = styled(Box).attrs({
 
 const NewsletterForm = () => (
   <Flex
-    m={4}
+    mx={[3, 4]}
+    mb={[3, 4]}
     mt={2}
     as="form"
     action="https://buttondown.email/api/emails/embed-subscribe/mxstbr"
@@ -46,6 +48,7 @@ const NewsletterForm = () => (
     target="popupwindow"
     onsubmit="window.open('https://buttondown.email/mxstbr', 'popupwindow')"
     alignItems="center"
+    flexWrap="wrap"
   >
     <EmailInput
       flex={1}
@@ -77,6 +80,9 @@ const getShareLinks = path => ({
 export default withRouter(({ router, meta, children }: Props) => {
   const published = format(parse(meta.publishedAt), "MMMM Do, YYYY");
   const { twitter, github } = getShareLinks(router.pathname);
+  const current = blogposts.findIndex(post => post.title === meta.title);
+  const next = blogposts[current - 1];
+  const prev = blogposts[current + 1];
   return (
     <>
       <Head title={meta.title} description={meta.summary} image={meta.image} />
@@ -88,10 +94,11 @@ export default withRouter(({ router, meta, children }: Props) => {
         Published {published}
       </Text>
       {children}
-      <Paragraph mt={4} mb={5}>
+      <Paragraph fontSize={1} mt={4} mb={4}>
         <Link href={twitter}>Discuss on Twitter</Link> ·{" "}
         <Link href={github}>Edit on GitHub</Link>
       </Paragraph>
+      <hr />
       <Card hover={false} my={4}>
         <Card.Title css="margin-top: 0;">
           Subscribe to the newsletter{" "}
@@ -106,6 +113,18 @@ export default withRouter(({ router, meta, children }: Props) => {
         </Card.Body>
         <NewsletterForm />
       </Card>
+      <Flex
+        justifyContent="space-between"
+        flexDirection={["column-reverse", "row"]}
+      >
+        {prev && (
+          <NextPost position="left" title={prev.title} href={prev.path} />
+        )}
+        <Box my={[2, 0]} />
+        {next && (
+          <NextPost position="right" title={next.title} href={next.path} />
+        )}
+      </Flex>
     </>
   );
 });
