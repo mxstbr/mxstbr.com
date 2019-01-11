@@ -14,6 +14,7 @@ import Card from "./Card";
 import ViewMoreLink from "./ViewMoreLink";
 import BreadcrumbLink from "./BreadcrumbLink";
 import { ChevronLeft, Send } from "react-feather";
+import blogposts from "../blog-posts";
 import type { NewBlogPost } from "../blog-posts";
 
 type Props = {
@@ -66,50 +67,45 @@ const BackToBlog = props => (
   </BreadcrumbLink>
 );
 
-export default withRouter(({ router, meta, children }: Props) => (
-  <>
-    <Head title={meta.title} description={meta.summary} image={meta.image} />
-    <BackToBlog mb={4} mt={5} />
-    <H2 mb={3} mt={4}>
-      {meta.title}
-    </H2>
-    <Text mt={3} mb={4} color="quaternary">
-      Published {format(parse(meta.publishedAt), "MMMM Do, YYYY")}
-    </Text>
-    {children}
-    <Box my={5}>
-      <hr />
-    </Box>
-    <Card hover={false} my={4}>
-      <Card.Title css="margin-top: 0;">
-        Subscribe to the newsletter{" "}
-        <Icon>
-          <Send color="#666" size="1em" />
-        </Icon>
-      </Card.Title>
-      {/* $FlowIssue */}
-      <Card.Body mb={2}>
-        Be the first to know when I post something new! Candid thoughts about
-        React.js, Node.js, startups and other interesting things.
-      </Card.Body>
-      <NewsletterForm />
-    </Card>
-    <Paragraph>
-      <Link
-        href={`https://mobile.twitter.com/search?q=${encodeURIComponent(
-          `https://mxstbr.com${router.pathname}`
-        )}`}
-      >
-        Discuss on Twitter
-      </Link>{" "}
-      ·{" "}
-      <Link
-        href={`https://github.com/mxstbr/mxstbr.com/edit/master/pages${
-          router.pathname
-        }.md`}
-      >
-        Edit on GitHub
-      </Link>
-    </Paragraph>
-  </>
-));
+const getShareLinks = path => ({
+  twitter: `https://mobile.twitter.com/search?q=${encodeURIComponent(
+    `https://mxstbr.com${path}`
+  )}`,
+  github: `https://github.com/mxstbr/mxstbr.com/edit/master/pages${path}.md`
+});
+
+export default withRouter(({ router, meta, children }: Props) => {
+  const published = format(parse(meta.publishedAt), "MMMM Do, YYYY");
+  const { twitter, github } = getShareLinks(router.pathname);
+  return (
+    <>
+      <Head title={meta.title} description={meta.summary} image={meta.image} />
+      <BackToBlog mb={4} mt={5} />
+      <H2 mb={3} mt={4}>
+        {meta.title}
+      </H2>
+      <Text mt={3} mb={4} color="quaternary">
+        Published {published}
+      </Text>
+      {children}
+      <Paragraph mt={4} mb={5}>
+        <Link href={twitter}>Discuss on Twitter</Link> ·{" "}
+        <Link href={github}>Edit on GitHub</Link>
+      </Paragraph>
+      <Card hover={false} my={4}>
+        <Card.Title css="margin-top: 0;">
+          Subscribe to the newsletter{" "}
+          <Icon>
+            <Send color="#666" size="1em" />
+          </Icon>
+        </Card.Title>
+        {/* $FlowIssue */}
+        <Card.Body mb={2}>
+          Be the first to know when I post something new! Candid thoughts about
+          React.js, Node.js, startups and other interesting things.
+        </Card.Body>
+        <NewsletterForm />
+      </Card>
+    </>
+  );
+});
