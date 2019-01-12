@@ -19,7 +19,7 @@ A big part of Spectrum's appeal is that the content is public and search-indexed
 
 Although the search-indexing was a success, our users often request a better mobile experience. We are building native apps now, but starting from scratch is time consuming. If we had used [react-native-web](https://github.com/necolas/react-native-web) to build the website, we could have reused the base components and built the native apps much faster! 🏎💨
 
-We should have also optimised the website for mobile first. A great mobile experience on desktop is bearable and only needs tweaking to work well. However, a desktop experience on mobile is annoying, no matter how great, and it has proven hard to make ours work well on devices of all sizes.
+On top of that, we should have also optimised the website for mobile first. A great mobile experience on desktop is bearable and only needs tweaking to work well. However, a desktop experience on mobile is annoying, no matter how great, and it has proven hard to make ours work well on devices of all sizes.
 
 ### Not using Next.js
 
