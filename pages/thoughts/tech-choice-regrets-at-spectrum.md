@@ -3,7 +3,7 @@ import BlogPost from '../../components/BlogPost';
 export const meta = {
   published: true,
   publishedAt: '2019-01-10',
-  title: 'Bad Tech Decisions I made at Spectrum',
+  title: 'Tech choices I regret making at Spectrum',
   summary: 'Spectrum is an open source chat app for large online communities. With the benefit of hindsight, here are the technical decisions I would change if we were starting over.'
 }
 
@@ -13,7 +13,7 @@ export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
 
 With the benefit of hindsight, here are the technical decisions I would change if we were starting over.
 
-### Go mobile-first and use react-native-web
+### Not using react-native-web
 
 Most people prefer mobile apps for chatting with others. Yet, a big part of the appeal of Spectrum is that all the content is public and search-indexed, so we had to build the web app first.
 
@@ -21,7 +21,7 @@ Although the search indexing was a success, we should have optimised our web app
 
 We are building native apps, but starting from scratch is time consuming. If we had used [react-native-web](https://github.com/necolas/react-native-web) to build the base components for the web app we could have reused them for the native apps—a big win for moving fast! 💯
 
-### Use Next.js for server-side rendering
+### Not using Next.js
 
 We needed server-side rendering for SEO purposes ([client-side rendering does not cut it](https://twitter.com/mxstbr/status/985188986414161921)) but had already built a first version of the app with [create-react-app](https://github.com/facebook/create-react-app). We thought about switching to [Next.js](https://nextjs.org), but I decided that reworking the routing and data fetching would be more effort than building our own server-side rendering server.
 
@@ -29,7 +29,7 @@ Turns out, building your own production-ready SSR setup is tough. It takes a lot
 
 Next.js offers an amazing development experience and fast performance out of the box, not to mention the great community and excellent documentation. I would use it in a heartbeat if we started over today (in fact, [this website is built with Next.js](https://github.com/mxstbr/mxstbr.com) 😍).
 
-### Leverage a well-known database
+### Using RethinkDB
 
 I chose [RethinkDB](https://www.rethinkdb.com) as our primary data store mainly because of [changefeeds](https://rethinkdb.com/docs/changefeeds/javascript/). They allow you to listen to live updates on (almost) any query. I thought this would reduce complexity by avoiding a separate PubSub system for real-time functionality.
 
@@ -39,7 +39,7 @@ It also turns out that changefeeds do not scale as well as we had expected. Whil
 
 Nowadays, I would choose a more established database (Postgres?) and build a PubSub system on top.
 
-#### ...and use Prisma as the ORM
+#### Not using Prisma as the "ORM"
 
 Another reason why we chose RethinkDB is the Node.js driver, which has a beautiful query API. For example, check out this query which loads a paginated list of the threads posted by a user:
 
@@ -75,24 +75,13 @@ const getThreadsByUser = (id, after, first) => {
 
 Unfortunately Prisma didn't exist when we were starting out. It could have helped us move faster and avoid bugs at the same time.
 
-### Avoid WYSIWYG editing
+### Using DraftJS for WYSIWYG editing
 
 Writing is one of the primary activities on Spectrum, so we wanted the experience to be great. I decided to replace our plaintext markdown input with a custom WYSIWYG editor based on [Draft.js](https://draft-js.org).
 
 Unfortunately it did not work out well. The editor is really buggy, even after months of work our users rightfully complain about it constantly. On top of that, the library makes up a majority of our JavaScript bundle size and the lack of cross-browser support means that we had to keep the plaintext input around as a fallback. 👎
 
 While another WYSIWYG framework might have worked, we should have focused on more pressing features—the plaintext markdown input was fine.
-
-### Summary
-
-To summarise, this is what I would change if we were starting over today:
-
-- optimise for mobile first
-- use react-native-web for the base components
-- use Next.js for the web app
-- leverage a more established database
-- use Prisma as the "ORM"
-- avoid WYSIWYG editing
 
 ### Lessons Learned
 
