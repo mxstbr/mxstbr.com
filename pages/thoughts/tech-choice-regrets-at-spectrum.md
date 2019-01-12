@@ -15,11 +15,11 @@ With the benefit of hindsight, here are the technical decisions I would change i
 
 ### Not using react-native-web
 
-Most people prefer mobile apps for chatting with others. Yet, a big part of the appeal of Spectrum is that all the content is public and search-indexed, so we had to build the web app first.
+A big part of Spectrum's appeal is that the content is public and search-indexed, which is why we built the website before native apps.
 
-Although the search indexing was a success, we should have optimised our web app for mobile first. While a good mobile experience on desktop is bearable, a desktop experience on mobile or a crappy mobile experience is not.
+Although the search-indexing was a success, our users often request a better mobile experience. We are building native apps now, but starting from scratch is time consuming. If we had used [react-native-web](https://github.com/necolas/react-native-web) to build the website, we could have reused the base components and built the native apps much faster! 🏎💨
 
-We are building native apps, but starting from scratch is time consuming. If we had used [react-native-web](https://github.com/necolas/react-native-web) to build the base components for the web app we could have reused them for the native apps—a big win for moving fast! 💯
+We should have also optimised the website for mobile first. A great mobile experience on desktop is bearable and only needs tweaking to work well. However, a desktop experience on mobile is annoying, no matter how great, and it has proven hard to make ours work well on devices of all sizes.
 
 ### Not using Next.js
 
@@ -39,7 +39,7 @@ It also turns out that changefeeds do not scale as well as we had expected. Whil
 
 Nowadays, I would choose a more established database (Postgres?) and build a PubSub system on top.
 
-#### Not using Prisma as the "ORM"
+#### ...and use Prisma as the ORM
 
 Another reason why we chose RethinkDB is the Node.js driver, which has a beautiful query API. For example, check out this query which loads a paginated list of the threads posted by a user:
 
