@@ -9,8 +9,6 @@ export const meta = {
 
 export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
 
-This is it, folks, this is how I dream of styling my React apps:
-
 ```JS
 <div
   styles={{
@@ -24,56 +22,56 @@ This is it, folks, this is how I dream of styling my React apps:
 
 Look closely, there are some interesting things going on:
 
-- Enforced consistency via a built-in scale
-- Per-value media queries
 - Simple composition of styles
 - Statically typed styles
+- Enforced consistency via a built-in scale
+- Per-value media queries
 - Moving styles around is easy
 - Minimal abstraction
 - It's learn once, write anywhere just like React
 - Only for folks with JS experience
 
-Let's examine the tradeoffs!
+Let's examine the benefits and tradeoffs!
 
 ### Style Objects
 
 Compared to strings (a la styled-components), objects are easier to compose and statically analyse, but are less friendly to JavaScript newbies and have a learning curve.
 
-I prefer objects. 
-
-> Note for context: my team consists of people who know JavaScript and can handle the learning curve.
+I have started to prefer objects.
 
 ### Prop Based
 
-Second, you'll notice that I'm passing the style object to a prop called `styles`. Why a prop and not the familiar `styled.x` API or even a `withStyles` HOC? 
+Second, you'll notice that I'm passing the style object to a prop of the element. Why a prop and not the familiar `styled.x` API or a `withStyles` HOC? 
 
-With a prop, copy and pasting JSX around is easy and creating [style components](http://style-components.com) (not a typo) is simple since everything is based on standard React components, i.e. functions. You have all the benefits of the `styled.x` API too!
+With a prop, copy and pasting JSX around is easy and creating [style components](http://style-components.com) (not a typo) is simple since everything is based on standard React components, i.e. functions.
 
-I called it `styles` vs. the currently more common `css` because that makes it learn once, write anywhere just like React itself. Styling your React Native or React VR apps with a `css` prop doesn't make much sense since they don't support CSS.
+This simple abstraction can support everything, including adapting based on props and state, extending styles and global theming.
 
-#### Inline Styles?
+#### `styles` vs. `css`
 
-No, this is not inline styles.
+I called it `styles` vs. the currently more common `css` because that makes it learn once, write anywhere just like React itself. Styling your React Native or React VR apps with a `css` prop doesn't make sense since they don't support CSS.
 
-Inline styles are imperformant when used across an app. Compiling to actual CSS that's injected into the DOM is faster, much faster.
+#### Are these inline styles?
+
+They could be, but are not. Inline styles are less performant than compiling to CSS and injecting it into the CSSOM.
 
 ### Built-in Scale
 
-Rather than specifying arbitrary values (`margin: '16px'` or `margin: 16`), only values from 1 to 10 can be specified. There is a global scale (e.g. 4-based: `4px 8px 16px 32px 64px...` 4 * 2 ^ n) and the value defines which step on the scale is used. For example, `margin: 2` mean you have an `8px` margin.
+Rather than specifying arbitrary values (`margin: '16px'` or `margin: 16`), only values from 1 to 10 can be specified. There is a global scale, e.g. 4-based: `4px 8px 16px 32px 64px...` (`4 * 2 ^ n`), and the value defines which step on the scale is used. For example, `margin: 2` would result in a `8px` margin.
 
-Automatic consistency!
+All your spacing is now based on a the same scale, so it'll always look proportional. You no longer decide between `3px`, `4px` and `5px` margin (which are all the same anyway), you decide between three widely different steps on the scale.
 
-All your spacing is now based on a single scale, so it'll always look proportional. You no longer decide between `3px`, `4px` and `5px` margin (which are all the same anyway), you decide between three steps on the scale, each of which makes a big difference. There's always a winner!
+The same thing is true for colors, rather than allowing any hex/rgb value there is a global set of colors with names, and you pass the color name rather than a raw value.
 
-TK: Color scale
+Automatic consistency throughout your whole application!
 
 > TODO: ugly escape hatch for edge cases? maybe `import { __raw }; { margin: __raw('13px') };`
 
 ### Responsive Values
 
-Rather than using media queries we should allow making each property responsive a la facepaint with mobile-first values (i.e. `min-width: xyz` rather than `max-width`). 
+Rather than using media queries each property can be responsive (a la facepaint) with mobile-first values.
 
-Again there is a global scale for media queries (e.g. `0px 768px 1200px 2400px`), and specifying `margin: [1, 2]` would mean that anything above 768px has a margin of 8px and everything below a margin of 4px. Easy responsiveness ftw!
+Again there is a global scale for media queries (e.g. `0px 768px 1200px 2400px`), and specifying `margin: [1, 2]` would mean that anything above 768px has a margin of 8px and everything below a margin of 4px. Need to make a grid of things a column on mobile? `flexDirection: ['column', 'row']`!
 
 > TODO: Maybe the prop should accept an array to allow swapping out all values? `styles={[mobile, desktop]}`, or maybe that should merge styles? not sure
 
@@ -83,20 +81,15 @@ No media queries, pseudo selectors, pseudo elements, shorthands, or anything els
 
 Clarity over brevity (`margin: 1 1 2 2` vs. `{ marginTop: 1, marginBottom: 2, marginRight: 1, marginLeft: 2 }`). 
 
-Need styles on interaction? Do it in JS. Simple interactions usually don't work as expected across desktop and mobile anyway.
+Need styles on interaction? Do it in JS. CSS pseudo selectors usually do not work well on mobile, and you resolve to JS.
 
 ### Bonus: Static Typing
 
 The style objects can be fully statically typed with TypeScript or Flow! 
 
-### Anti Goals
-
-- Friendlyness to folks without a JavaScript background
-- TBD
-
 ### Open Questions
 
-- What happens when `<CustomComp styles={{}}>`? Does it pass through `className/style`, `styles` or both?
+- Extending styles: what happens here `<CustomComp styles={{}}>`? Does it pass through `className/style`, `styles` or both?
  
 ### Inspiration / Further Reading
 
