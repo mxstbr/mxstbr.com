@@ -36,7 +36,7 @@ const OpenSourceProjectTableRow = ({ project }) => (
         {project.name}
       </Heading>
       <MobileOnly>
-        <Text color="#666" mt="6px" fontSize={1} ml="1em">
+        <Text as="div" color="#666" mt="6px" fontSize={1} ml="1em">
           {project.stars.toLocaleString()}
           <StarIcon />
         </Text>
@@ -56,7 +56,7 @@ const OpenSourceProjectTableRow = ({ project }) => (
       width={[1, "6em"]}
     >
       <DesktopOnly>
-        <Text color="#666" fontSize={1}>
+        <Text as="div" color="#666" fontSize={1}>
           {project.stars.toLocaleString()}
           <StarIcon />
         </Text>
@@ -83,16 +83,17 @@ export default () => (
       <Table
         rows={projects
           .filter(p => p.active !== false)
-          .sort((a, b) => b.stars - a.stars)
+          .sort((a, b) => b.stars - a.stars || b.name.localeCompare(a.name))
           .map(p => ({
             ...p,
             id: p.repo,
             href: `https://github.com/${p.repo}`
           }))}
+        keyField="repo"
         render={row => <OpenSourceProjectTableRow project={row} />}
       />
     </WideSection>
-    <Text color="#666" mt={4} fontSize={2}>
+    <Text as="div" color="#666" mt={4} fontSize={2}>
       Total:{" "}
       {projects
         .filter(p => p.active !== false)
@@ -110,12 +111,13 @@ export default () => (
       <Table
         rows={projects
           .filter(p => p.active === false)
-          .sort((a, b) => b.stars - a.stars)
+          .sort((a, b) => b.stars - a.stars || b.name.localeCompare(a.name))
           .map(p => ({
             ...p,
             id: p.repo,
             href: `https://github.com/${p.repo}`
           }))}
+        keyField="repo"
         render={row => <OpenSourceProjectTableRow project={row} />}
       />
     </WideSection>
