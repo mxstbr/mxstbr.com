@@ -1,5 +1,4 @@
-// $FlowIssue StrictMode isn't typed yet
-import React, { StrictMode } from "react";
+import React from "react";
 import App, { Container } from "next/app";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
 import reset from "styled-reset";
@@ -77,34 +76,31 @@ class MyApp extends App {
   render() {
     const { Component, pageProps } = this.props;
     return (
-      <StrictMode>
-        {" "}
-        <Container>
-          <ThemeProvider theme={theme}>
-            <MDXProvider components={components}>
-              <>
-                <Nav />
-                <Head
-                  title={DEFAULT_TITLE}
-                  description={DEFAULT_DESCRIPTION}
-                  image={DEFAULT_IMAGE}
-                />
-                <Layout
-                  pt={[`${NAV_HEIGHT}px`, `${NAV_HEIGHT / 2}px`]}
-                  css={{
-                    paddingLeft: "8px",
-                    paddingRight: "8px"
-                  }}
-                >
-                  <GlobalStyle />
-                  <Component {...pageProps} />
-                </Layout>
-                <Footer />
-              </>
-            </MDXProvider>
-          </ThemeProvider>
-        </Container>
-      </StrictMode>
+      <Container>
+        <ThemeProvider theme={theme}>
+          <MDXProvider components={components}>
+            <>
+              <Nav />
+              <Head
+                title={DEFAULT_TITLE}
+                description={DEFAULT_DESCRIPTION}
+                image={DEFAULT_IMAGE}
+              />
+              <Layout
+                pt={[`${NAV_HEIGHT}px`, `${NAV_HEIGHT / 2}px`]}
+                css={{
+                  paddingLeft: "8px",
+                  paddingRight: "8px"
+                }}
+              >
+                <GlobalStyle />
+                <Component {...pageProps} />
+              </Layout>
+              <Footer />
+            </>
+          </MDXProvider>
+        </ThemeProvider>
+      </Container>
     );
   }
 }
