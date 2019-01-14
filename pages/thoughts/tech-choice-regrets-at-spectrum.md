@@ -3,7 +3,7 @@ import BlogPost from '../../components/BlogPost';
 export const meta = {
   published: true,
   publishedAt: '2019-01-10',
-  title: 'Tech choices I regret making at Spectrum',
+  title: 'Tech Choices I Regret at Spectrum',
   summary: 'Spectrum is an open source chat app for large online communities. With the benefit of hindsight, here are the technical decisions I would change if we were starting over.'
 }
 
