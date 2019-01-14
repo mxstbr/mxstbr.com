@@ -51,7 +51,7 @@ Another framework might have worked better, but in reality we should have focuse
 
 Changing these decisions would not have made Spectrum a success by itself. Yet, it would have improved our chances. Here are the lessons I am taking away for my next projects:
 
-1. Deliberately choose core technologies that are hard to change later.
+1. Carefully choose core technologies that are hard to change later.
 1. Prefer conserative choices over the cutting edge.
 1. Community size and active maintenance are vital, especially in unfamiliar territory.
 1. Building a good product is all about experimenting. Optimise for iteration speed and flexibility. 
