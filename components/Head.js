@@ -7,7 +7,7 @@ type Props = {
   title?: string,
   description?: string,
   image?: string,
-  jsonld?: JsonLDType,
+  jsonld?: JsonLDType | Array<JsonLDType>,
   router: Router
 };
 
@@ -99,7 +99,7 @@ export default withRouter(
               "http://instagram.com/mxstbr"
             ]
           },
-          jsonld
+          ...(Array.isArray(jsonld) ? jsonld : [jsonld])
         ].filter(Boolean)}
       />
     </Head>

@@ -79,6 +79,7 @@ export default class BlogIndex extends React.Component<Props> {
         </PageHeader>
         {blogposts.map((post, index) => (
           <BlogPostListItem
+            key={post.title}
             small={false}
             last={index === blogposts.length - 1}
             post={post}
@@ -95,6 +96,7 @@ export default class BlogIndex extends React.Component<Props> {
         {this.props.oldPosts.slice(0, 16).map((post, index) => (
           <BlogPostListItem
             small
+            key={post.title}
             post={{
               title: post.title,
               publishedAt: post.date_published,
