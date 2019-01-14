@@ -21,46 +21,28 @@ export type NewBlogPost = {|
 
 export type BlogPost = $Exact<OldBlogPost> | $Exact<NewBlogPost>;
 
-const files = preval`
-  module.exports = require('fs').readdirSync('./pages/thoughts').filter(file => file.endsWith('.md') || file.endsWith('.mdx'));
+// Load all posts meta data
+const posts: Array<NewBlogPost> = preval`
+  const fs = require('fs')
+  const META = /export\\s+const\\s+meta\\s+=\\s+(\\{(\\n|.)*?\\n\\})/;
+  const files = fs.readdirSync('./pages/thoughts')
+    .filter(file => file.endsWith('.md') || file.endsWith('.mdx'));
+
+  module.exports = files
+    .map(file => {
+      const contents = fs.readFileSync('./pages/thoughts/' + file, 'utf8')
+      const match = META.exec(contents);
+      if (!match || typeof match[1] !== 'string') throw new Error(\`\${file} needs to export const meta = {}\`);
+
+      const meta = eval('(' + match[1] + ')')
+
+      return {
+        ...meta,
+        path: '/thoughts/' + file.replace(/\\.mdx?$/, '')
+      };
+    })
+    .filter(meta => meta.published)
+    .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
 `;
-
-// Fall back to getting meta from string in case of cyclical dependency
-const contents = preval`
-  const files = require('fs').readdirSync('./pages/thoughts').filter(file => file.endsWith('.md') || file.endsWith('.mdx'));
-  module.exports = files.reduce((map, file) => {
-    map[file] = require('fs').readFileSync('./pages/thoughts/' + file, 'utf8')
-    return map;
-  }, {});
-`;
-const META = /export\s+const\s+meta\s+=\s+(\{(\n|.)*?\n\})/;
-
-const posts: Array<NewBlogPost> = files
-  .map(file => {
-    // $FlowIssue
-    let { meta } = require(`./pages/thoughts/${file}`);
-    // This could be undefined due to a cyclical dep, so we fall back to
-    // parsing the file contents
-    if (!meta) {
-      const match = META.exec(contents[file]);
-      if (match && typeof match[1] === "string") {
-        // Yeah eval is evil but this is trusted input and, contrary to
-        // JSON.parse, also supports JavaScript objects
-        meta = eval("(" + match[1] + ")");
-      }
-    }
-    if (!meta) throw new Error(`${file} needs to \`export const meta = {}\``);
-    if (!meta.publishedAt)
-      throw new Error(
-        "Blog posts need to have a publishedAt date in their metadata."
-      );
-
-    return {
-      ...meta,
-      path: `/thoughts/${file.replace(/\.mdx?$/, "")}`
-    };
-  })
-  .filter(meta => meta.published)
-  .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
 
 module.exports = posts;
