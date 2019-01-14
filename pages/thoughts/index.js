@@ -37,6 +37,7 @@ const BlogPostListItem = ({ post, small, last }) => (
     </H3>
     <Text color="quaternary" fontSize={small ? 1 : 2}>
       {format(parse(post.publishedAt), "MMMM Do, YYYY")}
+      {typeof post.external === "string" && ` · ${post.external}`}
     </Text>
   </Link>
 );
@@ -52,7 +53,21 @@ export default class BlogIndex extends React.Component<Props> {
   render() {
     return (
       <>
-        <PageHeader title="Blog">
+        <PageHeader
+          title="Blog"
+          description="Candid thoughts about React.js, Node.js, startups and other interesting things."
+          jsonld={{
+            "@context": "http://schema.org",
+            "@type": "Blog",
+            about:
+              "Candid thoughts about React.js, Node.js, startups and other interesting things.",
+            author: {
+              "@type": "Person",
+              "@id": "mxstbr",
+              name: "Max Stoiber"
+            }
+          }}
+        >
           <Paragraph>
             Candid thoughts about React.js, Node.js, startups and other
             interesting things.{" "}
@@ -83,7 +98,8 @@ export default class BlogIndex extends React.Component<Props> {
             post={{
               title: post.title,
               publishedAt: post.date_published,
-              path: post.url
+              path: post.url,
+              external: post["_external-site"]
             }}
             last={index === 15}
           />

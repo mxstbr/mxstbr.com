@@ -3,13 +3,15 @@ import { Flex, type RebassProps } from "rebass";
 import Head from "./Head";
 import SmallLayout from "./SmallLayout";
 import { H2 } from "./Heading";
+import type { JsonLD } from "./JsonLD";
 
 type Props = {
   ...$Exact<RebassProps>,
   children: React$Node,
   title: string,
   description?: string,
-  image?: string
+  image?: string,
+  jsonld?: JsonLD
 };
 
 export default (props: Props) => (
@@ -25,6 +27,7 @@ export default (props: Props) => (
       title={props.title}
       description={props.description}
       image={props.image}
+      jsonld={props.jsonld}
     />
     <H2 alignSelf="center" textAlign="center" mt={0}>
       {props.title}

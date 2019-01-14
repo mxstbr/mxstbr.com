@@ -62,6 +62,7 @@ const NewsletterForm = () => (
 );
 
 const BackToBlog = props => (
+  // $FlowIssue
   <BreadcrumbLink {...props} color="primary" href="/thoughts">
     <Icon ml={0} mr={1}>
       <ChevronLeft size="1em" />
@@ -85,8 +86,36 @@ export default withRouter(({ router, meta, children }: Props) => {
   const prev = blogposts[current + 1];
   return (
     <>
-      <Head title={meta.title} description={meta.summary} image={meta.image} />
-      <BackToBlog mb={4} mt={5} />
+      <Head
+        title={meta.title}
+        description={meta.summary}
+        image={meta.image}
+        jsonld={{
+          "@context": "http://schema.org",
+          "@type": "BlogPosting",
+          headline: meta.title,
+          image: meta.image,
+          //  "editor": "John Doe",
+          //  "genre": "search engine optimization",
+          //  "keywords": "seo sales b2b",
+          //  "wordcount": "1120",
+          //  "publisher": "Book Publisher Inc",
+          url: `https://mxstbr.com${router.pathname}`,
+          mainEntityOfPage: {
+            "@type": "WebPage",
+            "@id": "https://mxstbr.com/blog"
+          },
+          datePublished: format(parse(meta.publishedAt), "YYYY-MM-DD"),
+          dateModified: format(parse(meta.publishedAt), "YYYY-MM-DD"),
+          description: meta.summary,
+          author: {
+            "@type": "Person",
+            "@id": "mxstbr",
+            name: "Max Stoiber"
+          }
+        }}
+      />
+      <BackToBlog mb={4} mt={[4, 5]} />
       <H2 mb={3} mt={4}>
         {meta.title}
       </H2>

@@ -1,10 +1,12 @@
 // From: https://blog.haroen.me/json-ld-with-react
 import React from "react";
 
+export type JsonLD = {
+  [key: string]: string | Array<string>
+};
+
 type Props = {
-  data: {
-    [key: string]: string | Array<string>
-  }
+  data: JsonLD | Array<JsonLD>
 };
 
 const JsonLd = ({ data }: Props) => (
