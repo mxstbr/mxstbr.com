@@ -39,42 +39,6 @@ It also turns out that changefeeds do not scale as well as we had expected. Whil
 
 Nowadays, I would choose a more established database (Postgres?) and build a PubSub system on top.
 
-#### ...and use Prisma as the ORM
-
-Another reason why we chose RethinkDB is the Node.js driver, which has a beautiful query API. For example, check out this query which loads a paginated list of the threads posted by a user:
-
-```JS
-const getThreadsByUser = (id, skip, limit) => {
-  return db
-    .table('threads')
-    .getAll(id, { index: 'userId' })
-    .skip(skip || 0)
-    .limit(limit || 10)
-    .run();
-}
-```
-
-That is one pretty API! 😍 But there is a new kid on the block and it looks even better: [Prisma](https://prisma.io).
-
-With Prisma, you define your database schema with the GraphQL Schema Definition Language. It then automatically generates a custom database driver with type-safe queries—a phenomenal developer experience! It would also have been a natural fit for our GraphQL-based API.
-
-Let's look at the same query again, but this time using Prisma:
-
-```JS
-const getThreadsByUser = (id, after, first) => {
-  return db
-    .user({ id })
-    .threads({ 
-      first,
-      after,
-    });
-}
-```
-
-😍😍😍
-
-Unfortunately Prisma didn't exist when we were starting out. It could have helped us move faster and avoid bugs at the same time.
-
 ### Regret 4: Using DraftJS for WYSIWYG editing
 
 Writing is one of the primary activities on Spectrum, so we wanted the experience to be great. I decided to replace our plaintext markdown input with a custom WYSIWYG editor based on [Draft.js](https://draft-js.org).
@@ -95,8 +59,12 @@ To summarise, these are my regrets:
 
 ### Lessons Learned
 
-1. Conservative choices are usually good choices.
-2. Community size and active maintenance are vital, especially in unfamiliar territory.
-3. Building good products is all about experimenting. Optimise for iteration speed and flexibility.
-4. Leave interesting technological problems to other people.
-5. Carefully choose technologies that are hard to change later. Move faster on choices that are easily undone.
+I learned a lot of lessons from the experience of starting and building Spectrum, and I will not make the same mistakes for my next projects:
+
+1. Deliberately choose core technologies that are hard to change later.
+1. Prefer conserative choices over the cutting edge.
+1. Community size and active maintenance are vital, especially in unfamiliar territory.
+1. Optimise for iteration speed and flexibility. Building good products is all about experimenting.
+1. Leave interesting technological problems to other people. Focus on your users.
+
+On top of that, writing this down has been invaluable to help me crystallise my thoughts.
