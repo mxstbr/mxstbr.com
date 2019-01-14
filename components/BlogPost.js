@@ -80,7 +80,7 @@ const getShareLinks = path => ({
 export default withRouter(({ router, meta, children }: Props) => {
   const published = format(parse(meta.publishedAt), "MMMM Do, YYYY");
   const { twitter, github } = getShareLinks(router.pathname);
-  const current = blogposts.findIndex(post => post.title === meta.title);
+  const current = blogposts.map(({ title }) => title).indexOf(meta.title);
   const next = blogposts[current - 1];
   const prev = blogposts[current + 1];
   return (
