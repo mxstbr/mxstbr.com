@@ -4,14 +4,14 @@ export const meta = {
   published: true,
   publishedAt: '2019-01-10',
   title: 'Tech Choices I Regret at Spectrum',
-  summary: 'Spectrum is an open source chat app for large online communities. With the benefit of hindsight, here are the technical decisions I would change if we were starting over.'
+  summary: 'Spectrum is an open source chat app for large online communities. With the benefit of hindsight, here are the technology choices I regret.'
 }
 
 export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
 
 👋 I am Max, the technical co-founder of [Spectrum](https://spectrum.chat). Spectrum is an [open source](https://github.com/withspectrum/spectrum) chat app for large online communities and was recently acquired by GitHub. We are a team of three with a predominantly frontend and design background and have worked on it for close to two years.
 
-With the benefit of hindsight, here are the technical choices I regret.
+With the benefit of hindsight, here are the technology choices I regret.
 
 ### Regret 1: Not using react-native-web
 
@@ -39,32 +39,23 @@ It also turns out that changefeeds do not scale as well as we had expected. Whil
 
 Nowadays, I would choose a more established database (Postgres?) and build a PubSub system on top.
 
-### Regret 4: Using DraftJS for WYSIWYG editing
+### Regret 4: Using DraftJS and WYSIWYG editing
 
 Writing is one of the primary activities on Spectrum, so we wanted the experience to be great. I decided to replace our plaintext markdown input with a custom WYSIWYG editor based on [Draft.js](https://draft-js.org).
 
-Unfortunately it did not work out well. The editor is really buggy, even after months of work our users rightfully complain about it constantly. On top of that, the library makes up a majority of our JavaScript bundle size and the lack of cross-browser support means that we had to keep the plaintext input around as a fallback. 👎
+Unfortunately it did not work out well. The editor is really buggy, even after months of work our users rightfully complain about it constantly. On top of that, the library makes up a majority of our JavaScript bundle size and the lack of cross-browser support means that we have to keep the plaintext input around as a fallback. 👎
 
-While another WYSIWYG framework might have worked, we should have focused on more pressing features—the plaintext markdown input was fine.
-
-### Summary
-
-To summarise, these are my regrets:
-
-1. Not using react-native-web
-2. Not building mobile-first
-3. Not using Next.js
-4. Using RethinkDB
-5. Using DraftJS
+Another framework might have worked better, but in reality we should have focused on more pressing features instead. I thought we needed WYSIWYG editing but did not validate it by talking to our users. Otherwise, we would have quickly realised that there was no need for it.
 
 ### Lessons Learned
 
-I learned a lot of lessons from the experience of starting and building Spectrum, and I will not make the same mistakes for my next projects:
+Changing these decisions would not have made Spectrum a success by itself. Yet, it would have improved our chances. Here are the lessons I am taking away for my next projects:
 
 1. Deliberately choose core technologies that are hard to change later.
 1. Prefer conserative choices over the cutting edge.
 1. Community size and active maintenance are vital, especially in unfamiliar territory.
-1. Optimise for iteration speed and flexibility. Building good products is all about experimenting.
-1. Leave interesting technological problems to other people. Focus on your users.
+1. Building good products is all about experimenting. Optimise for iteration speed and flexibility. 
+1. Leave interesting technological problems to other people.
+1. Talk to your users, especially during planning to prevent wasting time on features they do not care about.
 
-On top of that, writing this down has been invaluable to help me crystallise my thoughts.
+On top of that, writing this down has been invaluable to help me crystallise my thoughts. Expect more of this in the future!
