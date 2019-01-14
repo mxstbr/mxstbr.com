@@ -17,7 +17,7 @@ With the benefit of hindsight, here are the technology choices I regret.
 
 A big part of Spectrum's appeal is that the content is public and search-indexed, which is why we built the website before native apps.
 
-Although the search-indexing was a success, our users often request a better mobile experience. We are building native apps now, but starting from scratch is time consuming. If we had used [react-native-web](https://github.com/necolas/react-native-web) to build the website, we could have reused the base components and built the native apps much faster! 🏎💨
+Although the search-indexing was a success, our users have been requesting a better mobile experience. We are building native apps now, but starting from scratch is time consuming. If we had used [react-native-web](https://github.com/necolas/react-native-web) to build the website, we could have reused the base components and built the native apps much faster! 🏎💨
 
 On top of that, we should have also optimised the website for mobile first. A great mobile experience on desktop is bearable and only needs tweaking to work well. However, a desktop experience on mobile is annoying, no matter how great, and it has proven hard to make ours work well on devices of all sizes.
 
@@ -33,7 +33,7 @@ Next.js offers an amazing development experience and fast performance out of the
 
 I chose [RethinkDB](https://www.rethinkdb.com) as our primary data store mainly because of [changefeeds](https://rethinkdb.com/docs/changefeeds/javascript/). They allow you to listen to live updates on (almost) any query. I thought this would reduce complexity by avoiding a separate PubSub system for real-time functionality.
 
-Unfortunately, we have had a lot of troubles with RethinkDB. Since it is not widely used, there is little documentation and knowledge about operations. We have had many database outages and debugging them often feels like shooting in the dark.
+Unfortunately, we have had a lot of troubles with RethinkDB. Since it is not widely used, there is little documentation and knowledge about operations. We have had many database outages and debugging them has often felt like shooting in the dark.
 
 It also turns out that changefeeds do not scale as well as we had expected. While we managed to work around it, we should not have had to. 😕
 
@@ -54,8 +54,8 @@ Changing these decisions would not have made Spectrum a success by itself. Yet, 
 1. Deliberately choose core technologies that are hard to change later.
 1. Prefer conserative choices over the cutting edge.
 1. Community size and active maintenance are vital, especially in unfamiliar territory.
-1. Building good products is all about experimenting. Optimise for iteration speed and flexibility. 
+1. Building a good product is all about experimenting. Optimise for iteration speed and flexibility. 
 1. Leave interesting technological problems to other people.
-1. Talk to your users, especially during planning to prevent wasting time on features they do not care about.
+1. Talk to your users to prevent wasting time on features they do not care about.
 
 On top of that, writing this down has been invaluable to help me crystallise my thoughts. Expect more of this in the future!
