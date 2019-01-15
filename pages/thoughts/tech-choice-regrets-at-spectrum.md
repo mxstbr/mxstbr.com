@@ -49,14 +49,12 @@ Another framework might have worked better, but in reality we should have focuse
 
 ### Lessons Learned
 
-// while spectrum didn't remain independent, i don't consider it a failure; i think these two sentences come across as you admitting failure and defeat - maybe there's a slightly better way to phrase this?
-Changing these decisions would not have made Spectrum a success by itself. Yet, it would have improved our chances. Here are the lessons I am taking away for my next projects:
+Changing these decisions would not have made Spectrum a better product by itself. Yet, it would have saved us time and allowed us to spend more time experimenting. Here are the lessons I am taking away for my next projects:
 
-1. Carefully choose core technologies that are hard to change later. // eg datastore, user interface frameworks, and api layer
-1. Prefer conserative choices over the cutting edge. // torn on this, because graphql is cutting edge but i think we're net-happy that we chose this; react is also relatively cutting edge over something like angular, no? same with styled-components? i think it's not about exploring the cutting edge, but just making more calculated decisions on core infra (datastore)
-1. Community size and active maintenance are vital, especially in unfamiliar territory. // i'm not sure what you mean by this, or what it has to do with your preceeding 4 regrets
-1. Building a good product is all about experimentation. Optimise for iteration speed and technology flexibility.
-1. Leave interesting technological problems to other people. // what do you mean by this?
-1. Talk to your users to prevent wasting time on features they do not care about. // we did this quite a lot, but it's not really feasible to do this for *every little thing* - just the main things!
+1. Carefully choose core technologies that are hard to change later (e.g. the datastore).
+1. Be deliberate about cutting edge tech. Prefer conserative choices.
+1. Community size and active maintenance are vital, especially in unfamiliar territory.
+1. Building a good product is all about experimentation. Optimise for iteration speed and flexibility.
+1. Be open with your roadmap to learn about your users priorities.
 
 On top of that, writing this down has been invaluable to help me crystallise my thoughts. Expect more of this in the future!
