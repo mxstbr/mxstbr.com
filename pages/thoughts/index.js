@@ -9,6 +9,7 @@ import Link from "../../components/Link";
 import Text from "../../components/Text";
 import { H3, H4 } from "../../components/Heading";
 import BlogPostCard from "../../components/BlogPostCard";
+import { NewsletterUpsellCard } from "../../components/NewsletterForm";
 import { ListDivider } from "../../components/Lists";
 import blogposts from "../../blog-posts";
 import type { OldBlogPost } from "../../blog-posts";
@@ -71,10 +72,8 @@ export default class BlogIndex extends React.Component<Props> {
           <Paragraph>
             Candid thoughts about React.js, Node.js, startups and other
             interesting things.{" "}
-            <Link href="https://buttondown.email/mxstbr">
-              Subscribe to the newsletter
-            </Link>{" "}
-            to be notified when I publish something new.
+            <Link href="#newsletter">Subscribe to the newsletter</Link> to be
+            notified when I publish something new.
           </Paragraph>
         </PageHeader>
         {blogposts.map((post, index) => (
@@ -85,7 +84,9 @@ export default class BlogIndex extends React.Component<Props> {
             post={post}
           />
         ))}
-        <H3 fontSize={3} mr={3} mt={4} mb={2}>
+        <NewsletterUpsellCard id="newsletter" my={undefined} mt={4} mb={5} />
+        <hr />
+        <H3 fontSize={3} mt={5} mb={2}>
           Archive
         </H3>
         <Paragraph color="#666" mb={4}>
