@@ -72,7 +72,7 @@ Another framework might have worked better, but in reality we should have focuse
 
 <Lesson 
   title="Lesson 5" 
-  body="Deliberately asses cutting edge technologies, bias towards conservative choices."
+  body="Deliberately assess cutting edge technologies, bias towards conservative choices."
   last={false}
 />
 
