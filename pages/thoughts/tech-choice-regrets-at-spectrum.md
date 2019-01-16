@@ -3,7 +3,7 @@ import Lesson from '../../components/Lesson';
 
 export const meta = {
   published: true,
-  publishedAt: '2019-01-10',
+  publishedAt: '2019-01-16',
   title: 'Tech Choices I Regret at Spectrum',
   summary: 'Spectrum is an open source chat app for large online communities. With the benefit of hindsight, here are the technology choices I regret.'
 }

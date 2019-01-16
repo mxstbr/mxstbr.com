@@ -16,7 +16,14 @@ import NextPost from "./NextPost";
 import ViewMoreLink from "./ViewMoreLink";
 import BreadcrumbLink from "./BreadcrumbLink";
 import blogposts from "../blog-posts";
-import { ChevronLeft, Send, Heart, MessageCircle } from "react-feather";
+import {
+  ChevronLeft,
+  Send,
+  Heart,
+  MessageCircle,
+  HelpCircle,
+  Twitter
+} from "react-feather";
 import { NewsletterUpsellCard } from "./NewsletterForm";
 import type { NewBlogPost } from "../blog-posts";
 
@@ -211,6 +218,7 @@ class BlogPost extends React.Component<Props, State> {
           <Flex
             justifyContent="space-between"
             flexDirection={["column-reverse", "row"]}
+            my={5}
           >
             {prev && (
               <NextPost position="left" title={prev.title} href={prev.path} />
@@ -221,9 +229,17 @@ class BlogPost extends React.Component<Props, State> {
             )}
           </Flex>
         )}
-        <hr />
-        <H3>Webmentions</H3>
-        {Array.isArray(mentions) && (
+        <H3>
+          Webmentions{" "}
+          <Link href="https://indieweb.org/Webmention">
+            <Icon title="Webmention is a web standard for mentions and conversations across the web.">
+              <HelpCircle color="#999" size="0.75em" />
+            </Icon>
+          </Link>
+        </H3>
+        {mentions === null ? (
+          <Paragraph>Loading...</Paragraph>
+        ) : (
           <>
             <Paragraph as="div" mb={4} color="tertiary">
               <Icon verticalAlign="bottom" ml={0} mr={1}>
@@ -252,7 +268,7 @@ class BlogPost extends React.Component<Props, State> {
                     </Link>
                     <Box>
                       <Link href={mention.url}>
-                        <Text fontWeight="bold" mb={2} mr={2}>
+                        <Text fontWeight="bold" mb={1} mr={2}>
                           {mention.author.name}
                           <Box
                             as="span"
@@ -269,6 +285,18 @@ class BlogPost extends React.Component<Props, State> {
                               "DD MMM, YYYY"
                             )}
                           </Box>
+                          {mention.url.indexOf("twitter.com") > -1 && (
+                            <Box
+                              as="span"
+                              color="tertiary"
+                              css={{ fontWeight: "normal" }}
+                            >
+                              {" · "}
+                              <Icon>
+                                <Twitter size="1em" />
+                              </Icon>
+                            </Box>
+                          )}
                         </Text>
                       </Link>
                       {mention.content && (
