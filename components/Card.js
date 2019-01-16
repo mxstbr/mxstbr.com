@@ -33,7 +33,12 @@ const BaseCard = styled(Card)`
 `;
 
 const C = (props: RebassProps) => (
-  <BoxShadow hoverShadow={props.hover} borderRadius="5px" display="block">
+  <BoxShadow
+    hoverShadow={props.hover}
+    borderRadius="5px"
+    display="block"
+    css={props.css}
+  >
     <BaseCard {...props} />
   </BoxShadow>
 );

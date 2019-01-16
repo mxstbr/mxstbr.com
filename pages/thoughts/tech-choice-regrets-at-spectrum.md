@@ -37,7 +37,7 @@ Next.js offers an amazing development experience and fast performance out of the
 
 <Lesson 
   title="Lesson 2" 
-  body="Leave interesting technical problems to others where possible, no matter how simple they seem to solve."
+  body="Use existing solutions for technological problems where possible, particularly ones you do not understand deeply."
 />
 
 ### Regret 3: Using RethinkDB
@@ -58,7 +58,7 @@ Nowadays, I would choose a more established database (Postgres?) and build a Pub
 
 <Lesson 
   title="Lesson 4" 
-  body="Community size and active maintenance are vital, especially in unfamiliar territory."
+  body="Prioritize community size and active maintenance, especially in unfamiliar territory."
   first={false}
 />
 
@@ -72,7 +72,7 @@ Another framework might have worked better, but in reality we should have focuse
 
 <Lesson 
   title="Lesson 5" 
-  body="Be deliberate about cutting edge tech. Prefer conservative choices."
+  body="Deliberately asses cutting edge technologies, bias towards conservative choices."
   last={false}
 />
 
@@ -88,9 +88,9 @@ Changing these decisions would not have made Spectrum a better product by itself
 
 To summarize, here are the six lessons I am taking away for my next projects:
 
-1. Building a good product is all about experimentation. Optimise for iteration speed and flexibility.
-1. Leave interesting technical problems to others where possible, no matter how simple they seem to solve.
+1. Building a good product is all about experimentation. Optimize for iteration speed and flexibility.
+1. Use existing solutions for technological problems where possible, particularly ones you do not understand deeply.
 1. Carefully choose core technologies that are hard to change later.
-1. Community size and active maintenance are vital, especially in unfamiliar territory.
+1. Prioritize community size and active maintenance, especially in unfamiliar territory.
 1. Be deliberate about cutting edge tech. Prefer conserative choices.
 1. Be open with your roadmap to learn about your users priorities.

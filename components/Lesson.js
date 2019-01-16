@@ -1,9 +1,8 @@
 import React from "react";
-import { Zap } from "react-feather";
-import { Flex, Box } from "rebass";
-import { H3 } from "./Heading";
 import Paragraph from "./Paragraph";
-import Icon from "./Icon";
+import Card from "./Card";
+import { Award } from "react-feather";
+import { Box } from "rebass";
 
 type Props = {
   title: string,
@@ -13,22 +12,26 @@ type Props = {
 };
 
 export default (props: Props) => (
-  <Box mt={4} mb={props.last !== false ? 5 : undefined}>
-    {props.first !== false && (
-      <Flex flexDirection="row" alignItems="center" width={1} mb={-3} mt={3}>
-        <Box css={{ background: "#BBB", width: "100%", height: "1px" }} />
-
-        <Icon ml={2} mr={2}>
-          <Zap size="1.5em" color="#BBB" />
-        </Icon>
-        <Box css={{ background: "#BBB", width: "100%", height: "1px" }} />
-      </Flex>
-    )}
-    <Paragraph my={4} fontFamily="serif">
+  <Card hover={false} my={4}>
+    <Paragraph mb={0} py={4} px={4} width="75%">
       <strong>{props.title}</strong>: {props.body}
     </Paragraph>
-    {props.last !== false && (
-      <Box css={{ background: "#BBB", width: "100%", height: "1px" }} />
-    )}
-  </Box>
+    <Box
+      css={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        overflow: "hidden",
+        display: "flex",
+        // justifyContent: "flex-end",
+        alignItems: "center"
+      }}
+    >
+      <Box ml="-30px" color="background">
+        <Award size="200px" />
+      </Box>
+    </Box>
+  </Card>
 );

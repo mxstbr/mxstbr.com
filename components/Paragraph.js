@@ -7,6 +7,8 @@ import Link from "./Link";
 const Wrapper = styled(Box)`
   max-width: 35em;
   width: 100%;
+  position: relative;
+  z-index: 1;
   ${props => props.centered && `margin: 0 auto;`} ${Link} {
     color: ${props => props.theme.colors.primary};
   }
