@@ -53,11 +53,13 @@ Nowadays, I would choose a more established database (Postgres?) and build a Pub
 <Lesson 
   title="Lesson 3" 
   body="Carefully choose core technologies that are hard to change later."
+  last={false}
 />
 
 <Lesson 
   title="Lesson 4" 
   body="Community size and active maintenance are vital, especially in unfamiliar territory."
+  first={false}
 />
 
 ### Regret 4: Using DraftJS and WYSIWYG editing
@@ -71,11 +73,13 @@ Another framework might have worked better, but in reality we should have focuse
 <Lesson 
   title="Lesson 5" 
   body="Be deliberate about cutting edge tech. Prefer conservative choices."
+  last={false}
 />
 
 <Lesson 
   title="Lesson 6" 
   body="Be open with your roadmap to learn about your users priorities."
+  first={false}
 />
 
 ### Takeaways
@@ -90,7 +94,3 @@ To summarize, here are the six lessons I am taking away for my next projects:
 1. Community size and active maintenance are vital, especially in unfamiliar territory.
 1. Be deliberate about cutting edge tech. Prefer conserative choices.
 1. Be open with your roadmap to learn about your users priorities.
-
-<br />
-
-On top of that, writing this down has been invaluable to help me crystallise my thoughts.
