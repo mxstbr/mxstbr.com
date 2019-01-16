@@ -72,7 +72,7 @@ Another framework might have worked better, but in reality we should have focuse
 
 <Lesson 
   title="Lesson 5" 
-  body="Deliberately asses cutting edge technologies, bias towards conservative choices."
+  body="Deliberately assess cutting edge technologies, bias towards conservative choices."
   last={false}
 />
 
@@ -92,5 +92,5 @@ To summarize, here are the six lessons I am taking away for my next projects:
 1. Use existing solutions for technological problems where possible, particularly ones you do not understand deeply.
 1. Carefully choose core technologies that are hard to change later.
 1. Prioritize community size and active maintenance, especially in unfamiliar territory.
-1. Be deliberate about cutting edge tech. Prefer conserative choices.
+1. Deliberately assess cutting edge technologies, bias towards conservative choices.
 1. Be open with your roadmap to learn about your users priorities.
