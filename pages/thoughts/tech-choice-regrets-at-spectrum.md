@@ -64,7 +64,7 @@ Nowadays, I would choose a more established database (Postgres?) and build a Pub
 
 ### Regret 4: Using DraftJS and WYSIWYG editing
 
-Writing is one of the primary activities on Spectrum, so we wanted the experience to be great. I decided to replace our plaintext markdown input with a custom WYSIWYG editor based on [Draft.js](https://draft-js.org).
+Writing is one of the primary activities on Spectrum, so we wanted the experience to be great. I decided to replace our plaintext markdown input with a custom WYSIWYG editor based on [Draft.js](https://draft-js.org), which had recently been released by Facebook.
 
 Unfortunately it did not work out well. The editor is really buggy, even after months of work our users rightfully complain about it constantly. On top of that, the library makes up a majority of our JavaScript bundle size and the lack of cross-browser support means that we have to keep the plaintext input around as a fallback. 👎
 
@@ -90,7 +90,7 @@ To summarize, here are the six lessons I am taking away for my next projects:
 
 1. Building a good product is all about experimentation. Optimise for iteration speed and flexibility.
 1. Leave interesting technical problems to others where possible, no matter how simple they seem to solve.
-1. Carefully choose core technologies that are hard to change later (e.g. the datastore).
+1. Carefully choose core technologies that are hard to change later.
 1. Community size and active maintenance are vital, especially in unfamiliar territory.
 1. Be deliberate about cutting edge tech. Prefer conserative choices.
 1. Be open with your roadmap to learn about your users priorities.

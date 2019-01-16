@@ -13,7 +13,7 @@ type Props = {
 };
 
 export default (props: Props) => (
-  <Box my={4}>
+  <Box mt={4} mb={props.last !== false ? 5 : undefined}>
     {props.first !== false && (
       <Flex flexDirection="row" alignItems="center" width={1} mb={-3} mt={3}>
         <Box css={{ background: "#BBB", width: "100%", height: "1px" }} />
