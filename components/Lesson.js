@@ -13,7 +13,7 @@ type Props = {
 
 export default (props: Props) => (
   <Card hover={false} my={4}>
-    <Paragraph mb={0} py={4} px={4} width="75%">
+    <Paragraph mb={0} py={4} px={4}>
       <strong>{props.title}</strong>: {props.body}
     </Paragraph>
     <Box
