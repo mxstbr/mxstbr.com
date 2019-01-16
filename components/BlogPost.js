@@ -355,7 +355,7 @@ class BlogPost extends React.Component<Props, State> {
           <Link href={twitterCommentLink}>
             a tweet with a link to this post
           </Link>{" "}
-          it will automatically show up here! 💯
+          it will automatically show up here! (refreshed every 30 minutes) 💯
         </Paragraph>
       </>
     );
