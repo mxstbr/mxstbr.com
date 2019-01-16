@@ -83,10 +83,10 @@ const filterWebMentions = (mentions: Array<WebMention>): Array<WebMention> => {
     .sort(
       (a, b) =>
         new Date(
-          typeof a.published === "string" ? a.published : b["wm-received"]
+          typeof b.published === "string" ? b.published : b["wm-received"]
         ) -
         new Date(
-          typeof b.published === "string" ? b.published : b["wm-received"]
+          typeof a.published === "string" ? a.published : a["wm-received"]
         )
     );
 };
