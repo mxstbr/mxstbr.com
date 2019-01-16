@@ -17,7 +17,7 @@ export default ({ appearances }: Props) => (
         appearances[i - 1].date.getFullYear() !==
           appearance.date.getFullYear() ? (
           <ListDivider>
-            <H3 mr={3} width={50}>
+            <H3 mr={3} mt={2} mb={2} width={50}>
               {appearance.date.getFullYear()}
             </H3>
           </ListDivider>

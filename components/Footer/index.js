@@ -7,40 +7,71 @@ import Text from "../Text";
 import Layout from "../Layout";
 import Icon from "../Icon";
 
+const FooterColumn = (props: {
+  title: string,
+  width?: number,
+  last?: boolean,
+  children: React$Node
+}) => (
+  <Flex flexDirection="column" flex={1} mb={4} mr={props.last === true ? 0 : 4}>
+    <Text mb={3} fontWeight="bold" color="#333">
+      {props.title}
+    </Text>
+    {props.children}
+  </Flex>
+);
+
+type ListItemProps = {
+  Icon?: React$ComponentType<{ size: string }>,
+  children: React$Node,
+  href: string
+};
+
+const FooterListItem = ({ Icon: IconComp, children, href }: ListItemProps) => (
+  <Text as="div" my={1} color="#666">
+    <Link href={href}>
+      {IconComp && (
+        <Icon mr={2} ml={0}>
+          <IconComp size="1em" />
+        </Icon>
+      )}
+      {children}
+    </Link>
+  </Text>
+);
+
 export default (props: {}) => (
   <Flex
-    py={4}
+    py={5}
     mt={5}
     as="footer"
-    css={{ borderTop: "1px solid #CCC" }}
-    bg="#EEE"
+    bg="#fff"
+    css={css`
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+    `}
   >
     <Layout width={[1, 0.5]}>
-      <Flex justifyContent={["space-around", "space-between"]}>
-        <Text color="#666">
-          <Link href="https://twitter.com/mxstbr">
-            <Icon mr={2} ml={0}>
-              <Twitter size="1em" />
-            </Icon>
-            Twitter
-          </Link>
-        </Text>
-        <Text mb={1} color="#666">
-          <Link href="https://github.com/mxstbr/mxstbr.com">
-            <Icon mr={2} ml={0}>
-              <GitHub size="1em" />
-            </Icon>
-            View Source
-          </Link>
-        </Text>
-        <Text color="#666">
-          <Link href="https://unsplash.com/@mxstbr">
-            <Icon mr={2} ml={0}>
-              <Camera size="1em" />
-            </Icon>
-            Unsplash
-          </Link>
-        </Text>
+      <Flex flexDirection={["column", "row"]}>
+        <FooterColumn title="About this place" width={0.5}>
+          <Text color="#666" lineHeight={1.5}>
+            Welcome to my personal website! I'm @mxstbr, a JavaScript Engineer
+            from Austria 🇦🇹 and I love React and Node.
+          </Text>
+        </FooterColumn>
+        <FooterColumn last title="Social Stuff">
+          <FooterListItem
+            Icon={GitHub}
+            href="https://github.com/mxstbr/mxstbr.com"
+          >
+            View source on GitHub
+          </FooterListItem>
+          <FooterListItem Icon={Twitter} href="https://twitter.com/mxstbr">
+            Follow me on Twitter
+          </FooterListItem>
+          <FooterListItem Icon={Camera} href="https://unsplash.com/@mxstbr">
+            See my photos on Unsplash
+          </FooterListItem>
+        </FooterColumn>
       </Flex>
     </Layout>
   </Flex>

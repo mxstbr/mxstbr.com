@@ -1,15 +1,16 @@
-// $FlowIssue StrictMode isn't typed yet
-import React, { StrictMode } from "react";
+import React from "react";
 import App, { Container } from "next/app";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
 import reset from "styled-reset";
 import { Box } from "rebass";
 import Router from "next/router";
 import withGA from "next-ga";
+import { MDXProvider } from "@mdx-js/tag";
 import Layout from "../components/Layout";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import Head from "../components/Head";
+import components from "../components/markdown";
 
 const colors = {
   blue: "#3867d6",
@@ -23,7 +24,9 @@ const theme = {
     primary: colors.blue,
     text: colors.black,
     background: "rgb(246, 247, 248)",
-    secondaryText: colors.greys[4],
+    secondary: colors.greys[4],
+    tertiary: colors.greys[3],
+    quaternary: colors.greys[2],
     ...colors
   },
   breakpoints: ["850px", "1100px", "64em"],
@@ -55,23 +58,27 @@ const GlobalStyle = createGlobalStyle`
   strong {
     font-weight: bold;
   }
+
+  hr {
+    margin: 2em 0;
+    border-color: rgba(0, 0, 0, 0.1);
+  }
 `;
 
 const NAV_HEIGHT = 65;
 
-const DEFAULT_TITLE = "Max Stoiber (@mxstbr) - JavaScript Engineer";
+export const DEFAULT_TITLE = "Max Stoiber (@mxstbr) - JavaScript Engineer";
 const DEFAULT_DESCRIPTION =
   "Creator of styled-components, react-boilerplate, micro-analytics and dozens of other open source projects in the React and Node ecosystems. Probably brewing specialty coffee beverages, travelling around the world or skiing double black diamond ◆◆ slopes right now.";
-const DEFAULT_IMAGE = "https://mxstbr.com/static/images/social_media.png";
+const DEFAULT_IMAGE = "/static/images/social_media.png";
 
 class MyApp extends App {
   render() {
     const { Component, pageProps } = this.props;
     return (
-      <StrictMode>
-        {" "}
-        <Container>
-          <ThemeProvider theme={theme}>
+      <Container>
+        <ThemeProvider theme={theme}>
+          <MDXProvider components={components}>
             <>
               <Nav />
               <Head
@@ -91,9 +98,9 @@ class MyApp extends App {
               </Layout>
               <Footer />
             </>
-          </ThemeProvider>
-        </Container>
-      </StrictMode>
+          </MDXProvider>
+        </ThemeProvider>
+      </Container>
     );
   }
 }

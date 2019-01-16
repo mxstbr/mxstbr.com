@@ -59,7 +59,8 @@ type RowType = *;
 
 type Props = {
   rows: Array<RowType>,
-  render: (row: RowType) => React$Node
+  render: (row: RowType) => React$Node,
+  keyField?: string
 };
 
 const Table = (props: Props) => (
@@ -72,7 +73,15 @@ const Table = (props: Props) => (
         width={1}
       >
         {props.rows.map(row => (
-          <RowLink py={3} px={3} key={row.id} href={row.href} underline={false}>
+          <RowLink
+            py={3}
+            px={3}
+            key={
+              typeof props.keyField === "string" ? row[props.keyField] : row.id
+            }
+            href={row.href}
+            underline={false}
+          >
             <Flex flexDirection={["column", "row"]}>{props.render(row)}</Flex>
           </RowLink>
         ))}

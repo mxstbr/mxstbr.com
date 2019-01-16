@@ -1,6 +1,7 @@
 import React from "react";
 import styled, { css } from "styled-components";
 import { Flex, Box } from "rebass";
+import { withRouter, type Router } from "next/router";
 import Link from "../Link";
 import Icon from "../Icon";
 import { ExternalLink as LinkExternal, Menu, X, Twitter } from "react-feather";
@@ -23,24 +24,31 @@ const MobileMenu = styled(Flex)`
   height: 100%;
 `;
 
-const NavItem = styled(props => (
-  <Box mr={4} className={props.className}>
-    <Link itemProp="url" prefetch href={props.href}>
-      <Text color="#666" itemProp="name">
-        {props.title}
-      </Text>
-    </Link>
-  </Box>
-))`
+const NavItem = withRouter(styled(props => {
+  const active = props.router.pathname.indexOf(props.href) === 0;
+  return (
+    <Box mr={4} className={props.className}>
+      <Link itemProp="url" prefetch href={props.href}>
+        <Text
+          color={active ? "#000" : "#666"}
+          fontWeight={active ? "bold" : "normal"}
+          itemProp="name"
+        >
+          {props.title}
+        </Text>
+      </Link>
+    </Box>
+  );
+})`
   &:last-of-type {
     margin-right: 0;
   }
-`;
+`);
 
 const MobileNavItem = props => (
   <Box p={3} onClick={props.onClick}>
     <Link prefetch href={props.href}>
-      <Text color="#333" fontSize={4} fontWeight="bold">
+      <Text color="#333" as="div" fontSize={4} fontWeight="bold">
         {props.title}
       </Text>
     </Link>
@@ -101,21 +109,10 @@ class Nav extends React.Component<{}> {
                     itemScope
                     itemType="http://www.schema.org/SiteNavigationElement"
                   >
+                    <NavItem href="/thoughts" title="Blog" />
                     <NavItem href="/appearances" title="Appearances" />
                     <NavItem href="/oss" title="OSS" />
                     {/* <NavItem href="/audits" title="Audits" /> */}
-                    <NavItem
-                      href="https://mxstbr.blog"
-                      target="_blank"
-                      title={
-                        <>
-                          Blog{" "}
-                          <Icon ml={1}>
-                            <LinkExternal size="1em" />
-                          </Icon>
-                        </>
-                      }
-                    />
                   </DesktopOnly>
                 </Flex>
               </Layout>
@@ -164,6 +161,11 @@ class Nav extends React.Component<{}> {
                     onClick={this.closeMenu}
                   />
                   <MobileNavItem
+                    href="/thoughts"
+                    onClick={this.closeMenu}
+                    title="Blog"
+                  />
+                  <MobileNavItem
                     href="/appearances"
                     title="Appearances"
                     onClick={this.closeMenu}
@@ -178,18 +180,6 @@ class Nav extends React.Component<{}> {
                           title="Audits"
                           onClick={this.closeMenu}
                         /> */}
-                  <MobileNavItem
-                    href="https://mxstbr.blog"
-                    onClick={this.closeMenu}
-                    title={
-                      <>
-                        Blog{" "}
-                        <Icon ml={1}>
-                          <LinkExternal size="1em" />
-                        </Icon>
-                      </>
-                    }
-                  />
                   <MobileNavItem
                     href="https://twitter.com/mxstbr"
                     onClick={this.closeMenu}
