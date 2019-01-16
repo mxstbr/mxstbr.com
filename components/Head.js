@@ -103,6 +103,11 @@ export default withRouter(
           ...(Array.isArray(jsonld) ? jsonld : [jsonld])
         ].filter(Boolean)}
       />
+      <link
+        rel="webmention"
+        href="https://webmention.io/mxstbr.com/webmention"
+      />
+      <link rel="pingback" href="https://webmention.io/mxstbr.com/xmlrpc" />
       {children}
     </Head>
   )
