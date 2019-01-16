@@ -93,21 +93,32 @@ const filterWebMentions = (mentions: Array<WebMention>): Array<WebMention> => {
 
 type State = {
   mentions: ?Array<WebMention>,
-  error: ?string
+  error: ?string,
+  page: number,
+  loading: boolean,
+  hasNextPage: boolean,
+  counts: ?{
+    like: number,
+    mention: number,
+    reply: number,
+    repost: number
+  }
 };
 
 const loadWebMentions = async (target: string, page?: number = 0) => {
-  return fetch(`${WEB_MENTIONS}?page=${page}&target=${target}`)
+  return fetch(
+    `${WEB_MENTIONS}?page=${page}&per-page=5&sort-by=published&wm-property[]=in-reply-to&wm-property[]=mention-of&target=${target}`
+  )
     .then(res => res.json())
-    .then(async json => {
-      if (!Array.isArray(json.children) || json.children.length === 0)
-        return [];
+    .then(json =>
+      Array.isArray(json.children) ? filterWebMentions(json.children) : []
+    );
+};
 
-      return [...json.children, ...(await loadWebMentions(target, page + 1))];
-    })
-    .catch(err => {
-      return [];
-    });
+const loadWebMentionsCount = async (target: string) => {
+  return fetch(`https://webmention.io/api/count.json?target=${target}`)
+    .then(res => res.json())
+    .then(res => res.type);
 };
 
 const handleLineBreaks = (text: string) =>
@@ -121,27 +132,101 @@ const handleLineBreaks = (text: string) =>
       </>
     ));
 
+const WebMentionItem = ({ mention }: { mention: WebMention }) => (
+  <Flex flexDirection="row" my={3}>
+    <Link href={mention.url}>
+      <Image
+        width={40}
+        height={40}
+        mr={3}
+        css={{ borderRadius: "50%" }}
+        alt={`avatar of ${mention.author.name}`}
+        src={mention.author.photo}
+      />
+    </Link>
+    <Box>
+      <Link href={mention.url}>
+        <Text fontWeight="bold" as="div" mb={1} mr={2}>
+          {mention.author.name}
+          <Box as="span" color="tertiary" css={{ fontWeight: "normal" }}>
+            {" · "}
+            {format(
+              parse(
+                typeof mention.published === "string"
+                  ? mention.published
+                  : mention["wm-received"]
+              ),
+              "DD MMM, YYYY [at] H:m"
+            )}
+          </Box>
+          {mention.url.indexOf("twitter.com") > -1 && (
+            <Box as="span" color="tertiary" css={{ fontWeight: "normal" }}>
+              {" · "}
+              <Icon>
+                <Twitter size="1em" />
+              </Icon>
+            </Box>
+          )}
+        </Text>
+      </Link>
+      {mention.content && (
+        <Paragraph color="tertiary" fontSize={2}>
+          {handleLineBreaks(mention.content.text)}
+        </Paragraph>
+      )}
+    </Box>
+  </Flex>
+);
+
 class BlogPost extends React.Component<Props, State> {
   state = {
     mentions: null,
+    counts: null,
+    page: 0,
+    hasNextPage: true,
+    loading: false,
     error: null
   };
 
   async componentDidMount() {
+    this.loadNextPage(0);
     const url = `https://mxstbr.com${this.props.router.pathname}/`;
     try {
-      const mentions = await loadWebMentions(url);
-      console.log(mentions);
+      const counts = await loadWebMentionsCount(url);
       this.setState({
-        mentions: Array.isArray(mentions) ? filterWebMentions(mentions) : []
+        counts
       });
     } catch (err) {
       this.setState({
-        mentions: [],
-        error: "WebMentions failed to load"
+        counts: null,
+        error: "Failed to load."
       });
     }
   }
+
+  loadNextPage = async (page: number) => {
+    const url = `https://mxstbr.com${this.props.router.pathname}/`;
+    this.setState({
+      loading: true,
+      page
+    });
+    try {
+      const mentions = await loadWebMentions(url, page);
+      this.setState(prev => ({
+        mentions: prev.mentions
+          ? [...prev.mentions, ...(mentions || [])]
+          : mentions,
+        loading: false,
+        hasNextPage: mentions.length !== 0
+      }));
+    } catch (err) {
+      this.setState({
+        mentions: null,
+        loading: false,
+        error: "Failed to load."
+      });
+    }
+  };
 
   render() {
     const { meta, children, router } = this.props;
@@ -151,22 +236,9 @@ class BlogPost extends React.Component<Props, State> {
     const current = blogposts.map(({ title }) => title).indexOf(meta.title);
     const next = blogposts[current - 1];
     const prev = blogposts[current + 1];
-
-    const likes =
-      Array.isArray(mentions) &&
-      mentions.filter(
-        mention =>
-          mention["wm-property"] === "like-of" ||
-          mention["wm-property"] === "bookmark-of" ||
-          mention["wm-property"] === "repost-of"
-      );
-    const responses =
-      Array.isArray(mentions) &&
-      mentions.filter(
-        mention =>
-          mention["wm-property"] === "in-reply-to" ||
-          mention["wm-property"] === "mention-of"
-      );
+    const twitterCommentLink = `https://twitter.com/intent/tweet/?text=${`My thoughts on https://mxstbr.com${
+      router.pathname
+    }/`}`;
 
     return (
       <>
@@ -241,74 +313,50 @@ class BlogPost extends React.Component<Props, State> {
           <Paragraph>Loading...</Paragraph>
         ) : (
           <>
-            <Paragraph as="div" mb={4} color="tertiary">
-              <Icon verticalAlign="bottom" ml={0} mr={1}>
-                <Heart size="1em" />
-              </Icon>{" "}
-              {(likes && likes.length) || 0} likes{" "}
-              <Icon ml={2} mr={1}>
-                <MessageCircle size="1em" />
-              </Icon>{" "}
-              {(responses && responses.length) || 0} responses
-            </Paragraph>
-            {responses &&
-              responses
+            {this.state.counts && (
+              <Paragraph as="div" mb={4} color="tertiary">
+                <Icon verticalAlign="bottom" ml={0} mr={1}>
+                  <Heart size="1em" />
+                </Icon>{" "}
+                {this.state.counts.like + this.state.counts.repost || 0} likes{" "}
+                <Icon ml={2} mr={1}>
+                  <MessageCircle size="1em" />
+                </Icon>{" "}
+                {this.state.counts.mention + this.state.counts.reply || 0}{" "}
+                responses
+              </Paragraph>
+            )}
+            {mentions &&
+              mentions
                 .filter(mention => mention.content && mention.content.text)
                 .map(mention => (
-                  <Flex flexDirection="row" key={mention["wm-id"]} my={3}>
-                    <Link href={mention.url}>
-                      <Image
-                        width={40}
-                        height={40}
-                        mr={3}
-                        css={{ borderRadius: "50%" }}
-                        alt={`avatar of ${mention.author.name}`}
-                        src={mention.author.photo}
-                      />
-                    </Link>
-                    <Box>
-                      <Link href={mention.url}>
-                        <Text fontWeight="bold" mb={1} mr={2}>
-                          {mention.author.name}
-                          <Box
-                            as="span"
-                            color="tertiary"
-                            css={{ fontWeight: "normal" }}
-                          >
-                            {" · "}
-                            {format(
-                              parse(
-                                typeof mention.published === "string"
-                                  ? mention.published
-                                  : mention["wm-received"]
-                              ),
-                              "DD MMM, YYYY"
-                            )}
-                          </Box>
-                          {mention.url.indexOf("twitter.com") > -1 && (
-                            <Box
-                              as="span"
-                              color="tertiary"
-                              css={{ fontWeight: "normal" }}
-                            >
-                              {" · "}
-                              <Icon>
-                                <Twitter size="1em" />
-                              </Icon>
-                            </Box>
-                          )}
-                        </Text>
-                      </Link>
-                      {mention.content && (
-                        <Paragraph color="tertiary" fontSize={2}>
-                          {handleLineBreaks(mention.content.text)}
-                        </Paragraph>
-                      )}
-                    </Box>
-                  </Flex>
+                  <WebMentionItem key={mention["wm-id"]} mention={mention} />
                 ))}
+            {this.state.hasNextPage && (
+              <Button
+                disabled={this.state.loading}
+                onClick={() => this.loadNextPage(this.state.page + 1)}
+              >
+                {this.state.loading ? "Loading..." : "Load more"}
+              </Button>
+            )}
+            <Box as="span" ml={this.state.hasNextPage ? 2 : 0}>
+              <Button onClick={() => (window.location = twitterCommentLink)}>
+                Post comment{" "}
+                <Icon>
+                  <Twitter size="0.9em" />
+                </Icon>
+              </Button>
+            </Box>
           </>
         )}
+        <Paragraph fontSize={1} color="tertiary" mt={3}>
+          When you post{" "}
+          <Link href={twitterCommentLink}>
+            a tweet with a link to this post
+          </Link>{" "}
+          it will automatically show up here! 💯
+        </Paragraph>
       </>
     );
   }
