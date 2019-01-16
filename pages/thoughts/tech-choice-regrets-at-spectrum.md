@@ -64,7 +64,7 @@ Nowadays, I would choose a more established database (Postgres?) and build a Pub
 
 ### Regret 4: Using DraftJS and WYSIWYG editing
 
-Writing is one of the primary activities on Spectrum, so we wanted the experience to be great. I decided to replace our plaintext markdown input with a custom WYSIWYG editor based on [Draft.js](https://draft-js.org), which had recently been released by Facebook.
+Writing is one of the primary activities on Spectrum, so we wanted the experience to be great. I decided to replace our plaintext markdown input with a custom WYSIWYG editor based on [Draft.js](https://draftjs.org), which had recently been released by Facebook.
 
 Unfortunately it did not work out well. The editor is really buggy, even after months of work our users rightfully complain about it constantly. On top of that, the library makes up a majority of our JavaScript bundle size and the lack of cross-browser support means that we have to keep the plaintext input around as a fallback. 👎
 
