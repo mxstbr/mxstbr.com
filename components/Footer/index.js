@@ -24,12 +24,18 @@ const FooterColumn = (props: {
 type ListItemProps = {
   Icon?: React$ComponentType<{ size: string }>,
   children: React$Node,
-  href: string
+  href: string,
+  rel?: string
 };
 
-const FooterListItem = ({ Icon: IconComp, children, href }: ListItemProps) => (
+const FooterListItem = ({
+  Icon: IconComp,
+  rel,
+  children,
+  href
+}: ListItemProps) => (
   <Text as="div" my={1} color="#666">
-    <Link href={href}>
+    <Link href={href} rel={rel}>
       {IconComp && (
         <Icon mr={2} ml={0}>
           <IconComp size="1em" />
@@ -62,10 +68,15 @@ export default (props: {}) => (
           <FooterListItem
             Icon={GitHub}
             href="https://github.com/mxstbr/mxstbr.com"
+            rel="me"
           >
             View source on GitHub
           </FooterListItem>
-          <FooterListItem Icon={Twitter} href="https://twitter.com/mxstbr">
+          <FooterListItem
+            Icon={Twitter}
+            rel="me"
+            href="https://twitter.com/mxstbr"
+          >
             Follow me on Twitter
           </FooterListItem>
           <FooterListItem Icon={Camera} href="https://unsplash.com/@mxstbr">
