@@ -8,11 +8,12 @@ type Props = {
   description?: string,
   image?: string,
   jsonld?: JsonLDType | Array<JsonLDType>,
-  router: Router
+  router: Router,
+  children?: React$Node
 };
 
 export default withRouter(
-  ({ title, description, image, router, jsonld }: Props) => (
+  ({ title, description, image, router, jsonld, children }: Props) => (
     <Head>
       {/* DEFAULT */}
 
@@ -102,6 +103,7 @@ export default withRouter(
           ...(Array.isArray(jsonld) ? jsonld : [jsonld])
         ].filter(Boolean)}
       />
+      {children}
     </Head>
   )
 );

@@ -78,7 +78,14 @@ export default withRouter(({ router, meta, children }: Props) => {
             name: "Max Stoiber"
           }
         }}
-      />
+      >
+        <link
+          rel="webmention"
+          href="https://webmention.io/mxstbr.com/webmention"
+        />
+        <link rel="pingback" href="https://webmention.io/mxstbr.com/xmlrpc" />
+      </Head>
+
       <BackToBlog mb={4} mt={[4, 5]} />
       <H2 mb={3} mt={4}>
         {meta.title}
