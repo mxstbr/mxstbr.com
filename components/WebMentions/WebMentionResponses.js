@@ -1,5 +1,5 @@
 import React from "react";
-import { withRouter } from "next/router";
+import { withRouter, type Router } from "next/router";
 import { Box } from "rebass";
 import { Twitter } from "react-feather";
 import FetchWebMentionResponses from "./FetchWebMentionReponses";
@@ -8,8 +8,15 @@ import Button from "../Button";
 import WebMentionItem from "./WebMentionItem";
 import Icon from "../Icon";
 
-export default withRouter(props => (
-  <FetchWebMentionResponses path={props.router.pathname}>
+type Props = {
+  router: Router,
+  path?: string
+};
+
+export default withRouter((props: Props) => (
+  <FetchWebMentionResponses
+    path={typeof props.path === "string" ? props.path : props.router.pathname}
+  >
     {({ data, error, loading, loadNextPage, hasNextPage }) => {
       return (
         <>

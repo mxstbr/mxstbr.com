@@ -2,7 +2,7 @@ import React from "react";
 import { css } from "styled-components";
 import fetch from "isomorphic-unfetch";
 import { parse, format } from "date-fns";
-import { Heading } from "rebass";
+import { Heading, Box } from "rebass";
 import PageHeader from "../../components/PageHeader";
 import Paragraph from "../../components/Paragraph";
 import Link from "../../components/Link";
@@ -12,13 +12,14 @@ import BlogPostCard from "../../components/BlogPostCard";
 import { NewsletterUpsellCard } from "../../components/NewsletterForm";
 import { ListDivider } from "../../components/Lists";
 import blogposts from "../../blog-posts";
+import WebMentionsCount from "../../components/WebMentions/WebMentionCounts";
 import type { OldBlogPost } from "../../blog-posts";
 
 type Props = {
   oldPosts: Array<OldBlogPost>
 };
 
-const BlogPostListItem = ({ post, small, last }) => (
+const BlogPostListItem = ({ post, small, last, webmentions }) => (
   <Link
     href={post.path}
     mt={small ? 3 : 4}
@@ -36,9 +37,15 @@ const BlogPostListItem = ({ post, small, last }) => (
     <H3 mt={0} fontSize={small ? 2 : 4} mb={2}>
       {post.title}
     </H3>
-    <Text color="quaternary" fontSize={small ? 1 : 2}>
+    <Text color="quaternary" css={{ height: "1em" }} fontSize={small ? 1 : 2}>
       {format(parse(post.publishedAt), "MMMM Do, YYYY")}
       {typeof post.external === "string" && ` · ${post.external}`}
+      {webmentions === true && (
+        <>
+          <Box as="span" ml={3} />
+          <WebMentionsCount path={post.path} size="small" />
+        </>
+      )}
     </Text>
   </Link>
 );
@@ -82,6 +89,7 @@ export default class BlogIndex extends React.Component<Props> {
             small={false}
             last={index === blogposts.length - 1}
             post={post}
+            webmentions
           />
         ))}
         <NewsletterUpsellCard id="newsletter" my={undefined} mt={4} mb={5} />
@@ -104,6 +112,7 @@ export default class BlogIndex extends React.Component<Props> {
               path: post.url,
               external: post["_external-site"]
             }}
+            webmentions={false}
             last={index === 15}
           />
         ))}
