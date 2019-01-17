@@ -2,11 +2,11 @@
 export const meta = {
   published: false,
   publishedAt: '2019-01-17',
-  title: 'Prisma',
+  title: 'Prisma Is Awesome',
   summary: ''
 }
 
-Another reason why we chose RethinkDB is the Node.js driver, which has a beautiful query API. For example, check out this query which loads a paginated list of the threads posted by a user:
+We chose RethinkDB as our main datastore for Spectrum (and [regretted it](/thoughts/tech-choice-regrets-at-spectrum)). One of the reasons was the Node.js driver, which has a beautiful query API. For example, check out this query which loads a paginated list of the threads posted by a user:
 
 ```JS
 const getThreadsByUser = (id, skip, limit) => {
@@ -21,9 +21,21 @@ const getThreadsByUser = (id, skip, limit) => {
 
 That is one pretty API! 😍 But there is a new kid on the block and it looks even better: [Prisma](https://prisma.io).
 
-With Prisma, you define your database schema with the GraphQL Schema Definition Language. It then automatically generates a custom database driver with type-safe queries—a phenomenal developer experience! It would also have been a natural fit for our GraphQL-based API.
+With Prisma, you define your database schema with the GraphQL Schema Definition Language, for example:
 
-Let's look at the same query again, but this time using Prisma:
+```graphql
+type Thread {
+  id: ID
+  content: String
+}
+
+type User {
+  id: ID
+  threads: [Thread]
+}
+```
+
+It then automatically generates a custom database driver with type-safe queries—a phenomenal developer experience! Let's look at the same query again, but this time using Prisma:
 
 ```JS
 const getThreadsByUser = (id, after, first) => {
@@ -38,4 +50,4 @@ const getThreadsByUser = (id, after, first) => {
 
 😍😍😍
 
-Unfortunately Prisma didn't exist when we were starting out. It could have helped us move faster and avoid bugs at the same time.
+I wish Prisma had existed when we started building Spectrum. It could have helped us move faster and avoid bugs at the same time.
