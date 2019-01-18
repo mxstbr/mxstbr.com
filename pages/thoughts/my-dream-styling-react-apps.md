@@ -37,7 +37,7 @@ Let's examine the benefits and tradeoffs!
 
 Compared to strings (a la styled-components), objects are easier to compose and statically analyse, but are less friendly to JavaScript newbies and have a learning curve.
 
-I have started to prefer objects.
+I prefer objects.
 
 ### Prop Based
 
@@ -45,7 +45,7 @@ Second, you'll notice that I'm passing the style object to a prop of the element
 
 With a prop, copy and pasting JSX around is easy and creating [style components](http://style-components.com) (not a typo) is simple since everything is based on standard React components, i.e. functions.
 
-This simple abstraction can support everything, including adapting based on props and state, extending styles and global theming.
+This simple abstraction can support everything, including adapting based on props and state, extending and theming.
 
 #### `styles` vs. `css`
 
@@ -59,11 +59,9 @@ They could be, but are not. Inline styles are less performant than compiling to 
 
 Rather than specifying arbitrary values (`margin: '16px'` or `margin: 16`), only values from 1 to 10 can be specified. There is a global scale, e.g. 4-based: `4px 8px 16px 32px 64px...` (`4 * 2 ^ n`), and the value defines which step on the scale is used. For example, `margin: 2` would result in a `8px` margin.
 
-All your spacing is now based on a the same scale, so it'll always look proportional. You no longer decide between `3px`, `4px` and `5px` margin (which are all the same anyway), you decide between three widely different steps on the scale.
-
 The same thing is true for colors, rather than allowing any hex/rgb value there is a global set of colors with names, and you pass the color name rather than a raw value.
 
-Automatic consistency throughout your whole application!
+This means your app is always consistently styled. All the spacing and colors are automatically uniform, leveling up the design. You also have less mental overhead, as you no longer have to decide between a `4px` and `5px` margin, but between a `4px` and `8px` margin.
 
 > TODO: ugly escape hatch for edge cases? maybe `import { __raw }; { margin: __raw('13px') };`
 
@@ -72,6 +70,8 @@ Automatic consistency throughout your whole application!
 Rather than using media queries each property can be responsive (a la facepaint) with mobile-first values.
 
 Again there is a global scale for media queries (e.g. `0px 768px 1200px 2400px`), and specifying `margin: [1, 2]` would mean that anything above 768px has a margin of 8px and everything below a margin of 4px. Need to make a grid of things a column on mobile? `flexDirection: ['column', 'row']`!
+
+This makes it convient and quick to add responsiveness to your app. Because the media queries are mobile-first, it also encourages starting from the mobile layout first, which is a good idea for most apps.
 
 > TODO: Maybe the prop should accept an array to allow swapping out all values? `styles={[mobile, desktop]}`, or maybe that should merge styles? not sure
 
@@ -90,6 +90,12 @@ The style objects can be fully statically typed with TypeScript or Flow!
 ### Open Questions
 
 - Extending styles: what happens here `<CustomComp styles={{}}>`? Does it pass through `className/style`, `styles` or both?
+
+### Implementation
+
+Identical to emotions `css` prop, this should be implemented as a custom `React.createElement` replacement and handle server-side rendering out of the box.
+
+All the validation should only happen in development. Since there is only simple properties, there is no need for a CSS parser either. This should have a tiny runtime bundle size (< 2kB?).
  
 ### Inspiration / Further Reading
 
@@ -98,3 +104,5 @@ The style objects can be fully statically typed with TypeScript or Flow!
 - https://style-components.com by @chantastic
   - especially https://medium.learnreact.com/scale-fud-and-style-components-c0ce87ec9772
 - https://github.com/threepointone/glam by @threepointone
+- https://github.com/jxnblk/rebass
+- https://github.com/emotion-js/facepaint
