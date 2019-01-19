@@ -9,6 +9,10 @@ export const meta = {
 
 export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
 
+As the co-creator of styled-components I have spent the past four years thinking about styling React components.
+
+Prompted by a lot of conversations and inspiration I have a new dream of styling my React applications:
+
 ```JS
 <div
   styles={{
@@ -20,13 +24,14 @@ export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
 />
 ```
 
-Look closely, there are some interesting things going on:
+Look closely, there are a lot of interesting things going on:
 
-- Simple composition of styles
-- Statically typed styles
+- No unnecessary naming
 - Enforced consistency via a built-in scale
 - Per-value media queries
-- Moving styles around is easy
+- Simple composition
+- Simple refactoring
+- Statically typed styles
 - Minimal abstraction
 - It's learn once, write anywhere just like React
 - Only for folks with JS experience
@@ -43,17 +48,19 @@ I prefer objects.
 
 Second, you'll notice that I'm passing the style object to a prop of the element. Why a prop and not the familiar `styled.x` API or a `withStyles` HOC? 
 
-With a prop, copy and pasting JSX around is easy and creating [style components](http://style-components.com) (not a typo) is simple since everything is based on standard React components, i.e. functions.
+Naming is one of the hardest things about coding, and with the prop there is no need to create either class names (`.name`) or intermediate components (`Name`). All you have to name is the component you are creating, nothing more.
 
-This simple abstraction can support everything, including adapting based on props and state, extending and theming.
+It also makes refactoring simple, you can copy entire blocks of JSX around without worrying about other parts of your code like HOCs or styled components.
+
+The prop is a small abstraction on top of standard React APIs, making it easy to learn. Further, it can support everything other CSS-in-JS libraries can, including adapting based on props and state, extending and theming.
 
 #### `styles` vs. `css`
 
-I called it `styles` vs. the currently more common `css` because that makes it learn once, write anywhere just like React itself. Styling your React Native or React VR apps with a `css` prop doesn't make sense since they don't support CSS.
+I call it `styles` vs. the (currently) more common `css` because that makes it learn once, write anywhere (like React itself). Styling your React Native or ReactVR apps with a `css` prop doesn't make sense, they don't support CSS.
 
 #### Are these inline styles?
 
-They could be, but are not. Inline styles are less performant than compiling to CSS and injecting it into the CSSOM.
+They could be, but are not. Inline styles are less performant than compiling to CSS and injecting it into the CSSOM, and they also do not support pseudo-selectors and other nice parts of CSS.
 
 ### Built-in Scale
 
@@ -74,14 +81,6 @@ Again there is a global scale for media queries (e.g. `0px 768px 1200px 2400px`)
 This makes it convient and quick to add responsiveness to your app. Because the media queries are mobile-first, it also encourages starting from the mobile layout first, which is a good idea for most apps.
 
 > TODO: Maybe the prop should accept an array to allow swapping out all values? `styles={[mobile, desktop]}`, or maybe that should merge styles? not sure
-
-### Primitive properties only
-
-No media queries, pseudo selectors, pseudo elements, shorthands, or anything else. 
-
-Clarity over brevity (`margin: 1 1 2 2` vs. `{ marginTop: 1, marginBottom: 2, marginRight: 1, marginLeft: 2 }`). 
-
-Need styles on interaction? Do it in JS. CSS pseudo selectors usually do not work well on mobile, and you resolve to JS.
 
 ### Bonus: Static Typing
 
@@ -106,3 +105,11 @@ All the validation should only happen in development. Since there is only simple
 - https://github.com/threepointone/glam by @threepointone
 - https://github.com/jxnblk/rebass
 - https://github.com/emotion-js/facepaint
+
+### Primitive properties only
+
+No media queries, pseudo selectors, pseudo elements, shorthands, or anything else. 
+
+Clarity over brevity (`margin: 1 1 2 2` vs. `{ marginTop: 1, marginBottom: 2, marginRight: 1, marginLeft: 2 }`). 
+
+Need styles on interaction? Do it in JS. CSS pseudo selectors usually do not work well on mobile, and you resolve to JS.
