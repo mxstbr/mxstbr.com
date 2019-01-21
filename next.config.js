@@ -7,7 +7,7 @@ const generateJsonFeed = require("./data/generate-json-feed");
 const { promisify } = require("util");
 const copyFile = promisify(fs.copyFile);
 
-const staticFilesToCopy = ["now.json", "favicon.ico"];
+const staticFilesToCopy = ["favicon.ico"];
 
 module.exports = withMDX({
   pageExtensions: ["js", "jsx", "mdx", "md"],

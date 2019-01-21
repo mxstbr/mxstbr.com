@@ -1,17 +1,6 @@
 {
-  "type": "static",
-  "static": {
-    "directoryListing": false,
-    "headers": [
-      {
-        "source": "**/static/**",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "public, max-age=31536000, immutable"
-          }
-        ]
-      }
-    ]
-  }
+  "version": 2,
+  "alias": "mxstbr.com",
+  "regions": ["all"],
+  "builds": [{ "src": "package.json", "use": "@now/static-build", "config": { "distDir": "out" } }]
 }
