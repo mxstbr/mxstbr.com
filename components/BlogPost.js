@@ -27,6 +27,7 @@ import {
   Twitter
 } from "react-feather";
 import { NewsletterUpsellCard } from "./NewsletterForm";
+import HackerNewsLink from "./HackerNewsLink";
 import type { NewBlogPost } from "../data/blog-posts";
 
 type Props = {
@@ -45,17 +46,20 @@ const BackToBlog = props => (
   </BreadcrumbLink>
 );
 
-const getShareLinks = path => ({
+const getShareLinks = (path: string, title: string) => ({
   twitter: `https://mobile.twitter.com/search?q=${encodeURIComponent(
-    `https://mxstbr.com${path}`
+    `https://mxstbr.com${path}/`
   )}`,
-  github: `https://github.com/mxstbr/mxstbr.com/edit/master/pages${path}.md`
+  github: `https://github.com/mxstbr/mxstbr.com/edit/master/pages${path}.md`,
+  hn: `https://news.ycombinator.com/submitlink?u=https://mxstbr.com${encodeURIComponent(
+    path
+  )}/&t=${encodeURIComponent(title)}`
 });
 
 export default withRouter((props: Props) => {
   const { meta, children, router } = props;
   const published = format(parse(meta.publishedAt), "MMMM Do, YYYY");
-  const { twitter, github } = getShareLinks(router.pathname);
+  const { twitter, github, hn } = getShareLinks(router.pathname, meta.title);
   const current = blogposts.map(({ title }) => title).indexOf(meta.title);
   const next = blogposts[current - 1];
   const prev = blogposts[current + 1];
@@ -101,6 +105,10 @@ export default withRouter((props: Props) => {
       </Text>
       {children}
       <Paragraph fontSize={1} mt={4} mb={4}>
+        <HackerNewsLink path={router.pathname} title={meta.title}>
+          {({ href }) => <Link href={href}>Discuss on HackerNews</Link>}
+        </HackerNewsLink>
+        {" · "}
         <Link href={twitter}>Discuss on Twitter</Link> ·{" "}
         <Link href={github}>Edit on GitHub</Link>
       </Paragraph>
