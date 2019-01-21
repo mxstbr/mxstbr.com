@@ -13,10 +13,10 @@ const handleLineBreaks = (text: string) =>
     .replace(/\n+/g, "\n")
     .split("\n")
     .map((item, key) => (
-      <>
+      <React.Fragment key={key}>
         {item}
         <br />
-      </>
+      </React.Fragment>
     ));
 
 export default ({ mention }: { mention: WebMention }) => (

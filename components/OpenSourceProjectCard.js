@@ -23,7 +23,9 @@ const Title = props => <H3 {...props} fontSize={3} lineHeight={1} my={0} />;
 const Description = props => (
   <Text color="#666" fontSize={2} lineHeight={1.25} {...props} mb={4} mt={2} />
 );
-const FinePrint = props => <Text color="#666" fontSize={1} {...props} />;
+const FinePrint = props => (
+  <Text as="div" color="#666" fontSize={1} {...props} />
+);
 
 const Wrapper = styled(Link).attrs({
   m: [1, 2],

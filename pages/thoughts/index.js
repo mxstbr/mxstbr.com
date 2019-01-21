@@ -37,7 +37,12 @@ const BlogPostListItem = ({ post, small, last, webmentions }) => (
     <H3 mt={0} fontSize={small ? 2 : 4} mb={2}>
       {post.title}
     </H3>
-    <Text color="quaternary" css={{ height: "1em" }} fontSize={small ? 1 : 2}>
+    <Text
+      color="quaternary"
+      as="div"
+      css={{ height: "1em" }}
+      fontSize={small ? 1 : 2}
+    >
       {format(parse(post.publishedAt), "MMMM Do, YYYY")}
       {typeof post.external === "string" && ` · ${post.external}`}
       {webmentions === true && (

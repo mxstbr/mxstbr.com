@@ -23,7 +23,9 @@ type Props = {
 const ViewMoreLink = (props: Props) => (
   <ViewMoreLinkWrapper mt={4}>
     <TextButton as={Link} href={props.href}>
-      <Text fontSize={2}>{props.children}</Text>
+      <Text as="div" fontSize={2}>
+        {props.children}
+      </Text>
     </TextButton>
   </ViewMoreLinkWrapper>
 );
