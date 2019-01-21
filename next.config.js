@@ -3,6 +3,7 @@ const withMDX = require("@zeit/next-mdx")({
 });
 const fs = require("fs");
 const { join } = require("path");
+const generateJsonFeed = require("./data/generate-json-feed");
 const { promisify } = require("util");
 const copyFile = promisify(fs.copyFile);
 
@@ -15,6 +16,7 @@ module.exports = withMDX({
     { dev, dir, outDir, distDir, buildId }
   ) {
     if (dev) return defaultPathMap;
+    generateJsonFeed(outDir);
     await Promise.all(
       staticFilesToCopy.map(file =>
         copyFile(join(dir, file), join(outDir, file))

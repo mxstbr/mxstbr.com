@@ -19,7 +19,7 @@ module.exports = files
 
     return {
       ...meta,
-      path: "/thoughts/" + file.replace(/\\.mdx?$/, "")
+      path: "/thoughts/" + file.replace(/\.mdx?$/, "")
     };
   })
   .filter(meta => meta.published)

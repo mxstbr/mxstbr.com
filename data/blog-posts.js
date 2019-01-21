@@ -12,8 +12,7 @@ export type OldBlogPost = {|
 
 export type NewBlogPost = {|
   title: string,
-  summary?: string,
-
+  summary: string,
   image?: string,
   publishedAt: string,
   published: boolean,

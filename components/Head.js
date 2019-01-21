@@ -27,6 +27,12 @@ export default withRouter(
         href="/static/images/favicon_new.png"
       />
       <link rel="apple-touch-icon" href="/static/images/favicon_new.png" />
+      <link
+        rel="alternate"
+        title="Max Stoibers (@mxstbr) Thoughts — Feed"
+        type="application/json"
+        href="https://mxstbr.com/feed.json"
+      />
 
       {/* OPEN GRAPH */}
       <meta property="og:type" key="og:type" content="website" />
