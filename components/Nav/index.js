@@ -88,8 +88,6 @@ class Nav extends React.Component<{}> {
   menu: ?HTMLInputElement;
 
   closeMenu = () => {
-    console.log("close menu");
-    console.log(this.menu);
     if (this.menu) this.menu.checked = false;
   };
 

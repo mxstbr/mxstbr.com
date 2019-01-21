@@ -26,15 +26,9 @@ export default withRouter((props: Props) => (
             <div>
               {data
                 .filter(mention => mention.content && mention.content.text)
-                .map(
-                  mention =>
-                    console.log(mention["wm-id"]) || (
-                      <WebMentionItem
-                        key={mention["wm-id"]}
-                        mention={mention}
-                      />
-                    )
-                )}
+                .map(mention => (
+                  <WebMentionItem key={mention["wm-id"]} mention={mention} />
+                ))}
               {hasNextPage === true && (
                 <Button disabled={loading} onClick={() => loadNextPage()}>
                   {loading === true ? "Loading..." : "Load more"}
