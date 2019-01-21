@@ -22,7 +22,7 @@ const feed = {
     id: `https://mxstbr.com${post.path}`,
     url: `https://mxstbr.com${post.path}`,
     title: post.title,
-    context_text: `${post.summary} See https://mxstbr.com/thoughts${
+    content_text: `${post.summary} See https://mxstbr.com/thoughts${
       post.path
     }!`,
     summary: post.summary,
