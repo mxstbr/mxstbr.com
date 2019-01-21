@@ -3,7 +3,7 @@ import { Flex } from "rebass";
 import { H3 } from "./Heading";
 import Appearance from "./Appearance";
 import { ListDivider } from "./Lists";
-import type { Appearance as AppearanceType } from "../appearances";
+import type { Appearance as AppearanceType } from "../data/appearances";
 
 type Props = {
   appearances: Array<AppearanceType>

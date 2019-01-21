@@ -15,7 +15,7 @@ import Card from "./Card";
 import NextPost from "./NextPost";
 import ViewMoreLink from "./ViewMoreLink";
 import BreadcrumbLink from "./BreadcrumbLink";
-import blogposts from "../blog-posts";
+import blogposts from "../data/blog-posts";
 import WebMentionCounts from "./WebMentions/WebMentionCounts";
 import WebMentionResponses from "./WebMentions/WebMentionResponses";
 import {
@@ -27,7 +27,7 @@ import {
   Twitter
 } from "react-feather";
 import { NewsletterUpsellCard } from "./NewsletterForm";
-import type { NewBlogPost } from "../blog-posts";
+import type { NewBlogPost } from "../data/blog-posts";
 
 type Props = {
   meta: NewBlogPost,

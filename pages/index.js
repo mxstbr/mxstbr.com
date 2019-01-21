@@ -6,7 +6,7 @@ import ConditionalWrap from "conditional-wrap";
 import { parse, format } from "date-fns";
 import styled from "styled-components";
 import fetch from "isomorphic-unfetch";
-import blogposts from "../blog-posts";
+import blogposts from "../data/blog-posts";
 import Link from "../components/Link";
 import Icon from "../components/Icon";
 import { H2 } from "../components/Heading";
@@ -25,10 +25,10 @@ import BlogPostCard from "../components/BlogPostCard";
 import Head from "../components/Head";
 import ViewMoreLink from "../components/ViewMoreLink";
 import { DEFAULT_TITLE } from "./_app";
-import type { OldBlogPost } from "../blog-posts";
+import type { OldBlogPost } from "../data/blog-posts";
 
-import appearances from "../appearances";
-import projects from "../open-source-projects";
+import appearances from "../data/appearances";
+import projects from "../data/open-source-projects";
 
 type Props = {
   oldPosts: Array<OldBlogPost>
@@ -69,20 +69,22 @@ class Homepage extends React.Component<Props> {
         <H2 mt={3}>Featured Open Source Projects</H2>
         <WideSection>
           <CardGrid>
-            {projects.filter(project => project.featured).map(project => (
-              <OSSProject
-                key={project.repo}
-                light={!!project.background}
-                repo={project.repo}
-                bg={project.background}
-                stars={project.stars}
-              >
-                <OSSProject.Title>{project.name}</OSSProject.Title>
-                <OSSProject.Description>
-                  {project.description}
-                </OSSProject.Description>
-              </OSSProject>
-            ))}
+            {projects
+              .filter(project => project.featured)
+              .map(project => (
+                <OSSProject
+                  key={project.repo}
+                  light={!!project.background}
+                  repo={project.repo}
+                  bg={project.background}
+                  stars={project.stars}
+                >
+                  <OSSProject.Title>{project.name}</OSSProject.Title>
+                  <OSSProject.Description>
+                    {project.description}
+                  </OSSProject.Description>
+                </OSSProject>
+              ))}
           </CardGrid>
         </WideSection>
         <ViewMoreLink href="/oss">

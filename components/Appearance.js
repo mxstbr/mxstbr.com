@@ -7,7 +7,7 @@ import { ListItem } from "./Lists";
 
 import Icon from "./Icon";
 import { Radio, Mic, Terminal, Award, Film, Zap } from "react-feather";
-import type { Appearance } from "../appearances";
+import type { Appearance } from "../data/appearances";
 
 const ICONS = {
   podcast: Mic,

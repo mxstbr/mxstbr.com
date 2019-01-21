@@ -15,7 +15,7 @@ import MobileOnly from "../components/MobileOnly";
 import DesktopOnly from "../components/DesktopOnly";
 import WideSection from "../components/WideSection";
 
-import projects from "../open-source-projects";
+import projects from "../data/open-source-projects";
 
 const StarIcon = props => (
   <Icon css={{ verticalAlign: "text-bottom" }} ml={1}>

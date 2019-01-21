@@ -11,9 +11,9 @@ import { H3, H4 } from "../../components/Heading";
 import BlogPostCard from "../../components/BlogPostCard";
 import { NewsletterUpsellCard } from "../../components/NewsletterForm";
 import { ListDivider } from "../../components/Lists";
-import blogposts from "../../blog-posts";
+import blogposts from "../../data/blog-posts";
 import WebMentionsCount from "../../components/WebMentions/WebMentionCounts";
-import type { OldBlogPost } from "../../blog-posts";
+import type { OldBlogPost } from "../../data/blog-posts";
 
 type Props = {
   oldPosts: Array<OldBlogPost>

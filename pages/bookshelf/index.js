@@ -11,7 +11,7 @@ import CardGrid from "../../components/CardGrid";
 import WideSection from "../../components/WideSection";
 import Text from "../../components/Text";
 import Link from "../../components/Link";
-import books, { type Book, type BookCategory } from "../../books";
+import books, { type Book, type BookCategory } from "../../data/books";
 
 type IconMap = {
   [key: BookCategory]: typeof Cpu | string

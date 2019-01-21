@@ -9,7 +9,7 @@ import SmallLayout from "../components/SmallLayout";
 import PageHeader from "../components/PageHeader";
 import Icon from "../components/Icon";
 
-import appearances from "../appearances";
+import appearances from "../data/appearances";
 
 export default () => (
   <>

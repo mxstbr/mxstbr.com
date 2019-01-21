@@ -5,7 +5,7 @@ import { parse, format } from "date-fns";
 import Link from "./Link";
 import Card from "./Card";
 import Icon from "./Icon";
-import type { NewBlogPost, OldBlogPost } from "../blog-posts";
+import type { NewBlogPost, OldBlogPost } from "../data/blog-posts";
 
 type OldBlogPostProps = {|
   old: OldBlogPost
