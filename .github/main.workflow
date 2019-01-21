@@ -14,7 +14,7 @@ action "Deploy" {
 
 action "Alias" {
   uses = "actions/zeit-now@master"
-  args = "alias --team peerigon"
+  args = "alias --team mxstbr"
   secrets = ["ZEIT_TOKEN"]
   needs = ["Filter out master branch"]
 }
