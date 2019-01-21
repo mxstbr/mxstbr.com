@@ -24,7 +24,7 @@ export default class HackerNewsLink extends React.Component<Props, State> {
 
   componentDidMount() {
     fetch(
-      `http://hn.algolia.com/api/v1/search?tags=story&restrictSearchableAttributes=url&query=${encodeURIComponent(
+      `https://hn.algolia.com/api/v1/search?tags=story&restrictSearchableAttributes=url&query=${encodeURIComponent(
         `https://mxstbr.com${this.props.path}/`
       )}`
     )
