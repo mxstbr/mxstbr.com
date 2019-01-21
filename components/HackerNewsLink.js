@@ -1,5 +1,6 @@
 import React from "react";
 import fetch from "isomorphic-unfetch";
+import { differenceInDays } from "date-fns";
 
 type State = {
   href: string
@@ -31,6 +32,16 @@ export default class HackerNewsLink extends React.Component<Props, State> {
       .then(res => res.json())
       .then(res => {
         if (!res || !Array.isArray(res.hits) || res.hits.length === 0) return;
+        // If it hasn't been submitted in a year and wasn't on the frontpage let's recommend submitting again
+        // (crude estimate of frontpage = >50 points, also see https://news.ycombinator.com/newsfaq.html for resubmit rules)
+        if (
+          res.hits.every(
+            hit =>
+              hit.points < 50 &&
+              differenceInDays(new Date(hit.created_at), new Date()) > 365
+          )
+        )
+          return;
         const beloved = res.hits.reduce((a, b) => {
           if (a.points > b.points) return a;
           return b;
