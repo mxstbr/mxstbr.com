@@ -9,9 +9,9 @@ export const meta = {
 
 export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
 
-As the co-creator of styled-components I have spent the past four years thinking about styling React components.
+As the co-creator of styled-components I have spent the past four years thinking about styling React components. Prompted by a lot of conversations and inspirations I have a new dream.
 
-Prompted by a lot of conversations and inspiration I have a new dream of styling my React applications:
+It looks like this:
 
 ```JS
 <div
@@ -24,25 +24,22 @@ Prompted by a lot of conversations and inspiration I have a new dream of styling
 />
 ```
 
-Look closely, there are a lot of interesting things going on:
+Look closely, there are a lot of interesting ideas in here:
 
 - No unnecessary naming
 - Enforced consistency via a built-in scale
-- Per-value media queries
+- Per-value responsiveness
 - Simple composition
 - Simple refactoring
-- Statically typed styles
-- Minimal abstraction
-- It's learn once, write anywhere just like React
-- Only for folks with JS experience
+- Static typing for styles
 
-Let's examine the benefits and tradeoffs!
+Let's examine the benefits and tradeoffs.
 
 ### Style Objects
 
-Compared to strings (a la styled-components), objects are easier to compose and statically analyse, but are less friendly to JavaScript newbies and have a learning curve.
+Compared to writing CSS in JS as strings (like styled-components uses), objects are are less familiar to developers with no JavaScript experience and are not as easily copy-and-pasted.
 
-I prefer objects.
+On the other hand, the visual noise caused by dynamic interpolations is reduced and composing objects is much simpler.
 
 ### Prop Based
 
