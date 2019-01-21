@@ -1,7 +1,7 @@
 import React from "react";
 import styled, { css } from "styled-components";
 import { Flex } from "rebass";
-import { Twitter, GitHub, Camera } from "react-feather";
+import { Twitter, GitHub, Camera, Rss } from "react-feather";
 import Link from "../Link";
 import Text from "../Text";
 import Layout from "../Layout";
@@ -81,6 +81,9 @@ export default (props: {}) => (
           </FooterListItem>
           <FooterListItem Icon={Camera} href="https://unsplash.com/@mxstbr">
             See my photos on Unsplash
+          </FooterListItem>
+          <FooterListItem Icon={Rss} href="https://mxstbr.com/feed.json">
+            Follow the RSS feed
           </FooterListItem>
         </FooterColumn>
       </Flex>
