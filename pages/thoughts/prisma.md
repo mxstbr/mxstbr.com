@@ -8,7 +8,7 @@ export const meta = {
 
 We chose RethinkDB as our main datastore for Spectrum (and [regretted it](/thoughts/tech-choice-regrets-at-spectrum)). One of the reasons was the Node.js driver, which has a beautiful query API. For example, check out this query which loads a paginated list of the threads posted by a user:
 
-```JS
+```js
 const getThreadsByUser = (id, skip, limit) => {
   return db
     .table('threads')
@@ -37,7 +37,7 @@ type User {
 
 It then automatically generates a custom database driver with type-safe queries—a phenomenal developer experience! Let's look at the same query again, but this time using Prisma:
 
-```JS
+```js
 const getThreadsByUser = (id, after, first) => {
   return db
     .user({ id })

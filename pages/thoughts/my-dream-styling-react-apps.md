@@ -13,7 +13,7 @@ As the co-creator of styled-components I have spent the past four years thinking
 
 It looks like this:
 
-```JS
+```js
 <div
   styles={{
     flexDirection: ['column', 'row'],
