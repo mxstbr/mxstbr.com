@@ -136,17 +136,19 @@ export default withRouter((props: Props) => {
         {meta.title}
       </H2>
       <Text mt={3} mb={4} color="quaternary">
-        Published {published}
+        {meta.published !== true && "Will be"} Published {published}
       </Text>
       {children}
-      <Paragraph fontSize={1} mt={4} mb={4}>
-        <HackerNewsLink path={router.pathname} title={meta.title}>
-          {({ href }) => <Link href={href}>Discuss on HackerNews</Link>}
-        </HackerNewsLink>
-        {" · "}
-        <Link href={twitter}>Discuss on Twitter</Link> ·{" "}
-        <Link href={github}>Edit on GitHub</Link>
-      </Paragraph>
+      {meta.published === true && (
+        <Paragraph fontSize={1} mt={4} mb={4}>
+          <HackerNewsLink path={router.pathname} title={meta.title}>
+            {({ href }) => <Link href={href}>Discuss on HackerNews</Link>}
+          </HackerNewsLink>
+          {" · "}
+          <Link href={twitter}>Discuss on Twitter</Link> ·{" "}
+          <Link href={github}>Edit on GitHub</Link>
+        </Paragraph>
+      )}
       <hr />
       <NewsletterUpsellCard />
       {(prev || next) && (
@@ -164,18 +166,22 @@ export default withRouter((props: Props) => {
           )}
         </Flex>
       )}
-      <H3>
-        Webmentions{" "}
-        <Link href="https://indieweb.org/Webmention">
-          <Icon title="Webmention is a web standard for mentions and conversations across the web.">
-            <HelpCircle color="#999" size="0.75em" />
-          </Icon>
-        </Link>
-      </H3>
-      <Paragraph as="div" mb={4} color="tertiary">
-        <WebMentionCounts />
-      </Paragraph>
-      <WebMentionResponses />
+      {meta.published === true && (
+        <>
+          <H3>
+            Webmentions{" "}
+            <Link href="https://indieweb.org/Webmention">
+              <Icon title="Webmention is a web standard for mentions and conversations across the web.">
+                <HelpCircle color="#999" size="0.75em" />
+              </Icon>
+            </Link>
+          </H3>
+          <Paragraph as="div" mb={4} color="tertiary">
+            <WebMentionCounts />
+          </Paragraph>
+          <WebMentionResponses />
+        </>
+      )}
     </>
   );
 });
