@@ -38,7 +38,7 @@ const Pre = styled(Box).attrs({
 export default {
   h2: H2,
   h3: H3,
-  h4: H4,
+  h4: (props: {||}) => <H4 fontSize="18px" {...props} />,
   p: (props: {||}) => <Paragraph fontFamily="serif" {...props} />,
   a: Link,
   ul: UnorderedList,
