@@ -1,3 +1,34 @@
+// $FlowIssue this is what mapbox/rehype-prism uses under the hood
+const refract = require("refractor");
+
+// NOTE: This highlights template-strings as strings of CSS
+const styledHighlight = {
+  "styled-template-string": {
+    pattern: /(styled(\.\w+|\([^\)]*\))(\.\w+(\([^\)]*\))*)*|css|injectGlobal|createGlobalStyle|keyframes|\.extend|\.withComponent)`(?:\$\{[^}]+\}|\\\\|\\?[^\\])*?`/,
+    lookbehind: true,
+    greedy: true,
+    inside: {
+      interpolation: {
+        pattern: /\$\{[^}]+\}/,
+        inside: {
+          "interpolation-punctuation": {
+            pattern: /^\$\{|\}$/,
+            alias: "punctuation"
+          },
+          rest: refract.languages.jsx
+        }
+      },
+      string: {
+        pattern: /[^$;]+/,
+        inside: refract.languages.css,
+        alias: "language-css"
+      }
+    }
+  }
+};
+refract.languages.insertBefore("jsx", "template-string", styledHighlight);
+refract.languages.insertBefore("js", "template-string", styledHighlight);
+
 const withMDX = require("@zeit/next-mdx")({
   extension: /\.mdx?$/,
   options: {
