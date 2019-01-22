@@ -95,10 +95,43 @@ export default withRouter((props: Props) => {
             name: "Max Stoiber"
           }
         }}
-      />
+      >
+        {meta.published !== true && <meta name="robots" content="noindex" />}
+      </Head>
       <PrismTheme />
 
       <BackToBlog mb={4} mt={[4, 5]} />
+      {meta.published !== true && (
+        <Text
+          mb={3}
+          mt={4}
+          p={3}
+          fontSize={2}
+          lineHeight={1.5}
+          bg="#FFF7E8"
+          css={{
+            border: "1px solid #F2AA1F",
+            borderRadius: "4px",
+            a: {
+              textDecoration: "underline"
+            }
+          }}
+        >
+          <Box mb={1} css={{ fontWeight: 700 }}>
+            ⚠️ THIS IS A DRAFT, PLEASE DO NOT SHARE ⚠️
+          </Box>
+          <Box>
+            <Link
+              href={`https://twitter.com/messages/compose?recipient_id=2451223458&text=${encodeURIComponent(
+                `I have some feedback about "${meta.title}": `
+              )}`}
+            >
+              DM me on Twitter
+            </Link>{" "}
+            if you have any feedback.
+          </Box>
+        </Text>
+      )}
       <H2 mb={3} mt={4}>
         {meta.title}
       </H2>
