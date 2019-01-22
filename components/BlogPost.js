@@ -132,7 +132,9 @@ export default withRouter((props: Props) => {
         {meta.title}
       </H2>
       <Text mt={3} mb={4} color="quaternary">
-        {meta.published !== true && "Will be"} Published {published}
+        {meta.published !== true
+          ? "Not yet published"
+          : `Published ${published}`}
       </Text>
       {children}
       {meta.published === true && (
