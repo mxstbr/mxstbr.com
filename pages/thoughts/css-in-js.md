@@ -9,13 +9,9 @@ export const meta = {
 
 export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
 
-CSS-in-JS is the result of the React community trying to enhance CSS for component systems. By honing in on a single use case we optimized the experience for both developers and end users.
+“CSS-in-JS” refers to a set of libraries that make it possible to write CSS in JavaScript. The most popular one is [styled-components](https://styled-components.com) (which I co-created), but there are [many others](https://github.com/michelebertoli/css-in-js).
 
-### What is CSS-in-JS?
-
-CSS-in-JS refers to a set of libraries that make it possible to write CSS in JavaScript. The most popular one is [styled-components](https://styled-components.com) (disclaimer: I am the co-creator), but there are [many others](https://github.com/michelebertoli/css-in-js).
-
-For example, here is what styled-components looks like:
+For example, here is what using styled-components with React looks like:
 
 ```js
 import styled from 'styled-components';
@@ -32,26 +28,26 @@ const App = () => (
 
 ### Who is CSS-in-JS for?
 
-If you are using a JavaScript framework (e.g. React) to build a “web app”, especially if you are part of a team, you would likely benefit from CSS-in-JS.
+If you are using a JavaScript framework (e.g. React) to build a web app, especially if you are part of a team, you would likely benefit from CSS-in-JS.
 
 #### Is anybody using CSS-in-JS?
 
 Yes.
 
 - [In October, around 50% of npm installs including React also included a CSS-in-JS library](https://twitter.com/mxstbr/status/1049194935428308992).
-- Many many many companies use it, including big ones like Airbnb, Atlassian, Vogue, Bloomberg, BBC News, Coinbase, and thousands of others. 
+- Many companies use it, including Airbnb, Atlassian, Vogue, Bloomberg, BBC News, Coinbase, and thousands of others.
 
-Also, this website is styled with styled-components. Open your DevTools or see [the source on GitHub](https://github.com/mxstbr/mxstbr.com).
+[(this website is also built with styled-components)](https://github.com/mxstbr/mxstbr.com)
 
 ### Why would you use CSS-in-JS?
 
-**First and foremost, CSS-in-JS is about increasing the confidence in your code.** The confidence to write and change CSS because you know it only affects a single component. The confidence to remove CSS because you know it is unused.
+**CSS-in-JS is about increasing the confidence in your code.** It lets you write, change and delete CSS knowing it will not have any unintended consequences.
 
 Many web developers have felt the horror of [the "append-only stylesheet"](https://css-tricks.com/oh-no-stylesheet-grows-grows-grows-append-stylesheet-problem/). Time flies by on a project, and it seems like CSS is only ever added, but never removed.
 
-There is no need for complex methodologies or intricate code reviews to avoid the append-only stylesheet with CSS-in-JS. It happens automatically without you having to think about it.
+There is no need for complex methodologies or intricate code reviews to avoid the append-only stylesheet with CSS-in-JS libraries. They take care of managing your styling for you.
 
-You are working on the styling of the `Button` component? You know if will only affect the `Button`. You delete the unused `Accordion` component? You also delete its CSS and know for sure that you did not break anything else.
+For example, if you are working on the styling of an `Accordion` component, you can be sure your changes will not affect anything else. If you delete the `Accordion` component, you also automatically delete all its CSS.
 
 #### Other Benefits of CSS-in-JS
 
