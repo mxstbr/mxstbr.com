@@ -407,6 +407,13 @@ const appearances: Array<Appearance> = [
     link:
       "https://www.itsnicethat.com/features/review-of-the-year-2015-top-10-instagram",
     date: new Date(2015, 12)
+  },
+  {
+    title: "Modern React",
+    site: "React Amsterdam",
+    type: "workshop",
+    link: "https://react.amsterdam/workshops/",
+    date: new Date(2019, 4, 1)
   }
 ].sort((a, b) => b.date - a.date);
 
