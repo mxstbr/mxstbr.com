@@ -3,7 +3,7 @@ import BlogPost from '../../components/BlogPost';
 export const meta = {
   published: false,
   publishedAt: '2019-01-30',
-  title: 'Writing CSS in JavaScript: What, How, Who and Why?',
+  title: 'Writing CSS in JavaScript',
   summary: ''
 }
 
@@ -26,26 +26,17 @@ const App = () => (
 )
 ```
 
-### Who is CSS-in-JS for?
+### Is CSS-in-JS for you?
 
-If you are using a JavaScript framework (e.g. React) to build a web app, especially if you are part of a team, you would likely benefit from CSS-in-JS.
+If you are using a JavaScript framework (e.g. React) to build a web app, especially as part of a team, you would likely benefit from adopting CSS-in-JS.
 
-#### Is anybody using CSS-in-JS?
+Thousands of companies use it in production, including Reddit, Patreon, LEGO, Target, Atlassian, Vogue, Bloomberg, BBC News, GitHub, Coinbase and many more. ([this website is also built with styled-components](https://github.com/mxstbr/mxstbr.com))
 
-Yes.
+### Why should you use CSS-in-JS?
 
-- [In October, around 50% of npm installs including React also included a CSS-in-JS library](https://twitter.com/mxstbr/status/1049194935428308992).
-- Many companies use it, including Airbnb, Atlassian, Vogue, Bloomberg, BBC News, Coinbase, and thousands of others.
+First and foremost, **CSS-in-JS increases your confidence.** It lets you write, change and delete CSS knowing there will not be any unintended consequences.
 
-[(this website is also built with styled-components)](https://github.com/mxstbr/mxstbr.com)
-
-### Why would you use CSS-in-JS?
-
-**CSS-in-JS is about increasing the confidence in your code.** It lets you write, change and delete CSS knowing it will not have any unintended consequences.
-
-Many web developers have felt the horror of [the "append-only stylesheet"](https://css-tricks.com/oh-no-stylesheet-grows-grows-grows-append-stylesheet-problem/). Time flies by on a project, and it seems like CSS is only ever added, but never removed.
-
-There is no need for complex methodologies or intricate code reviews to avoid the append-only stylesheet with CSS-in-JS libraries. They take care of managing your styling for you.
+There is no need for complex methodologies or intricate code reviews to avoid [the "append-only stylesheet"](https://css-tricks.com/oh-no-stylesheet-grows-grows-grows-append-stylesheet-problem/). Let the library take care of managing your stylesheet for you and focus on the important things.
 
 For example, if you are working on the styling of an `Accordion` component, you can be sure your changes will not affect anything else. If you delete the `Accordion` component, you also automatically delete all its CSS.
 
