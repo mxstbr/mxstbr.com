@@ -117,19 +117,15 @@ export default withRouter((props: Props) => {
             }
           }}
         >
-          <Box mb={1} css={{ fontWeight: 700 }}>
-            ⚠️ THIS IS A DRAFT, PLEASE DO NOT SHARE ⚠️
-          </Box>
-          <Box>
-            <Link
-              href={`https://twitter.com/messages/compose?recipient_id=2451223458&text=${encodeURIComponent(
-                `I have some feedback about "${meta.title}": `
-              )}`}
-            >
-              DM me on Twitter
-            </Link>{" "}
-            if you have any feedback.
-          </Box>
+          <strong>⚠️ THIS IS A DRAFT, PLEASE DO NOT SHARE ⚠️</strong>{" "}
+          <Link
+            href={`https://twitter.com/messages/compose?recipient_id=2451223458&text=${encodeURIComponent(
+              `I have some feedback about "${meta.title}": `
+            )}`}
+          >
+            DM me on Twitter
+          </Link>{" "}
+          if you have any feedback.
         </Text>
       )}
       <H2 mb={3} mt={4}>
