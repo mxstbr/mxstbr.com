@@ -1,4 +1,12 @@
 {
   "typescript.validate.enable": false,
   "javascript.validate.enable": false,
+  "spellright.language": [
+    "en"
+  ],
+  "spellright.documentTypes": [
+    "markdown",
+    "latex",
+    "plaintext"
+  ],
 }
