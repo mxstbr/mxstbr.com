@@ -14,7 +14,7 @@ action "Deploy" {
 
 action "Alias" {
   uses = "actions/zeit-now@master"
-  args = "alias --team mxstbr `cat /github/home/deploy.txt`"
+  args = "alias --team mxstbr `cat /github/home/deploy.txt` mxstbr.com"
   secrets = ["ZEIT_TOKEN"]
   needs = ["Filter out master branch"]
 }
