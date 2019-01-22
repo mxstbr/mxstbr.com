@@ -1,5 +1,9 @@
 const withMDX = require("@zeit/next-mdx")({
-  extension: /\.mdx?$/
+  extension: /\.mdx?$/,
+  options: {
+    // $FlowIssue
+    hastPlugins: [require("@mapbox/rehype-prism")]
+  }
 });
 const fs = require("fs");
 const { join } = require("path");
@@ -35,6 +39,10 @@ module.exports = withMDX({
           }
         }
       ]
+    });
+    config.module.rules.push({
+      test: /.css$/,
+      use: "raw-loader"
     });
     return config;
   }

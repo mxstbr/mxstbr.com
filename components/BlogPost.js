@@ -28,6 +28,7 @@ import {
 } from "react-feather";
 import { NewsletterUpsellCard } from "./NewsletterForm";
 import HackerNewsLink from "./HackerNewsLink";
+import PrismTheme from "./PrismTheme";
 import type { NewBlogPost } from "../data/blog-posts";
 
 type Props = {
@@ -95,6 +96,7 @@ export default withRouter((props: Props) => {
           }
         }}
       />
+      <PrismTheme />
 
       <BackToBlog mb={4} mt={[4, 5]} />
       <H2 mb={3} mt={4}>
