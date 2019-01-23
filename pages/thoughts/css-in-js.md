@@ -30,11 +30,13 @@ const App = () => (
 
 If you are using a JavaScript framework (e.g. React) to build a web app, especially as part of a team, you would likely benefit from adopting CSS-in-JS.
 
-Thousands of companies use it in production, including Reddit, Patreon, LEGO, Target, Atlassian, Vogue, Bloomberg, BBC News, GitHub, Coinbase and many more. ([this website is also built with styled-components](https://github.com/mxstbr/mxstbr.com))
+#### Who is using CSS-in-JS?
+
+Thousands of companies use CSS-in-JS in production, including Reddit, Patreon, LEGO, Target, Atlassian, Vogue, Bloomberg, BBC News, GitHub, Coinbase and many more. ([this website is also built with styled-components](https://github.com/mxstbr/mxstbr.com))
 
 ### Why should you use CSS-in-JS?
 
-First and foremost, **CSS-in-JS increases your confidence.** It lets you write, change and delete CSS knowing there will not be any unintended consequences.
+First and foremost, **CSS-in-JS increases your confidence in the code.** You can write, change and delete CSS knowing there will not be any unintended consequences.
 
 There is no need for complex methodologies or intricate code reviews to avoid [the "append-only stylesheet"](https://css-tricks.com/oh-no-stylesheet-grows-grows-grows-append-stylesheet-problem/). Let the library take care of managing your stylesheet for you and focus on the important things.
 
