@@ -33,7 +33,9 @@ const withMDX = require("@zeit/next-mdx")({
   extension: /\.mdx?$/,
   options: {
     // $FlowIssue
-    hastPlugins: [require("@mapbox/rehype-prism")]
+    hastPlugins: [require("@mapbox/rehype-prism")],
+    // $FlowIssue
+    mdPlugins: [require("remark-capitalize")]
   }
 });
 const fs = require("fs");
