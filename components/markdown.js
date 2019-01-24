@@ -6,17 +6,19 @@ import Link from "./Link";
 import { UnorderedList, OrderedList, ListItem } from "./HtmlLists";
 import Image from "./Image";
 
-const Code = styled(Box).attrs({
+const Code = styled(Box).attrs(props => ({
   as: "code",
-  fontSize: 2
-})`
+  fontSize: props.fontSize || 1
+}))`
   line-height: 1.4;
   font-family: Inconsolata, Monaco, monospace;
   color: ${props => props.theme.colors.text};
   border-radius: 3px;
 `;
 
-const InlineCode = styled(Code)`
+const InlineCode = styled(Code).attrs({
+  fontSize: 2
+})`
   background-color: ${props => props.theme.colors.greys[0]};
   ${"" /* border: 1px solid ${props => props.theme.colors.greys[1]}; */} padding: 0 0.25em;
 `;
@@ -24,7 +26,8 @@ const InlineCode = styled(Code)`
 const Pre = styled(Box).attrs({
   as: "pre",
   p: 3,
-  mb: 3
+  mb: 3,
+  fontSize: 1
 })`
   display: block;
   white-space: pre;
