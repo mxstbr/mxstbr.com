@@ -8,7 +8,7 @@ export const meta = {
   summary: ''
 }
 
-export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
+export default BlogPost
 
 CSS in JavaScript (“CSS-in-JS”) refers to a set of libraries that make it possible to write CSS in JavaScript and tie the styles to a specific component. The most popular one is [styled-components](https://styled-components.com) (which I co-created), but there are [many others](https://github.com/michelebertoli/css-in-js).
 
