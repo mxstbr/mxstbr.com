@@ -8,7 +8,7 @@ import Image from "./Image";
 
 const Code = styled(Box).attrs(props => ({
   as: "code",
-  fontSize: props.fontSize || 1
+  fontSize: props.fontSize || "15px"
 }))`
   line-height: 1.4;
   font-family: Inconsolata, Monaco, monospace;
@@ -27,7 +27,7 @@ const Pre = styled(Box).attrs({
   as: "pre",
   p: 3,
   mb: 3,
-  fontSize: 1
+  fontSize: "15px"
 })`
   display: block;
   white-space: pre;

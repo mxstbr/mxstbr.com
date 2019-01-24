@@ -27,11 +27,9 @@ const App = () => (
 )
 ```
 
-### Why?
+### The Rationale Behind CSS-in-JS
 
-<!-- CSS-in-JS makes machines handle the tasks we humans are not good at. It removes the global namespace for classes and ties styles to specific components. -->
-
-CSS-in-JS increases your confidence in the code. You can add, change and delete CSS without unintended consequences. You avoid the ["append-only stylesheet"](https://css-tricks.com/oh-no-stylesheet-grows-grows-grows-append-stylesheet-problem/) without complex tooling or decades of experience.
+CSS-in-JS makes machines handle the tasks we humans are not good at. By doing so, it increases your confidence in the code. You can add, change and delete CSS without unintended consequences. You avoid the ["append-only stylesheet"](https://css-tricks.com/oh-no-stylesheet-grows-grows-grows-append-stylesheet-problem/) without complex tooling or decades of experience.
 
 If you are working on the styling of a component, you can be sure your changes will not affect anything else. If you delete the component, you also automatically delete its CSS.
 
@@ -72,10 +70,10 @@ CSS-in-JS still has all the important features of CSS preprocessors. Auto-prefix
 
 That is why I personally use and recommend CSS-in-JS.
 
-### Who else is using CSS-in-JS?
+### Who Has Adopted CSS-in-JS?
 
 Thousands of companies use CSS-in-JS in production, including Reddit, Patreon, LEGO, Target, Atlassian, Vogue, Bloomberg, BBC News, GitHub, Coinbase, and many more. ([I also built this website with styled-components](https://github.com/mxstbr/mxstbr.com))
 
-### Is CSS-in-JS for you?
+### Should You Use CSS-in-JS?
 
 If you are using a JavaScript framework to build a web app with components, especially as part of a team, CSS-in-JS might be a good fit. I would recommend trying it on a small project and seeing whether it feels good.
