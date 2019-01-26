@@ -31,7 +31,7 @@ const App = () => (
 )
 ```
 
-Primarily, CSS-in-JS boosts your confidence. You can add, change and delete CSS without unexpected consequences. You avoid the ["append-only stylesheet"](https://css-tricks.com/oh-no-stylesheet-grows-grows-grows-append-stylesheet-problem/)automatically, without complex tooling or years of experience.
+Primarily, CSS-in-JS boosts your confidence. You can add, change and delete CSS without unexpected consequences. You avoid the ["append-only stylesheet"](https://css-tricks.com/oh-no-stylesheet-grows-grows-grows-append-stylesheet-problem/) automatically, without complex tooling or years of experience.
 
 If you are working on the styling of a component, your changes will not affect anything else. If you delete the component, you automatically delete its CSS.
 
