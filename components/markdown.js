@@ -38,6 +38,10 @@ const Pre = styled(Box).attrs({
   border-radius: 3px;
 `;
 
+const Em = styled.em`
+  font-style: italic;
+`;
+
 export default {
   h2: H2,
   h3: H3,
@@ -50,5 +54,6 @@ export default {
   img: Image,
   pre: Pre,
   code: Code,
-  inlineCode: InlineCode
+  inlineCode: InlineCode,
+  em: Em
 };

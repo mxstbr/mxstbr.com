@@ -10,13 +10,13 @@ export const meta = {
 
 export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
 
-I am the co-creator of [styled-components](https://styled-components.com), the most widely used CSS in JavaScript ("CSS-in-JS") library. CSS-in-JS libraries let you write styles in JavaScript and tie them to specific components.
+For three years, I have styled my web apps without any `.css` files. Instead, I wrote all the CSS in JavaScript.
 
 I know what you are thinking, why would anybody write CSS in JavaScript?! Let me explain.
 
-### The Rationale Behind CSS-in-JS
+### What Does CSS-in-JS Look Like?
 
-Here is what using styled-components with React looks like:
+Here is what using the most popular CSS-in-JS library, [styled-components](https://styled-components.com), looks like:
 
 ```js
 import styled from 'styled-components'
@@ -31,37 +31,41 @@ const App = () => (
 )
 ```
 
-Primarily, CSS-in-JS boosts your confidence. You can add, change and delete CSS without unexpected consequences. You avoid the ["append-only stylesheet"](https://css-tricks.com/oh-no-stylesheet-grows-grows-grows-append-stylesheet-problem/) automatically, without complex tooling or years of experience.
+*Disclaimer: I co-created styled-components*
 
-If you are working on the styling of a component, your changes will not affect anything else. If you delete the component, you automatically delete its CSS.
+### The Motivation Behind CSS-in-JS
+
+Primarily, using CSS-in-JS boosts my confidence. I can add, change and delete CSS without unexpected consequences. I avoid the ["append-only stylesheet"](https://css-tricks.com/oh-no-stylesheet-grows-grows-grows-append-stylesheet-problem/) effortlessly.
+
+My changes to the styling of a component will not affect anything else. If I delete a component, I automatically delete its CSS too.
 
 <Lesson
   title="Confidence"
   body="Add, change and delete CSS without unexpected consequences."
 />
 
-This confidence boost is especially vital for teams. Not everybody has a comprehensive understanding of CSS and deadlines can get in the way of quality. With CSS-in-JS your codebase stays clean and you avoid common CSS frustrations (e.g. class name collisions).
+This confidence boost is especially vital for teams. Not everybody has a comprehensive understanding of CSS and deadlines can get in the way of quality. With CSS-in-JS our codebase stays clean and we avoid common CSS frustrations (e.g. class name collisions).
 
 <Lesson
   title="Better Teamwork"
-  body="Keep your codebase clean and avoid common bugs, no matter the experience level of the team members."
+  body="Keep your codebase clean and avoid common bugs, regardeless of the team members experience levels."
 />
 
-Since styles are bound to a specific component, you always know what is affecting it. You can come back two years after first writing some code and you will know exactly what is going on.
+Since styles are bound to a specific component, I always know what is affecting it. I can come back two years after first writing some code and I will know exactly what is going on.
 
 <Lesson
   title="Painless maintenance"
   body="Never go on a hunt for that one CSS declaration breaking your component ever again."
 />
 
-CSS-in-JS libraries keep track of the components you use on a page and only inject their styles. Every user will load the least styles possible when server-side rendering.
+CSS-in-JS libraries keep track of the components I use on a page and only inject their styles. Every user will load the least styles possible when server-side rendering.
 
 <Lesson
   title="Fast first paint"
   body="Automatically extract the critical CSS and send the least amount of code possible from the server."
 />
 
-Simply adjust the styles of a component based on different states (`<Button variant="primary">` vs `<Button variant="secondary">`) or a global theme.
+I can simply adjust the styles of a component based on different states (`<Button variant="primary">` vs `<Button variant="secondary">`) or a global theme.
 
 <Lesson
   title="Simple dynamic styling"
