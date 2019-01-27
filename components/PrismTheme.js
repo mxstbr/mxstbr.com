@@ -11,6 +11,7 @@ export default createGlobalStyle`
 
   pre,
   pre code {
-    line-height: 1.3;
+    margin: 0!important;
+    margin-bottom: 16px!important;
   }
 `;

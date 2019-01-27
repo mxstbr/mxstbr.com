@@ -8,8 +8,7 @@ import Image from "./Image";
 
 const Code = styled(Box).attrs(props => ({
   as: "code",
-  fontSize: props.fontSize || "15px",
-  mb: props.mb || 3
+  fontSize: props.fontSize || "15px"
 }))`
   line-height: 1.4;
   font-family: Inconsolata, Monaco, monospace;
@@ -18,8 +17,7 @@ const Code = styled(Box).attrs(props => ({
 `;
 
 const InlineCode = styled(Code).attrs({
-  fontSize: 2,
-  mb: 0
+  fontSize: 2
 })`
   background-color: ${props => props.theme.colors.greys[0]};
   ${"" /* border: 1px solid ${props => props.theme.colors.greys[1]}; */} padding: 0 0.25em;
