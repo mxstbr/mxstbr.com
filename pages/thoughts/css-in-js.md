@@ -16,7 +16,7 @@ I know what you are thinking, why would anybody write CSS in JavaScript?! Let me
 
 ### What Does CSS-in-JS Look Like?
 
-Here is what using the most popular CSS-in-JS library, [styled-components](https://styled-components.com), looks like:
+Developers have created [different flavors of CSS-in-JS](https://github.com/michelebertoli/css-in-js). The most popular is [styled-components](https://styled-components.com), a library I co-created. Using it with React looks like this:
 
 ```js
 import styled from 'styled-components'
@@ -31,9 +31,9 @@ const App = () => (
 )
 ```
 
-*Disclaimer: I co-created styled-components*
+Note how it ties styles to specific components and lets you write them in JavaScript.
 
-### The Motivation Behind CSS-in-JS
+### Why I Write CSS in JavaScript
 
 Primarily, using CSS-in-JS boosts my confidence. I can add, change and delete CSS without unexpected consequences. I avoid the ["append-only stylesheet"](https://css-tricks.com/oh-no-stylesheet-grows-grows-grows-append-stylesheet-problem/) effortlessly.
 
@@ -41,14 +41,14 @@ My changes to the styling of a component will not affect anything else. If I del
 
 <Lesson
   title="Confidence"
-  body="Add, change and delete CSS without unexpected consequences."
+  body="Add, change and delete CSS without unexpected consequences and avoid dead code."
 />
 
 This confidence boost is especially vital for teams. Not everybody has a comprehensive understanding of CSS and deadlines can get in the way of quality. With CSS-in-JS our codebase stays clean and we avoid common CSS frustrations (e.g. class name collisions).
 
 <Lesson
   title="Better Teamwork"
-  body="Keep your codebase clean and avoid common bugs, regardeless of the team members experience levels."
+  body="Keep your codebase clean and avoid common bugs, regardeless of experience levels."
 />
 
 Since styles are bound to a specific component, I always know what is affecting it. I can come back two years after first writing some code and I will know exactly what is going on.
@@ -58,11 +58,11 @@ Since styles are bound to a specific component, I always know what is affecting 
   body="Never go on a hunt for that one CSS declaration breaking your component ever again."
 />
 
-CSS-in-JS libraries keep track of the components I use on a page and only inject their styles. Every user will load the least styles possible when server-side rendering.
+CSS-in-JS libraries keep track of the components I use on a page and only inject their styles. Every user loads the least styles possible when server-side rendering.
 
 <Lesson
   title="Fast first paint"
-  body="Automatically extract the critical CSS and send the least amount of code possible from the server."
+  body="Automatically extract the critical CSS and send the least amount of code possible over the wire."
 />
 
 I can simply adjust the styles of a component based on different states (`<Button variant="primary">` vs `<Button variant="secondary">`) or a global theme.
@@ -72,7 +72,7 @@ I can simply adjust the styles of a component based on different states (`<Butto
   body="Style your components with a global theme. Never concatenate classnames again."
 />
 
-CSS-in-JS still has all the important features of CSS preprocessors. Auto-prefixing is built in, and others like mixins, variables, and many others come with JavaScript.
+CSS-in-JS still offers all the important features of CSS preprocessors. All libraries have auto-prefixing built in, and other features like mixins (functions) and variables are native to JavaScript.
 
 ### Who Has Adopted CSS-in-JS?
 
