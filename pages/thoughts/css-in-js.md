@@ -35,7 +35,7 @@ Note how it ties styles to specific components and lets you write them in JavaSc
 
 ### Why I Write CSS in JavaScript
 
-Primarily, using CSS-in-JS boosts my confidence. I can add, change and delete CSS without unexpected consequences. I avoid the ["append-only stylesheet"](https://css-tricks.com/oh-no-stylesheet-grows-grows-grows-append-stylesheet-problem/) effortlessly.
+Primarily, using CSS-in-JS boosts my confidence. I can add, change and delete CSS without unexpected consequences. I effortlessly avoid the ["append-only stylesheet"](https://css-tricks.com/oh-no-stylesheet-grows-grows-grows-append-stylesheet-problem/).
 
 My changes to the styling of a component will not affect anything else. If I delete a component, I automatically delete its CSS too.
 
@@ -44,14 +44,16 @@ My changes to the styling of a component will not affect anything else. If I del
   body="Add, change and delete CSS without unexpected consequences and avoid dead code."
 />
 
-This confidence boost is especially vital for teams. Not everybody has a comprehensive understanding of CSS and deadlines can get in the way of quality. With CSS-in-JS our codebase stays clean and we avoid common CSS frustrations (e.g. class name collisions).
+Teams especially benefit from this confidence boost. I cannot expect everybody to have a comprehensive understanding of CSS. On top of that, deadlines can get in the way of quality.
+
+With CSS-in-JS our codebase stays clean and we avoid common CSS frustrations like class name collisions.
 
 <Lesson
-  title="Better Teamwork"
-  body="Keep your codebase clean and avoid common bugs, regardeless of experience levels."
+  title="Enhanced Teamwork"
+  body="Keep your codebase clean and avoid common CSS bugs, regardeless of experience levels."
 />
 
-Since styles are bound to a specific component, I always know what is affecting it. I can come back two years after first writing some code and I will know exactly what is going on.
+I always know why a component looks the way it does since the styles that affect it are right there. I can come back years after styling a component and I will know exactly what is going on.
 
 <Lesson
   title="Painless maintenance"
