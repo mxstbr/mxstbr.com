@@ -7,7 +7,7 @@ export const meta = {
   summary: ''
 }
 
-export default BlogPost
+export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
 
 Conceptually, CSS-in-JS libraries take your styles, hash them to create a unique class name and insert that whole block into the DOM.
 

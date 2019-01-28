@@ -8,7 +8,7 @@ export const meta = {
   summary: ''
 }
 
-export default BlogPost
+export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
 
 For three years, I have styled my web apps without any `.css` files. Instead, I wrote all the CSS in JavaScript.
 

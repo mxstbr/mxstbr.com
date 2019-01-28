@@ -7,7 +7,7 @@ export const meta = {
   summary: ''
 }
 
-export default BlogPost
+export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
 
 As the co-creator of styled-components I have spent the past four years thinking about styling React components. Prompted by a lot of conversations and inspirations I have a new dream.
 

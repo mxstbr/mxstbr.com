@@ -7,7 +7,7 @@ export const meta = {
   summary: 'Spectrum is an open source chat app for large online communities. With the benefit of hindsight after two years, here are the great technical decisions we made'
 }
 
-export default BlogPost
+export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
 
 ### React
 

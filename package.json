@@ -10,8 +10,8 @@
   },
   "dependencies": {
     "@mapbox/rehype-prism": "^0.3.0",
-    "@mdx-js/mdx": "^0.16.8",
-    "@mdx-js/tag": "^0.16.8",
+    "@mdx-js/mdx": "^0.16.6",
+    "@mdx-js/tag": "^0.16.6",
     "@zeit/next-mdx": "^1.2.0",
     "conditional-wrap": "^1.0.0",
     "date-fns": "^1.30.1",

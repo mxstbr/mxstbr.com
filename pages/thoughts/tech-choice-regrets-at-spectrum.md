@@ -8,7 +8,7 @@ export const meta = {
   summary: 'Spectrum is an open source chat app for large online communities. With the benefit of hindsight, here are the technology choices I regret.'
 }
 
-export default BlogPost
+export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
 
 👋 I am Max, the technical co-founder of [Spectrum](https://spectrum.chat). Spectrum is an [open source](https://github.com/withspectrum/spectrum) chat app for large online communities and was recently acquired by GitHub. We are a team of three with a predominantly frontend and design background and have worked on it for close to two years.
 
