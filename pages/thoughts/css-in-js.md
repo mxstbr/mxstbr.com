@@ -1,4 +1,5 @@
 import BlogPost from '../../components/BlogPost';
+import Browser from '../../components/BrowserDemo';
 import Lesson from '../../components/Lesson';
 
 export const meta = {
@@ -16,14 +17,14 @@ I know what you are thinking, why would anybody write CSS in JavaScript?! Let me
 
 ### What Does CSS-in-JS Look Like?
 
-Developers have created [different flavors of CSS-in-JS](https://github.com/michelebertoli/css-in-js). The most popular is [styled-components](https://styled-components.com), a library I co-created. Using it with React looks like this:
+Developers have created [different flavors of CSS-in-JS](https://github.com/michelebertoli/css-in-js). The most popular is a library I co-created with over 20,000 stars on GitHub called [styled-components](https://styled-components.com). Using it with React looks like this:
 
 ```js
 import styled from 'styled-components'
 
 const Title = styled.h1`
   color: palevioletred;
-  font-size: 1.5em;
+  font-size: 18px;
 `
 
 const App = () => (
@@ -31,22 +32,32 @@ const App = () => (
 )
 ```
 
-Note how it ties styles to specific components and lets you write them in JavaScript.
+Note how it ties styles to specific components and lets you write them in JavaScript. This is what the above code renders:
+
+<Browser html={`
+  <style>
+    .faEkXI {
+      font-size: 18px;
+      color: palevioletred;
+    }
+  </style>
+  <h1 class="sc-ifAKCX faEkXI">Hello World!</h1>
+`}/>
 
 ### Why I Write CSS in JavaScript
 
-Primarily, using CSS-in-JS boosts my confidence. I can add, change and delete CSS without unexpected consequences. I effortlessly avoid the ["append-only stylesheet"](https://css-tricks.com/oh-no-stylesheet-grows-grows-grows-append-stylesheet-problem/).
+Primarily, using CSS-in-JS boosts my confidence. I can add, change and delete CSS without unexpected consequences. My changes to the styling of a component will not affect anything else.
 
-My changes to the styling of a component will not affect anything else. If I delete a component, I automatically delete its CSS too.
+CSS-in-JS prevents the [“append-only stylesheet”](https://css-tricks.com/oh-no-stylesheet-grows-grows-grows-append-stylesheet-problem/) automatically. If I delete a component, I delete its CSS too.
 
 <Lesson
   title="Confidence"
   body="Add, change and delete CSS without unexpected consequences and avoid dead code."
 />
 
-Teams especially benefit from this confidence boost. I cannot expect everybody to have a comprehensive understanding of CSS. On top of that, deadlines can get in the way of quality.
+Teams especially benefit from this confidence boost. One cannot expect everybody to have a comprehensive understanding of CSS. On top of that, deadlines can get in the way of quality.
 
-With CSS-in-JS our codebase stays clean and we avoid common CSS frustrations like class name collisions.
+With CSS-in-JS my teams codebase stays clean and we avoid common CSS frustrations like class name collisions.
 
 <Lesson
   title="Enhanced Teamwork"
@@ -56,22 +67,22 @@ With CSS-in-JS our codebase stays clean and we avoid common CSS frustrations lik
 I always know why a component looks the way it does since the styles that affect it are right there. I can come back years after styling a component and I will know exactly what is going on.
 
 <Lesson
-  title="Painless maintenance"
-  body="Never go on a hunt for that one CSS declaration breaking your component ever again."
+  title="Painless Maintenance"
+  body="Never go on a hunt for CSS affecting your components ever again."
 />
 
 CSS-in-JS libraries keep track of the components I use on a page and only inject their styles. Every user loads the least styles possible when server-side rendering.
 
 <Lesson
-  title="Fast first paint"
+  title="Fast Performance"
   body="Automatically extract the critical CSS and send the least amount of code possible over the wire."
 />
 
 I can simply adjust the styles of a component based on different states (`<Button variant="primary">` vs `<Button variant="secondary">`) or a global theme.
 
 <Lesson
-  title="Simple dynamic styling"
-  body="Style your components with a global theme. Never concatenate classnames again."
+  title="Dynamic Styling"
+  body="Simply style your components with a global theme or implement different states."
 />
 
 CSS-in-JS still offers all the important features of CSS preprocessors. All libraries have auto-prefixing built in, and other features like mixins (functions) and variables are native to JavaScript.
