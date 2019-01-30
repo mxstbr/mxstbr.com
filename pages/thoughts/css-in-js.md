@@ -55,7 +55,7 @@ CSS-in-JS prevents the [“append-only stylesheet”](https://css-tricks.com/oh-
   body="Add, change and delete CSS without unexpected consequences and avoid dead code."
 />
 
-Teams especially benefit from this confidence boost. One cannot expect everybody to have a comprehensive understanding of CSS. On top of that, deadlines can get in the way of quality.
+My teams have especially benefited from this confidence boost. I cannot expect everybody to have a comprehensive understanding of CSS. On top of that, deadlines can get in the way of quality.
 
 With CSS-in-JS my teams codebase stays clean and we avoid common CSS frustrations like class name collisions. ✅
 
@@ -90,12 +90,6 @@ If I dynamically change that context all my components will apply the correct st
 />
 
 CSS-in-JS still offers all the important features of CSS preprocessors. All libraries support auto-prefixing, and JavaScript offers most other features like mixins (functions) and variables natively.
-
-### The Downsides of CSS-in-JS
-
-Technically diverse organizations should make sure their library of choice works with all the projects' tech stacks using the shared components.
-
-Users have to load, parse and execute more JavaScript.
 
 ### Who Has Adopted CSS-in-JS?
 
