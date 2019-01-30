@@ -68,10 +68,7 @@ export default ({ html, children }: Props) => (
     <BrowserBar>
       <TrafficLights />
     </BrowserBar>
-    <BrowserContent
-      class="post__example-content"
-      dangerouslySetInnerHTML={{ __html: html }}
-    >
+    <BrowserContent dangerouslySetInnerHTML={{ __html: html }}>
       {children}
     </BrowserContent>
   </Browser>
