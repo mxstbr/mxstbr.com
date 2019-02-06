@@ -19,8 +19,8 @@ type Props = {
   centered?: boolean
 };
 
-export default (props: Props) => (
-  <Wrapper centered={props.centered}>
+export default ({ centered, as, ...props }: Props) => (
+  <Wrapper centered={centered} as={as}>
     <Text color="#333" mb={3} fontSize="18px" lineHeight={1.6} {...props} />
   </Wrapper>
 );

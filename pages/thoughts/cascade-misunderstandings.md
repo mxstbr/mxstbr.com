@@ -1,4 +1,5 @@
 import BlogPost from '../../components/BlogPost';
+import Paragraph from '../../components/Paragraph';
 import Browser from '../../components/BrowserDemo';
 
 export const meta = {
@@ -40,46 +41,43 @@ What do you think?
 
 ----
 
-Have your answer?
+<details>
+  <Paragraph style={{ display: 'inline-block' }} as="summary">Click to see the correct answer</Paragraph>
 
-----
+  <Paragraph>Both will be blue! Here is a live demo:</Paragraph>
 
-Are you sure about it?
+  <Browser
+    html={`
+    <style>
+      .box {
+        width: 50px;
+        height: 50px;
+        margin: 8px;
+        color: white;
+        font-family: sans-serif;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .wrapper {
+        display: flex;
+        flex-direction: row;
+      }
+      .red {
+        background: red;
+      }
+      .blue {
+        background: blue;
+      }
+    </style>
+    <div class="wrapper">
+      <div class="box red blue">1</div>
+      <div class="box blue red">2</div>
+    </div>
+    `}
+  />
 
-----
+</details>
 
-The right answer is both blue! If that surprises you, do not worry. [Only 43% out of 13,000 developers answered correctly](https://twitter.com/mxstbr/status/1038416725182697472) in an informal Twitter poll.
-
-If you do not believe me, here is a live demo:
-
-<Browser
-  html={`
-  <style>
-    .box {
-      width: 50px;
-      height: 50px;
-      margin: 8px;
-      color: white;
-      font-family: sans-serif;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .wrapper {
-      display: flex;
-      flex-direction: row;
-    }
-    .red {
-      background: red;
-    }
-    .blue {
-      background: blue;
-    }
-  </style>
-  <div class="wrapper">
-    <div class="box red blue">1</div>
-    <div class="box blue red">2</div>
-  </div>
-  `}
-/>
+If that surprises you, do not worry. [Only 43% out of 13,000 developers answered correctly](https://twitter.com/mxstbr/status/1038416725182697472) in an informal Twitter poll.

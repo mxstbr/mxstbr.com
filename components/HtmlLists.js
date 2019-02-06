@@ -15,15 +15,14 @@ export const UnorderedList = styled(Box).attrs({
 })`
   ${baseListStyles};
 `;
-export const OrderedList = styled.ol`
+export const OrderedList = styled(Box).attrs({
+  as: "ol",
+  mb: 3
+})`
   ${baseListStyles};
   list-style: decimal;
 `;
-const ListItemText = styled(Paragraph).attrs({
-  my: 1
-})``;
+
 export const ListItem = (props: RebassProps) => (
-  <li>
-    <ListItemText {...props} />
-  </li>
+  <Paragraph style={{ fontSize: "18px" }} my={1} {...props} as="li" />
 );
