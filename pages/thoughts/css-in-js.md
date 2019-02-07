@@ -48,9 +48,7 @@ Note how it ties styles to specific components and lets you write them in JavaSc
 
 Primarily, using CSS-in-JS boosts my confidence. I can add, change and delete CSS without unexpected consequences. My changes to the styling of a component will not affect anything else.
 
-I always know why a component looks the way it does. All styles affecting it are beside it. If they are not (e.g. because another component has overrides), I can find them with a quick search. 
-
-CSS-in-JS prevents the [“append-only stylesheet”](https://css-tricks.com/oh-no-stylesheet-grows-grows-grows-append-stylesheet-problem/) automatically. If I delete a component, I delete its CSS too. 🚮
+If I delete a component, I delete its CSS too. With CSS-in-JS, I prevent the [“append-only stylesheet”](https://css-tricks.com/oh-no-stylesheet-grows-grows-grows-append-stylesheet-problem/) automatically. ✨
 
 <Lesson
   title="Confidence"
@@ -62,9 +60,9 @@ CSS-in-JS prevents the [“append-only stylesheet”](https://css-tricks.com/oh-
   body="Never go on a hunt for CSS affecting your components ever again."
 />
 
-Teams I have been a member of have especially benefited from this confidence boost. I cannot expect everybody to have a comprehensive understanding of CSS. On top of that, deadlines can get in the way of quality.
+Teams I have been a member of have especially benefited from this confidence boost. I cannot expect everybody to have a encyclopedic understanding of CSS. On top of that, deadlines can get in the way of quality.
 
-With CSS-in-JS, our codebase stays cleaner and we sidestep common CSS frustrations like class name collisions. 😍
+With CSS-in-JS, our codebase stays cleaner and we sidestep common CSS frustrations like class name collisions automatically. 😍
 
 <Lesson
   title="Enhanced Teamwork"
@@ -77,7 +75,7 @@ Automatic critical CSS! 🤯
 
 <Lesson
   title="Fast Performance"
-  body="Automatically extract the critical CSS and send the least amount of code possible over the wire."
+  body="Automatically send only the critical CSS to the user for a rapid first paint."
 />
 
 Also, I can adjust the styles of a component based on different states (`<Button variant="primary">` vs `<Button variant="secondary">`) or a global theme.
@@ -86,15 +84,23 @@ If I dynamically change that context all my components will apply the correct st
 
 <Lesson
   title="Dynamic Styling"
-  body="Simply style your components with a global theme or implement different states."
+  body="Simply style your components with a global theme or based on different states."
 />
 
 CSS-in-JS still offers all the important features of CSS preprocessors. All libraries support auto-prefixing, and JavaScript offers most other features like mixins (functions) and variables natively.
 
-### Does Anybody Else Use CSS-in-JS?
+----
 
-Thousands of companies use CSS-in-JS in production, including Reddit, Patreon, LEGO, Target, Atlassian, Vogue, Bloomberg, BBC News, GitHub, Coinbase, and many more. ([I also built this website with styled-components](https://github.com/mxstbr/mxstbr.com))
+I know what you are thinking: “Max, you can also get these benefits with other tools or strict processes or extensive training. What makes CSS-in-JS special?”
+
+CSS-in-JS combines all these benefits into one handy package and enforces them. It guides me to the [pit of success](https://blog.codinghorror.com/falling-into-the-pit-of-success/): it makes it easy to do the right thing, and hard (or even impossible) to do the wrong thing automatically.
+
+### Who Uses CSS-in-JS?
+
+Thousands of companies use CSS-in-JS in production, including [Reddit](https://reddit.com), [Patreon](https://patreon.com), [Target](https://target.com), [Atlassian](https://atlaskit.atlassian.com), [Vogue](https://vogue.de), [GitHub](https://primer.style/components), [Coinbase](https://pro.coinbase.com), and many more. ([including this website](https://github.com/mxstbr/mxstbr.com))
 
 ### Is CSS-in-JS For You?
 
-If you are using a JavaScript framework to build a web app with components, especially as part of a team, CSS-in-JS might be a good fit. I would recommend trying it on a small project and seeing whether it feels good.
+If you are using a JavaScript framework to build a web app with components, CSS-in-JS might be a good fit. Especially if you are part of a team where everybody understands basic JavaScript.
+
+If you are not sure how to get started, I would recommend trying it and assessing how it feels after a day or two. If you do not like it, no harm done!
