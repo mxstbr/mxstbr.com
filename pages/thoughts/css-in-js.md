@@ -49,7 +49,7 @@ This renders a palevioletred `<h1>` with a font size of 18px to the DOM:
 
 ### Why I like CSS-in-JS
 
-Primarily, using CSS-in-JS boosts my confidence. I can add, change and delete CSS without unexpected consequences. My changes to the styling of a component will not affect anything else. If I delete a component, I delete its CSS too. No more [“append-only stylesheets”](https://css-tricks.com/oh-no-stylesheet-grows-grows-grows-append-stylesheet-problem/)! ✨
+Primarily, using CSS-in-JS boosts my confidence. I can add, change and delete CSS without unexpected consequences. My changes to the styling of a component will not affect anything else. If I delete a component, I delete its CSS too. No more [append-only stylesheets](https://css-tricks.com/oh-no-stylesheet-grows-grows-grows-append-stylesheet-problem/)! ✨
 
 <Lesson
   title="Confidence"
