@@ -66,7 +66,7 @@ With CSS-in-JS, our codebase stays cleaner and we sidestep common CSS frustratio
 
 <Lesson
   title="Enhanced Teamwork"
-  body="Keep your codebase clean and avoid common CSS bugs, regardeless of experience levels."
+  body="Keep your codebase clean and avoid common CSS bugs, regardless of experience levels."
 />
 
 Regarding performance, CSS-in-JS libraries keep track of the components I use on a page and only inject their styles. Every user downloads the least code possible when server-side rendering.
