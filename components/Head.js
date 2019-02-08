@@ -78,7 +78,11 @@ export default withRouter(
         />
       )}
       {image != undefined && (
-        <meta name="twitter:image" key="twitter:image" content={image} />
+        <meta
+          name="twitter:image"
+          key="twitter:image"
+          content={`https://mxstbr.com${image}`}
+        />
       )}
       <JsonLD
         data={[

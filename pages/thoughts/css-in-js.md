@@ -7,7 +7,7 @@ export const meta = {
   publishedAt: '2019-01-30',
   title: 'Why I Write CSS in JavaScript',
   summary: '',
-  image: 'https://mxstbr.com/static/images/css-in-js.png'
+  image: '/static/images/css-in-js.png'
 }
 
 export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>

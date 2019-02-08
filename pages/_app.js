@@ -70,7 +70,7 @@ const NAV_HEIGHT = 65;
 export const DEFAULT_TITLE = "Max Stoiber (@mxstbr) - JavaScript Engineer";
 const DEFAULT_DESCRIPTION =
   "Creator of styled-components, react-boilerplate, micro-analytics and dozens of other open source projects in the React and Node ecosystems. Probably brewing specialty coffee beverages, travelling around the world or skiing double black diamond ◆◆ slopes right now.";
-const DEFAULT_IMAGE = "https://mxstbr.com/static/images/social_media.png";
+const DEFAULT_IMAGE = "/static/images/social_media.png";
 
 class MyApp extends App {
   render() {
