@@ -35,9 +35,7 @@ const App = () => (
 )
 ```
 
-It lets you write styles in JavaScript and ties them to specific components.
-
-This is what the above code renders:
+This renders a palevioletred `<h1>` with a font size of 18px to the DOM:
 
 <Browser html={`
   <style>
