@@ -47,9 +47,7 @@ Note how it ties styles to specific components and lets you write them in JavaSc
 
 ### Why I like CSS-in-JS
 
-Primarily, using CSS-in-JS boosts my confidence. I can add, change and delete CSS without unexpected consequences. My changes to the styling of a component will not affect anything else.
-
-If I delete a component, I delete its CSS too. With CSS-in-JS, I prevent the [“append-only stylesheet”](https://css-tricks.com/oh-no-stylesheet-grows-grows-grows-append-stylesheet-problem/) automatically. ✨
+Primarily, using CSS-in-JS boosts my confidence. I can add, change and delete CSS without unexpected consequences. My changes to the styling of a component will not affect anything else. If I delete a component, I delete its CSS too. I prevent the [“append-only stylesheet”](https://css-tricks.com/oh-no-stylesheet-grows-grows-grows-append-stylesheet-problem/) automatically! ✨
 
 <Lesson
   title="Confidence"
@@ -70,7 +68,7 @@ With CSS-in-JS, our codebase stays cleaner and we sidestep common CSS frustratio
   body="Keep your codebase clean and avoid common CSS bugs, regardless of experience levels."
 />
 
-Regarding performance, CSS-in-JS libraries keep track of the components I use on a page and only inject their styles. Every user downloads the least code possible when server-side rendering.
+Regarding performance, CSS-in-JS libraries keep track of the components I use on a page and only inject their styles. Every user downloads the least CSS possible when server-side rendering.
 
 Automatic critical CSS! 🤯
 
@@ -94,7 +92,7 @@ CSS-in-JS still offers all the important features of CSS preprocessors. All libr
 
 I know what you are thinking: “Max, you can also get these benefits with other tools or strict processes or extensive training. What makes CSS-in-JS special?”
 
-CSS-in-JS combines all these benefits into one handy package and enforces them. It guides me to the [pit of success](https://blog.codinghorror.com/falling-into-the-pit-of-success/): it makes it easy to do the right thing, and hard (or even impossible) to do the wrong thing automatically.
+CSS-in-JS combines all these benefits into one handy package and enforces them. It guides me to the [pit of success](https://blog.codinghorror.com/falling-into-the-pit-of-success/): it makes it easy to do the right thing, and hard (or even impossible) to do the wrong thing.
 
 ### Who Uses CSS-in-JS?
 
