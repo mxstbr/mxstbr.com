@@ -6,7 +6,7 @@ export const meta = {
   published: false,
   publishedAt: '2019-01-30',
   title: 'Why I Write CSS in JavaScript',
-  summary: '',
+  summary: 'For three years, I have styled my web apps without any `.css` files. Instead, I wrote all the CSS in JavaScript. Let me explain.',
   image: '/static/images/css-in-js.png'
 }
 
