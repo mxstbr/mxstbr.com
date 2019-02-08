@@ -17,7 +17,7 @@ I know what you are thinking, why would anybody write CSS in JavaScript?! Let me
 
 ### What Does CSS-in-JS Look Like?
 
-Developers have created [different flavors of CSS-in-JS](https://github.com/michelebertoli/css-in-js). The most popular is a library I co-created with over 20,000 stars on GitHub called [styled-components](https://styled-components.com). Using it with React looks like this:
+Developers have created [different flavors of CSS-in-JS](https://github.com/michelebertoli/css-in-js). The most popular to date is a library I co-created with over 20,000 stars on GitHub called [styled-components](https://styled-components.com). Using it with React looks like this:
 
 ```js
 import styled from 'styled-components'
@@ -62,7 +62,7 @@ If I delete a component, I delete its CSS too. With CSS-in-JS, I prevent the [�
 
 Teams I have been a member of have especially benefited from this confidence boost. I cannot expect everybody to have a encyclopedic understanding of CSS. On top of that, deadlines can get in the way of quality.
 
-With CSS-in-JS, our codebase stays cleaner and we sidestep common CSS frustrations like class name collisions automatically. 😍
+With CSS-in-JS, our codebase stays cleaner and we sidestep common CSS frustrations like class name collisions and specificity wars automatically. 😍
 
 <Lesson
   title="Enhanced Teamwork"
