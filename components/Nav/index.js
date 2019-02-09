@@ -30,7 +30,7 @@ const NavItem = withRouter(styled(props => {
     <Box mr={4} className={props.className}>
       <Link itemProp="url" prefetch href={props.href}>
         <Text
-          color={active ? "#000" : "#666"}
+          color={active ? "text" : "#666"}
           fontWeight={active ? "bold" : "normal"}
           itemProp="name"
         >

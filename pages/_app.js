@@ -16,7 +16,7 @@ const colors = {
   blue: "#3867d6",
   greys: ["#EEE", "#BBB", "#999", "#666"],
   white: "#FFF",
-  black: "#000"
+  black: "#333"
 };
 
 const theme = {
