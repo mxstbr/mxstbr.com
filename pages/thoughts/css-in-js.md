@@ -61,13 +61,13 @@ Primarily, using CSS-in-JS boosts my confidence. I can add, change and delete CS
   body="Never go on a hunt for CSS affecting your components ever again."
 />
 
-Teams I have been a member of have especially benefited from this confidence boost. I cannot expect everybody to have an encyclopedic understanding of CSS. On top of that, deadlines can get in the way of quality.
+Teams I have been a member of have especially benefited from this confidence boost. I cannot expect all developers, particularly juniors, to have an encyclopedic understanding of CSS. On top of that, deadlines can get in the way of quality.
 
-With CSS-in-JS, our codebase is cleaner and we automatically sidestep common CSS frustrations such as class name collisions and specificity wars. 😍
+With CSS-in-JS, we automatically sidestep common CSS frustrations such as class name collisions and specificity wars. This keeps our codebase clean and lets us move quickly. 😍
 
 <Lesson
   title="Enhanced Teamwork"
-  body="Keep your codebase clean and avoid common CSS bugs, regardless of experience levels."
+  body="Avoid common CSS frustrations to keep a neat codebase and move quickly, regardless of experience levels."
 />
 
 Regarding performance, CSS-in-JS libraries keep track of the components I use on a page and only inject their styles. Every user downloads the least CSS possible when server-side rendering.
