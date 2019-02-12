@@ -70,9 +70,9 @@ With CSS-in-JS, we automatically sidestep common CSS frustrations such as class 
   body="Avoid common CSS frustrations to keep a neat codebase and move quickly, regardless of experience levels."
 />
 
-Regarding performance, CSS-in-JS libraries keep track of the components I use on a page and only inject their styles. Every user downloads the least CSS possible when server-side rendering.
+Regarding performance, CSS-in-JS libraries keep track of the components I use on a page and only inject their styles. Automatic critical CSS!
 
-Automatic critical CSS! 🤯
+While my `.js` bundles are slightly heavier, my users download the smallest possible CSS payload. This leads to a marginally slower time to interactive, but a much quicker first meaningful paint. 🏎💨
 
 <Lesson
   title="Fast Performance"
