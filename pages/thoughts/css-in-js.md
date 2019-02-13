@@ -102,4 +102,4 @@ Thousands of companies use CSS-in-JS in production, including [Reddit](https://r
 
 If you are using a JavaScript framework to build a web app with components, CSS-in-JS might be a good fit. Especially if you are part of a team where everybody understands basic JavaScript.
 
-If you are not sure how to get started, I would recommend trying it out and assessing how it feels. 👍
+If you are not sure how to get started, I would recommend simply trying it out and seeing how it feels! ✌️
