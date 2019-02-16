@@ -49,11 +49,11 @@ This renders a palevioletred `<h1>` with a font size of 18px to the DOM:
 
 ### Why I like CSS-in-JS
 
-Primarily, using CSS-in-JS boosts my confidence. I can add, change and delete CSS without unexpected consequences. My changes to the styling of a component will not affect anything else. If I delete a component, I delete its CSS too. No more [append-only stylesheets](https://css-tricks.com/oh-no-stylesheet-grows-grows-grows-append-stylesheet-problem/)! ✨
+Primarily, using CSS-in-JS boosts my confidence. I can add, change and delete CSS without unexpected consequences. My changes to the styling of a component will not affect any others. If I delete a component, I delete its CSS too. No more [append-only stylesheets](https://css-tricks.com/oh-no-stylesheet-grows-grows-grows-append-stylesheet-problem/)! ✨
 
 <Lesson
   title="Confidence"
-  body="Add, change and delete CSS without unexpected consequences and avoid dead code."
+  body="Add, change and delete CSS without unexpected consequences and avoid the append-only stylesheet."
 />
 
 <Lesson
@@ -63,14 +63,14 @@ Primarily, using CSS-in-JS boosts my confidence. I can add, change and delete CS
 
 Teams I have been a member of have especially benefited from this confidence boost. I cannot expect all developers, particularly juniors, to have an encyclopedic understanding of CSS. On top of that, deadlines can get in the way of quality.
 
-With CSS-in-JS, we automatically sidestep common CSS frustrations such as class name collisions and specificity wars. This keeps our codebase clean and lets us move quickly. 😍
+With CSS-in-JS, we automatically sidestep common CSS frustrations such as class name collisions and specificity wars. This keeps our codebase clean and lets us move quicker. 😍
 
 <Lesson
   title="Enhanced Teamwork"
-  body="Avoid common CSS frustrations to keep a neat codebase and move quickly, regardless of experience levels."
+  body="Avoid common CSS frustrations to keep a neat codebase and moving quickly, regardless of experience levels."
 />
 
-Regarding performance, CSS-in-JS libraries keep track of the components I use on a page and inject only their styles into the DOM. While my `.js` bundles are slightly heavier, my users download the smallest possible CSS payload and avoid an extra network request for the `.css` file.
+Regarding performance, CSS-in-JS libraries keep track of the components I use on a page and only inject their styles into the DOM. While my `.js` bundles are slightly heavier, my users download the smallest possible CSS payload and avoid extra network requests for `.css` files.
 
 This leads to a marginally slower time to interactive, but a much quicker first meaningful paint! 🏎💨
 
@@ -79,7 +79,7 @@ This leads to a marginally slower time to interactive, but a much quicker first 
   body="Send only the critical CSS to the user for a rapid first paint."
 />
 
-Also, I can adjust the styles of a component based on different states (`variant="primary"` vs `variant="secondary"`) or a global theme. If I dynamically change that context, all my components will apply the correct styles. 💅
+I can also easily adjust the styles of my components based on different states (`variant="primary"` vs `variant="secondary"`) or a global theme. The component will apply the correct styles automatically when I dynamically change that context. 💅
 
 <Lesson
   title="Dynamic Styling"
