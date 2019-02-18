@@ -1,9 +1,11 @@
 import fetch from "isomorphic-unfetch";
 import type { WebMention } from "./types";
 
+const VALID_PROPERTY_TYPES = ["mention-of", "in-reply-to"];
 const filterWebMentions = (mentions: Array<WebMention>): Array<WebMention> => {
   return mentions
     .filter(entry => entry.author.name !== "Max Stoiber")
+    .filter(entry => VALID_PROPERTY_TYPES.indexOf(entry["wm-property"]) > -1)
     .sort(
       (a, b) =>
         new Date(
@@ -17,7 +19,7 @@ const filterWebMentions = (mentions: Array<WebMention>): Array<WebMention> => {
 
 export const loadWebMentions = async (target: string, page?: number = 0) => {
   return fetch(
-    `https://webmention.io/api/mentions.jf2?page=${page}&per-page=5&sort-by=published&wm-property[]=in-reply-to&wm-property[]=mention-of&target=${target}`
+    `https://webmention.io/api/mentions.jf2?page=${page}&per-page=20&sort-by=published&target=${target}`
   )
     .then(res => res.json())
     .then(json =>
