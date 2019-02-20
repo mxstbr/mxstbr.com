@@ -21,16 +21,17 @@ const handleLineBreaks = (text: string) =>
 
 export default ({ mention }: { mention: WebMention }) => (
   <Flex flexDirection="row" my={3}>
-    <Link href={mention.url}>
-      <Image
-        width={40}
-        height={40}
-        mr={3}
-        css={{ borderRadius: "50%" }}
-        alt={`avatar of ${mention.author.name}`}
-        src={mention.author.photo}
-      />
-    </Link>
+    <Box width={40} mr={3}>
+      <Link href={mention.url}>
+        <Image
+          width={40}
+          height={40}
+          css={{ borderRadius: "50%" }}
+          alt={`avatar of ${mention.author.name}`}
+          src={mention.author.photo}
+        />
+      </Link>
+    </Box>
     <Box>
       <Link href={mention.url}>
         <Text fontWeight="bold" as="div" mb={1} mr={2}>
@@ -46,14 +47,6 @@ export default ({ mention }: { mention: WebMention }) => (
               "DD MMM, YYYY [at] H:m"
             )}
           </Box>
-          {mention.url.indexOf("twitter.com") > -1 && (
-            <Box as="span" color="tertiary" css={{ fontWeight: "normal" }}>
-              {" · "}
-              <Icon>
-                <Twitter size="1em" />
-              </Icon>
-            </Box>
-          )}
         </Text>
       </Link>
       {mention.content && (
