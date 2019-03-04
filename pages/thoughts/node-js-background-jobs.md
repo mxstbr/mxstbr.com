@@ -3,7 +3,7 @@ import BlogPost from '../../components/BlogPost';
 export const meta = {
   published: false,
   publishedAt: '2019-02-28',
-  title: 'How We Handle 10 Million Background Jobs a Month in Node.js',
+  title: 'How We Handle 12 Million Monthly Background Jobs With Node.js',
   summary: ''
 }
 
@@ -11,19 +11,21 @@ export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
 
 👋 I am Max, the technical co-founder of [Spectrum](https://spectrum.chat). Spectrum is an [open source](https://github.com/withspectrum/spectrum) chat app for large online communities and was recently acquired by GitHub. We are a team of three with a predominantly frontend and design background and have worked on it for close to two years.
 
-We wrote our servers in Node.js, and handled over 12 million background jobs last month. Our six workers (each with as many instances as necessary) share the load depending on the type of job.
+Our Node.js servers handled over 12 million background jobs last month. Let's dive into our system!
 
 ### Why Do We Need Background Jobs?
 
-Spectrums users expect everything to happen in real-time. Our API has to respond as quickly as possible to all requests. So all heavy computations have to happen asynchronously in the background.
+Some user actions trigger complex processes, like sending notification emails and spam checking when users post new messages. We do not want our users to wait long for responses, so we run these tasks asynchronously in the background.
 
-We set up worker servers that are solely responsible for background processing. To communicate between our web servers and our workers we use queues of background jobs that need to be processed. Our web servers add jobs to the queues, and the workers pick up the newest one from the queue and process it.
+### What Does The Architecture Look Like?
 
-### Bull
+We set up six worker servers that are solely responsible for background processing, and split our ~70 queues between them based on type. For example,  one worker ("hermes") sends emails and another ("athena") handles notifications. Each worker is scaled to many instances that share the load.
+
+Our web servers add jobs to the queues and then respond to the users without waiting for the result. Our workers process them asynchronously in the background as they have time.
+
+### Where Are The Job Queues Stored?
 
 To handle that we chose a package called [bull](https://github.com/optimalbits/bull), which uses Redis under the hood. We initially selected it over the alternatives due to its intuitive API, but it has also proven to be the most stable part of our entire infrastructure.
-
-### What Do Jobs Look Like?
 
 Here is a real-world example of a job from our codebase:
 
@@ -45,10 +47,8 @@ import Queue from 'bull'
 const messageNotificationsQueue = new Queue('message-notifications')
 
 messageNotificationsQueue.process(job => {
-  console.log(job.data.messageId)
+  // ...send message notifications for job.data.messageId...
 })
 ```
-
-### What Kind Of Jobs Do We Handle?
 
 ### Would We Use Bull Again?
