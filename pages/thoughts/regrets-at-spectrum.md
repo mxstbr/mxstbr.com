@@ -27,5 +27,5 @@ export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
 ### Mistake 3: We Did Not Focus On Our Niche
 
 - Wanted to build for our use case, open knowledge communities (e.g. open source)
-- Needed to make money, so built business features
-- Businesses were not interested, and had we focused on our core niche use case we would have grown faster like we are now
+- Needed to make money, so built business features for a broader audience of businesses generally
+- Businesses were not interested, and had we focused on our core niche use case we would have grown much faster (like we are right now)
