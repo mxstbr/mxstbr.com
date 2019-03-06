@@ -14,4 +14,18 @@ export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
 
 ### Mistake 1: We Did Not Tell Our Story
 
+- Branding was good and unique, but we did not do enough marketing
+- Brand did not have minimum viable personality https://avc.com/2011/09/minimum-viable-personality/ 
+- Should have told our story
+
 ### Mistake 2: We Thought We Would Be Quicker
+
+- Thought we could build another product "after" Spectrum
+- Named company Space Program Inc.
+- Never done with one product, never mind starting another one
+
+### Mistake 3: We Did Not Focus On Our Niche
+
+- Wanted to build for our use case, open knowledge communities (e.g. open source)
+- Needed to make money, so built business features
+- Businesses were not interested, and had we focused on our core niche use case we would have grown faster like we are now
