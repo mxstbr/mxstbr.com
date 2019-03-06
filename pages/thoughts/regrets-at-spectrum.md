@@ -2,7 +2,7 @@ import BlogPost from '../../components/BlogPost';
 import Lesson from '../../components/Lesson';
 
 export const meta = {
-  published: true,
+  published: false,
   publishedAt: '2019-01-16',
   title: 'More Regrets',
   summary: ''
