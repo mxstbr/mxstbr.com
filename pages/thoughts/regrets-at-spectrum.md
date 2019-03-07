@@ -29,3 +29,15 @@ export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
 - Wanted to build for our use case, open knowledge communities (e.g. open source)
 - Needed to make money, so built business features for a broader audience of businesses generally
 - Businesses were not interested, and had we focused on our core niche use case we would have grown much faster (like we are right now)
+
+### Mistake 4: We Did Not Do Enough Marketing
+
+- Spend too much time on development and crafting the perfect experience
+- Should have spent more time on marketing, typical engineering mistake
+- Not just social media, but also in-product growth marketing, marketing pages on the website, etc.
+
+### Mistake 5: We Did Not Iterate (Quickly) Enough
+
+- Had an early MVP built with minimal technology
+- Saw some tiny traction, though we needed to have proper setup to be able to do custom things
+- Should have stuck with MVP setup and iterated and experimented like mad until we felt much higher traction (you know when you have product-market fit, we did not)
