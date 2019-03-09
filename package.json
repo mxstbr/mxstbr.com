@@ -25,6 +25,7 @@
     "react-dom": "^16.7.0",
     "react-feather": "^1.1.5",
     "rebass": "^3.0.0-9",
+    "remark-capitalize": "^1.1.0",
     "slugg": "^1.2.1",
     "styled-components": "^4.1.3",
     "styled-reset": "^1.6.4"
