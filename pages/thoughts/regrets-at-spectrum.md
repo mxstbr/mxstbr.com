@@ -15,9 +15,9 @@ export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;
 ### Regret 1: We Did Not Focus On Our Niche
 
 - Wanted to build for our use case, open knowledge communities (e.g. open source)
-- Needed to make money, so built business features for a broader audience of businesses generally
-- Businesses were not interested, and had we focused on our core niche use case we would have grown much faster (like we are right now)
-- Better to have 1,000 true fans than 100,000 users who are barely interested
+- Needed to make money, so built business features
+- Businesses were not interested, and had we focused on our core niche use case we would have grown much faster
+- Better to have 100 true fans who love the product than 10,000 barely interested users
 
 ### Regret 2: We Did Not Do Enough Marketing
 
@@ -25,7 +25,7 @@ export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;
 - Should have spent more time on marketing, typical engineering mistake
 - Not just social media, but also in-product growth marketing, marketing pages on the website, etc.
 
-### Regret 2.5: We Should Have Told Our Story
+### Regret 2.5: We Did Not Tell Our Story
 
 - Branding was good and unique
 - Brand did not have minimum viable personality https://avc.com/2011/09/minimum-viable-personality/
@@ -33,6 +33,6 @@ export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;
 
 ### Regret 3: We Did Not Iterate (Quickly) Enough
 
-- Had an early MVP built with minimal technology
-- Saw some tiny traction, though we needed to have proper setup to be able to do custom things
-- Should have stuck with MVP setup and iterated and experimented like mad until we felt much higher traction (you know when you have product-market fit, we did not—only concept-market fit)
+- Had an early MVP built with minimal technology (Firebase)
+- Saw some tiny traction, thought we needed proper setup for custom functionality
+- Should have stuck with MVP setup and iterated until we felt higher traction, the custom functionality did not make the difference
