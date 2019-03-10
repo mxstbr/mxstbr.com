@@ -29,7 +29,7 @@ const styledHighlight = {
 refract.languages.insertBefore("jsx", "template-string", styledHighlight);
 refract.languages.insertBefore("js", "template-string", styledHighlight);
 
-const withMDX = require("@zeit/next-mdx")({
+const withMDX = require("@next/mdx")({
   extension: /\.mdx?$/,
   options: {
     // $FlowIssue
