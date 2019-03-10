@@ -1,29 +1,27 @@
-import BlogPost from '../../components/BlogPost';
+import BlogPost from "../../components/BlogPost";
 
 export const meta = {
   published: false,
-  publishedAt: '2019-01-30',
-  title: 'How does CSS-in-JS work?',
-  summary: ''
-}
+  publishedAt: "2019-01-30",
+  title: "How does CSS-in-JS work?",
+  summary: ""
+};
 
-export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
+export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;
 
 Conceptually, CSS-in-JS libraries take your styles, hash them to create a unique class name and insert that whole block into the DOM.
 
 For example:
 
 ```js
-import styled from 'styled-components';
+import styled from "styled-components";
 
 const Title = styled.h1`
   color: palevioletred;
   font-size: 1.5em;
-`
+`;
 
-const App = () => (
-  <Title>Hello World!</Title>
-)
+const App = () => <Title>Hello World!</Title>;
 ```
 
 would render the following to the DOM:

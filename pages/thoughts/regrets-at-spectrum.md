@@ -1,14 +1,14 @@
-import BlogPost from '../../components/BlogPost';
-import Lesson from '../../components/Lesson';
+import BlogPost from "../../components/BlogPost";
+import Lesson from "../../components/Lesson";
 
 export const meta = {
   published: false,
-  publishedAt: '2019-01-16',
-  title: 'More Regrets',
-  summary: ''
-}
+  publishedAt: "2019-01-16",
+  title: "More Regrets",
+  summary: ""
+};
 
-export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
+export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;
 
 👋 I am Max, the technical co-founder of [Spectrum](https://spectrum.chat). Spectrum is an [open source](https://github.com/withspectrum/spectrum) chat app for large online communities and was recently acquired by GitHub. We are a team of three with a predominantly frontend and design background and have worked on it for close to two years.
 
@@ -28,7 +28,7 @@ export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
 ### Regret 2.5: We Should Have Told Our Story
 
 - Branding was good and unique
-- Brand did not have minimum viable personality https://avc.com/2011/09/minimum-viable-personality/ 
+- Brand did not have minimum viable personality https://avc.com/2011/09/minimum-viable-personality/
 - The Practical Dev (dev.to) is doing a great job at this
 
 ### Regret 3: We Did Not Iterate (Quickly) Enough

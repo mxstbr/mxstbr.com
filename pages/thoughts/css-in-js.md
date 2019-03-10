@@ -1,16 +1,17 @@
-import BlogPost from '../../components/BlogPost';
-import Browser from '../../components/BrowserDemo';
-import Lesson from '../../components/Lesson';
+import BlogPost from "../../components/BlogPost";
+import Browser from "../../components/BrowserDemo";
+import Lesson from "../../components/Lesson";
 
 export const meta = {
   published: true,
-  publishedAt: '2019-02-18',
-  title: 'Why I Write CSS in JavaScript',
-  summary: 'For three years, I have styled my web apps without any `.css` files. Instead, I have written all the CSS in JavaScript. Let me explain.',
-  image: '/static/images/css-in-js.png'
-}
+  publishedAt: "2019-02-18",
+  title: "Why I Write CSS in JavaScript",
+  summary:
+    "For three years, I have styled my web apps without any `.css` files. Instead, I have written all the CSS in JavaScript. Let me explain.",
+  image: "/static/images/css-in-js.png"
+};
 
-export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
+export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;
 
 For three years, I have styled my web apps without any `.css` files. Instead, I have written all the CSS in JavaScript.
 
@@ -23,21 +24,20 @@ Developers have created [different flavors of CSS-in-JS](https://github.com/mich
 Using it with React looks like this:
 
 ```js
-import styled from 'styled-components'
+import styled from "styled-components";
 
 const Title = styled.h1`
   color: palevioletred;
   font-size: 18px;
-`
+`;
 
-const App = () => (
-  <Title>Hello World!</Title>
-)
+const App = () => <Title>Hello World!</Title>;
 ```
 
 This renders a palevioletred `<h1>` with a font size of 18px to the DOM:
 
-<Browser html={`
+<Browser
+  html={`
   <style>
     .faEkXI {
       font-size: 18px;
@@ -45,7 +45,8 @@ This renders a palevioletred `<h1>` with a font size of 18px to the DOM:
     }
   </style>
   <h1 class="sc-ifAKCX faEkXI">Hello World!</h1>
-`}/>
+`}
+/>
 
 ### Why I like CSS-in-JS
 
@@ -88,7 +89,7 @@ I can also easily adjust the styles of my components based on different states (
 
 CSS-in-JS still offers all the important features of CSS preprocessors. All libraries support auto-prefixing, and JavaScript offers most other features like mixins (functions) and variables natively.
 
-----
+---
 
 I know what you are thinking: “Max, you can also get these benefits with other tools or strict processes or extensive training. What makes CSS-in-JS special?”
 
