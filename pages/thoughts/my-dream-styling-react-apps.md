@@ -1,13 +1,13 @@
-import BlogPost from '../../components/BlogPost';
+import BlogPost from "../../components/BlogPost";
 
 export const meta = {
   published: false,
-  publishedAt: '2019-01-17',
-  title: 'How I dream of styling my React apps',
-  summary: ''
-}
+  publishedAt: "2019-01-17",
+  title: "How I dream of styling my React apps",
+  summary: ""
+};
 
-export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
+export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;
 
 As the co-creator of styled-components I have spent the past four years thinking about styling React components. Prompted by a lot of conversations and inspirations I have a new dream.
 
@@ -16,10 +16,10 @@ It looks like this:
 ```js
 <div
   styles={{
-    flexDirection: ['column', 'row'],
+    flexDirection: ["column", "row"],
     margin: [1, 2],
     padding: 1,
-    color: 'primary'
+    color: "primary"
   }}
 />
 ```
@@ -43,7 +43,7 @@ On the other hand, the visual noise caused by dynamic interpolations is reduced 
 
 ### Prop Based
 
-Second, you'll notice that I'm passing the style object to a prop of the element. Why a prop and not the familiar `styled.x` API or a `withStyles` HOC? 
+Second, you'll notice that I'm passing the style object to a prop of the element. Why a prop and not the familiar `styled.x` API or a `withStyles` HOC?
 
 Naming is one of the hardest things about coding, and with the prop there is no need to create either class names (`.name`) or intermediate components (`Name`). All you have to name is the component you are creating, nothing more.
 
@@ -81,7 +81,7 @@ This makes it convient and quick to add responsiveness to your app. Because the 
 
 ### Bonus: Static Typing
 
-The style objects can be fully statically typed with TypeScript or Flow! 
+The style objects can be fully statically typed with TypeScript or Flow!
 
 ### Open Questions
 
@@ -92,7 +92,7 @@ The style objects can be fully statically typed with TypeScript or Flow!
 Identical to emotions `css` prop, this should be implemented as a custom `React.createElement` replacement and handle server-side rendering out of the box.
 
 All the validation should only happen in development. Since there is only simple properties, there is no need for a CSS parser either. This should have a tiny runtime bundle size (< 2kB?).
- 
+
 ### Inspiration / Further Reading
 
 - https://mrmrs.cc/writing/2018/06/18/component-styling-api by @mrmrs
@@ -105,8 +105,8 @@ All the validation should only happen in development. Since there is only simple
 
 ### Primitive properties only
 
-No media queries, pseudo selectors, pseudo elements, shorthands, or anything else. 
+No media queries, pseudo selectors, pseudo elements, shorthands, or anything else.
 
-Clarity over brevity (`margin: 1 1 2 2` vs. `{ marginTop: 1, marginBottom: 2, marginRight: 1, marginLeft: 2 }`). 
+Clarity over brevity (`margin: 1 1 2 2` vs. `{ marginTop: 1, marginBottom: 2, marginRight: 1, marginLeft: 2 }`).
 
 Need styles on interaction? Do it in JS. CSS pseudo selectors usually do not work well on mobile, and you resolve to JS.

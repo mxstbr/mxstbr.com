@@ -1,13 +1,14 @@
-import BlogPost from '../../components/BlogPost';
+import BlogPost from "../../components/BlogPost";
 
 export const meta = {
   published: false,
-  publishedAt: '2019-01-20',
-  title: 'Spectrum in Hindsight: Good Tech Decisions',
-  summary: 'Spectrum is an open source chat app for large online communities. With the benefit of hindsight after two years, here are the great technical decisions we made'
-}
+  publishedAt: "2019-01-20",
+  title: "Spectrum in Hindsight: Good Tech Decisions",
+  summary:
+    "Spectrum is an open source chat app for large online communities. With the benefit of hindsight after two years, here are the great technical decisions we made"
+};
 
-export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
+export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;
 
 ### React
 
@@ -23,11 +24,11 @@ We knew our API server would need to stay as nimble as possible, so a background
 
 ### Prettier
 
-Nothing grinds my gears like code style discussions. Prettier makes it possible to write code in whatever style you prefer, and then have it formatted to the codebase common style on commit. (lint-staged is awesome) 
+Nothing grinds my gears like code style discussions. Prettier makes it possible to write code in whatever style you prefer, and then have it formatted to the codebase common style on commit. (lint-staged is awesome)
 
 ### Static type system
 
-Using a static type system on top of JavaScript has saved us from many bugs. It seems like it should slow down your development, but in fact after a short upfront trudge you speed up and churn out code faster than before. 
+Using a static type system on top of JavaScript has saved us from many bugs. It seems like it should slow down your development, but in fact after a short upfront trudge you speed up and churn out code faster than before.
 
 There are two projects that allow you to add static types to JavaScript, both of which work equally well. We went with Flow due to it having better React support at the time, but I'm sure TypeScript would've worked too.
 

@@ -1,15 +1,15 @@
-import BlogPost from '../../components/BlogPost';
-import Paragraph from '../../components/Paragraph';
-import Browser from '../../components/BrowserDemo';
+import BlogPost from "../../components/BlogPost";
+import Paragraph from "../../components/Paragraph";
+import Browser from "../../components/BrowserDemo";
 
 export const meta = {
   published: false,
-  publishedAt: '2019-01-30',
-  title: '57% of Developers Misunderstand the Cascade in CSS',
-  summary: ''
-}
+  publishedAt: "2019-01-30",
+  title: "57% of Developers Misunderstand the Cascade in CSS",
+  summary: ""
+};
 
-export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>
+export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;
 
 57% of frontend developers misunderstand the "Cascade" in Cascading Style Sheets (CSS). Do you?
 
@@ -39,15 +39,15 @@ Possible answers:
 
 What do you think?
 
-----
+---
 
 <details>
   <Paragraph style={{ display: 'inline-block' }} as="summary">Click to see the correct answer</Paragraph>
 
-  <Paragraph>Both will be blue! Here is a live demo:</Paragraph>
+<Paragraph>Both will be blue! Here is a live demo:</Paragraph>
 
-  <Browser
-    html={`
+<Browser
+  html={`
     <style>
       .box {
         width: 50px;
@@ -76,7 +76,7 @@ What do you think?
       <div class="box blue red">2</div>
     </div>
     `}
-  />
+/>
 
 </details>
 
