@@ -18,10 +18,11 @@ export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;
 - Needed to make money, so built business features
 - Businesses were not interested, and had we focused on our core niche use case we would have grown much faster
 - Better to have 100 true fans who love the product than 10,000 barely interested users
+- Easier to raise money if necessary, more satisfying, ultimately more momentum and higher chance at success
 
 ### Regret 2: We Did Not Do Enough Marketing
 
-- Spend too much time on development and crafting the perfect experience
+- Spend too much time on building new, shiny features
 - Should have spent more time on marketing, typical engineering mistake
 - Not just social media, but also in-product growth marketing, marketing pages on the website, etc.
 
@@ -36,3 +37,10 @@ export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;
 - Had an early MVP built with minimal technology (Firebase)
 - Saw some tiny traction, thought we needed proper setup for custom functionality
 - Should have stuck with MVP setup and iterated until we felt higher traction, the custom functionality did not make the difference
+
+### Regret 4: We Did Not Talk Enough With Users
+
+- Went into a hole and built a shiny feature for months (e.g. WYSIWYG editing) without talking to users about their priorities
+- Ended up wasting valuable time and adding a lot of unnessary tech debt
+- Should have spent more time talking with our users
+- Should have opened up our roadmap and let users tell us what their priorities are
