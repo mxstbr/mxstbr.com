@@ -26,11 +26,18 @@ export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;
 - Should have spent more time on marketing, typical engineering mistake
 - Not just social media, but also in-product growth marketing, marketing pages on the website, etc.
 
-### Regret 2.5: We Did Not Tell Our Story
+### Regret 2.3: We Did Not Tell Our Story
 
 - Branding was good and unique
 - Brand did not have minimum viable personality https://avc.com/2011/09/minimum-viable-personality/
 - The Practical Dev (dev.to) is doing a great job at this
+
+### Regret 2.6: We Did Not Launch Often Enough
+
+- Launches are great for marketing, every new release excites customers
+- Shipped tons of stuff without ever announcing it
+- Missed opportunity to showcase a new feature and get more users at the same time
+- Launch early, launch often
 
 ### Regret 3: We Did Not Iterate (Quickly) Enough
 
