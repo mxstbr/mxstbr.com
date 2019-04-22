@@ -21,7 +21,7 @@ const handleLineBreaks = (text: string) =>
 
 export default ({ mention }: { mention: WebMention }) => (
   <Flex flexDirection="row" my={3}>
-    <Box width={40} mr={3}>
+    <Box width={40} mr={3} flex="0 0 auto">
       <Link href={mention.url}>
         <Image
           width={40}
