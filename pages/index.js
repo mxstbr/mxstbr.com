@@ -48,9 +48,10 @@ class Homepage extends React.Component<Props> {
         <PageHeader title="Hey, I'm Max! 👋">
           <Paragraph centered>
             I'm a JavaScript Engineer from Austria 🇦🇹 in love with React and
-            Node. I'm the technical co-founder of{" "}
-            <Link href="https://spectrum.chat">Spectrum</Link> (acquired by
-            GitHub), a platform to build communities around OSS projects.
+            Node. I am currently working on community experiences at GitHub
+            after they acquired my previous company{" "}
+            <Link href="https://spectrum.chat">Spectrum</Link>, a platform to
+            build communities around open source projects.
           </Paragraph>
           <Paragraph centered>
             If I'm not coding or{" "}
