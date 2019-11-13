@@ -61,7 +61,7 @@ class Homepage extends React.Component<Props> {
               specialty coffee geek
             </Link>
             ), exploring the world or skiing. My drug of choice? Fresh, white
-            powder. 🤙
+            powder snow. 🤙
           </Paragraph>
         </PageHeader>
         {/* Render default title */}
