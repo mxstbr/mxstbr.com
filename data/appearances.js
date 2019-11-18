@@ -409,12 +409,33 @@ const appearances: Array<Appearance> = [
     date: new Date(2015, 12)
   },
   {
+    title: "Tech Regrets at Spectrum",
+    site: "React Amsterdam",
+    type: "talk",
+    link: "https://reactsummit.com/2019/",
+    date: new Date(2019, 4, 2)
+  },
+  {
     title: "Modern React",
     site: "React Amsterdam",
     type: "workshop",
-    link: "https://react.amsterdam/workshops/",
+    link: "https://reactsummit.com/2019/workshops",
     date: new Date(2019, 4, 1)
-  }
+  },
+  {
+    title: "Modern React",
+    site: "React Day Berlin",
+    type: "workshop",
+    link: "https://reactday.berlin",
+    date: new Date(2019, 12, 4)
+  },
+  {
+    title: "Keynote",
+    site: "React Day Berlin",
+    type: "talk",
+    link: "https://reactday.berlin",
+    date: new Date(2019, 12, 6)
+  },
 ].sort((a, b) => b.date - a.date);
 
 export default appearances;
