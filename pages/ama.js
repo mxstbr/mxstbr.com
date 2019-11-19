@@ -1,35 +1,35 @@
 import React from "react";
 import styled from "styled-components";
-import { Flex } from "rebass";
-import { ThumbsUp } from "react-feather";
+import { Flex, Box } from "rebass";
+import { ThumbsUp, Twitter } from "react-feather";
+import fetch from "isomorphic-unfetch";
+import useModal from "use-react-modal";
 import PageHeader from "../components/PageHeader";
 import Paragraph from "../components/Paragraph";
 import BoxShadow from "../components/BoxShadow";
+import {
+  TextButton as Button,
+  default as NormalButton
+} from "../components/Button";
+import Card from "../components/Card";
 import Text from "../components/Text";
 import { ListDivider } from "../components/Lists";
 import { H3 } from "../components/Heading";
 
-const questions = [
-  {
-    content:
-      "GitHub or GitLab ? Which one for which usage ? What do you advise for innersource purposes ?",
-    author: "brian_lovin",
-    votes: ["mxstbr", "brian_lovin"]
-  },
-  {
-    content:
-      "You do a lot of different things. Would you have some tips to share with us in Time Management?",
-    author: "brian_lovin",
-    votes: ["brian_lovin"]
-  }
-];
-
-const Avatar = styled.img`
+const Avatar = styled.img.attrs(props => ({
+  src: `https://avatars.io/twitter/${props.user}`
+}))`
   height: 50px;
   border-radius: 50%;
+
+  ${props =>
+    props.currentUser === props.user &&
+    `
+    box-shadow: 0px 0px 0px 2px white, 0px 0px 0px 4px #3867d6;
+  `}
 `;
 
-const UpvoteButton = styled(BoxShadow).attrs({
+const UpvoteButton = styled(Box).attrs({
   as: "button",
   p: 2
 })`
@@ -37,15 +37,25 @@ const UpvoteButton = styled(BoxShadow).attrs({
   justify-content: center;
   flex-direction: column;
   align-self: center;
-  background-color: white;
-  border: none;
+  background-color: transparent;
+  border: 1px solid ${props => props.borderColor};
   border-radius: 3px;
+  color: ${props => props.theme.colors.black};
 `;
 
-const QuestionInput = styled(BoxShadow).attrs({
+const QuestionInputRules = styled(Text).attrs({
+  fontSize: 0,
+  px: 3,
+  pb: 2
+})`
+  display: none;
+  color: #999;
+`;
+
+const QuestionInput = styled(Box).attrs({
   as: "input",
   p: 3,
-  mb: 5
+  pr: 0
 })`
   width: 100%;
   border-radius: 3px;
@@ -53,78 +63,302 @@ const QuestionInput = styled(BoxShadow).attrs({
   background-color: white;
   outline: none;
   font-size: 16px;
+
+  &:focus ~ ${QuestionInputRules} {
+    display: block;
+  }
 `;
 
-const currentUser = "mxstbr";
+const QuestionWrapper = styled(Flex).attrs({
+  py: 3
+})`
+  border-bottom: 1px solid #eee;
+  justify-content: space-between;
 
-const Question = ({ question }) => (
-  <Flex mb={4}>
-    <Avatar src={`https://avatars.io/twitter/${question.author}`} />
-    <Flex flexDirection="column" ml={2} mr={3}>
-      <Text fontSize={2} mb={1}>
-        <strong>@{question.author}</strong> asks...
-      </Text>
-      <Paragraph fontSize={2} mb={0}>
-        {question.content}
-      </Paragraph>
-    </Flex>
-    <UpvoteButton>
-      <ThumbsUp
-        stroke={
-          question.votes.indexOf(currentUser) > -1 ? "#3867d6" : "currentColor"
-        }
-      />
-      <Text
-        fontSize={1}
-        fontWeight={
-          question.votes.indexOf(currentUser) > -1 ? "bold" : "normal"
-        }
-        mt={1}
-        color={question.votes.indexOf(currentUser) > -1 ? "#3867d6" : "#333"}
+  &:last-of-type {
+    border-bottom: none;
+  }
+`;
+
+const Question = ({ question, currentUser, openModal, onUpvote }) => {
+  const viewerHasVoted = question.votes.find(
+    ({ user }) => user === currentUser
+  );
+  return (
+    <QuestionWrapper>
+      <Flex>
+        <Avatar user={question.user} currentUser={currentUser} />
+        <Flex flexDirection="column" ml={3} mr={3}>
+          <Text fontSize={2} mb={1}>
+            <strong>@{question.user}</strong>
+          </Text>
+          <Paragraph fontSize={2} mb={0}>
+            {question.content}
+          </Paragraph>
+        </Flex>
+      </Flex>
+      <UpvoteButton
+        onClick={evt => {
+          if (!currentUser) {
+            openModal(evt);
+            return;
+          }
+
+          fetch(`http://localhost:3000/api/questions/vote`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              questionId: question.id
+            })
+          });
+          onUpvote && onUpvote();
+        }}
+        borderColor={viewerHasVoted ? "#3867d6" : "#eee"}
       >
-        {question.votes.length}
-      </Text>
-    </UpvoteButton>
-  </Flex>
-);
+        <ThumbsUp size="1.75em" stroke={viewerHasVoted ? "#3867d6" : "#666"} />
+        <Text
+          fontSize={1}
+          fontWeight={viewerHasVoted ? "bold" : "normal"}
+          color={viewerHasVoted ? "#3867d6" : "#666"}
+        >
+          {question.votes_aggregate.aggregate.count}
+        </Text>
+      </UpvoteButton>
+    </QuestionWrapper>
+  );
+};
 
-export default () => {
+let optimisticId = 0;
+const AMA = ({ questions: onlineQuestions, currentUser }) => {
+  const [questions, setQuestions] = React.useState(onlineQuestions);
   const [value, setValue] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+  const { isOpen, openModal, closeModal, Modal } = useModal({
+    background: "rgba(0, 0, 0, 0.85)"
+  });
 
   return (
     <>
-      <PageHeader title="Ask Me Anything Podcast">
+      {isOpen && (
+        <Modal>
+          <Card
+            hover={false}
+            css={{ maxWidth: "550px" }}
+            width={["98vw", "100vw"]}
+            mx={[2, 0]}
+          >
+            <Card.Title>Sign in</Card.Title>
+            <Card.Body mb={[2, 3]}>
+              Sign in to ask and upvote questions.
+              <Box mt={3} />
+              <Box
+                as="a"
+                p={2}
+                css={{
+                  background: "#1da1f2",
+                  color: "white",
+                  display: "inline-block",
+                  borderRadius: "3px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  textDecoration: "none",
+                  "& svg": {
+                    marginRight: "8px"
+                  }
+                }}
+                href="/api/auth/twitter"
+              >
+                <Twitter size="1em" fill="currentColor" stroke="currentColor" />
+                Sign in with Twitter
+              </Box>
+            </Card.Body>
+            <Card.FinePrint>
+              No data apart from your username, questions and votes will be
+              stored.
+            </Card.FinePrint>
+          </Card>
+        </Modal>
+      )}
+      <PageHeader title="Ask Max Anything Podcast">
         <Paragraph centered>
-          I record a <a href="#">weekly podcast</a> where I answer the most
-          upvoted questions from this page. Feel free to submit new ones or vote
-          on existing ones!
+          I record a weekly podcast where I answer the most upvoted question
+          from this page.{" "}
+          <a href="https://anchor.fm/mxstbr" target="_blank">
+            Subscribe in your favorite podcast player
+          </a>
+          , ask me anything you want to know and upvote the questions you would
+          like the answer to!
         </Paragraph>
       </PageHeader>
-      <Flex backgroundColor="white">
-        <QuestionInput
-          value={value}
-          onChange={evt => setValue(evt.target.value)}
-          placeholder="Ask a question..."
-          autoFocus
-        />
+      <Flex>
+        {currentUser && <Avatar user={currentUser} currentUser={currentUser} />}
+        <BoxShadow as={Flex} mb={3} ml={currentUser ? 3 : 0} width={1}>
+          <Flex
+            as="form"
+            width={1}
+            css={{
+              background: "white",
+              alignItems: "center",
+              borderRadius: "3px"
+            }}
+            onSubmit={evt => {
+              evt.preventDefault();
+              if (loading || value.trim() === "" || !currentUser) return;
+
+              setLoading(true);
+              fetch(`http://localhost:3000/api/questions/ask`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                  content: value.trim()
+                })
+              })
+                .then(res => {
+                  if (res.ok) {
+                    setQuestions([
+                      ...questions,
+                      {
+                        id: optimisticId++,
+                        user: currentUser,
+                        content: value.trim(),
+                        votes: [{ user: currentUser }],
+                        answered_in_episode: null,
+                        votes_aggregate: {
+                          aggregate: {
+                            count: 1
+                          }
+                        }
+                      }
+                    ]);
+                    setValue("");
+                    setLoading(false);
+                  }
+                })
+                .catch(err => {
+                  setLoading(false);
+                });
+            }}
+          >
+            <Box width={1}>
+              <QuestionInput
+                value={value}
+                disabled={!currentUser}
+                onClick={evt => {
+                  if (currentUser) return;
+
+                  openModal(evt);
+                }}
+                onChange={evt => setValue(evt.target.value)}
+                placeholder="Ask a question..."
+                autoFocus={currentUser}
+                disabled={loading}
+              />
+              <QuestionInputRules>
+                280 characters per question · 5 questions max
+              </QuestionInputRules>
+            </Box>
+            <Button type="submit" disabled={loading} p={3}>
+              {loading ? "Submitting..." : "Submit"}
+            </Button>
+          </Flex>
+        </BoxShadow>
       </Flex>
-      {questions
-        .filter(question => question.answered !== true)
-        .sort((a, b) => b.votes.length - a.votes.length)
-        .map(question => (
-          <Question question={question} />
-        ))}
       <ListDivider>
-        <H3 mr={3} mt={2} mb={2}>
+        <H3 mr={3} mt={2} mb={3}>
+          New
+        </H3>
+      </ListDivider>
+      <Card px={3} mb={4} hover={false}>
+        {questions
+          .filter(question => !question.answered_in_episode)
+          .sort(
+            (a, b) =>
+              b.votes_aggregate.aggregate.count -
+              a.votes_aggregate.aggregate.count
+          )
+          .map(question => (
+            <Question
+              key={question.id}
+              question={question}
+              currentUser={currentUser}
+              openModal={openModal}
+              onUpvote={() => {
+                setQuestions(
+                  questions.map(q => {
+                    if (q.id !== question.id) return q;
+
+                    const viewerHasVoted = q.votes.find(
+                      ({ user }) => user === currentUser
+                    );
+                    return {
+                      ...q,
+                      votes: [...q.votes, { user: currentUser }],
+                      votes_aggregate: {
+                        ...q.votes_aggregate,
+                        aggregate: {
+                          ...q.votes_aggregate.aggregate,
+                          count: viewerHasVoted
+                            ? q.votes_aggregate.aggregate.count - 1
+                            : q.votes_aggregate.aggregate.count + 1
+                        }
+                      }
+                    };
+                  })
+                );
+              }}
+            />
+          ))}
+      </Card>
+      <ListDivider>
+        <H3 mr={3} mt={2} mb={3}>
           Answered
         </H3>
       </ListDivider>
-      {questions
-        .filter(question => question.answered === true)
-        .sort((a, b) => b.votes.length - a.votes.length)
-        .map(question => (
-          <Question question={question} />
-        ))}
+      <Card px={3} mb={4} hover={false}>
+        {questions
+          .filter(question => question.answered_in_episode)
+          .sort(
+            (a, b) =>
+              b.votes_aggregate.aggregate.count -
+              a.votes_aggregate.aggregate.count
+          )
+          .map(question => (
+            <Question
+              key={question.id}
+              question={question}
+              currentUser={currentUser}
+              openModal={openModal}
+            />
+          ))}
+      </Card>
     </>
   );
 };
+
+AMA.getInitialProps = async ({ req }) => {
+  const [questions, currentUser] = await Promise.all([
+    fetch(`http://localhost:3000/api/questions`, {
+      withCredentials: true,
+      headers: {
+        cookie: req && req.headers && req.headers.cookie
+      }
+    }).then(res => res.json()),
+    fetch("http://localhost:3000/api/user", {
+      withCredentials: true,
+      headers: {
+        cookie: req && req.headers && req.headers.cookie
+      }
+    }).then(res => res.text())
+  ]);
+
+  return {
+    questions,
+    currentUser
+  };
+};
+
+export default AMA;

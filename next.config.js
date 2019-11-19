@@ -1,5 +1,6 @@
 // $FlowIssue this is what mapbox/rehype-prism uses under the hood
 const refract = require("refractor");
+require("dotenv").config();
 
 // NOTE: This highlights template-strings as strings of CSS
 const styledHighlight = {
@@ -76,5 +77,8 @@ module.exports = withMDX({
       use: "raw-loader"
     });
     return config;
+  },
+  env: {
+    HASURA_ADMIN_SECRET: process.env.HASURA_ADMIN_SECRET
   }
 });

@@ -12,6 +12,8 @@ export const TextButton = styled(Box).attrs(props => ({
   color: ${props => props.theme.colors.primary};
   letter-spacing: 0.03em;
   font-weight: bold;
+  background: transparent;
+  border: none;
 `;
 
 const Button = styled(Box).attrs(props => ({

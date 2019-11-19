@@ -4,20 +4,26 @@
   "regions": ["all"],
   "builds": [
     {
-      "src": "package.json",
-      "use": "@now/static-build",
-      "config": { "distDir": "out" }
+      "src": "next.config.js",
+      "use": "@now/next"
     }
   ],
+  "env": {
+    "HASURA_ADMIN_SECRET": "@hasura-admin-secret",
+    "SESSION_SECRET": "@session-secret",
+    "TWITTER_CONSUMER_KEY": "@twitter-consumer-key",
+    "TWITTER_CONSUMER_SECRET": "@twitter-consumer-secret",
+    "BUTTONDOWN_API_KEY": "@buttondown-api-key"
+  },
   "routes": [ 
     {
       "src": "^(/static/.*)",
       "dest": "$1"
     },
     {
-      "src": "/(.*[^/])$",
+      "src": "/(.*)/$",
       "status": 301,
-      "headers": { "Location": "/$1/" }
+      "headers": { "Location": "/$1" }
     }
   ]
 }

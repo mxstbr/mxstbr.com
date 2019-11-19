@@ -37,7 +37,7 @@ const Handle = styled.span`
 `;
 
 const Logo = () => (
-  <LogoLink prefetch href="/">
+  <LogoLink href="/">
     <Flex
       flexDirection="column"
       justifyContent="center"
