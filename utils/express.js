@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const session = require("cookie-session");
 const bodyParser = require("body-parser");
@@ -12,6 +13,7 @@ if (!process.env.SESSION_SECRET)
 export default () => {
   const app = express();
   app.set("trust proxy", 1);
+  app.use(cors());
   app.use(cookieParser());
   app.use(
     session({

@@ -1,5 +1,7 @@
+const fetch = require("isomorphic-unfetch");
 const passport = require("passport");
 const TwitterStrategy = require("passport-twitter").Strategy;
+const { URL } = require("./constants");
 
 passport.serializeUser(function(user, done) {
   done(null, user);
@@ -13,7 +15,7 @@ passport.use(
     {
       consumerKey: process.env.TWITTER_CONSUMER_KEY,
       consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
-      callbackURL: "http://localhost:3000/api/auth/twitter/callback",
+      callbackURL: `${URL}/api/auth/twitter/callback`,
       includeEmail: true
     },
     (token, tokenSecret, profile, done) => {

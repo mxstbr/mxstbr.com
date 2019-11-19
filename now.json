@@ -9,7 +9,7 @@
     }
   ],
   "env": {
-    "HASURA_ADMIN_SECRET": "@hasura-admin-secret",
+    "HASURA_ADMIN_SECRET": "@hasura-secret",
     "SESSION_SECRET": "@session-secret",
     "TWITTER_CONSUMER_KEY": "@twitter-consumer-key",
     "TWITTER_CONSUMER_SECRET": "@twitter-consumer-secret",
@@ -18,6 +18,10 @@
   "routes": [ 
     {
       "src": "^(/static/.*)",
+      "dest": "$1"
+    },
+    {
+      "src": "^(/api/.*)",
       "dest": "$1"
     },
     {

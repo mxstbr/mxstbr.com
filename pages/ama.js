@@ -15,6 +15,7 @@ import Card from "../components/Card";
 import Text from "../components/Text";
 import { ListDivider } from "../components/Lists";
 import { H3 } from "../components/Heading";
+import { URL } from "../utils/constants";
 
 const Avatar = styled.img.attrs(props => ({
   src: `https://avatars.io/twitter/${props.user}`
@@ -104,7 +105,7 @@ const Question = ({ question, currentUser, openModal, onUpvote }) => {
             return;
           }
 
-          fetch(`http://localhost:3000/api/questions/vote`, {
+          fetch(`${URL}/api/questions/vote`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
@@ -181,7 +182,11 @@ const AMA = ({ questions: onlineQuestions, currentUser }) => {
           </Card>
         </Modal>
       )}
-      <PageHeader title="Ask Max Anything Podcast">
+      <PageHeader
+        title="Ask Max Anything Podcast"
+        describe="Upvote and ask questions for @mxstbr to answer in a future episode of the Ask Max Anything podcast."
+        image="/static/images/ama.png"
+      >
         <Paragraph centered>
           I record a weekly podcast where I answer the most upvoted question
           from this page.{" "}
@@ -208,7 +213,7 @@ const AMA = ({ questions: onlineQuestions, currentUser }) => {
               if (loading || value.trim() === "" || !currentUser) return;
 
               setLoading(true);
-              fetch(`http://localhost:3000/api/questions/ask`, {
+              fetch(`${URL}/api/questions/ask`, {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json"
@@ -341,13 +346,13 @@ const AMA = ({ questions: onlineQuestions, currentUser }) => {
 
 AMA.getInitialProps = async ({ req }) => {
   const [questions, currentUser] = await Promise.all([
-    fetch(`http://localhost:3000/api/questions`, {
+    fetch(`${URL}/api/questions`, {
       withCredentials: true,
       headers: {
         cookie: req && req.headers && req.headers.cookie
       }
     }).then(res => res.json()),
-    fetch("http://localhost:3000/api/user", {
+    fetch(`${URL}/api/user`, {
       withCredentials: true,
       headers: {
         cookie: req && req.headers && req.headers.cookie
