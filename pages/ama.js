@@ -17,6 +17,34 @@ import { ListDivider } from "../components/Lists";
 import { H3 } from "../components/Heading";
 import { URL } from "../utils/constants";
 
+const PodcastIconImage = styled.img`
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+`;
+
+const PodcastIcon = props => (
+  <Box>
+    <PodcastIconImage {...props} />
+  </Box>
+);
+
+const SubscriptionOption = ({ href, name, icon }) => (
+  <Flex
+    flexDirection="column"
+    alignItems="center"
+    as="a"
+    target="_blank"
+    href={href}
+    css={{ textDecoration: "none" }}
+  >
+    <PodcastIcon src={icon} />
+    <Text mt={1} fontSize={0} color="tertiary">
+      {name}
+    </Text>
+  </Flex>
+);
+
 const Avatar = styled.img.attrs(props => ({
   src: `https://avatars.io/twitter/${props.user}`
 }))`
@@ -184,18 +212,44 @@ const AMA = ({ questions: onlineQuestions, currentUser }) => {
       )}
       <PageHeader
         title="Ask Max Anything Podcast"
-        describe="Upvote and ask questions for @mxstbr to answer in a future episode of the Ask Max Anything podcast."
+        description="Upvote and ask questions for @mxstbr to answer in a future episode of the Ask Max Anything podcast."
         image="/static/images/ama.png"
       >
-        <Paragraph centered>
-          I record a weekly podcast where I answer the most upvoted question
-          from this page.{" "}
-          <a href="https://anchor.fm/mxstbr" target="_blank">
-            Subscribe in your favorite podcast player
-          </a>
-          , ask me anything you want to know and upvote the questions you would
-          like the answer to!
-        </Paragraph>
+        <>
+          <Paragraph centered>
+            I record a weekly podcast where I answer the most upvoted question
+            from this page. Ask me anything you want to know, upvote the
+            questions you would like the answer to and subscribe in your
+            favorite podcast player!
+          </Paragraph>
+          <Flex mt={2} justifyContent="space-around">
+            <SubscriptionOption
+              href="https://podcasts.apple.com/fr/podcast/ask-max-anything/id1488813808?l=en"
+              icon="https://spec.fm/static/img/subscription_icons/podcasts.png"
+              name="Apple"
+            />
+            <SubscriptionOption
+              href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9hbmNob3IuZm0vcy8xMDZlOGY0Yy9wb2RjYXN0L3Jzcw=="
+              icon="https://spec.fm/static/img/subscription_icons/google-podcasts.png"
+              name="Google"
+            />
+            <SubscriptionOption
+              href="https://open.spotify.com/show/0CLRm2SV5shH3EyB1KOJl4"
+              icon="/static/images/spotify.png"
+              name="Spotify"
+            />
+            <SubscriptionOption
+              href="https://pca.st/s00vpw8t"
+              icon="https://spec.fm/static/img/subscription_icons/pocketcasts.png"
+              name="Pocket Casts"
+            />
+            <SubscriptionOption
+              href="https://anchor.fm/s/106e8f4c/podcast/rss"
+              icon="https://spec.fm/static/img/subscription_icons/rss.png"
+              name="RSS"
+            />
+          </Flex>
+        </>
       </PageHeader>
       <Flex>
         {currentUser && <Avatar user={currentUser} currentUser={currentUser} />}
