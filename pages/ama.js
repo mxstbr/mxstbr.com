@@ -37,10 +37,11 @@ const SubscriptionOption = ({ href, name, icon }) => (
     as="a"
     target="_blank"
     href={href}
+    flex="1"
     css={{ textDecoration: "none" }}
   >
     <PodcastIcon src={icon} />
-    <Text mt={1} fontSize={0} color="tertiary">
+    <Text mt={1} fontSize={0} color="tertiary" textAlign="center">
       {name}
     </Text>
   </Flex>
@@ -243,10 +244,10 @@ const AMA = ({ questions: onlineQuestions, currentUser }) => {
           <Paragraph centered>
             I record a weekly podcast where I answer the most upvoted question
             from this page. Ask me anything you want to know, upvote the
-            questions you would like the answer to and subscribe in your
-            favorite podcast player!
+            questions you would like the answer to and{" "}
+            <strong>subscribe in your favorite podcast player</strong>:
           </Paragraph>
-          <Flex mt={2} justifyContent="space-around">
+          <Flex mt={2} justifyContent="space-between">
             <SubscriptionOption
               href="https://podcasts.apple.com/fr/podcast/ask-max-anything/id1488813808?l=en"
               icon="https://spec.fm/static/img/subscription_icons/podcasts.png"
@@ -266,6 +267,16 @@ const AMA = ({ questions: onlineQuestions, currentUser }) => {
               href="https://pca.st/s00vpw8t"
               icon="https://spec.fm/static/img/subscription_icons/pocketcasts.png"
               name="Pocket Casts"
+            />
+            <SubscriptionOption
+              href="https://overcast.fm/itunes1488813808/ask-max-anything"
+              icon="https://spec.fm/static/img/subscription_icons/overcast.png"
+              name="Overcast"
+            />
+            <SubscriptionOption
+              href="https://www.breaker.audio/ask-max-anything"
+              icon="https://spec.fm/static/img/subscription_icons/breaker.png"
+              name="Breaker"
             />
             <SubscriptionOption
               href="https://anchor.fm/s/106e8f4c/podcast/rss"
