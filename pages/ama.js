@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { Flex, Box } from "rebass";
-import { ThumbsUp, Twitter } from "react-feather";
+import { ThumbsUp, Twitter, ExternalLink, Headphones } from "react-feather";
 import fetch from "isomorphic-unfetch";
 import useModal from "use-react-modal";
 import PageHeader from "../components/PageHeader";
@@ -13,6 +13,7 @@ import {
 } from "../components/Button";
 import Card from "../components/Card";
 import Text from "../components/Text";
+import Link from "../components/Link";
 import { ListDivider } from "../components/Lists";
 import { H3 } from "../components/Heading";
 import { URL } from "../utils/constants";
@@ -70,6 +71,7 @@ const UpvoteButton = styled(Box).attrs({
   border: 1px solid ${props => props.borderColor};
   border-radius: 3px;
   color: ${props => props.theme.colors.black};
+  cursor: pointer;
 `;
 
 const QuestionInputRules = styled(Text).attrs({
@@ -103,6 +105,7 @@ const QuestionWrapper = styled(Flex).attrs({
 })`
   border-bottom: 1px solid #eee;
   justify-content: space-between;
+  position: relative;
 
   &:last-of-type {
     border-bottom: none;
@@ -115,6 +118,10 @@ const Question = ({ question, currentUser, openModal, onUpvote }) => {
   );
   return (
     <QuestionWrapper>
+      <Box
+        id={`q${question.id}`}
+        css={{ position: "absolute", top: "-80px", left: 0 }}
+      />
       <Flex>
         <Avatar user={question.user} currentUser={currentUser} />
         <Flex flexDirection="column" ml={3} mr={3}>
@@ -124,6 +131,22 @@ const Question = ({ question, currentUser, openModal, onUpvote }) => {
           <Paragraph fontSize={2} mb={0}>
             {question.content}
           </Paragraph>
+          {question.answered_in_episode && (
+            <Text
+              as={Link}
+              mt={2}
+              href={question.answered_in_episode}
+              color="#3867d6!important"
+              fontSize={2}
+            >
+              Listen to the answer{" "}
+              <Box
+                as={Headphones}
+                size="1em"
+                css={{ verticalAlign: "bottom" }}
+              />
+            </Text>
+          )}
         </Flex>
       </Flex>
       <UpvoteButton
@@ -144,6 +167,7 @@ const Question = ({ question, currentUser, openModal, onUpvote }) => {
           });
           onUpvote && onUpvote();
         }}
+        disabled={!!question.answered_in_episode}
         borderColor={viewerHasVoted ? "#3867d6" : "#eee"}
       >
         <ThumbsUp size="1.75em" stroke={viewerHasVoted ? "#3867d6" : "#666"} />
@@ -328,6 +352,28 @@ const AMA = ({ questions: onlineQuestions, currentUser }) => {
       </Flex>
       <ListDivider>
         <H3 mr={3} mt={2} mb={3}>
+          Answered
+        </H3>
+      </ListDivider>
+      <Card px={3} mb={4} hover={false}>
+        {questions
+          .filter(question => question.answered_in_episode)
+          .sort(
+            (a, b) =>
+              b.votes_aggregate.aggregate.count -
+              a.votes_aggregate.aggregate.count
+          )
+          .map(question => (
+            <Question
+              key={question.id}
+              question={question}
+              currentUser={currentUser}
+              openModal={openModal}
+            />
+          ))}
+      </Card>
+      <ListDivider>
+        <H3 mr={3} mt={2} mb={3}>
           New
         </H3>
       </ListDivider>
@@ -369,28 +415,6 @@ const AMA = ({ questions: onlineQuestions, currentUser }) => {
                   })
                 );
               }}
-            />
-          ))}
-      </Card>
-      <ListDivider>
-        <H3 mr={3} mt={2} mb={3}>
-          Answered
-        </H3>
-      </ListDivider>
-      <Card px={3} mb={4} hover={false}>
-        {questions
-          .filter(question => question.answered_in_episode)
-          .sort(
-            (a, b) =>
-              b.votes_aggregate.aggregate.count -
-              a.votes_aggregate.aggregate.count
-          )
-          .map(question => (
-            <Question
-              key={question.id}
-              question={question}
-              currentUser={currentUser}
-              openModal={openModal}
             />
           ))}
       </Card>
