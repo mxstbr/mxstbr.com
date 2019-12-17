@@ -1,5 +1,5 @@
 import React from "react";
-import App, { Container } from "next/app";
+import App from "next/app";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
 import reset from "styled-reset";
 import { Box } from "rebass";
@@ -72,37 +72,32 @@ const DEFAULT_DESCRIPTION =
   "Creator of styled-components, react-boilerplate, micro-analytics and dozens of other open source projects in the React and Node ecosystems. Probably brewing specialty coffee beverages, travelling around the world or skiing double black diamond ◆◆ slopes right now.";
 const DEFAULT_IMAGE = "/static/images/social_media.png";
 
-class MyApp extends App {
-  render() {
-    const { Component, pageProps } = this.props;
-    return (
-      <Container>
-        <ThemeProvider theme={theme}>
-          <MDXProvider components={components}>
-            <>
-              <Nav />
-              <Head
-                title={DEFAULT_TITLE}
-                description={DEFAULT_DESCRIPTION}
-                image={DEFAULT_IMAGE}
-              />
-              <Layout
-                pt={[`${NAV_HEIGHT}px`, `${NAV_HEIGHT / 2}px`]}
-                css={{
-                  paddingLeft: "8px",
-                  paddingRight: "8px"
-                }}
-              >
-                <GlobalStyle />
-                <Component {...pageProps} />
-              </Layout>
-              <Footer />
-            </>
-          </MDXProvider>
-        </ThemeProvider>
-      </Container>
-    );
-  }
+function MyApp({ Component, pageProps }) {
+  return (
+    <ThemeProvider theme={theme}>
+      <MDXProvider components={components}>
+        <>
+          <Nav />
+          <Head
+            title={DEFAULT_TITLE}
+            description={DEFAULT_DESCRIPTION}
+            image={DEFAULT_IMAGE}
+          />
+          <Layout
+            pt={[`${NAV_HEIGHT}px`, `${NAV_HEIGHT / 2}px`]}
+            css={{
+              paddingLeft: "8px",
+              paddingRight: "8px"
+            }}
+          >
+            <GlobalStyle />
+            <Component {...pageProps} />
+          </Layout>
+          <Footer />
+        </>
+      </MDXProvider>
+    </ThemeProvider>
+  );
 }
 
 export default withGA("UA-49258834-4", Router)(MyApp);

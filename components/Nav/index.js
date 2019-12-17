@@ -28,7 +28,7 @@ const NavItem = withRouter(styled(props => {
   const active = props.router.pathname.indexOf(props.href) === 0;
   return (
     <Box mr={4} className={props.className}>
-      <Link itemProp="url" prefetch href={props.href}>
+      <Link itemProp="url" href={props.href}>
         <Text
           color={active ? "text" : "#666"}
           fontWeight={active ? "bold" : "normal"}
@@ -47,7 +47,7 @@ const NavItem = withRouter(styled(props => {
 
 const MobileNavItem = props => (
   <Box p={3} onClick={props.onClick}>
-    <Link prefetch href={props.href}>
+    <Link href={props.href}>
       <Text color="#333" as="div" fontSize={4} fontWeight="bold">
         {props.title}
       </Text>

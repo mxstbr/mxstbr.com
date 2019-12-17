@@ -1,19 +1,7 @@
 {
   "version": 2,
   "alias": "mxstbr.com",
-  "regions": ["all"],
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@now/static-build",
-      "config": { "distDir": "out" }
-    }
-  ],
   "routes": [ 
-    {
-      "src": "^(/static/.*)",
-      "dest": "$1"
-    },
     {
       "src": "/(.*[^/])$",
       "status": 301,
