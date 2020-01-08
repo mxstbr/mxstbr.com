@@ -72,7 +72,7 @@ export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;
 ### Regret 4: We Did Not Talk Enough With Users
 
 - Went into a hole and built a shiny feature for months (e.g. WYSIWYG editing) without talking to users about their priorities
-- Ended up wasting valuable time and adding a lot of unnessary tech debt
+- Ended up wasting valuable time and adding a lot of unnecessary tech debt
 
 <Lesson 
   title="Lesson 5"
