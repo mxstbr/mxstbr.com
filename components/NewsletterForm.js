@@ -23,7 +23,7 @@ const EmailInput = styled(Box).attrs({
 const NewsletterForm = () => (
   <Flex
     mx={[3, 4]}
-    mb={[3, 4]}
+    pb={[3, 4]}
     mt={2}
     as="form"
     action="https://buttondown.email/api/emails/embed-subscribe/mxstbr"
