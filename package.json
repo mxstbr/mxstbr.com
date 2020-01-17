@@ -32,6 +32,7 @@
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
     "react-feather": "^1.1.6",
+    "react-twitter-embed": "^3.0.3",
     "rebass": "^3.0.0-9",
     "slugg": "^1.2.1",
     "styled-components": "^4.4.1",
