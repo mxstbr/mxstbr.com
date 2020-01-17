@@ -21,6 +21,6 @@ I think Blocks is one of the most exciting developments in the React ecosystem r
   tweetId="1199384410199449600"
 />
 
-This has wide reaching implications for the design and development process. Rather than handing off static drawings to developers, designers can visually edit code to "design" new pages. Instead of uploading images to Dropbox they can submit pull requests with their new "designs".
+This has wide reaching implications for the design and development process. Rather than drawing a bunch of rectangles, designers can visually edit code to design new pages. Instead of handing off static images, they can submit pull requests with their new designs.
 
-A couple of years from now, visual editors will be standard in web development. Everybody will be using them. However, there is a lot of work left to make them great and I can't wait to be a part of that!
+A couple of years from now, visual editors will be standard in web development. Everybody will be using them. However, there is a lot of work left to make them great and I cannot wait to be a part of that!
