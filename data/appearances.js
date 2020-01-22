@@ -436,6 +436,20 @@ const appearances: Array<Appearance> = [
     link: "https://reactday.berlin",
     date: new Date(2019, 11, 6)
   },
+  {
+    title: "The past, present and future of CSS-in-JS",
+    site: "Agent Conf",
+    type: "talk",
+    link: "https://agent.sh",
+    date: new Date(2020, 0, 22)
+  },
+  {
+    title: "Keynote",
+    site: "React Conf Australia",
+    type: "talk",
+    link: "https://reactconfau.com",
+    date: new Date(2020, 1, 27)
+  }
 ].sort((a, b) => b.date - a.date);
 
 export default appearances;
