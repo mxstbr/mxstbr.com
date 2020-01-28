@@ -7,7 +7,7 @@ export const meta = {
   publishedAt: "2020-01-31",
   title: "I am joining Gatsby",
   summary:
-    "I am joining Gatsby to work on Blocks, the visual editor for React apps, as well as theme-ui and Gatsby themes! 🎉",
+    "I am joining Gatsby to work on Blocks, the visual editor for React apps, as well as theme-ui, MDX and Gatsby themes! 🎉",
   image: "/static/images/gatsby.png"
 };
 
