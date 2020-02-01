@@ -79,11 +79,11 @@ export default (props: {}) => (
           >
             Follow me on Twitter
           </FooterListItem>
-          <FooterListItem Icon={Camera} href="https://unsplash.com/@mxstbr">
-            See my photos on Unsplash
+          <FooterListItem Icon={Camera} href="https://instagram.com/mxstbr">
+            See my stories on Instagram
           </FooterListItem>
           <FooterListItem Icon={Rss} href="https://mxstbr.com/feed.json">
-            Follow the RSS feed
+            Subscribe to the RSS feed
           </FooterListItem>
         </FooterColumn>
       </Flex>
