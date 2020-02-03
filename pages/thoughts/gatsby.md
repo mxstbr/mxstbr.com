@@ -7,13 +7,13 @@ export const meta = {
   publishedAt: "2020-01-31",
   title: "I am joining Gatsby",
   summary:
-    "I am joining Gatsby to work on Blocks, the visual editor for React apps, as well as theme-ui, MDX and Gatsby themes! 🎉",
+    "I am joining Gatsby to work on open source R&D projects including Blocks, the visual editor for React apps, theme-ui, mdx and Gatsby themes! 🎉",
   image: "/static/images/gatsby.png"
 };
 
 export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;
 
-The cat is out of the bag: I am joining [Gatsby](https://gatsbyjs.com) to work on [Blocks](https://blocks-ui.com), theme-ui, MDX and Gatsby themes!
+The cat is out of the bag: I am joining [Gatsby](https://gatsbyjs.com) to work on open source R&D projects, including [Blocks](https://blocks-ui.com), [theme-ui](https://theme-ui.com), [mdx](https://mdxjs.com) and Gatsby themes!
 
 I think Blocks is one of the most exciting open source projects in the React ecosystem right now. Blocks is a visual editor for your React apps: it renders a page of your app and lets you drag-and-drop components to edit the actual underlying code. 🤯
 
