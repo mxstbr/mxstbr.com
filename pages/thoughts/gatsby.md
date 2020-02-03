@@ -3,8 +3,8 @@ import Browser from "../../components/BrowserDemo";
 import { TwitterTweetEmbed } from "react-twitter-embed";
 
 export const meta = {
-  published: false,
-  publishedAt: "2020-01-31",
+  published: true,
+  publishedAt: "2020-02-03",
   title: "I am joining Gatsby",
   summary:
     "I am joining Gatsby to work on open source R&D projects including Blocks, the visual editor for React apps, theme-ui, mdx and Gatsby themes! 🎉",
