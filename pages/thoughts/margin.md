@@ -25,7 +25,7 @@ By banning margin from all components you have to build more reusable and encaps
 
 ### Spacer components
 
-Instead of margin I recommend you use spacer components. For example, [Seek's design system](https://seek-oss.github.io/braid-design-system) popularized the `Stack` component:
+Instead of margin I recommend you use spacer components. For example, Seek's design system popularized the [`Stack` component](https://seek-oss.github.io/braid-design-system/components/Stack):
 
 ```jsx
 <Stack space={3}>
