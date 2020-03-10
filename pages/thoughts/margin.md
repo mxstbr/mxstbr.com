@@ -23,7 +23,7 @@ Margin conflicts with how designers think. Designers think about space in relati
 
 By banning margin from all components you have to build more reusable and encapsuled components.
 
-### Spacer components
+### Moving responsibility
 
 Instead of margin I recommend you use spacer components. For example, Seek's design system popularized the [`Stack` component](https://seek-oss.github.io/braid-design-system/components/Stack):
 
@@ -39,7 +39,7 @@ Using spacer components has other implications that are not obvious _a priori_.
 
 Spacer components (such as `Stack` above) can restrict spacing values to steps on a scale. That way, all spacing aligns to the grid.
 
-By using spacer components, you specify the space between components in a specific instance. You have to define space in relation and context.
+Spacer components move the responsibility of managing whitespace to the parent. You specify the space between components in a specific instance. You have to define space in relation and context.
 
 Who else thinks about space in relation and context? Designers.
 
