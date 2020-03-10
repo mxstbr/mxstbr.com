@@ -35,13 +35,15 @@ Instead of margin I recommend you use spacer components. For example, [Seek's de
 </Stack>
 ```
 
-Using spacer components has another implication that is not obvious _a priori_.
+Using spacer components has other implications that are not obvious _a priori_.
+
+Spacer components (such as `Stack` above) can restrict spacing values to steps on a scale. That way, all spacing aligns to the grid.
 
 By using spacer components, you specify the space between components in a specific instance. You have to define space in relation and context.
 
 Who else thinks about space in relation and context? Designers.
 
-Spacer components bring us closer to how designers think. They also force us to build more reusable and encapsulated components.
+Spacer components bring us closer to how designers think. They make our designs more consistent and they force us to build more reusable and encapsulated components.
 
 Use spacer components. Ban margin.
 
