@@ -17,15 +17,17 @@ We should ban margin from our components. Hear me out.
 
 Margin breaks component encapsulation. A well-built component should not affect anything outside itself.
 
-Margin makes reusability harder. Good components are usable in any context.
+Margin makes reusability harder. Good components are usable in any context or layout.
 
 Margin conflicts with how designers think. Designers think about space in relation and context. They define how far a component should be from another component in a specific instance.
 
-By banning margin from all components you have to build more reusable and encapsuled components.
+By banning margin from all components you have to build more reusable and encapsulated components.
 
 ### Moving responsibility
 
-Instead of margin I recommend you use spacer components. For example, Seek's design system popularized the [`Stack` component](https://seek-oss.github.io/braid-design-system/components/Stack):
+Instead of margin I recommend you use spacer components, which move the responsibility of managing space to the parent-level.
+
+For example, the Braid design system popularized the [`Stack` component](https://seek-oss.github.io/braid-design-system/components/Stack):
 
 ```jsx
 <Stack space={3}>
@@ -35,11 +37,11 @@ Instead of margin I recommend you use spacer components. For example, Seek's des
 </Stack>
 ```
 
-Using spacer components has other implications that are not obvious _a priori_.
+Using spacer components has implications that are not obvious _a priori_.
 
-Spacer components (such as `Stack` above) can restrict spacing values to steps on a scale. That way, all spacing aligns to the grid.
+Spacer components (such as `Stack` above) can restrict spacing values to steps on a scale. That way, all spacing automatically aligns to the grid.
 
-Spacer components move the responsibility of managing whitespace to the parent. You specify the space between components in a specific instance. You have to define space in relation and context.
+Spacer components define how far a component should be from another component in a specific instance. You have to define space in relation and context.
 
 Who else thinks about space in relation and context? Designers.
 
