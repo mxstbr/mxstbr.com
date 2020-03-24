@@ -6,7 +6,8 @@ export const meta = {
   publishedAt: "2019-01-16",
   title: "Tech Choices I Regret at Spectrum",
   summary:
-    "Spectrum is an open source chat app for large online communities. With the benefit of hindsight, here are the technology choices I regret."
+    "Spectrum is an open source chat app for large online communities. With the benefit of hindsight, here are the technology choices I regret.",
+  likes: 1354
 };
 
 export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;

@@ -133,8 +133,9 @@ export default withRouter((props: Props) => {
       </H2>
       <Text mt={3} mb={4} color="quaternary">
         {meta.published !== true
-          ? "Not yet published"
-          : `Published ${published}`}
+          ? "Not yet published "
+          : `Published ${published} `}
+        <WebMentionCounts />
       </Text>
       {children}
       {meta.published === true && (
@@ -163,22 +164,6 @@ export default withRouter((props: Props) => {
             <NextPost position="right" title={next.title} href={next.path} />
           )}
         </Flex>
-      )}
-      {meta.published === true && (
-        <>
-          <H3>
-            Webmentions{" "}
-            <Link href="https://indieweb.org/Webmention">
-              <Icon title="Webmention is a web standard for mentions and conversations across the web.">
-                <HelpCircle color="#999" size="0.75em" />
-              </Icon>
-            </Link>
-          </H3>
-          <Paragraph as="div" mb={4} color="tertiary">
-            <WebMentionCounts />
-          </Paragraph>
-          <WebMentionResponses />
-        </>
       )}
     </>
   );

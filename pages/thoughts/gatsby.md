@@ -8,7 +8,8 @@ export const meta = {
   title: "I am joining Gatsby",
   summary:
     "I am joining Gatsby to work on open source R&D projects including Blocks, the visual editor for React apps, theme-ui, mdx and Gatsby themes! 🎉",
-  image: "/static/images/gatsby.png"
+  image: "/static/images/gatsby.png",
+  likes: 2015
 };
 
 export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;
