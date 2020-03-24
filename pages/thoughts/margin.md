@@ -4,7 +4,7 @@ import Lesson from "../../components/Lesson";
 
 export const meta = {
   published: true,
-  publishedAt: "2019-03-24",
+  publishedAt: "2020-03-24",
   title: "Margin considered harmful",
   summary:
     "We should ban margin from our React components. Hear me out.",
