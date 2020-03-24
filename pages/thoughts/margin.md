@@ -4,11 +4,11 @@ import Lesson from "../../components/Lesson";
 
 export const meta = {
   published: false,
-  publishedAt: "2019-03-15",
+  publishedAt: "2019-03-24",
   title: "Margin considered harmful",
   summary:
-    "",
-  image: ""
+    "We should ban margin from our React components. Hear me out.",
+  image: "/static/images/margin.png"
 };
 
 export default BlogPost
@@ -25,7 +25,7 @@ By banning margin from all components you have to build more reusable and encaps
 
 ### Moving responsibility
 
-Instead of margin I recommend you use spacer components, which move the responsibility of managing space to the parent-level.
+Instead of margin I have started using spacer components, which move the responsibility of managing space to the parent-level.
 
 For example, the Braid design system popularized the [`Stack` component](https://seek-oss.github.io/braid-design-system/components/Stack):
 
