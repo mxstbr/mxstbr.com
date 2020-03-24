@@ -3,7 +3,7 @@ import Browser from "../../components/BrowserDemo";
 import Lesson from "../../components/Lesson";
 
 export const meta = {
-  published: false,
+  published: true,
   publishedAt: "2019-03-24",
   title: "Margin considered harmful",
   summary:
