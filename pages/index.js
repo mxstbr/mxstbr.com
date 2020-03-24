@@ -112,11 +112,6 @@ class Homepage extends React.Component<Props> {
             {blogposts.slice(0, 3).map((post, i) => (
               <BlogPostCard key={post.title} post={post} />
             ))}
-            {this.props.oldPosts
-              .slice(0, 3 - blogposts.length)
-              .map((post, i) => (
-                <BlogPostCard key={post.title} old={post} />
-              ))}
           </CardGrid>
         </WideSection>
         <ViewMoreLink href="/thoughts">
