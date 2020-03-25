@@ -52,5 +52,5 @@ Use spacer components. Ban margin.
 
 ----
 
-_I am not the first one to realize this. Thanks to [@markdalgleish](https://twitter.com/markdalgleish), [@michaeltaranto](https://twitter.com/michaeltaranto) and [@mattcompiles](https://twitter.com/mattcompiles) at Seek for paving the way and prompting me to think about it._
+_I am not the first one to realize this. Thanks to [@markdalgleish](https://twitter.com/markdalgleish), [@michaeltaranto](https://twitter.com/michaeltaranto) and [@mattcompiles](https://twitter.com/mattcompiles) at Seek, as well as my good friend [@okonetchnikov](https://twitter.com/okonetchnikov) for paving the way and prompting me to think about it._
 
