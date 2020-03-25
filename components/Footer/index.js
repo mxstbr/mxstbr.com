@@ -82,7 +82,7 @@ export default (props: {}) => (
           <FooterListItem Icon={Camera} href="https://instagram.com/mxstbr">
             See my stories on Instagram
           </FooterListItem>
-          <FooterListItem Icon={Rss} href="https://mxstbr.com/feed.json">
+          <FooterListItem Icon={Rss} href="https://mxstbr.com/rss">
             Subscribe to the RSS feed
           </FooterListItem>
         </FooterColumn>
