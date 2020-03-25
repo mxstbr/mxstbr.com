@@ -8,7 +8,8 @@ export const meta = {
   title: "Margin considered harmful",
   summary:
     "We should ban margin from our React components. Hear me out.",
-  image: "/static/images/margin.png"
+  image: "/static/images/margin.png",
+  likes: 1711
 };
 
 export default BlogPost
@@ -51,5 +52,5 @@ Use spacer components. Ban margin.
 
 ----
 
-_I am not the first one to realize this. Thanks to [@markdalgleish](https://twitter.com/markdalgleish) and [@michaeltaranto](https://twitter.com/michaeltaranto) at Seek for paving the way and prompting me to think about it._
+_I am not the first one to realize this. Thanks to [@markdalgleish](https://twitter.com/markdalgleish), [@michaeltaranto](https://twitter.com/michaeltaranto) and [@mattcompiles](https://twitter.com/mattcompiles) at Seek for paving the way and prompting me to think about it._
 

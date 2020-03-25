@@ -160,9 +160,9 @@ class Nav extends React.Component<{}> {
                     onClick={this.closeMenu}
                   />
                   <MobileNavItem
-                    href="/ama"
+                    href="https://notes.mxstbr.com"
                     onClick={this.closeMenu}
-                    title="AMA Podcast"
+                    title="Notes"
                   />
                   <MobileNavItem
                     href="/thoughts"
