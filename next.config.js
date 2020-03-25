@@ -1,6 +1,7 @@
 // $FlowIssue this is what mapbox/rehype-prism uses under the hood
 const refract = require("refractor");
 if (process.env.NODE_ENV === "development") {
+  // $FlowIssue
   require("dotenv").config();
 }
 
@@ -41,7 +42,6 @@ const withMDX = require("@next/mdx")({
 });
 const fs = require("fs");
 const { join } = require("path");
-const generateJsonFeed = require("./data/generate-json-feed");
 const { promisify } = require("util");
 const copyFile = promisify(fs.copyFile);
 
@@ -54,7 +54,6 @@ module.exports = withMDX({
     { dev, dir, outDir, distDir, buildId }
   ) {
     if (dev) return defaultPathMap;
-    generateJsonFeed(outDir);
     await Promise.all(
       staticFilesToCopy.map(file =>
         copyFile(join(dir, file), join(outDir, file))
@@ -80,9 +79,10 @@ module.exports = withMDX({
     });
     return config;
   },
-  env: process.env.HASURA_ADMIN_SECRET
-    ? {
-        HASURA_ADMIN_SECRET: process.env.HASURA_ADMIN_SECRET
-      }
-    : {}
+  env:
+    process.env.HASURA_ADMIN_SECRET == undefined
+      ? {
+          HASURA_ADMIN_SECRET: process.env.HASURA_ADMIN_SECRET
+        }
+      : {}
 });

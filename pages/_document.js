@@ -22,6 +22,12 @@ export default class MyDocument extends Document {
             name="viewport"
             content="width=device-width, minimum-scale=1.0"
           />
+          <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="RSS"
+            href="https://mxstbr.com/rss"
+          />
           {this.props.styleTags}
         </Head>
         <body className="no-js">
