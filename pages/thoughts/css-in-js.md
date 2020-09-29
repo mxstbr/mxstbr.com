@@ -7,7 +7,7 @@ export const meta = {
   publishedAt: "2019-02-18",
   title: "Why I Write CSS in JavaScript",
   summary:
-    "For three years, I have styled my web apps without any `.css` files. Instead, I have written all the CSS in JavaScript. Let me explain.",
+    "For three years, I have written all my CSS in JavaScript. In fact, I am the creator of styled-components, one of the most popular CSS-in-JS libraries. Let me explain why.",
   image: "/static/images/css-in-js.png",
   likes: 1680
 };
