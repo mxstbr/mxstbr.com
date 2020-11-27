@@ -416,14 +416,14 @@ const appearances: Array<Appearance> = [
     date: new Date(2019, 3, 2)
   },
   {
-    title: "Modern React",
+    title: "Modern React Workshop",
     site: "React Amsterdam",
     type: "workshop",
     link: "https://reactsummit.com/2019/workshops",
     date: new Date(2019, 3, 1)
   },
   {
-    title: "Modern React",
+    title: "Modern React Workshop",
     site: "React Day Berlin",
     type: "workshop",
     link: "https://reactday.berlin",
@@ -449,6 +449,62 @@ const appearances: Array<Appearance> = [
     type: "talk",
     link: "https://reactconfau.com",
     date: new Date(2020, 1, 27)
+  },
+  {
+    title: "Modern React Workshop",
+    type: "workshop",
+    site: "Remote React Summit",
+    link: "https://remote.reactsumit.com",
+    date: new Date(2020, 3, 15)
+  },
+  {
+    title: "JavaScript Open Source Awards",
+    site: "Host",
+    type: "award",
+    link: "https://osawards.com/javascript",
+    date: new Date(2020, 5, 18)
+  },
+  {
+    title: "The past, present and future of CSS-in-JS",
+    site: "BristolJS",
+    type: "talk",
+    link: "https://www.youtube.com/watch?v=-qJR9LG0b64",
+    date: new Date(2020, 5, 10)
+  },
+  {
+    title: "Modern React Workshop",
+    site: "JSNation Remote",
+    type: "workshop",
+    link: "https://jsnation.com",
+    date: new Date(2020, 5, 16)
+  },
+  {
+    title: "Modern React Workshop",
+    site: "React Summit",
+    type: "workshop",
+    link: "https://reactsummit.com",
+    date: new Date(2020, 9, 6)
+  },
+  {
+    title: "styled-components workshop",
+    site: "React Summit",
+    type: "workshop",
+    link: "https://reactsummit.com",
+    date: new Date(2020, 9, 28)
+  },
+  {
+    title: "React Open Source Awards",
+    site: "Host",
+    type: "award",
+    link: "https://osawards.com/react",
+    date: new Date(2020, 9, 15)
+  },
+  {
+    title: "How Open Source Changed My Life",
+    site: "Documentary Movie",
+    type: "interview",
+    link: "https://www.youtube.com/watch?v=ifq3xhik8tE",
+    date: new Date(2020, 3, 27)
   }
 ].sort((a, b) => b.date - a.date);
 
