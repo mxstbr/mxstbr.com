@@ -55,14 +55,22 @@ class Homepage extends React.Component<Props> {
             <Link href="https://spectrum.chat">Spectrum</Link>.
           </Paragraph>
           <Paragraph centered>
+            I run two SaaS products with some friends,{" "}
+            <Link href="https://changefeed.app">Changefeed</Link> and{" "}
+            <Link href="https://feedback.fish">Feedback Fish</Link>, and angel
+            invest in early-stage startups that I'm passionate about, such as{" "}
+            <Link href="https://devjobs.de">Dev Jobs</Link>,{" "}
+            <Link href="https://lambda.store">Lambda Store</Link> and{" "}
+            <Link href="https://www.mikafi.com">Mikafi</Link>.
+          </Paragraph>
+          <Paragraph centered>
             If I'm not coding or{" "}
             <Link href="https://twitter.com/mxstbr">tweeting</Link>, I'm likely
             brewing coffee on my espresso machine (I'm a huge{" "}
             <Link href="https://github.com/mxstbr/ama/issues/46">
               specialty coffee geek
             </Link>
-            ), exploring the world or skiing. My drug of choice? Fresh, white
-            powder snow. 🤙
+            ), climbing in a bouldering gym or skiing around the alps.
           </Paragraph>
         </PageHeader>
         {/* Render default title */}
