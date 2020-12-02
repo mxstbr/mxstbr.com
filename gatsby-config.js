@@ -34,6 +34,7 @@ module.exports = {
     siteUrl: `https://mxstbr.com`
   },
   plugins: [
+    `gatsby-plugin-styled-components`,
     `gatsby-plugin-flow`,
     {
       resolve: `gatsby-plugin-layout`,
