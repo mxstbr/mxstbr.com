@@ -35,7 +35,7 @@ We needed server-side rendering for SEO purposes ([client-side rendering does no
 
 Turns out, building your own production-ready SSR setup is tough. It takes a lot of work and it is difficult to provide a good experience, for both developers and users.
 
-Next.js offers an amazing development experience and fast performance out of the box, not to mention the great community and excellent documentation. I would use it in a heartbeat if we started over today (in fact, [this website is built with Next.js](https://github.com/mxstbr/mxstbr.com) 😍).
+Next.js offers an amazing development experience and fast performance out of the box, not to mention the great community and excellent documentation. I would use it in a heartbeat if we started over today and needed server-side rendering.
 
 <Lesson
   title="Lesson 2"
