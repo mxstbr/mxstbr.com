@@ -1,9 +1,9 @@
 import React from "react";
 import { Flex, Box, Image } from "rebass";
 import styled from "styled-components";
-import { withRouter, type Router } from "next/router";
 import { parse, format } from "date-fns";
 import fetch from "isomorphic-unfetch";
+import { useLocation } from "@reach/router";
 import Button from "./Button";
 import Head from "./Head";
 import { H3, H2 } from "./Heading";
@@ -33,8 +33,7 @@ import type { NewBlogPost } from "../data/blog-posts";
 
 type Props = {
   meta: NewBlogPost,
-  children: React$Node,
-  router: Router
+  children: React$Node
 };
 
 const BackToBlog = props => (
@@ -57,10 +56,11 @@ const getShareLinks = (path: string, title: string) => ({
   )}/&t=${encodeURIComponent(title)}`
 });
 
-export default withRouter((props: Props) => {
-  const { meta, children, router } = props;
+export default (props: Props) => {
+  const { meta, children } = props;
+  const location = useLocation();
   const published = format(parse(meta.publishedAt), "MMMM Do, YYYY");
-  const { twitter, github, hn } = getShareLinks(router.pathname, meta.title);
+  const { twitter, github, hn } = getShareLinks(location.pathname, meta.title);
   const current = blogposts.map(({ title }) => title).indexOf(meta.title);
   const next = blogposts[current - 1];
   const prev = blogposts[current + 1];
@@ -81,7 +81,7 @@ export default withRouter((props: Props) => {
           //  "keywords": "seo sales b2b",
           //  "wordcount": "1120",
           //  "publisher": "Book Publisher Inc",
-          url: `https://mxstbr.com${router.pathname}/`,
+          url: `https://mxstbr.com${location.pathname}/`,
           mainEntityOfPage: {
             "@type": "WebPage",
             "@id": "https://mxstbr.com/blog"
@@ -140,7 +140,7 @@ export default withRouter((props: Props) => {
       {children}
       {meta.published === true && (
         <Paragraph fontSize={1} mt={4} mb={4}>
-          <HackerNewsLink path={router.pathname} title={meta.title}>
+          <HackerNewsLink path={location.pathname} title={meta.title}>
             {({ href }) => <Link href={href}>Discuss on HackerNews</Link>}
           </HackerNewsLink>
           {" · "}
@@ -167,4 +167,4 @@ export default withRouter((props: Props) => {
       )}
     </>
   );
-});
+};

@@ -1,4 +1,5 @@
 // Adapted from https://github.com/styled-components/styled-components-website/blob/42aba1e04dcc51c94cd8d5a09defe1356d4fc0bc/components/NextPage.js
+import React from "react";
 import styled, { css } from "styled-components";
 import { Flex } from "rebass";
 import { ChevronRight, ChevronLeft } from "react-feather";

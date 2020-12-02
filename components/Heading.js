@@ -1,3 +1,4 @@
+import React from "react";
 import { Heading, type RebassProps } from "rebass";
 
 const BaseHeading = (props: RebassProps) => (

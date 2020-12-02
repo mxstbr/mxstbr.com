@@ -1,27 +1,10 @@
 import React from "react";
 import styled from "styled-components";
-import { Link } from "rebass";
-import NextLink from "next/link";
+import { Link as RebassLink } from "rebass";
+import { Link as GatsbyLink } from "gatsby";
 import ConditionalWrap from "conditional-wrap";
 
-const UniversalLink = props => {
-  const external = props.href.indexOf("//") !== -1;
-
-  return (
-    <ConditionalWrap
-      condition={!external}
-      wrap={children => <NextLink href={props.href}>{children}</NextLink>}
-    >
-      <Link
-        target={external ? "_blank" : undefined}
-        rel={external ? "noopener" : undefined}
-        {...props}
-      />
-    </ConditionalWrap>
-  );
-};
-
-export default styled(UniversalLink)`
+const BaseLink = styled(RebassLink)`
   text-decoration: none;
   color: inherit;
 
@@ -31,3 +14,22 @@ export default styled(UniversalLink)`
 
   ${props => props.css};
 `;
+
+const UniversalLink = props => {
+  console.log(props.href, props.to);
+  const href = props.href || "";
+  const external = href.indexOf("//") !== -1;
+
+  // TODO: Implement Gatsby's Link for internal links. Breaks styling.
+  return (
+    <BaseLink
+      target={external ? "_blank" : undefined}
+      rel={external ? "noopener" : undefined}
+      as={!external ? GatsbyLink : RebassLink}
+      to={href}
+      {...props}
+    />
+  );
+};
+
+export default styled(UniversalLink)``;
