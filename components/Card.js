@@ -1,3 +1,4 @@
+import React from "react";
 import styled, { css } from "styled-components";
 import { Card, Image, type RebassProps } from "rebass";
 import { H3 } from "./Heading";

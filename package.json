@@ -4,15 +4,14 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "next",
+    "dev": "gatsby develop",
+    "build": "gatsby build",
     "flow": "flow"
   },
   "dependencies": {
     "@mapbox/rehype-prism": "^0.3.0",
-    "@mdx-js/loader": "^0.20.3",
-    "@mdx-js/mdx": "^0.20.3",
-    "@mdx-js/tag": "^0.20.3",
-    "@next/mdx": "^9.1.3",
+    "@mdx-js/mdx": "^1.6.21",
+    "@mdx-js/react": "^1.6.21",
     "body-parser": "^1.19.0",
     "conditional-wrap": "^1.0.0",
     "cookie-parser": "^1.4.4",
@@ -21,9 +20,16 @@
     "date-fns": "^1.30.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "gatsby": "^2.27.4",
+    "gatsby-plugin-feed": "^2.9.0",
+    "gatsby-plugin-flow": "^1.6.0",
+    "gatsby-plugin-google-analytics": "^2.6.0",
+    "gatsby-plugin-layout": "^1.5.0",
+    "gatsby-plugin-mdx": "^1.5.0",
+    "gatsby-plugin-sitemap": "^2.8.0",
+    "gatsby-plugin-styled-components": "^3.6.0",
+    "gatsby-source-filesystem": "^2.6.1",
     "isomorphic-unfetch": "^3.0.0",
-    "next": "^9.1.3",
-    "next-ga": "^2.3.4",
     "p-timeout": "^2.0.1",
     "passport": "^0.4.0",
     "passport-twitter": "^1.0.4",
@@ -32,6 +38,7 @@
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
     "react-feather": "^1.1.6",
+    "react-helmet": "^6.1.0",
     "react-twitter-embed": "^3.0.3",
     "rebass": "^3.0.0-9",
     "slugg": "^1.2.1",
@@ -54,6 +61,9 @@
     "raw-loader": "^1.0.0",
     "yaml-front-matter": "^4.0.0"
   },
+  "resolutions": {
+    "node-fetch": "2.6.1"
+  },
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
@@ -61,7 +71,6 @@
   },
   "lint-staged": {
     "*.js": [
-      "yarn run flow focus-check",
       "prettier --write",
       "git add"
     ],

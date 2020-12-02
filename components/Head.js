@@ -1,6 +1,6 @@
 import React from "react";
-import Head from "next/head";
-import { withRouter, type Router } from "next/router";
+import Helmet from "react-helmet";
+import { useLocation } from "@reach/router";
 import JsonLD, { type JsonLD as JsonLDType } from "./JsonLD";
 
 type Props = {
@@ -12,9 +12,10 @@ type Props = {
   children?: React$Node
 };
 
-export default withRouter(
-  ({ title, description, image, router, jsonld, children }: Props) => (
-    <Head>
+export default ({ title, description, image, jsonld, children }: Props) => {
+  const location = useLocation();
+  return (
+    <Helmet>
       {/* DEFAULT */}
 
       {title != undefined && <title key="title">{title}</title>}
@@ -39,7 +40,7 @@ export default withRouter(
       <meta
         property="og:url"
         key="og:url"
-        content={`https://mxstbr.com${router.pathname}`}
+        content={`https://mxstbr.com${location.pathname}`}
       />
       {title != undefined && (
         <meta property="og:title" content={title} key="og:title" />
@@ -119,6 +120,6 @@ export default withRouter(
       />
       <link rel="pingback" href="https://webmention.io/mxstbr.com/xmlrpc" />
       {children}
-    </Head>
-  )
-);
+    </Helmet>
+  );
+};

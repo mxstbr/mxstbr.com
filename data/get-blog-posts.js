@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 const META = /export\s+const\s+meta\s+=\s+(\{(\n|.)*?\n\})/;
-const DIR = path.join(process.cwd(), "./pages/thoughts/");
+const DIR = path.join(process.cwd(), "./src/pages/thoughts/");
 const files = fs
   .readdirSync(DIR)
   .filter(file => file.endsWith(".md") || file.endsWith(".mdx"));

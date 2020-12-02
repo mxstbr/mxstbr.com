@@ -1,19 +1,18 @@
 import React from "react";
-import { withRouter, type Router } from "next/router";
 import { Heart, MessageCircle } from "react-feather";
+import { useLocation } from "@reach/router";
 import Paragraph from "../Paragraph";
 import Icon from "../Icon";
 import blogposts from "../../data/blog-posts";
 
 type Props = {
-  router: Router,
   path?: string,
   size?: "small"
 };
 
-export default withRouter((props: Props) => {
-  const path =
-    typeof props.path === "string" ? props.path : props.router.pathname;
+export default (props: Props) => {
+  const location = useLocation();
+  const path = typeof props.path === "string" ? props.path : location.pathname;
   const post = blogposts.find(post => post.path === path);
 
   // $FlowIssue
@@ -29,4 +28,4 @@ export default withRouter((props: Props) => {
   }
 
   return null;
-});
+};

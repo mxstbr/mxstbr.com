@@ -5,7 +5,7 @@ This is the source for my personal website and blog [mxstbr.com](https://mxstbr.
 ## Tech Stack
 
 - [React](https://github.com/facebook/react)
-- [Next.js](https://github.com/zeit/next.js)
+- [Gatsby](https://github.com/gatsbyjs/gatsby)
 - [styled-components](https://github.com/styled-components) (of course)
 - [Rebass](https://github.com/rebassjs/rebass)
 - [mdx](https://github.com/mdx-js/mdx)

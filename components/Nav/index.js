@@ -1,7 +1,7 @@
 import React from "react";
 import styled, { css } from "styled-components";
 import { Flex, Box } from "rebass";
-import { withRouter, type Router } from "next/router";
+import { useLocation } from "@reach/router";
 import Link from "../Link";
 import Icon from "../Icon";
 import { ExternalLink as LinkExternal, Menu, X, Twitter } from "react-feather";
@@ -24,8 +24,9 @@ const MobileMenu = styled(Flex)`
   height: 100%;
 `;
 
-const NavItem = withRouter(styled(props => {
-  const active = props.router.pathname.indexOf(props.href) === 0;
+const NavItem = styled(props => {
+  const location = useLocation();
+  const active = location.pathname.indexOf(props.href) === 0;
   return (
     <Box mr={4} className={props.className}>
       <Link itemProp="url" href={props.href}>
@@ -43,7 +44,7 @@ const NavItem = withRouter(styled(props => {
   &:last-of-type {
     margin-right: 0;
   }
-`);
+`;
 
 const MobileNavItem = props => (
   <Box p={3} onClick={props.onClick}>
