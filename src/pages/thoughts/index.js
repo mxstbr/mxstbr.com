@@ -111,7 +111,7 @@ export default () => {
         previous iteration. (they are all preserved on{" "}
         <Link href="https://mxstbr.blog">mxstbr.blog</Link>)
       </Paragraph>
-      {oldPosts.slice(0, 16).map((post, index) => (
+      {oldPosts.slice(2, 16).map((post, index) => (
         <BlogPostListItem
           small
           key={post.id}
