@@ -50,7 +50,10 @@ const getShareLinks = (path: string, title: string) => ({
   twitter: `https://mobile.twitter.com/search?q=${encodeURIComponent(
     `https://mxstbr.com${path}/`
   )}`,
-  github: `https://github.com/mxstbr/mxstbr.com/edit/master/pages${path}.md`,
+  github: `https://github.com/mxstbr/mxstbr.com/edit/master/src/pages${path.replace(
+    /\/$/,
+    ""
+  )}.md`,
   hn: `https://news.ycombinator.com/submitlink?u=https://mxstbr.com${encodeURIComponent(
     path
   )}/&t=${encodeURIComponent(title)}`
