@@ -2,6 +2,7 @@ import BlogPost from "../../../components/BlogPost";
 import Browser from "../../../components/BrowserDemo";
 import Lesson from "../../../components/Lesson";
 import Card from "../../../components/Card";
+import Blockquote, { Cite } from "../../../components/Blockquote";
 
 export const meta = {
   published: false,
@@ -22,19 +23,17 @@ Different decisions have different resistance to change or "inertia".
 
 </div>
 
-I have found this to be a helpful mental model over the past years. The higher the inertia of a decision, the more time I need to spend on it. The lower the inertia of a decision, the less time I should spend on it.
-
-For example:
+The higher the inertia of a decision, the more time I need to spend on it. The lower the inertia of a decision, the less time I should spend on it. For example:
 
 - Choosing a framework has high inertia: switching to a different framework would mean rewriting large parts of my app, so I consider my choice carefully. (I [learned that the hard way](/thoughts/tech-choice-regrets-at-spectrum))
-- Choosing a `_.defaults` method has little inertia: switching between lodash's and underscore's implementation takes less than a minute, so I simply make any choice and move on.
+- Choosing a `_.defaults` method has little inertia: switching between lodash's and underscore's implementation takes less than a minute, so I quickly install either one and move on.
 
-I now always consider the inertia of a decision beforehand and act accordingly. I don't want to waste time on irrelevant decisions or rush important ones.
+I now always consider the inertia of my decisions beforehand and act accordingly. I don't want to waste time on reversible decisions or rush important ones.
 
 <Lesson title="Lesson 1" body="Consider the inertia of your decisions and spend your time accordingly." />
 
-I noticed that I often spend too much time on decisions with low inertia. Particularly in teams people can feel like they have to add their two cents for every choice.
+I noticed specifically that I often spend more time than I should on low inertia decisions. Particularly in teams it can feel like everyone always has to add their two cents.
 
-This is counterproductive, as it's usually faster to undo a low inertia decision than to think about it! I now decide these quickly rather than thinking long and hard what the best option is. This applies particularly to startups, who have to keep moving.
+This is very counterproductive, as it's faster to undo a low inertia decision than to think about and/or debate it. Now, as soon as I realise I'm looking at a low inertia decision I make an immediate gut call and move on.
 
 <Lesson title="Lesson 2" body="Always keep moving. Bias towards action." />

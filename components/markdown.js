@@ -6,6 +6,7 @@ import Paragraph from "./Paragraph";
 import Link from "./Link";
 import { UnorderedList, OrderedList, ListItem } from "./HtmlLists";
 import Image from "./Image";
+import Blockquote from "./Blockquote";
 
 const Code = styled(Box).attrs(props => ({
   as: "code",
@@ -56,5 +57,6 @@ export default {
   pre: Pre,
   code: Code,
   inlineCode: InlineCode,
-  em: Em
+  em: Em,
+  blockquote: props => <Blockquote {...props} />
 };
