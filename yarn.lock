@@ -6162,6 +6162,13 @@ gatsby-plugin-page-creator@^2.5.0:
     graphql "^14.7.0"
     lodash "^4.17.20"
 
+gatsby-plugin-react-helmet@^3.6.0:
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/gatsby-plugin-react-helmet/-/gatsby-plugin-react-helmet-3.6.0.tgz#cad6771b4c9e84b094f274197d475a8b35832daa"
+  integrity sha512-nuI9UyLuxaRRGiTbAkYW5EXEKqrRJiaAnTrmXhLf5btQZSG0EGVrRFtQeN9KTuCi43czenZ2IDcbBg5yf0p1Gg==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+
 gatsby-plugin-sitemap@^2.8.0:
   version "2.8.0"
   resolved "https://registry.yarnpkg.com/gatsby-plugin-sitemap/-/gatsby-plugin-sitemap-2.8.0.tgz#0dfaab56170e18da0278e3c5bb2774bcc669f1ac"

@@ -16,7 +16,6 @@ const BaseLink = styled(RebassLink)`
 `;
 
 const UniversalLink = props => {
-  console.log(props.href, props.to);
   const href = props.href || "";
   const external = href.indexOf("//") !== -1;
 

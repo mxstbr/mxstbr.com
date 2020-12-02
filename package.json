@@ -26,6 +26,7 @@
     "gatsby-plugin-google-analytics": "^2.6.0",
     "gatsby-plugin-layout": "^1.5.0",
     "gatsby-plugin-mdx": "^1.5.0",
+    "gatsby-plugin-react-helmet": "^3.6.0",
     "gatsby-plugin-sitemap": "^2.8.0",
     "gatsby-plugin-styled-components": "^3.6.0",
     "gatsby-source-filesystem": "^2.6.1",

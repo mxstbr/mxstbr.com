@@ -36,6 +36,7 @@ module.exports = {
   plugins: [
     `gatsby-plugin-styled-components`,
     `gatsby-plugin-flow`,
+    `gatsby-plugin-react-helmet`,
     {
       resolve: `gatsby-plugin-layout`,
       options: {
