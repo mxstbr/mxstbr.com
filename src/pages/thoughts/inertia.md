@@ -7,9 +7,9 @@ import Blockquote, { Cite } from "../../../components/Blockquote";
 export const meta = {
   published: false,
   publishedAt: "2020-12-14",
-  title: "On the Inertia of Decisions",
-  summary: "One of my most useful mental models: I consider any decisions inertia (resistance to change) before making a choice.",
-  image: "https://cdn.splitbee.io/og/08763fac65?headline=On%20the%20Inertia%20of%20Decisions&url=mxstbr.com%2Fthoughts%2Finertia",
+  title: "The Inertia of Decisions",
+  summary: "One of my most useful mental models is considering any decisions' inertia before making a choice. What does that even mean though?",
+  image: "https://cdn.splitbee.io/og/08763fac65?headline=The%20Inertia%20of%20Decisions&url=mxstbr.com%2Fthoughts%2Finertia",
   likes: 0
 };
 
