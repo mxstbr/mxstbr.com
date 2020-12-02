@@ -33,8 +33,8 @@ I now always consider the inertia of a decision beforehand and act accordingly. 
 
 <Lesson title="Lesson 1" body="Consider the inertia of your decisions and spend your time accordingly." />
 
-I have also realised that it is very common to spend too much time on decisions with low inertia. Particularly in teams people like to add their two cents to every tiny decision.
+I have also realised that it is very common to spend too much time on decisions with low inertia. Particularly in teams it can happen that people feel like they have to add their two cents to every choice. 
 
-It is often better to make a choice, any choice, than to think about or debate what the best option is — particularly for startups.
+This is counterproductive, as it is better to make a low inertia decision quickly than to think about or debate what the best option is — particularly for startups. Since it's easily undoable, undo it if necessary!
 
 <Lesson title="Lesson 2" body="Always keep moving. Bias towards action." />
