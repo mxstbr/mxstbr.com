@@ -1,4 +1,5 @@
 const fetch = require("isomorphic-unfetch");
+const blogPosts = require("./data/get-blog-posts");
 
 exports.sourceNodes = async ({
   actions,
@@ -25,6 +26,18 @@ exports.sourceNodes = async ({
         contentDigest: createContentDigest(nodeData)
       },
       ...nodeData
+    });
+  });
+
+  blogPosts.forEach(post => {
+    actions.createNode({
+      id: createNodeId(post.path),
+      parentNode: null,
+      internal: {
+        type: `BlogPost`,
+        contentDigest: createContentDigest(post)
+      },
+      ...post
     });
   });
 };

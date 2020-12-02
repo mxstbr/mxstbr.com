@@ -1,3 +1,4 @@
+const path = require(`path`);
 const refract = require("refractor");
 
 // NOTE: This highlights template-strings as strings of CSS
@@ -29,6 +30,9 @@ refract.languages.insertBefore("jsx", "template-string", styledHighlight);
 refract.languages.insertBefore("js", "template-string", styledHighlight);
 
 module.exports = {
+  siteMetadata: {
+    siteUrl: `https://mxstbr.com`
+  },
   plugins: [
     `gatsby-plugin-flow`,
     {
@@ -56,6 +60,38 @@ module.exports = {
       resolve: `gatsby-plugin-google-analytics`,
       options: {
         trackingId: `UA-49258834-4`
+      }
+    },
+    {
+      resolve: `gatsby-plugin-feed`,
+      options: {
+        feeds: [
+          {
+            title: `Max Stoibers (@mxstbr) Thoughts`,
+            description: `Candid thoughts about React.js, Node.js, startups and other interesting things.`,
+            link: `https://mxstbr.com/thoughts`,
+            output: `/rss`,
+            query: `
+              {
+                allBlogPost {
+                  nodes {
+                    title
+                    summary
+                    publishedAt
+                    path
+                  }
+                }
+              }
+            `,
+            serialize: ({ query: { allBlogPost } }) => {
+              return allBlogPost.nodes.map(post => ({
+                title: post.title,
+                description: post.summary,
+                url: path.join(`https://mxstbr.com`, post.path)
+              }));
+            }
+          }
+        ]
       }
     }
   ]
