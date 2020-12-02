@@ -71,7 +71,6 @@ module.exports = {
           {
             title: `Max Stoibers (@mxstbr) Thoughts`,
             description: `Candid thoughts about React.js, Node.js, startups and other interesting things.`,
-            link: `https://mxstbr.com/thoughts`,
             output: `/rss`,
             query: `
               {

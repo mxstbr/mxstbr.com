@@ -8,7 +8,7 @@ export const meta = {
   published: false,
   publishedAt: "2020-12-14",
   title: "On the Inertia of Decisions",
-  summary: "Decisions have different inertia, or resistance to change.",
+  summary: "One of my most useful mental models: I consider any decisions inertia (resistance to change) before making a choice.",
   image: "https://cdn.splitbee.io/og/08763fac65?headline=On%20the%20Inertia%20of%20Decisions&url=mxstbr.com%2Fthoughts%2Finertia",
   likes: 0
 };
