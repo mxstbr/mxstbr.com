@@ -39,8 +39,8 @@ const theme = {
       "Apple Color Emoji",
       "Segoe UI Emoji",
       "Segoe UI Symbol"
-    ],
-    serif: ["Georgia", "serif"]
+    ].join(", "),
+    serif: ["Georgia", "serif"].join(", ")
   }
 };
 

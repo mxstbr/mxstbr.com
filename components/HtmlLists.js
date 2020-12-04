@@ -8,6 +8,7 @@ const baseListStyles = css`
   padding-left: 1em;
   list-style: initial;
   list-style-position: outside;
+  font-family: ${props => props.theme.fonts.system};
 `;
 
 export const UnorderedList = styled(Box).attrs({
