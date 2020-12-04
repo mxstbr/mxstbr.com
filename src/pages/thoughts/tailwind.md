@@ -144,7 +144,7 @@ import "styled-components/macro"
 />
 ```
 
-This transpiles to the actual CSS rules the Tailwind.css classes refer to. This has [all the advantages of CSS-in-JS](/thoughts/css-in-js) combined with Tailwind's fantastic system and developer experience!
+This transpiles to the actual CSS rules the Tailwind.css classes refer to, which means it has [all the advantages of CSS-in-JS](/thoughts/css-in-js):
 
 - Extending your elements with custom styles is as simple as using the css prop, no extra setup required to "bailwind":
 
