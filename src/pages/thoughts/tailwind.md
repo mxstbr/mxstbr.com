@@ -6,8 +6,8 @@ export const meta = {
   published: false,
   publishedAt: "2020-05-28",
   title: "Why I Love Tailwind",
-  summary: "",
-  image: ""
+  summary: "How I leverage Tailwind's marvelous system and fantastic developer experience without the downsides of atomic CSS.",
+  image: "https://cdn.splitbee.io/og/08763fac65?headline=__headline__&url=mxstbr.com%2Fthoughts%2Ftailwind".replace('__headline__', encodeURIComponent("Why I Love Tailwind"))
 };
 
 export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;
@@ -73,9 +73,9 @@ Hear me out.
 
 We have had [atomic](https://github.com/basscss/basscss/commit/ed65eec980c4899d930f2c293f70bc619573456f) [CSS](https://github.com/tachyons-css/tachyons/commit/7f27af8d52d8ed03615e23a9db5ff33fc8153729) [frameworks](https://medium.com/buzzfeed-design/introducing-solid-1c16b1bf4868) for almost a decade but none of them have been as critically acclaimed as Tailwind.css. What makes it different?
 
-**The key to Tailwind.css's popularity is the painstakingly constructed system of design tokens at the core of the framework.** The system's carefully selected constraints give developers the right guardrails. They make it obvious whether a choice is good or bad by offering only discrete steps.
+**The key to Tailwind.css's popularity is the painstakingly constructed system of design tokens at the core of the framework.** The system's carefully selected constraints give developers _just_ the right guardrails. They make it obvious whether a choice is good or bad by offering only discrete steps.
 
-This does require some design _taste_, but all engineers I know have developed that over the years of building user interface. It lets them turn that taste into implementation without requiring a lot of design _skill_ — it helps them cross ["the gap"](https://vimeo.com/85040589).
+This does require some design _taste_, but all engineers I know have developed that over the years of building user interface. Tailwind's sytem lets them turn that taste into implementation without requiring a lot of design _skill_ — it helps them cross ["the gap"](https://vimeo.com/85040589).
 
 Tailwind's system is a masterpiece of design. Developers all around the world feel empowered by it and rightfully love it.
 
@@ -84,7 +84,7 @@ Tailwind's system is a masterpiece of design. Developers all around the world fe
 Tailwind.css (the atomic CSS framework) is simply a delivery mechanism for the system that allows developers to apply it to their UIs. However, we have learned over the past decade that [atomic CSS has downsides](https://jxnblk.com/blog/two-steps-forward/):
 
 - Users still have to add a separate setup for the [custom CSS they inevitably need](https://twitter.com/kentcdodds/status/1240868842361913347) (coined ["bailwind"](https://twitter.com/samselikoff/status/1251637275412357121)). You cannot get by on _just_ Tailwind.css in the real world.
-- More importantly, atomic CSS does not scale well. No tooling can extract the _per-page_ critical CSS, so developers are always shipping more CSS to the browser than necessary. The bigger and more dynamic the app, the worse this becomes.
+- More importantly, atomic CSS does not scale as well as it should. No tooling can extract the _per-page_ critical CSS, so developers are always shipping more CSS to the browser than necessary. The bigger and more dynamic the app, the slower the performance.
 
 At the same time, it's undeniable that the developer experience of Tailwind.css is fantastic. It does require learning a custom vocabulary, but once you get used to it you feel like you are flying.
 

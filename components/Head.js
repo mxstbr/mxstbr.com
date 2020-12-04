@@ -56,7 +56,9 @@ export default ({ title, description, image, jsonld, children }: Props) => {
         <meta
           property="og:image"
           key="og:image"
-          content={`https://mxstbr.com${image}`}
+          content={
+            image.indexOf(`//`) === -1 ? `https://mxstbr.com${image}` : image
+          }
         />
       )}
 
@@ -82,7 +84,9 @@ export default ({ title, description, image, jsonld, children }: Props) => {
         <meta
           name="twitter:image"
           key="twitter:image"
-          content={`https://mxstbr.com${image}`}
+          content={
+            image.indexOf(`//`) === -1 ? `https://mxstbr.com${image}` : image
+          }
         />
       )}
       <JsonLD
