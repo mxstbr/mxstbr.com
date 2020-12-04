@@ -6,7 +6,7 @@ export const meta = {
   published: false,
   publishedAt: "2020-05-28",
   title: "Why I Love Tailwind",
-  summary: "How I leverage Tailwind's marvelous system and fantastic developer experience without the downsides of atomic CSS.",
+  summary: "Why Tailwind is blowing up, why I (the creator of styled-components) love it and how I avoid the downsides of atomic CSS.",
   image: "https://cdn.splitbee.io/og/08763fac65?headline=__headline__&url=mxstbr.com%2Fthoughts%2Ftailwind".replace('__headline__', encodeURIComponent("Why I Love Tailwind"))
 };
 
