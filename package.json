@@ -46,7 +46,7 @@
     "styled-components": "^4.4.1",
     "styled-reset": "^1.6.4",
     "tailwindcss": "^1.9.5",
-    "twin.macro": "^2.0.4",
+    "twin.macro": "^1.12.1",
     "use-react-modal": "^0.0.9"
   },
   "devDependencies": {
