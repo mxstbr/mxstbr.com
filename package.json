@@ -45,13 +45,14 @@
     "slugg": "^1.2.1",
     "styled-components": "^4.4.1",
     "styled-reset": "^1.6.4",
+    "tailwindcss": "^1.9.5",
+    "twin.macro": "^2.0.4",
     "use-react-modal": "^0.0.9"
   },
   "devDependencies": {
     "@babel/plugin-proposal-optional-chaining": "^7.2.0",
     "@babel/plugin-transform-react-constant-elements": "^7.2.0",
     "@babel/preset-flow": "^7.0.0",
-    "babel-plugin-macros": "^2.5.0",
     "babel-plugin-preval": "^3.0.1",
     "babel-plugin-styled-components": "^1.8.0",
     "flow-bin": "^0.83.0",
@@ -79,5 +80,10 @@
       "prettier --write --parser mdx",
       "git add"
     ]
+  },
+  "babelMacros": {
+    "twin": {
+      "preset": "styled-components"
+    }
   }
 }

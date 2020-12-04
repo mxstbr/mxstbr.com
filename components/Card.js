@@ -57,9 +57,6 @@ C.Body = props => (
     {...props}
   />
 );
-C.Image = props => (
-  <Image {...props} css={{ borderRadius: "5px 5px 0 0", ...props.css }} />
-);
 C.FinePrint = props => (
   <Text
     color="#666"
