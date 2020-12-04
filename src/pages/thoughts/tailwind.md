@@ -7,7 +7,7 @@ export const meta = {
   publishedAt: "2020-05-28",
   title: "Why I Love Tailwind",
   summary: "Why Tailwind is blowing up, why I (the creator of styled-components) love it and how I avoid the downsides of atomic CSS.",
-  image: "https://cdn.splitbee.io/og/08763fac65?headline=__headline__&url=mxstbr.com%2Fthoughts%2Ftailwind.jpg".replace('__headline__', encodeURIComponent("Why I Love Tailwind"))
+  image: "/static/images/tailwind.jpeg"
 };
 
 export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;
