@@ -161,7 +161,7 @@ This transpiles to the actual CSS rules the Tailwind.css classes refer to, which
 
 The ideal setup for both developer _and_ user experience!
 
-To summarize: use [twin.macro](https://github.com/ben-rogerson/twin.macro) to **leverage Tailwind's marvelous system and developer experience without the downsides of atomic CSS**.
+<Lesson title="Lesson" body={<>use <a href="https://github.com/ben-rogerson/twin.macro" target="_blank">twin.macro</a> to leverage Tailwind's marvelous system and developer experience without the downsides of atomic CSS.</>} />
 
 Rather than taking two steps forward with Tailwind's system and one step backward with atomic CSS, let's take five steps forward. Together.
 
