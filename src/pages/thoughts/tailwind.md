@@ -80,21 +80,19 @@ We have had [atomic](https://github.com/basscss/basscss/commit/ed65eec980c4899d9
 
 **The key to Tailwind's popularity is the painstakingly constructed system of design tokens at the core of the framework.** The system's carefully selected constraints give developers _just_ the right guardrails. They make it obvious whether a choice is good or bad by offering only discrete steps.
 
-This does require some design _taste_, but all engineers I know have developed that over the years of building user interfaces. Tailwind's sytem lets them turn that taste into implementation without requiring a lot of design _skill_ — it helps them cross ["the gap"](https://vimeo.com/85040589).
+This does require some design _taste_, but most frontend engineers I know have developed that over the years of building user interfaces. Tailwind's sytem lets them turn that taste into implementation without requiring a lot of design _skill_ — it helps them cross ["the gap"](https://vimeo.com/85040589).
 
-Tailwind's system is a masterpiece of design. I and many other developers all around the world feel empowered by and love it.
+Tailwind's system is a masterpiece of design. I, and many other developers all around the world, feel empowered by and love it.
 
 ### The problem with Tailwind
 
-The atomic CSS framework around Tailwind's system is basically a delivery mechanism that allows developers to apply it to their UIs. It's undeniable that it has a fantastic developer experience: once you get used to the custom vocabulary (`.leading-normal`?!) you feel like you are flying!
+The atomic CSS framework is basically a delivery mechanism that allows developers to apply the system to their UIs. It's undeniable that it has a fantastic developer experience: once you get used to the custom vocabulary you feel like you are flying!
 
 However, we have learned over the past decade that [atomic CSS has downsides](https://jxnblk.com/blog/two-steps-forward/):
 
 - Users still have to add a separate setup for the [custom CSS they inevitably need](https://twitter.com/kentcdodds/status/1240868842361913347) (coined ["bailwind"](https://twitter.com/samselikoff/status/1251637275412357121)). You cannot get by on _just_ Tailwind in the real world. Not having a dedicated place for custom styles in the same system can cause maintenance issues down the line.
 - Due to file-size considerations, [Tailwind does not include all variants](https://tailwindcss.com/docs/hover-focus-and-other-states#default-variants-reference) (e.g. `hover:`, `sm:`) for all utilities by default. It leaves it to you to manually configure which ones you need for every single CSS property.
 - Atomic CSS is not ideal for performance. No tooling can extract the _per-page_ critical CSS, so you end up shipping more CSS to the browser than necessary. The bigger and more dynamic the app, the more unnecessary code you will ship.[^1]
-
-At the same time,  
 
 ### Tailwind without the downsides
 
