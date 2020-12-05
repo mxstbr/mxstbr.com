@@ -20,7 +20,7 @@ I know what you are thinking: “why would anybody write CSS in JavaScript?!” 
 
 ### What Does CSS-in-JS Look Like?
 
-Developers have created [different flavors of CSS-in-JS](https://github.com/michelebertoli/css-in-js). The most popular to date, with over 20,000 stars on GitHub, is a library I co-created, called [styled-components](https://styled-components.com).
+Developers have created [different flavors of CSS-in-JS](https://github.com/michelebertoli/css-in-js). The most popular to date, with over 30,000 stars on GitHub, is a library I co-created, called [styled-components](https://styled-components.com).
 
 Using it with React looks like this:
 

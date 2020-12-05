@@ -12,9 +12,9 @@ export const meta = {
 
 export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;
 
-[Tailwind.css](https://tailwindcss.com) is an atomic CSS framework that has taken the frontend world by storm. It gives developers without a deep understanding of design the ability to build visually gorgeous, modern user interfaces. 
+[Tailwind](https://tailwindcss.com) is an atomic CSS framework that has taken the frontend world by storm. It gives developers without a deep understanding of design the ability to build visually gorgeous, modern user interfaces. 
 
-If you have not seen it before, here is the canonical Tailwind.css example from their original homepage:
+If you have not seen it before, here is the canonical Tailwind example from their original homepage:
 
 ```html
 <div class="shadow-lg flex bg-white rounded-lg p-6 leading-normal">
@@ -70,34 +70,41 @@ sup {   font-size: 75%;   line-height: 0;   position: relative;   vertical-align
 <br />
 <br />
 
-Many people think Tailwind.css is cool because it uses atomic CSS. Here is the thing though: **Tailwind.css is awesome _despite_ using atomic CSS, not because of it**.
+Many people think Tailwind is cool because it uses atomic CSS. Here is the thing though: **Tailwind is awesome _despite_ using atomic CSS, not because of it**.
 
 Hear me out.
 
-### The key to Tailwind.css
+### The key to Tailwind
 
-We have had [atomic](https://github.com/basscss/basscss/commit/ed65eec980c4899d930f2c293f70bc619573456f) [CSS](https://github.com/tachyons-css/tachyons/commit/7f27af8d52d8ed03615e23a9db5ff33fc8153729) [frameworks](https://medium.com/buzzfeed-design/introducing-solid-1c16b1bf4868) for almost a decade but none of them have been as critically acclaimed as Tailwind.css. What makes it different?
+We have had [atomic](https://github.com/basscss/basscss/commit/ed65eec980c4899d930f2c293f70bc619573456f) [CSS](https://github.com/tachyons-css/tachyons/commit/7f27af8d52d8ed03615e23a9db5ff33fc8153729) [frameworks](https://medium.com/buzzfeed-design/introducing-solid-1c16b1bf4868) for almost a decade but none of them have been as critically acclaimed as Tailwind. What makes it different?
 
-**The key to Tailwind.css's popularity is the painstakingly constructed system of design tokens at the core of the framework.** The system's carefully selected constraints give developers _just_ the right guardrails. They make it obvious whether a choice is good or bad by offering only discrete steps.
+**The key to Tailwind's popularity is the painstakingly constructed system of design tokens at the core of the framework.** The system's carefully selected constraints give developers _just_ the right guardrails. They make it obvious whether a choice is good or bad by offering only discrete steps.
 
-This does require some design _taste_, but all engineers I know have developed that over the years of building user interface. Tailwind's sytem lets them turn that taste into implementation without requiring a lot of design _skill_ — it helps them cross ["the gap"](https://vimeo.com/85040589).
+This does require some design _taste_, but all engineers I know have developed that over the years of building user interfaces. Tailwind's sytem lets them turn that taste into implementation without requiring a lot of design _skill_ — it helps them cross ["the gap"](https://vimeo.com/85040589).
 
 Tailwind's system is a masterpiece of design. I and many other developers all around the world feel empowered by and love it.
 
-### The problem with Tailwind.css
+### The problem with Tailwind
 
-Tailwind.css (the atomic CSS framework) is simply a delivery mechanism for the system that allows developers to apply it to their UIs. However, we have learned over the past decade that [atomic CSS has downsides](https://jxnblk.com/blog/two-steps-forward/):
+The atomic CSS framework around Tailwind's system is basically a delivery mechanism that allows developers to apply it to their UIs. It's undeniable that it has a fantastic developer experience: once you get used to the custom vocabulary (`.leading-normal`?!) you feel like you are flying!
 
-- Users still have to add a separate setup for the [custom CSS they inevitably need](https://twitter.com/kentcdodds/status/1240868842361913347) (coined ["bailwind"](https://twitter.com/samselikoff/status/1251637275412357121)). You cannot get by on _just_ Tailwind.css in the real world.
-- More importantly, atomic CSS does not scale as well as it should. No tooling can extract the _per-page_ critical CSS, so developers are shipping more CSS to the browser than necessary. The bigger and more dynamic the app, the more noticeable the unnecessary bundle size.[^1]
+However, we have learned over the past decade that [atomic CSS has downsides](https://jxnblk.com/blog/two-steps-forward/):
 
-At the same time, it's undeniable that the developer experience of Tailwind.css is fantastic. It does require learning a custom vocabulary, but once you get used to it you feel like you are flying!
+- Users still have to add a separate setup for the [custom CSS they inevitably need](https://twitter.com/kentcdodds/status/1240868842361913347) (coined ["bailwind"](https://twitter.com/samselikoff/status/1251637275412357121)). You cannot get by on _just_ Tailwind in the real world. Not having a dedicated place for custom styles in the same system can cause maintenance issues down the line.
+- Due to file-size considerations, [Tailwind does not include all variants](https://tailwindcss.com/docs/hover-focus-and-other-states#default-variants-reference) (e.g. `hover:`, `sm:`) for all utilities by default. It leaves it to you to manually configure which ones you need for every single CSS property.
+- Atomic CSS is not ideal for performance. No tooling can extract the _per-page_ critical CSS, so you end up shipping more CSS to the browser than necessary. The bigger and more dynamic the app, the more unnecessary code you will ship.[^1]
+
+At the same time,  
 
 ### Tailwind without the downsides
 
-Now, here is the thing: if you are using a JavaScript framework you can have your cake and eat it too. You can use Tailwind's marvelous system and fantastic developer experience without the downsides of atomic CSS.
+Brent Jackson, the creator of one of the original atomic CSS libraries, said it best in [his post on atomic CSS](https://jxnblk.com/blog/two-steps-forward/):
 
-How? [twin.macro](https://github.com/ben-rogerson/twin.macro)!
+> “This methodology was created before React was released and was intended for use in template-based user interfaces, including Rails and PHP. It was never designed for functional component-based UI and doesn't take advantage of this new paradigm.”
+
+Now, here is the thing: you can have your cake and eat it too. You can use Tailwind's marvelous system and fantastic developer experience without the downsides of atomic CSS.
+
+How? [twin.macro](https://github.com/ben-rogerson/twin.macro).
 
 Let me illustrate. Here is the canonical Tailwind example built with [twin.macro](https://github.com/ben-rogerson/twin.macro) and React:
 
@@ -123,7 +130,7 @@ const Card = () => (
 
 Unsurprisingly, the result looks identical — we are still using the same system after all. Even the code looks the same, except that we use the `tw` prop instead of the `class` attribute!
 
-However, under the hood this automatically compiles to CSS-in-JS with [the css prop](https://medium.com/styled-components/announcing-native-support-for-the-css-prop-in-styled-components-245ca5252feb):
+However, under the hood this automatically compiles the class names to the actual CSS they refer to (with [the css prop](https://medium.com/styled-components/announcing-native-support-for-the-css-prop-in-styled-components-245ca5252feb)):
 
 ```jsx
 import "twin.macro"
@@ -144,20 +151,32 @@ import "styled-components/macro"
 />
 ```
 
-This transpiles to the actual CSS rules the Tailwind.css classes refer to, which means it has [all the advantages of CSS-in-JS](/thoughts/css-in-js):
+You get to use Tailwind's system and developer experience _and_ take advantage of [all the benefits of CSS-in-JS](/thoughts/css-in-js):
 
-- Extending your elements with custom styles is as simple as using the css prop, no extra setup required to "bailwind":
+- Extending your elements with custom styles is as simple as using the css prop, no extra separate setup required to "bailwind":
 
   ```jsx
   import "twin.macro"
 
   <div
     tw="text-center md:text-left"
-    css={{ `&:hover`: { backgroundImage: `url("/bg.png")` } }}
+    css={{`
+      &:hover { 
+        background-image: url("/bg.png");
+      }
+    `}}
   />
   ```
 
-- Most importantly, this does fully automatic critical CSS extraction and code splitting: users will only load exactly the styles they need for the page they see — nothing more and nothing less!
+- Since twin.macro compiles at build-time you can use always use all variants in all combinations without worrying about configuration or file size, allowing for even more expression within the system:
+
+  ```jsx
+  import "twin.macro"
+
+  <div tw="sm:hover:first:bg-black" />
+  ```
+
+- Fully automatic critical CSS extraction and code splitting: users will only load exactly the styles they need for the page they requested — nothing more and nothing less! CSS performance does not get better.[^1]
 
 The ideal setup for both developer _and_ user experience!
 
@@ -165,4 +184,4 @@ The ideal setup for both developer _and_ user experience!
 
 Rather than taking two steps forward with Tailwind's system and one step backward with atomic CSS, let's take five steps forward. Together.
 
-[^1]: As always with performance there is a lot of nuance to this point. The first-paint with CSS-in-JS will always be faster as the critical CSS for the requested page is inlined into a `<style>` tag. This saves both an extra network request for the `.css` file as well as not shipping any CSS not used on that specific page. However, the JavaScript bundle includes the CSS-in-JS library, so the Time To Interactive might be slightly slower for small apps. However, at some point the size of the Tailwind-generated CSS file will outweigh any CSS-in-JS library, which doesn't grow in size.&nbsp;
+[^1]: CSS-in-JS automatically extracts the critical CSS for the requested page and inlines it into a `<style>` tag. That means the first-paint with CSS-in-JS will _always_ be faster as it saves both an extra network request for the `.css` file as well as sending less CSS code to the client. While the Time To Interactive for small apps will be slightly slower (as the JavaScript bundle includes the CSS-in-JS library you use) once your app grows the network request for the larger CSS file can outweigh any CSS-in-JS library and can cause a slower Time To Interactive as well.&nbsp;
