@@ -166,15 +166,15 @@ You get to use Tailwind's system and developer experience _and_ take advantage o
   />
   ```
 
-- Since twin.macro compiles at build-time you can use always use all variants in all combinations without worrying about configuration or file size, allowing for even more expression within the system:
+- You can use all variants in all combinations with all utilities allowing for even more expression within the system. Since twin.macro runs at build-time, you don't have to worry about configuration or file size:
 
   ```jsx
   import "twin.macro"
 
-  <div tw="sm:hover:first:bg-black" />
+  <div tw="sm:hover:first:bg-black">...</div>
   ```
 
-- Fully automatic critical CSS extraction and code splitting: users will only load exactly the styles they need for the page they requested — nothing more and nothing less! CSS performance does not get better.[^1]
+- You get fully automatic critical CSS extraction and code splitting. Users will only load exactly the styles they need for the page they requested — nothing more and nothing less! CSS performance does not get better.[^1]
 
 The ideal setup for both developer _and_ user experience!
 
