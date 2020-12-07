@@ -34,16 +34,16 @@ const FooterListItem = ({
   children,
   href
 }: ListItemProps) => (
-  <Text as="div" my={1} color="#666">
-    <Link href={href} rel={rel}>
+  <Link href={href} rel={rel}>
+    <Text as="span" py={1} color="#666" css={{ display: `block` }}>
       {IconComp && (
         <Icon mr={2} ml={0}>
           <IconComp size="1em" />
         </Icon>
       )}
       {children}
-    </Link>
-  </Text>
+    </Text>
+  </Link>
 );
 
 export default (props: {}) => (
@@ -61,7 +61,7 @@ export default (props: {}) => (
         <FooterColumn title="About this place" width={0.5}>
           <Text color="#666" lineHeight={1.5}>
             Welcome to my personal website! I'm @mxstbr, a JavaScript Engineer
-            from Austria 🇦🇹 and I love React and Node.
+            from Austria 🇦🇹 in love with React and Node.
           </Text>
         </FooterColumn>
         <FooterColumn last title="Social Stuff">

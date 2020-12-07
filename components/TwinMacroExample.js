@@ -12,6 +12,7 @@ const TwinMacroExample = () => (
     <Box
       as="img"
       tw="h-24 w-24 rounded-full mx-0 mr-6"
+      alt="Avatar of Erin Lindford"
       src="https://randomuser.me/api/portraits/women/17.jpg"
     />
     <Box tw="text-left">

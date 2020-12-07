@@ -3,8 +3,8 @@ import Lesson from "../../../components/Lesson";
 import TwinMacroExample from "../../../components/TwinMacroExample";
 
 export const meta = {
-  published: false,
-  publishedAt: "2020-05-28",
+  published: true,
+  publishedAt: "2020-12-07",
   title: "Why I Love Tailwind",
   summary: "Why Tailwind is blowing up, why I (the creator of styled-components) love it and how I avoid the downsides of atomic CSS.",
   image: "/static/images/tailwind.jpeg"
@@ -56,6 +56,7 @@ sup {   font-size: 75%;   line-height: 0;   position: relative;   vertical-align
 
 <div className="shadow-lg flex bg-white rounded-lg p-6 leading-normal" style={{ fontFamily: "sans-serif" }}>
   <img
+    alt="Avatar of Erin Lindford"
     className="h-24 w-24 rounded-full mx-auto mx-0 mr-6" 
     src="https://randomuser.me/api/portraits/women/17.jpg"
   />
