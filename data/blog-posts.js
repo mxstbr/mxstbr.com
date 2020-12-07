@@ -22,6 +22,7 @@ export type NewBlogPost = {|
 export type BlogPost = $Exact<OldBlogPost> | $Exact<NewBlogPost>;
 
 const posts: Array<NewBlogPost> = preval`
+  console.log("Clear cache please");
   module.exports = require('./get-blog-posts.js');
 `;
 
