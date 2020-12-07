@@ -65,6 +65,12 @@ module.exports = {
       }
     },
     {
+      resolve: `gatsby-plugin-splitbee`,
+      options: {
+        includeInDevelopment: false
+      }
+    },
+    {
       resolve: `gatsby-plugin-feed`,
       options: {
         feeds: [

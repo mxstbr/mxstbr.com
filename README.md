@@ -14,6 +14,7 @@ This is the source for my personal website and blog [mxstbr.com](https://mxstbr.
 - [Prettier](https://github.com/prettier/prettier)
 - [now](https://now.sh)
 - [Feather Icons](https://feathericons.com)
+- [Splitbee](https://splitbee.io)
 
 ## License
 
