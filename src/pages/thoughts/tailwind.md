@@ -20,10 +20,10 @@ If you have not seen it before, here is the canonical Tailwind example from thei
 <div class="shadow-lg flex bg-white rounded-lg p-6 leading-normal">
   <img class="h-24 w-24 rounded-full mx-auto mx-0 mr-6" src="avatar.jpg" />
   <div class="text-center text-left">
-    <div class="text-lg">Erin Lindford</div>
-    <div class="text-purple-500">Customer Support</div>
-    <div class="text-gray-600">erinlindford@example.com</div>
-    <div class="text-gray-600">(555) 765-4321</div>
+    <h1 class="text-lg">Erin Lindford</h1>
+    <h2 class="text-purple-500">Customer Support</h2>
+    <p class="text-gray-600">erinlindford@example.com</p>
+    <p class="text-gray-600">(555) 765-4321</p>
   </div>
 </div>
 ```
@@ -114,10 +114,10 @@ const Card = () => (
   <div tw="shadow-lg md:flex bg-white rounded-lg p-6 leading-normal">
     <img tw="h-16 w-16 md:h-24 md:w-24 rounded-full mx-auto md:mx-0 md:mr-6" src="avatar.jpg" />
     <div tw="text-center md:text-left">
-      <h2 tw="text-lg">Erin Lindford</h2>
-      <div tw="text-purple-500">Customer Support</div>
-      <div tw="text-gray-600">erinlindford@example.com</div>
-      <div tw="text-gray-600">(555) 765-4321</div>
+      <h1 tw="text-lg">Erin Lindford</h1>
+      <h2 tw="text-purple-500">Customer Support</h2>
+      <p tw="text-gray-600">erinlindford@example.com</p>
+      <p tw="text-gray-600">(555) 765-4321</p>
     </div>
   </div>
 )
