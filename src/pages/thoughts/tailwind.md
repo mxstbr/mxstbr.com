@@ -81,7 +81,7 @@ We have had [atomic](https://github.com/basscss/basscss/commit/ed65eec980c4899d9
 
 **The key to Tailwind's popularity is the painstakingly constructed system of design tokens at the core of the framework.** The system's carefully selected constraints give developers _just_ the right guardrails. They make it obvious whether a choice is good or bad by offering only discrete steps.
 
-This does require some design _taste_, but most frontend engineers I know have developed that over the years of building user interfaces. Tailwind's sytem lets them turn that taste into implementation without requiring a lot of design _skill_ — it helps them cross ["the gap"](https://vimeo.com/85040589).
+This does require some design _taste_, but most frontend engineers I know have developed that over the years of building user interfaces. Tailwind's system lets them turn that taste into implementation without requiring a lot of design _skill_ — it helps them cross ["the gap"](https://vimeo.com/85040589).
 
 Tailwind's system is a masterpiece of design. I, and many other developers all around the world, feel empowered by and love it.
 
