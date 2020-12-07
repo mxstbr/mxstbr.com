@@ -54,7 +54,7 @@ sup {   font-size: 75%;   line-height: 0;   position: relative;   vertical-align
 .text-left { text-align: left; }
 `}</style>
 
-<div className="shadow-lg flex bg-white rounded-lg p-6 leading-normal" style={{ fontFamily: "sans-serif" }}>
+<div className="shadow-lg flex bg-white rounded-lg p-6 leading-normal" style={{ fontFamily: "sans-serif", wordBreak: "break-all" }}>
   <img
     alt="Avatar of Erin Lindford"
     className="h-24 w-24 rounded-full mx-auto mx-0 mr-6" 

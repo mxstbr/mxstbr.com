@@ -6,7 +6,7 @@ import "twin.macro";
 
 const TwinMacroExample = () => (
   <Box
-    style={{ fontFamily: `sans-serif` }}
+    style={{ fontFamily: `sans-serif`, wordBreak: "break-all" }}
     tw="shadow-lg flex bg-white rounded-lg p-6 leading-normal"
   >
     <Box
