@@ -30,10 +30,6 @@ If you have not seen it before, here is the canonical Tailwind example from thei
 ```
 
 <style>{`
-sup {   font-size: 75%;   line-height: 0;   position: relative;   vertical-align: baseline;   top: -0.5em }
-.footnotes * { font-size: inherit!important; }
-.footnotes { font-size: 0.9em; }
-.footnotes li { max-width: 100%; }
 .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -2px rgba(0,0,0,.05); }
 .p-6 { padding: 1.5rem; }
 .leading-normal { line-height: 1.5; }

@@ -140,7 +140,28 @@ export default (props: Props) => {
           : `Published ${published} `}
         <WebMentionCounts />
       </Text>
-      {children}
+      <Box
+        css={`
+          sup {
+            font-size: 75%;
+            line-height: 0;
+            position: relative;
+            vertical-align: baseline;
+            top: -0.5em;
+          }
+          .footnotes * {
+            font-size: inherit !important;
+          }
+          .footnotes {
+            font-size: 0.9em;
+          }
+          .footnotes li {
+            max-width: 100%;
+          }
+        `}
+      >
+        {children}
+      </Box>
       {meta.published === true && (
         <Paragraph fontSize={1} mt={4} mb={4}>
           <HackerNewsLink path={location.pathname} title={meta.title}>
