@@ -34,6 +34,9 @@ module.exports = {
     siteUrl: `https://mxstbr.com`
   },
   plugins: [
+    `gatsby-plugin-image`,
+    `gatsby-plugin-sharp`,
+    `gatsby-transformer-sharp`,
     `gatsby-plugin-styled-components`,
     `gatsby-plugin-flow`,
     `gatsby-plugin-react-helmet`,
