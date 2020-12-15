@@ -7,6 +7,7 @@ import Icon from "./Icon";
 import Link from "./Link";
 
 const ViewMoreLinkWrapper = styled(Box)`
+  color: ${p => p.theme.colors.blue};
   ${Icon} {
     transition: transform 50ms ease-in-out;
   }
@@ -22,9 +23,9 @@ type Props = {
 };
 
 const ViewMoreLink = (props: Props) => (
-  <ViewMoreLinkWrapper mt={4}>
+  <ViewMoreLinkWrapper mt={4} {...props}>
     <TextButton as={Link} href={props.href}>
-      <Text as="div" fontSize={2}>
+      <Text as="div" fontSize={2} color="blue">
         {props.children}
       </Text>
     </TextButton>
