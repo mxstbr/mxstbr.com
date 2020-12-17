@@ -103,7 +103,7 @@ class Homepage extends React.Component<Props> {
           </Icon>
         </ViewMoreLink>
 
-        <H2>Recent Blog Posts</H2>
+        <H2 mb={2}>Recent Blog Posts</H2>
         {blogposts.slice(0, 4).map((post, index) => (
           <BlogPostListItem
             key={post.title}

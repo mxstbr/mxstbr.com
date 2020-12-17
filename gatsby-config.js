@@ -33,6 +33,10 @@ module.exports = {
   siteMetadata: {
     siteUrl: `https://mxstbr.com`
   },
+  flags: {
+    PARALLEL_SOURCING: true,
+    FAST_DEV: true
+  },
   plugins: [
     `gatsby-plugin-image`,
     `gatsby-plugin-sharp`,
