@@ -35,7 +35,7 @@ const FooterListItem = ({
   href
 }: ListItemProps) => (
   <Link href={href} rel={rel}>
-    <Text as="span" py={1} color="#666" css={{ display: `block` }}>
+    <Text py={1} color="#666" css={{ display: `block` }}>
       {IconComp && (
         <Icon mr={2} ml={0}>
           <IconComp size="1em" />

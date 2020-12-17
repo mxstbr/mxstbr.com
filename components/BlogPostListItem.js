@@ -37,7 +37,7 @@ export const BlogPostListItem = ({ post, small, last, webmentions }) => (
     </H3>
     <Text
       color="quaternary"
-      as="div"
+      m={0}
       css={{
         height: "1em"
       }}
