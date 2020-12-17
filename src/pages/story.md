@@ -1,6 +1,7 @@
 import { LiteYoutubeEmbed } from "react-lite-yt-embed";
 import { Tweet } from "react-twitter-widgets"
 import PageHeader from "../../components/PageHeader";
+import Head from "../../components/Head";
 import WideSection from "../../components/WideSection";
 
 <PageHeader title="My Story" mb={0}>
