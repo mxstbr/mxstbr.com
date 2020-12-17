@@ -1,5 +1,4 @@
 import React from "react";
-import timeout from "p-timeout";
 import { Flex, Box } from "rebass";
 import { ExternalLink as LinkExternal, ChevronRight } from "react-feather";
 import ConditionalWrap from "conditional-wrap";
@@ -24,6 +23,7 @@ import WideSection from "../../components/WideSection";
 import BlogPostCard from "../../components/BlogPostCard";
 import Head from "../../components/Head";
 import ViewMoreLink from "../../components/ViewMoreLink";
+import { BlogPostListItem } from "../../components/BlogPostListItem";
 import { DEFAULT_TITLE } from "../App";
 import type { OldBlogPost } from "../../data/blog-posts";
 
@@ -99,7 +99,24 @@ class Homepage extends React.Component<Props> {
         <ViewMoreLink href="/oss">
           View all
           <Icon>
-            <ChevronRight size="1em" />
+            <ChevronRight strokeWidth="3" size="1em" />
+          </Icon>
+        </ViewMoreLink>
+
+        <H2>Recent Blog Posts</H2>
+        {blogposts.slice(0, 4).map((post, index) => (
+          <BlogPostListItem
+            key={post.title}
+            small={false}
+            last={index === 3}
+            post={post}
+            webmentions
+          />
+        ))}
+        <ViewMoreLink mt={2} href="/thoughts">
+          View all
+          <Icon>
+            <ChevronRight strokeWidth="3" size="1em" />
           </Icon>
         </ViewMoreLink>
 
@@ -110,22 +127,7 @@ class Homepage extends React.Component<Props> {
         <ViewMoreLink href="/appearances">
           View all
           <Icon>
-            <ChevronRight size="1em" />
-          </Icon>
-        </ViewMoreLink>
-
-        <H2>Recent Blog Posts</H2>
-        <WideSection>
-          <CardGrid>
-            {blogposts.slice(0, 3).map((post, i) => (
-              <BlogPostCard key={post.title} post={post} />
-            ))}
-          </CardGrid>
-        </WideSection>
-        <ViewMoreLink href="/thoughts">
-          View more
-          <Icon>
-            <ChevronRight size="1em" />
+            <ChevronRight strokeWidth="3" size="1em" />
           </Icon>
         </ViewMoreLink>
       </Main>

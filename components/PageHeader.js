@@ -8,7 +8,7 @@ import type { JsonLD } from "./JsonLD";
 type Props = {
   ...$Exact<RebassProps>,
   children: React$Node,
-  title: string,
+  title?: string,
   description?: string,
   image?: string,
   jsonld?: JsonLD
@@ -29,9 +29,11 @@ export default (props: Props) => (
       image={props.image}
       jsonld={props.jsonld}
     />
-    <H2 alignSelf="center" textAlign="center" mt={0}>
-      {props.title}
-    </H2>
+    {props.title && (
+      <H2 alignSelf="center" textAlign="center" mt={0}>
+        {props.title}
+      </H2>
+    )}
     {props.children}
   </Flex>
 );
