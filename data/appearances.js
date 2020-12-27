@@ -380,7 +380,7 @@ const appearances: Array<Appearance> = [
     site: "The Lovie Awards",
     type: "award",
     city: "Frankensim",
-    link: "https://animade.tv/notes/double-win-in-the-lovie-awards",
+    link: "https://www.youtube.com/watch?v=6YS8YDgp-_I",
     date: new Date(2016, 9, 1)
   },
   {
