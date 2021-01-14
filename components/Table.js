@@ -69,7 +69,7 @@ const Table = (props: Props) => (
       <Flex
         flexDirection="column"
         bg="#fff"
-        css={{ borderRadius: "5px", border: "1px solid #eee" }}
+        css={{ borderRadius: "6px", border: "1px solid #eee" }}
         width={1}
       >
         {props.rows.map(row => (
@@ -82,7 +82,12 @@ const Table = (props: Props) => (
             href={row.href}
             underline={false}
           >
-            <Flex flexDirection={["column", "row"]}>{props.render(row)}</Flex>
+            <Flex
+              flexDirection={["column", "row"]}
+              alignItems={["initial", "center"]}
+            >
+              {props.render(row)}
+            </Flex>
           </RowLink>
         ))}
       </Flex>

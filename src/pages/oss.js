@@ -30,7 +30,7 @@ const OpenSourceProjectTableRow = ({ project }) => (
       width={[1, "260px"]}
       alignItems={["flex-start", "center"]}
       justifyContent={["space-between", "initial"]}
-      height={1}
+      height="100%"
     >
       <Heading as="h4" fontSize={[3, 2]} alignSelf={["flex-start", "center"]}>
         {project.name}
@@ -48,12 +48,14 @@ const OpenSourceProjectTableRow = ({ project }) => (
       px={[0, 3]}
       mb={[2, 0]}
     >
-      <Text color="#666">{project.description}</Text>
+      <Text color="#666" css={{ lineHeight: 1.5 }}>
+        {project.description}
+      </Text>
     </Flex>
     <Flex
       alignItems="center"
       justifyContent={["flex-start", "flex-end"]}
-      width={[1, "6em"]}
+      width={[1, "6.5em"]}
     >
       <DesktopOnly>
         <Text as="div" color="#666" fontSize={1}>
@@ -69,20 +71,35 @@ export default () => (
   <Main>
     <Head
       title="My Open Source Projects - Max Stoiber (@mxstbr)"
-      description="A list of most of the open source projects I've (co-) created and/or maintained."
+      description={`All of my open source projects, with a grand total of ${projects
+        .reduce((total, { stars }) => total + stars, 0)
+        .toLocaleString()} stars on GitHub.`}
     />
     <PageHeader title="My Open Source Projects">
       <Paragraph centered>
-        These are all the open source projects I've (co-) created and am
-        actively maintaining or using. (see{" "}
-        <Link href="https://github.com/mxstbr">my GitHub profile</Link> for all
-        contributions)
+        Open source projects I have (co-)created or maintained are used on 1% of
+        all public, crawlable websites
+        <sup
+          style={{
+            verticalAlign: `super`,
+            fontSize: `0.6em`
+          }}
+        >
+          <Link href="https://almanac.httparchive.org/en/2020/css#css-in-js">
+            1
+          </Link>
+        </sup>{" "}
+        and have a total of{" "}
+        {projects
+          .reduce((total, { stars }) => total + stars, 0)
+          .toLocaleString()}{" "}
+        stars <Link href="https://github.com/mxstbr">on GitHub</Link>.
       </Paragraph>
     </PageHeader>
     <WideSection>
       <Table
         rows={projects
-          .filter(p => p.active !== false)
+          .filter(p => p.owner !== false && p.stars > 50)
           .sort((a, b) => b.stars - a.stars || b.name.localeCompare(a.name))
           .map(p => ({
             ...p,
@@ -96,21 +113,22 @@ export default () => (
     <Text as="div" color="#666" mt={4} fontSize={2}>
       Total:{" "}
       {projects
-        .filter(p => p.active !== false)
-        .reduce((total, { stars }) => total + stars, 0)}
+        .filter(p => p.owner !== false)
+        .reduce((total, { stars }) => total + stars, 0)
+        .toLocaleString()}{" "}
       <StarIcon />
     </Text>
     <H2 my={null} mt={4} mb={3} fontSize={3}>
-      Past Open Source Projects
+      Maintainer
     </H2>
     <Paragraph mb={3}>
-      I used to work on these projects, but am either no longer involved with
-      them or they are archived.
+      These are open source projects I did not originally invent, but maintained
+      for some time on the core team.
     </Paragraph>
     <WideSection>
       <Table
         rows={projects
-          .filter(p => p.active === false)
+          .filter(p => p.owner === false)
           .sort((a, b) => b.stars - a.stars || b.name.localeCompare(a.name))
           .map(p => ({
             ...p,
@@ -121,5 +139,13 @@ export default () => (
         render={row => <OpenSourceProjectTableRow project={row} />}
       />
     </WideSection>
+    <Text as="div" color="#666" mt={4} fontSize={2}>
+      Total:{" "}
+      {projects
+        .filter(p => p.owner === false)
+        .reduce((total, { stars }) => total + stars, 0)
+        .toLocaleString()}
+      <StarIcon />
+    </Text>
   </Main>
 );

@@ -5,7 +5,7 @@ export type OpenSourceProject = {
   stars: number,
   background?: string,
   featured?: boolean,
-  active?: boolean
+  owner?: boolean
 };
 
 const projects: Array<OpenSourceProject> = [
@@ -227,15 +227,14 @@ const projects: Array<OpenSourceProject> = [
     name: "KeystoneJS",
     stars: 14803,
     description: "The original Node.js CMS and web application framework",
-    active: false
+    owner: false
   },
   {
     repo: "carteb/carte-blanche",
     name: "Carte Blanche",
     stars: 1526,
     description:
-      "An isolated development space with integrated fuzz testing for your React components.",
-    active: false
+      "An isolated development space with integrated fuzz testing for your React components."
   },
   {
     repo: "draft-js-plugins/draft-js-plugins",
@@ -246,8 +245,7 @@ const projects: Array<OpenSourceProject> = [
   {
     repo: "postcss/postcss.org",
     stars: 71,
-    description: "The PostCSS website.",
-    active: false
+    description: "The PostCSS website."
   },
   {
     repo: "mxstbr/mxstbr.com",
@@ -258,6 +256,13 @@ const projects: Array<OpenSourceProject> = [
     repo: "mxstbr/passport-magic-login",
     stars: 400,
     description: "Passwordless authentication with magic links for Passport"
+  },
+  {
+    repo: "gatsbyjs/gatsby",
+    stars: 48640,
+    description:
+      "A framework based on React that helps developers build blazing fast websites and apps",
+    owner: false
   }
 ].map(p => {
   if (p.name) return p;
