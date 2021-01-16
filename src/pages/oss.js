@@ -67,13 +67,18 @@ const OpenSourceProjectTableRow = ({ project }) => (
   </>
 );
 
+const total = projects
+  .reduce((total, { stars }) => total + stars, 0)
+  .toLocaleString();
+
 export default () => (
   <Main>
     <Head
       title="My Open Source Projects - Max Stoiber (@mxstbr)"
-      description={`All of my open source projects, with a grand total of ${projects
-        .reduce((total, { stars }) => total + stars, 0)
-        .toLocaleString()} stars on GitHub.`}
+      image={`https://cdn.splitbee.io/og/57fadbbdf5?headline=${encodeURIComponent(
+        `${total} stars`
+      )}`}
+      description={`All of my GitHub open source projects in one complete list.`}
     />
     <PageHeader title="My Open Source Projects">
       <Paragraph centered>
@@ -89,11 +94,8 @@ export default () => (
             1
           </Link>
         </sup>{" "}
-        and have a total of{" "}
-        {projects
-          .reduce((total, { stars }) => total + stars, 0)
-          .toLocaleString()}{" "}
-        stars <Link href="https://github.com/mxstbr">on GitHub</Link>.
+        and have a total of {} stars{" "}
+        <Link href="https://github.com/mxstbr">on GitHub</Link>.
       </Paragraph>
     </PageHeader>
     <WideSection>
