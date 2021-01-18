@@ -94,7 +94,7 @@ export default () => (
             1
           </Link>
         </sup>{" "}
-        and have a total of {} stars{" "}
+        and have a total of {total} stars{" "}
         <Link href="https://github.com/mxstbr">on GitHub</Link>.
       </Paragraph>
     </PageHeader>

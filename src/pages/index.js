@@ -75,7 +75,7 @@ class Homepage extends React.Component<Props> {
         </PageHeader>
         {/* Render default title */}
         <Head title={DEFAULT_TITLE} />
-        <H2 mt={3}>Featured Open Source Projects</H2>
+        <H2 mt={3}>My Open Source Projects</H2>
         <WideSection>
           <CardGrid>
             {projects

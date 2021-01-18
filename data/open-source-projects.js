@@ -33,8 +33,17 @@ const projects: Array<OpenSourceProject> = [
     description:
       "A foundation for React apps with a focus on scalability, developer experience and best practices.",
     stars: 26837,
-    background: "linear-gradient(to bottom right, #6D6E72, #9EA0A6)",
+    background: "linear-gradient(to top right, #6D6E72, #9EA0A6)",
     featured: true
+  },
+
+  {
+    repo: "gatsbyjs/gatsby",
+    stars: 48640,
+    description:
+      "A framework based on React that helps developers build blazing fast websites and apps",
+    owner: false,
+    background: "linear-gradient(to top right, #663399, #0e8de6)"
   },
   {
     repo: "styled-components/polished",
@@ -42,13 +51,15 @@ const projects: Array<OpenSourceProject> = [
     description:
       'A lightweight toolset for writing styles in JavaScript, the "Lodash of CSS-in-JS"',
     stars: 6570,
+    // background: "linear-gradient(to top right, #3a9b6d, #65daa2)",
     featured: true
   },
   {
     repo: "styled-components/awesome-styled-components",
     name: "awesome-styled-components",
     description: "A curated list of awesome styled-components resources",
-    stars: 2510
+    stars: 2510,
+    featured: true
   },
   {
     repo: "mxstbr/sharingbuttons.io",
@@ -63,8 +74,7 @@ const projects: Array<OpenSourceProject> = [
     name: "Login Flow",
     stars: 1620,
     description:
-      "An example React and Redux implementation of a login/register flow.",
-    featured: true
+      "An example React and Redux implementation of a login/register flow."
   },
   {
     repo: "mxstbr/micro-github",
@@ -256,13 +266,6 @@ const projects: Array<OpenSourceProject> = [
     repo: "mxstbr/passport-magic-login",
     stars: 400,
     description: "Passwordless authentication with magic links for Passport"
-  },
-  {
-    repo: "gatsbyjs/gatsby",
-    stars: 48640,
-    description:
-      "A framework based on React that helps developers build blazing fast websites and apps",
-    owner: false
   }
 ].map(p => {
   if (p.name) return p;
