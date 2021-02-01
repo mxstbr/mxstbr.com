@@ -19,18 +19,15 @@ Making local dev environments work often requires incantations of unbelievable l
 
 Docker _kind of_ solves this, but it's really optimized for production usage. It makes a lot of common development tasks unbearably slow. (e.g. installing dependencies, watching files, syncing files from host to volume, etc.) You have to remember to execute commands in the container (`docker-compose exec app yarn add package`). etc.etc.
 
-Fundamentally, Docker is the wrong tool for the job — like using sharp scissors to hammer in a nail. If the scissors are made of diamond, it'll still work fine — but it could work a lot better.
+Fundamentally, Docker is the wrong tool for the job. It works, but it's far from ideal.
 
-docker-compose, on the other hand, is really nice for the most part.
-
-One command to start/stop the local development environment which'll work on any operating system — fantastic!
+docker-compose though is really nice: One command to start/stop the local development environment which'll work on any operating system?! Fantastic!
 
 Is there a way to get the benefits of Docker (-compose) in a lighter-weight package optimized for development?
 
 ## Browser DevTools are optimized for debugging, not for development, and are too generic
 
-
-Browser devtools are a jack of all trades, master of none. They're fine, but they could be much more specific to _my_ app and setup. 
+Browser devtools are a jack of all trades, master of none. They're fine, but they could be much more specific to _my_ app and setup.
 
 ui-devtools.com is a great example of "DevTools specific to my stack" and makes for a fantastic development experience.
 
@@ -38,11 +35,11 @@ However, contrast that with the React DevTools: those are only useful for debugg
 
 My first intuition was that it's because UI Devtools writes out to my code, but really that's not the point. It could just as well not do that and still be super useful.
 
-What makes UI Devtools useful for development is its ability to scope itself to _my app_. I can lightly edit _my app_ with _my styles_ (in this case, only if I'm using Tailwind).
+What makes UI Devtools useful for development is its ability to scope itself to _my app_. I can lightly try different of _my styles_ on _my app_ in real-time.
 
 Think about this then: how could React DevTools scope itself to my app and be useful for development?
 
-What if you could drag and drop any React component that's already in your app onto the page? Or even just edit them in the JSX tree?
+What if you could drag and drop any React component that's already in your app onto the page? Or even just edit them in real-time into the JSX tree?
 
 ## Making good decisions is really hard
 
