@@ -4,8 +4,8 @@ import WideSection from "../../components/WideSection";
 
 <PageHeader title="Angel Investing" mb={0}>
   <Head
-    title="Investing – Max Stoiber (@mxstbr)"
-    description="I angel invest small checks in early-stage startups I'm excited about. Learn more about how I decide and which investments I've already made!"
+    title="Angel Investing – Max Stoiber (@mxstbr)"
+    description="I angel invest in early-stage startups I'm excited about. Learn more about how I decide and which investments I've already made!"
     image="https://cdn.splitbee.io/og/57fadbbdf5?headline=Angel%20investing"
   />
 </PageHeader>
