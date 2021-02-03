@@ -6,6 +6,7 @@ import WideSection from "../../components/WideSection";
   <Head
     title="Investing – Max Stoiber (@mxstbr)"
     description="I angel invest small checks in early-stage startups I'm excited about. Learn more about how I decide and which investments I've already made!"
+    image="https://cdn.splitbee.io/og/57fadbbdf5?headline=Angel%20investing"
   />
 </PageHeader>
 
