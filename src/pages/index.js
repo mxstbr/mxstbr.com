@@ -61,7 +61,7 @@ class Homepage extends React.Component<Props> {
             invest in early-stage startups that I'm passionate about, such as{" "}
             <Link href="https://devjobs.de">Dev Jobs</Link>,{" "}
             <Link href="https://lambda.store">Lambda Store</Link> and{" "}
-            <Link href="https://www.mikafi.com">Mikafi</Link>.
+            <Link href="/investing">others</Link>.
           </Paragraph>
           <Paragraph centered>
             If I'm not coding or{" "}
