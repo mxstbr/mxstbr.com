@@ -20,7 +20,7 @@ I love investing in products that I (would) use myself, even more so if they're 
 
 I love investing early to make the most of the limited amount of money I have. The earlier, the better.
 
-If you're founding a startup and think this could be a good fit I'd love to meet you. [DM me on Twitter](https://twitter.com/mxstbr) or [send me an email](mailto:contact@mxstbr.com) and let's chat!
+If you're founding a startup and think this could be a good fit I'd love to meet you. [DM me on Twitter](https://twitter.com/mxstbr) or <a href-"mailto:contact@mxstbr.com">send me an email</a> and let's chat!
 
 ### Investments
 
