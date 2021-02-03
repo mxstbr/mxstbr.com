@@ -28,5 +28,3 @@ So far, I have invested in:
 - [Lambda Store](https://lambda.store), the serverless database for Redis
 - [DevJobs.at](https://devjobs.at), a job matching service for developers in Austria
 - [Mikafi](https://mikafi.com), a consumer coffee roaster
-
-_I also own shares in [Gatsby](https://gatsbyjs.com), the static website framework powered by React and GraphQL, from my time working there._
