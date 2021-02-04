@@ -17,7 +17,7 @@ const BaseLink = styled(RebassLink)`
 
 const UniversalLink = props => {
   const href = props.href || "";
-  const external = href.indexOf("//") !== -1;
+  const external = href.indexOf("//") !== -1 || href.indexOf("mailto") === 0;
 
   // TODO: Implement Gatsby's Link for internal links. Breaks styling.
   return (
