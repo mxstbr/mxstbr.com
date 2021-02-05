@@ -27,7 +27,7 @@ If you're founding a startup and think this could be a good fit I'd love to meet
 So far, I have invested in:
 
 - _Unannounced developer startup_
-- _Unannounced developer startup #2_
-- [Lambda Store](https://lambda.store), the serverless database for Redis
-- [DevJobs.at](https://devjobs.at), a job matching service for developers in Austria
+- [Lambda Store](https://lambda.store), a database for the serverless world
+- [Outsmartly](https://www.outsmartly.com/), a CDN dynamically personalizing websites
+- [DevJobs](https://devjobs.at), a job matching platform for developers
 - [Mikafi](https://mikafi.com), a consumer coffee roaster
