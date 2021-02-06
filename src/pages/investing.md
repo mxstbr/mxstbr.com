@@ -28,6 +28,6 @@ So far, I have invested in:
 
 - _Unannounced developer startup_
 - [Lambda Store](https://lambda.store), a database for the serverless world
-- [Outsmartly](https://www.outsmartly.com/), a CDN dynamically personalizing websites
+- [Outsmartly](https://www.outsmartly.com/), a CDN for performantly personalizing websites
 - [DevJobs](https://devjobs.at), a job matching platform for developers
 - [Mikafi](https://mikafi.com), a consumer coffee roaster
