@@ -59,8 +59,8 @@ class Homepage extends React.Component<Props> {
             <Link href="https://changefeed.app">Changefeed</Link> and{" "}
             <Link href="https://feedback.fish">Feedback Fish</Link>, and angel
             invest in early-stage startups that I'm passionate about, such as{" "}
-            <Link href="https://devjobs.de">Dev Jobs</Link>,{" "}
-            <Link href="https://lambda.store">Lambda Store</Link> and{" "}
+            <Link href="https://raycast.com">Raycast</Link>,{" "}
+            <Link href="https://upstash.com">Upstash</Link> and{" "}
             <Link href="/investing">others</Link>.
           </Paragraph>
           <Paragraph centered>

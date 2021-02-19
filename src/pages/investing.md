@@ -26,8 +26,10 @@ If you're founding a startup and think this could be a good fit I'd love to meet
 
 So far, I have invested in:
 
-- [Lambda Store](https://lambda.store), a database for the serverless world
+- [Upstash](https://upstash.com/), a database for the serverless world
 - [Outsmartly](https://www.outsmartly.com/), a CDN for performantly personalizing websites
+- [Raycast](https://raycast.com), an extensible Spotlight for developers
+- [Magic Bell](https://magicbell.io), an embeddable notification system
+- _Unannounced_, a tool to improve engineering organizations
 - [DevJobs](https://devjobs.at), a job matching platform for developers
 - [Mikafi](https://mikafi.com), a consumer coffee roaster
-- _Unannounced developer startup_
