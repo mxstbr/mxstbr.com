@@ -48,19 +48,32 @@ class Homepage extends React.Component<Props> {
         <PageHeader title="Hey, I'm Max! 👋">
           <Paragraph centered>
             I'm a JavaScript Engineer from Austria 🇦🇹 in love with React and
-            Node. I currently work on open source JavaScript tooling at{" "}
-            <Link href="https://gatsbyjs.com">Gatsby</Link>. Before that I
-            worked at <Link href="https://github.com">GitHub</Link>, who
-            acquired my startup{" "}
-            <Link href="https://spectrum.chat">Spectrum</Link>.
+            Node. My biggest career achievement so far is that about 1% of all
+            public, crawlable websites use open source tooling I invented.
+            <Link
+              href="https://twitter.com/mxstbr/status/1336727600996167686?s=20"
+              target="_blank"
+            >
+              <sup style={{ verticalAlign: "super", fontSize: "0.75em" }}>
+                1
+              </sup>
+            </Link>
+          </Paragraph>
+          <Paragraph>
+            Previously, I worked on open source JavaScript tooling at{" "}
+            <Link href="https://gatsbyjs.com">Gatsby</Link> and architected a
+            greenfield React app at{" "}
+            <Link href="https://github.com">GitHub</Link> after they acquired my
+            startup <Link href="https://spectrum.chat">Spectrum</Link>.
           </Paragraph>
           <Paragraph centered>
-            I run two SaaS products with some friends,{" "}
+            I also run two SaaS products with friends,{" "}
             <Link href="https://changefeed.app">Changefeed</Link> and{" "}
             <Link href="https://feedback.fish">Feedback Fish</Link>, and angel
-            invest in early-stage startups that I'm passionate about, such as{" "}
+            invest in early-stage startups that I'm passionate about, like{" "}
             <Link href="https://raycast.com">Raycast</Link>,{" "}
-            <Link href="https://upstash.com">Upstash</Link> and{" "}
+            <Link href="https://upstash.com">Upstash</Link>,{" "}
+            <Link href="https://www.outsmartly.com/">Outsmartly</Link> and{" "}
             <Link href="/investing">others</Link>.
           </Paragraph>
           <Paragraph centered>
