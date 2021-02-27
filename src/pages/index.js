@@ -48,8 +48,8 @@ class Homepage extends React.Component<Props> {
         <PageHeader title="Hey, I'm Max! 👋">
           <Paragraph centered>
             I'm a JavaScript Engineer from Austria 🇦🇹 in love with React and
-            Node. My biggest career achievement so far is that about 1% of all
-            public, crawlable websites use open source tooling I invented.
+            Node. About 1% of all public, crawlable websites use open source
+            tooling I invented, styled-components.
             <Link
               href="https://twitter.com/mxstbr/status/1336727600996167686?s=20"
               target="_blank"
