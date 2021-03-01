@@ -38,7 +38,7 @@
     "p-timeout": "^2.0.1",
     "passport": "^0.4.0",
     "passport-twitter": "^1.0.4",
-    "prismjs": "^1.15.0",
+    "prismjs": "^1.23.0",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
