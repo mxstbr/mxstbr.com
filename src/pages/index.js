@@ -60,14 +60,16 @@ class Homepage extends React.Component<Props> {
             </Link>
           </Paragraph>
           <Paragraph>
-            Previously, I worked on open source JavaScript tooling at{" "}
+            Previously, I worked on JavaScript tooling at{" "}
             <Link href="https://gatsbyjs.com">Gatsby</Link> and architected a
             greenfield React app at{" "}
             <Link href="https://github.com">GitHub</Link> after they acquired my
-            startup <Link href="https://spectrum.chat">Spectrum</Link>.
+            startup <Link href="https://spectrum.chat">Spectrum</Link>, the
+            community platform of the future.
           </Paragraph>
           <Paragraph centered>
-            I also run two SaaS products with friends,{" "}
+            I also run three products on the side,{" "}
+            <Link href="https://bedrock.mxstbr.com">Bedrock</Link>,{" "}
             <Link href="https://changefeed.app">Changefeed</Link> and{" "}
             <Link href="https://feedback.fish">Feedback Fish</Link>, and angel
             invest in early-stage startups that I'm passionate about, like{" "}
