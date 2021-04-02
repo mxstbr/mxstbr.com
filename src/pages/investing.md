@@ -28,8 +28,10 @@ So far, I have invested in:
 
 - [Upstash](https://upstash.com/), a database for the serverless world
 - [Outsmartly](https://www.outsmartly.com/), a CDN for performantly personalizing websites
-- [Raycast](https://raycast.com), an extensible Spotlight for developers
 - [Magic Bell](https://magicbell.io), an embeddable notification system
+- [Raycast](https://raycast.com), an extensible Spotlight for developers
+- [Fig](https://withfig.com), a terminal for the 21st century
 - _Unannounced_, a tool to improve engineering organizations
+- _Unannounced_, a text editor for the 21st century
 - [DevJobs](https://devjobs.at), a job matching platform for developers
 - [Mikafi](https://mikafi.com), a consumer coffee roaster
