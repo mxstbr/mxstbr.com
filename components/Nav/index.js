@@ -108,7 +108,10 @@ class Nav extends React.Component<{}> {
                     itemScope
                     itemType="http://www.schema.org/SiteNavigationElement"
                   >
-                    <NavItem href="https://notes.mxstbr.com" title="Notes" />
+                    <NavItem
+                      href="https://bedrock.mxstbr.com"
+                      title="Bedrock"
+                    />
                     <NavItem href="/thoughts" title="Blog" />
                     <NavItem href="/appearances" title="Appearances" />
                     <NavItem href="/oss" title="OSS" />
@@ -161,9 +164,9 @@ class Nav extends React.Component<{}> {
                     onClick={this.closeMenu}
                   />
                   <MobileNavItem
-                    href="https://notes.mxstbr.com"
+                    href="https://bedrock.mxstbr.com"
                     onClick={this.closeMenu}
-                    title="Notes"
+                    title="Bedrock"
                   />
                   <MobileNavItem
                     href="/thoughts"
