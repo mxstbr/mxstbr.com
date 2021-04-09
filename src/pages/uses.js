@@ -26,24 +26,27 @@ export default () => (
       
     </H3> */}
     <Paragraph>
-      <ul>
-        <li>Visual Studio Code</li>
-        <li>The stock Terminal.app</li>
+      <ul style={{ listStyle: `disc`, paddingLeft: `1em` }}>
         <li>13" MacBook Pro, 2020</li>
-        <li>MonoLisa font</li>
-        <li>The Brave browser</li>
-        <li>Bear for note taking</li>
-        <li>Lungo for keeping my Mac awake</li>
-        <li>Vanilla for the neat menubar</li>
         <li>LG 34UC99-W widescreen monitor</li>
         <li>IKEA Bekant standing desk</li>
-        <li>Ergodox EZ keyboard</li>
-        <li>Logitech Vertical MX mouse</li>
         <li>Steelcase Gesture chair</li>
-        <li>Minaal Backpack</li>
-        <li>
-          Shure Beta 87A microphone connected to a TASCAM US-2x2 USB interface
-        </li>
+        <li>Logitech Vertical MX mouse</li>
+        <li>Ergodox EZ keyboard</li>
+        <li>Shure Beta 87A microphone</li>
+        <li>AirPods Pro / Bose QC20</li>
+        <li>TASCAM US-2x2 USB audio interface</li>
+        <li>Elgato CamLink</li>
+        <li>Fuji X100F (webcam)</li>
+        <li>Elgato KeyLight</li>
+        <li>Raycast.app</li>
+        <li>Visual Studio Code</li>
+        <li>Terminal.app with Fig</li>
+        <li>Todoist</li>
+        <li>Lungo</li>
+        <li>ColorSnapper</li>
+        <li>MonoLisa font</li>
+        <li>Brave browser</li>
       </ul>
     </Paragraph>
   </>
