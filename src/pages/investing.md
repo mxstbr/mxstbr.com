@@ -31,9 +31,11 @@ So far, I have invested in:
 - [Magic Bell](https://magicbell.io), an embeddable notification system
 - [Raycast](https://raycast.com), an extensible Spotlight for developers
 - [Fig](https://withfig.com), a terminal for the 21st century
-- _Unannounced_, a frontend-first user management
+- [StackShare](https://stackshare.io), the system of record for engineering organizations
+- [DX](https://getdx.com/), a tool to improve engineering organizations
+- [Clerk](https://clerk.dev), a frontend-first user management solution
+- [Along](https://along.video), an online video platform focussed on creators
 - _Unannounced_, a modern JavaScript toolchain
-- _Unannounced_, a tool to improve engineering organizations
 - _Unannounced_, a text editor for the 21st century
 - [DevJobs](https://devjobs.at), a job matching platform for developers
 - [Mikafi](https://mikafi.com), a consumer coffee roaster
