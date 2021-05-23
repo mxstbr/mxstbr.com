@@ -143,7 +143,7 @@ app.use('*', (request, response) => {
 
   // Create the rendering stream and pipe it into the cache stream
   const renderStream = renderToNodeStream(<Frontend />);
-  renderStream.pipe(cacheStream, { end: 'false' });
+  renderStream.pipe(cacheStream, { end: false });
   renderStream.on('end', () => {
     // Once it's done rendering write the rest of the HTML
     cacheStream.end('</div></body></html>');
