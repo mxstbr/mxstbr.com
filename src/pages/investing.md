@@ -34,9 +34,9 @@ So far, I have invested in:
 - [StackShare](https://stackshare.io), the system of record for engineering organizations
 - [DX](https://getdx.com/), a tool to improve engineering organizations
 - [Clerk](https://clerk.dev), a frontend-first user management solution
+- [Rome](https://rome.tools), a modern JavaScript toolchain
 - [Liveblocks](https://liveblocks.io), a toolchain to build real-time collaborative products
 - [Along](https://along.video), an online video platform focussed on creators
-- _Unannounced_, a modern JavaScript toolchain
 - _Unannounced_, a text editor for the 21st century
 - [DevJobs](https://devjobs.at), a job matching platform for developers
 - [Mikafi](https://mikafi.com), a consumer coffee roaster
