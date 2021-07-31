@@ -47,9 +47,13 @@ class Homepage extends React.Component<Props> {
       <Main>
         <PageHeader title="Hey, I'm Max! 👋">
           <Paragraph centered>
-            I'm a JavaScript Engineer from Austria 🇦🇹 in love with React and
-            Node. About 1% of all public, crawlable websites use open source
-            tooling I invented, styled-components.
+            I recently co-founded{" "}
+            <Link href="https://graphcdn.io" target="_blank">
+              GraphCDN
+            </Link>
+            , the GraphQL CDN. I'm most widely known for my open source work:
+            about 1% of all public, crawlable websites use tooling I invented,
+            styled-components.
             <Link
               href="https://twitter.com/mxstbr/status/1336727600996167686?s=20"
               target="_blank"
@@ -59,25 +63,18 @@ class Homepage extends React.Component<Props> {
               </sup>
             </Link>
           </Paragraph>
-          <Paragraph>
-            Previously, I worked on JavaScript tooling at{" "}
-            <Link href="https://gatsbyjs.com">Gatsby</Link> and architected a
-            greenfield React app at{" "}
+          <Paragraph centered>
+            I also make <Link href="https://bedrock.mxstbr.com">Bedrock</Link>,
+            the premium full-stack SaaS boilerplate, and{" "}
+            <Link href="/investing">angel invest</Link> in early-stage startups{" "}
+            that I'm passionate about. Previously, I worked on JavaScript
+            tooling at <Link href="https://gatsbyjs.com">Gatsby</Link> and
+            architected a greenfield React app at{" "}
             <Link href="https://github.com">GitHub</Link> after they acquired my
             startup <Link href="https://spectrum.chat">Spectrum</Link>, the
             community platform of the future.
           </Paragraph>
-          <Paragraph centered>
-            I also run three products on the side,{" "}
-            <Link href="https://bedrock.mxstbr.com">Bedrock</Link>,{" "}
-            <Link href="https://changefeed.app">Changefeed</Link> and{" "}
-            <Link href="https://feedback.fish">Feedback Fish</Link>, and angel
-            invest in early-stage startups that I'm passionate about, like{" "}
-            <Link href="https://raycast.com">Raycast</Link>,{" "}
-            <Link href="https://upstash.com">Upstash</Link>,{" "}
-            <Link href="https://www.outsmartly.com/">Outsmartly</Link> and{" "}
-            <Link href="/investing">others</Link>.
-          </Paragraph>
+
           <Paragraph centered>
             If I'm not coding or{" "}
             <Link href="https://twitter.com/mxstbr">tweeting</Link>, I'm likely
