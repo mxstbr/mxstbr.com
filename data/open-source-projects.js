@@ -14,7 +14,7 @@ const projects: Array<OpenSourceProject> = [
     name: "Spectrum",
     description:
       "The community platform for the future. Grow safe, successful online communities that are built to last.",
-    stars: 9560,
+    stars: 10038,
     background: "linear-gradient(to top right, #7213FB, #4F16EE)",
     featured: true
   },
@@ -23,7 +23,7 @@ const projects: Array<OpenSourceProject> = [
     name: "styled-components",
     description:
       "Visual primitives for the component age. Use the best bits of ES6 and CSS to style your apps without stress",
-    stars: 32174,
+    stars: 34479,
     background: "linear-gradient(to top right, #DB7093, #DAA357)",
     featured: true
   },
@@ -32,14 +32,14 @@ const projects: Array<OpenSourceProject> = [
     name: "react-boilerplate",
     description:
       "A foundation for React apps with a focus on scalability, developer experience and best practices.",
-    stars: 26837,
+    stars: 27818,
     background: "linear-gradient(to top right, #6D6E72, #9EA0A6)",
     featured: true
   },
 
   {
     repo: "gatsbyjs/gatsby",
-    stars: 48640,
+    stars: 51095,
     description:
       "A framework based on React that helps developers build blazing fast websites and apps",
     owner: false,
@@ -50,7 +50,7 @@ const projects: Array<OpenSourceProject> = [
     name: "Polished",
     description:
       'A lightweight toolset for writing styles in JavaScript, the "Lodash of CSS-in-JS"',
-    stars: 6570,
+    stars: 6920,
     // background: "linear-gradient(to top right, #3a9b6d, #65daa2)",
     featured: true
   },
@@ -58,7 +58,7 @@ const projects: Array<OpenSourceProject> = [
     repo: "styled-components/awesome-styled-components",
     name: "awesome-styled-components",
     description: "A curated list of awesome styled-components resources",
-    stars: 2510,
+    stars: 2778,
     featured: true
   },
   {
@@ -66,13 +66,13 @@ const projects: Array<OpenSourceProject> = [
     name: "sharingbuttons.io",
     description:
       "Quickly generate social media sharing buttons that don't track your users.",
-    stars: 2354,
+    stars: 2433,
     featured: true
   },
   {
     repo: "mxstbr/login-flow",
     name: "Login Flow",
-    stars: 1620,
+    stars: 1625,
     description:
       "An example React and Redux implementation of a login/register flow."
   },
