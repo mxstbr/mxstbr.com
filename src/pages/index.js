@@ -47,11 +47,11 @@ class Homepage extends React.Component<Props> {
       <Main>
         <PageHeader title="Hey, I'm Max! 👋">
           <Paragraph centered>
-            I recently co-founded{" "}
+            I'm the co-founder of{" "}
             <Link href="https://graphcdn.io" target="_blank">
               GraphCDN
             </Link>
-            , the GraphQL CDN. I'm most widely known for my open source work:
+            , the GraphQL CDN, and am widely known for my open source work:
             about 1% of all public, crawlable websites use tooling I invented,
             styled-components.
             <Link
