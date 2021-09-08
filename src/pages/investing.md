@@ -36,6 +36,8 @@ So far, I have invested in:
 - [Clerk](https://clerk.dev), a frontend-first user management solution
 - [Rome](https://rome.tools), a modern JavaScript toolchain
 - [Liveblocks](https://liveblocks.io), a toolchain to build real-time collaborative products
+- [Abbot](https://ab.bot), a hosted chat bot making ChatOps easier to adopt
+- [Fly](https://fly.io), a platform for running global apps
 - [Along](https://along.video), an online video platform focussed on creators
 - _Unannounced_, a text editor for the 21st century
 - [DevJobs](https://devjobs.at), a job matching platform for developers
