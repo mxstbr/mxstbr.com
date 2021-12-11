@@ -12,6 +12,10 @@ import WideSection from "../../components/WideSection";
 
 I irregularly angel invest small checks ($2500-$5000) of my own money in early-stage startups I'm excited about. Think of me as an advisor with skin in the game — I love helping with tricky, ambiguous problems, providing access to my network and audience, or even just lending an ear to founders building exciting new things.
 
+> Max is one of our highest value-add investors: he constantly gives us good product feedback, knows everything about open source, and every time he talks about us our stats go wild!
+>
+> – Brendan Falk, CEO Fig
+
 ### What I invest in
 
 I invest if I think I can provide value to you, whether through advice, audience, network, credibility or anything else. If I can't help you at all, it probably doesn't make sense for you to take my money.

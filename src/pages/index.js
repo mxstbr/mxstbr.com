@@ -51,9 +51,8 @@ class Homepage extends React.Component<Props> {
             <Link href="https://graphcdn.io" target="_blank">
               GraphCDN
             </Link>
-            , the GraphQL CDN, and am widely known for my open source work:
-            about 1% of all public, crawlable websites use tooling I invented,
-            styled-components.
+            , the GraphQL CDN. About 1% of all public, crawlable websites use
+            open source tooling I invented, styled-components.
             <Link
               href="https://twitter.com/mxstbr/status/1336727600996167686?s=20"
               target="_blank"
@@ -63,13 +62,18 @@ class Homepage extends React.Component<Props> {
               </sup>
             </Link>
           </Paragraph>
+
           <Paragraph centered>
             I also make <Link href="https://bedrock.mxstbr.com">Bedrock</Link>,
             the premium full-stack SaaS boilerplate, and{" "}
             <Link href="/investing">angel invest</Link> in early-stage startups{" "}
-            that I'm passionate about. Previously, I worked on JavaScript
-            tooling at <Link href="https://gatsbyjs.com">Gatsby</Link> and
-            architected a greenfield React app at{" "}
+            that I'm passionate about.
+          </Paragraph>
+
+          <Paragraph centered>
+            Previously, I worked on JavaScript tooling at{" "}
+            <Link href="https://gatsbyjs.com">Gatsby</Link> and architected a
+            greenfield React app at{" "}
             <Link href="https://github.com">GitHub</Link> after they acquired my
             startup <Link href="https://spectrum.chat">Spectrum</Link>, the
             community platform of the future.
