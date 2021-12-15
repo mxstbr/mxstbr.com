@@ -14,7 +14,7 @@ const projects: Array<OpenSourceProject> = [
     name: "Spectrum",
     description:
       "The community platform for the future. Grow safe, successful online communities that are built to last.",
-    stars: 10038,
+    stars: 10312,
     background: "linear-gradient(to top right, #7213FB, #4F16EE)",
     featured: true
   },
@@ -23,7 +23,7 @@ const projects: Array<OpenSourceProject> = [
     name: "styled-components",
     description:
       "Visual primitives for the component age. Use the best bits of ES6 and CSS to style your apps without stress",
-    stars: 34479,
+    stars: 35459,
     background: "linear-gradient(to top right, #DB7093, #DAA357)",
     featured: true
   },
@@ -32,7 +32,7 @@ const projects: Array<OpenSourceProject> = [
     name: "react-boilerplate",
     description:
       "A foundation for React apps with a focus on scalability, developer experience and best practices.",
-    stars: 27818,
+    stars: 28141,
     background: "linear-gradient(to top right, #6D6E72, #9EA0A6)",
     featured: true
   },
@@ -50,7 +50,7 @@ const projects: Array<OpenSourceProject> = [
     name: "Polished",
     description:
       'A lightweight toolset for writing styles in JavaScript, the "Lodash of CSS-in-JS"',
-    stars: 6920,
+    stars: 7071,
     // background: "linear-gradient(to top right, #3a9b6d, #65daa2)",
     featured: true
   },
@@ -58,7 +58,7 @@ const projects: Array<OpenSourceProject> = [
     repo: "styled-components/awesome-styled-components",
     name: "awesome-styled-components",
     description: "A curated list of awesome styled-components resources",
-    stars: 2778,
+    stars: 2864,
     featured: true
   },
   {
@@ -66,24 +66,23 @@ const projects: Array<OpenSourceProject> = [
     name: "sharingbuttons.io",
     description:
       "Quickly generate social media sharing buttons that don't track your users.",
-    stars: 2433,
+    stars: 2449,
     featured: true
   },
   {
     repo: "mxstbr/login-flow",
     name: "Login Flow",
-    stars: 1625,
+    stars: 1620,
     description:
       "An example React and Redux implementation of a login/register flow."
   },
   {
     repo: "mxstbr/micro-github",
-    stars: 581,
+    stars: 729,
     description:
       "A tiny microservice to easily add authentication with GitHub to your application."
   },
   {
-    repo: "mxstbr/postcss.parts",
     name: "PostCSS.parts",
     stars: 43,
     description: "A searchable catalog of of PostCSS plugins."
@@ -110,7 +109,7 @@ const projects: Array<OpenSourceProject> = [
   },
   {
     repo: "withspectrum/micro-open-graph",
-    stars: 370,
+    stars: 375,
     description:
       "A tiny Node.js microservice to scrape open graph data with joy."
   },
@@ -200,18 +199,18 @@ const projects: Array<OpenSourceProject> = [
   },
   {
     repo: "styled-components/babel-plugin-styled-components",
-    stars: 849,
+    stars: 965,
     description:
       "Improve the debugging experience and add server-side rendering support to styled-components"
   },
   {
     repo: "styled-components/stylelint-processor-styled-components",
-    stars: 637,
+    stars: 655,
     description: "Lint your styled components with stylelint!"
   },
   {
     repo: "styled-components/styled-components-website",
-    stars: 504,
+    stars: 534,
     description: "The styled-components website, styled-components.com"
   },
   {
@@ -242,30 +241,69 @@ const projects: Array<OpenSourceProject> = [
   {
     repo: "carteb/carte-blanche",
     name: "Carte Blanche",
-    stars: 1526,
+    stars: 1519,
     description:
       "An isolated development space with integrated fuzz testing for your React components."
   },
   {
     repo: "draft-js-plugins/draft-js-plugins",
     name: "DraftJS Plugins",
-    stars: 3676,
+    stars: 3918,
     description: "High quality plugins with great UX on top of DraftJS."
   },
   {
     repo: "postcss/postcss.org",
-    stars: 71,
+    stars: 73,
     description: "The PostCSS website."
   },
   {
     repo: "mxstbr/mxstbr.com",
-    stars: 348,
+    stars: 369,
     description: "This very website's source code!"
   },
   {
     repo: "mxstbr/passport-magic-login",
-    stars: 400,
+    stars: 574,
     description: "Passwordless authentication with magic links for Passport"
+  },
+  {
+    repo: "mxstbr/fifteen-kilos",
+    stars: 82,
+    description: "Fifteen kilos"
+  },
+  {
+    repo: "mxstbr/awesome-austria",
+    stars: 74,
+    description:
+      "A curated list of things that show the awesome side of Austria"
+  },
+  {
+    repo: "mxstbr/pgp.asc",
+    stars: 52,
+    description: "An initiative to decentralize public PGP keys"
+  },
+  {
+    repo: "micro-analytics/micro-analytics-cli",
+    stars: 746,
+    description:
+      "Public analytics as a Node.js microservice. No sysadmin experience required!"
+  },
+  {
+    repo: "system-ui/theme-ui",
+    stars: 4138,
+    description:
+      "Build consistent, themeable React apps based on constraint-based design principles",
+    owner: false
+  },
+  {
+    repo: "nice-boys/product-boilerplate",
+    stars: 689,
+    description: "Quickly ship your apps with the power of code generation."
+  },
+  {
+    repo: "nice-boys/components",
+    stars: 142,
+    description: "@brianlovin and @mxstbr's component library"
   }
 ].map(p => {
   if (p.name) return p;
