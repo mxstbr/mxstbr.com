@@ -44,6 +44,6 @@ So far, I have invested in:
 - [Fly](https://fly.io), a platform for running global apps
 - [Along](https://along.video), an online video platform focussed on creators
 - [Incident.io](https://incident.io), a platform for incident management and response
-- _Unannounced_, a text editor for the 21st century
+- [Zed](https://zed.dev), a text editor for the 21st century
 - [DevJobs](https://devjobs.at), a job matching platform for developers
 - [Mikafi](https://mikafi.com), a consumer coffee roaster
