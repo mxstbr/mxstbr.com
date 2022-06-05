@@ -48,11 +48,12 @@ class Homepage extends React.Component<Props> {
         <PageHeader title="Hey, I'm Max! 👋">
           <Paragraph centered>
             I'm the co-founder of{" "}
-            <Link href="https://graphcdn.io" target="_blank">
-              GraphCDN
+            <Link href="https://stellate.co" target="_blank">
+              Stellate
             </Link>
-            , the GraphQL CDN. About 1% of all public, crawlable websites use
-            open source tooling I invented, styled-components.
+            , the GraphQL CDN formerly known as GraphCDN. About
+            1% of all public, crawlable websites use open
+            source tooling I invented, styled-components.
             <Link
               href="https://twitter.com/mxstbr/status/1336727600996167686?s=20"
               target="_blank"
