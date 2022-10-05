@@ -30,20 +30,21 @@ If you're founding a startup and think this could be a good fit I'd love to meet
 
 So far, I have invested in:
 
-- [Upstash](https://upstash.com/), a database for the serverless world
-- [Outsmartly](https://www.outsmartly.com/), a CDN for performantly personalizing websites
-- [Magic Bell](https://magicbell.io), an embeddable notification system
+- [Fly](https://fly.io), a platform for running global apps
+- [Incident.io](https://incident.io), a platform for incident management and response
 - [Raycast](https://raycast.com), an extensible Spotlight for developers
 - [Fig](https://withfig.com), a terminal for the 21st century
-- [StackShare](https://stackshare.io), the system of record for engineering organizations
 - [DX](https://getdx.com/), a tool to improve engineering organizations
+- [StackShare](https://stackshare.io), a system of record for tech stacks
+- [Muse](https://museapp.com), a tool for thought for deep work on iPad
 - [Clerk](https://clerk.dev), a frontend-first user management solution
-- [Rome](https://rome.tools), a modern JavaScript toolchain
 - [Liveblocks](https://liveblocks.io), a toolchain to build real-time collaborative products
-- [Abbot](https://ab.bot), a hosted chat bot making ChatOps easier to adopt
-- [Fly](https://fly.io), a platform for running global apps
-- [Along](https://along.video), an online video platform focussed on creators
-- [Incident.io](https://incident.io), a platform for incident management and response
+- [Upstash](https://upstash.com/), a database for the serverless world
 - [Zed](https://zed.dev), a text editor for the 21st century
+- [Rome](https://rome.tools), a modern JavaScript toolchain
+- [Magic Bell](https://magicbell.io), an embeddable notification system
+- [Abbot](https://ab.bot), a hosted chat bot making ChatOps easier to adopt
+- [Along](https://along.video), an online video platform focussed on creators
 - [DevJobs](https://devjobs.at), a job matching platform for developers
+- [Outsmartly](https://www.outsmartly.com/), a CDN for performantly personalizing websites
 - [Mikafi](https://mikafi.com), a consumer coffee roaster
