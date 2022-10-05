@@ -41,12 +41,12 @@ exports.sourceNodes = async ({
     });
   });
 
-  createRedirect({
+  actions.createRedirect({
     fromPath: `/angel`,
     toPath: `/investing`,
   });
 
-  createRedirect({
+  actions.createRedirect({
     fromPath: `/investments`,
     toPath: `/investing`,
   });
