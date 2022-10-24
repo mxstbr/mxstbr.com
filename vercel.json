@@ -1,0 +1,14 @@
+{
+    "redirects": [
+      { 
+        "source": "/investments",
+        "destination": "/investing", 
+        "statusCode": 301
+      },
+      { 
+        "source": "/angel",
+        "destination": "/investing", 
+        "statusCode": 301
+      }
+    ]
+  }

@@ -40,14 +40,4 @@ exports.sourceNodes = async ({
       ...post
     });
   });
-
-  actions.createRedirect({
-    fromPath: `/angel`,
-    toPath: `/investing`,
-  });
-
-  actions.createRedirect({
-    fromPath: `/investments`,
-    toPath: `/investing`,
-  });
 };
