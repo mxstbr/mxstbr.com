@@ -51,9 +51,9 @@ class Homepage extends React.Component<Props> {
             <Link href="https://stellate.co" target="_blank">
               Stellate
             </Link>
-            , the GraphQL CDN formerly known as GraphCDN. About
-            1% of all public, crawlable websites use open
-            source tooling I invented, styled-components.
+            , the GraphQL CDN formerly known as GraphCDN. About 1% of all
+            public, crawlable websites use open source tooling I invented,
+            styled-components.
             <Link
               href="https://twitter.com/mxstbr/status/1336727600996167686?s=20"
               target="_blank"
@@ -137,7 +137,7 @@ class Homepage extends React.Component<Props> {
           </Icon>
         </ViewMoreLink>
 
-        <Flex flexDirection="column" width={1}>
+        {/* <Flex flexDirection="column" width={1}>
           <H2>Recent Appearances</H2>
           <AppearancesList appearances={appearances.slice(0, 7)} />
         </Flex>
@@ -146,7 +146,7 @@ class Homepage extends React.Component<Props> {
           <Icon>
             <ChevronRight strokeWidth="3" size="1em" />
           </Icon>
-        </ViewMoreLink>
+        </ViewMoreLink> */}
       </Main>
     );
   }

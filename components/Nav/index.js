@@ -112,9 +112,9 @@ class Nav extends React.Component<{}> {
                       href="https://bedrock.mxstbr.com"
                       title="Bedrock"
                     />
-                    <NavItem href="/thoughts" title="Blog" />
-                    <NavItem href="/appearances" title="Appearances" />
+                    <NavItem href="/investing" title="Investments" />
                     <NavItem href="/oss" title="OSS" />
+                    <NavItem href="/thoughts" title="Blog" />
                     {/* <NavItem href="/audits" title="Audits" /> */}
                   </DesktopOnly>
                 </Flex>
