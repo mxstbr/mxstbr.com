@@ -26,5 +26,10 @@ export const OrderedList = styled(Box).attrs({
 `;
 
 export const ListItem = (props: RebassProps) => (
-  <Paragraph style={{ fontSize: "18px" }} my={1} {...props} as="li" />
+  <Paragraph
+    style={{ fontSize: "18px", display: "inline-block" }}
+    my={1}
+    {...props}
+    as="li"
+  />
 );
