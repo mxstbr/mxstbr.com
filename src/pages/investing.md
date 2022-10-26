@@ -39,6 +39,8 @@ So far, I have invested in:
 1. [Muse](https://museapp.com), a tool for thought for deep work on iPad
 1. [Clerk](https://clerk.dev), a frontend-first user management solution
 1. [Liveblocks](https://liveblocks.io), a toolchain to build real-time collaborative products
+1. [Storytell.ai](https://storytell.ai), a tool to extract insights from internal videos
+1. _secret_, a home for your design team's work-in-progress
 1. [Upstash](https://upstash.com/), a database for the serverless world
 1. [Zed](https://zed.dev), a text editor for the 21st century
 1. [Rome](https://rome.tools), a modern JavaScript toolchain
