@@ -7,7 +7,6 @@ import type { RebassProps } from "rebass";
 const baseListStyles = css`
   padding-left: 1em;
   list-style: initial;
-  list-style-position: outside;
   font-family: ${props => props.theme.fonts.system};
 `;
 
