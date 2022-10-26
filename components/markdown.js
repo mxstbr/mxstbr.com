@@ -51,7 +51,11 @@ export default {
   p: (props: {||}) => <Paragraph {...props} />,
   a: Link,
   ul: UnorderedList,
-  ol: OrderedList,
+  ol: (props: {||}) => (
+    <Paragraph>
+      <OrderedList {...props} />
+    </Paragraph>
+  ),
   li: (props: {||}) => <ListItem {...props} />,
   img: Image,
   pre: Pre,
