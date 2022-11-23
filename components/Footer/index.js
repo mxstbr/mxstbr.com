@@ -1,7 +1,7 @@
 import React from "react";
 import styled, { css } from "styled-components";
 import { Flex } from "rebass";
-import { Twitter, GitHub, Camera, Rss } from "react-feather";
+import { Twitter, GitHub, Camera, Rss, AtSign } from "react-feather";
 import Link from "../Link";
 import Text from "../Text";
 import Layout from "../Layout";
@@ -78,6 +78,13 @@ export default (props: {}) => (
             href="https://twitter.com/mxstbr"
           >
             Follow me on Twitter
+          </FooterListItem>
+          <FooterListItem
+            Icon={AtSign}
+            rel="me"
+            href="https://mastodon.mxstbr.com/@mxstbr"
+          >
+            Follow me on Mastodon
           </FooterListItem>
           <FooterListItem Icon={Camera} href="https://instagram.com/mxstbr">
             See my stories on Instagram
