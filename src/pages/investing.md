@@ -49,5 +49,5 @@ So far, I have invested in:
 1. [Along](https://along.video), an online video platform focussed on creators
 1. [DevJobs](https://devjobs.at), a job matching platform for developers
 1. [Outsmartly](https://www.outsmartly.com/), a CDN for performantly personalizing websites
-1. [Mikafi](https://mikafi.com), a consumer coffee roaster
+1. [Remote First Capital](https://www.remotefirstcapital.com/), a fund by Andreas Klinger
 
