@@ -52,7 +52,7 @@ class Homepage extends React.Component<Props> {
               Stellate
             </Link>
             , the GraphQL CDN formerly known as GraphCDN. About 1% of all
-            public, crawlable websites use open source tooling I invented,
+            public, crawlable websites use open source tooling I co-created,
             styled-components.
             <Link
               href="https://twitter.com/mxstbr/status/1336727600996167686?s=20"
