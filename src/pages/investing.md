@@ -46,8 +46,7 @@ So far, I have invested in:
 1. [Rome](https://rome.tools), a modern JavaScript toolchain
 1. [Magic Bell](https://magicbell.io), an embeddable notification system
 1. [Abbot](https://ab.bot), a hosted chat bot making ChatOps easier to adopt
-1. [Along](https://along.video), an online video platform focussed on creators
 1. [DevJobs](https://devjobs.at), a job matching platform for developers
 1. [Outsmartly](https://www.outsmartly.com/), a CDN for performantly personalizing websites
 1. [Remote First Capital](https://www.remotefirstcapital.com/), a fund by Andreas Klinger
-
+1. [Along](https://along.video) ([rip](https://twitter.com/alongvideo/status/1610361111513288704)), an online video platform focussed on creators
