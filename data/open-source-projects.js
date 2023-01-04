@@ -14,7 +14,7 @@ const projects: Array<OpenSourceProject> = [
     name: "Spectrum",
     description:
       "The community platform for the future. Grow safe, successful online communities that are built to last.",
-    stars: 10312,
+    stars: 10725,
     background: "linear-gradient(to top right, #7213FB, #4F16EE)",
     featured: true
   },
@@ -23,7 +23,7 @@ const projects: Array<OpenSourceProject> = [
     name: "styled-components",
     description:
       "Visual primitives for the component age. Use the best bits of ES6 and CSS to style your apps without stress",
-    stars: 35459,
+    stars: 38005,
     background: "linear-gradient(to top right, #DB7093, #DAA357)",
     featured: true
   },
@@ -32,14 +32,14 @@ const projects: Array<OpenSourceProject> = [
     name: "react-boilerplate",
     description:
       "A foundation for React apps with a focus on scalability, developer experience and best practices.",
-    stars: 28141,
+    stars: 28909,
     background: "linear-gradient(to top right, #6D6E72, #9EA0A6)",
     featured: true
   },
 
   {
     repo: "gatsbyjs/gatsby",
-    stars: 51095,
+    stars: 53975,
     description:
       "A framework based on React that helps developers build blazing fast websites and apps",
     owner: false,
@@ -50,7 +50,7 @@ const projects: Array<OpenSourceProject> = [
     name: "Polished",
     description:
       'A lightweight toolset for writing styles in JavaScript, the "Lodash of CSS-in-JS"',
-    stars: 7071,
+    stars: 7407,
     // background: "linear-gradient(to top right, #3a9b6d, #65daa2)",
     featured: true
   },
@@ -58,7 +58,7 @@ const projects: Array<OpenSourceProject> = [
     repo: "styled-components/awesome-styled-components",
     name: "awesome-styled-components",
     description: "A curated list of awesome styled-components resources",
-    stars: 2864,
+    stars: 3120,
     featured: true
   },
   {
@@ -66,7 +66,7 @@ const projects: Array<OpenSourceProject> = [
     name: "sharingbuttons.io",
     description:
       "Quickly generate social media sharing buttons that don't track your users.",
-    stars: 2449,
+    stars: 2472,
     featured: true
   },
   {
@@ -199,7 +199,7 @@ const projects: Array<OpenSourceProject> = [
   },
   {
     repo: "styled-components/babel-plugin-styled-components",
-    stars: 965,
+    stars: 1032,
     description:
       "Improve the debugging experience and add server-side rendering support to styled-components"
   },
@@ -248,7 +248,7 @@ const projects: Array<OpenSourceProject> = [
   {
     repo: "draft-js-plugins/draft-js-plugins",
     name: "DraftJS Plugins",
-    stars: 3918,
+    stars: 4018,
     description: "High quality plugins with great UX on top of DraftJS."
   },
   {
@@ -290,7 +290,7 @@ const projects: Array<OpenSourceProject> = [
   },
   {
     repo: "system-ui/theme-ui",
-    stars: 4138,
+    stars: 4803,
     description:
       "Build consistent, themeable React apps based on constraint-based design principles",
     owner: false
