@@ -60,8 +60,8 @@ export default (props: {}) => (
       <Flex flexDirection={["column", "row"]}>
         <FooterColumn title="About this place" width={0.5}>
           <Text color="#666" lineHeight={1.5}>
-            Welcome to my personal website! I'm @mxstbr, a JavaScript Engineer
-            from Austria 🇦🇹 in love with React and Node.
+            Welcome to my personal website! I'm @mxstbr, a DevTools startup
+            founder in San Francisco. 🌁🇺🇸
           </Text>
         </FooterColumn>
         <FooterColumn last title="Social Stuff">
