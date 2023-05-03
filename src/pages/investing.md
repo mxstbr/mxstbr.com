@@ -30,23 +30,23 @@ I love investing early to make the most of the limited amount of money I have. T
 
 So far, I have invested in:
 
-1. [Fly](https://fly.io), a platform for running global apps
+1. [Fly.io](https://fly.io), a platform for running global apps
 1. [Incident.io](https://incident.io), a platform for incident management and response
 1. [Raycast](https://raycast.com), an extensible Spotlight for developers
-1. [Fig](https://withfig.com), a terminal for the 21st century
-1. [DX](https://getdx.com/), a tool to improve engineering organizations
-1. [StackShare](https://stackshare.io), a system of record for tech stacks
-1. [Muse](https://museapp.com), a tool for thought for deep work on iPad
+1. [Fig](https://fig.io), a terminal for the 21st century
+1. [DX](https://getdx.com/), a developer experience platform
 1. [Clerk](https://clerk.dev), a frontend-first user management solution
 1. [Liveblocks](https://liveblocks.io), a toolchain to build real-time collaborative products
-1. [Storytell.ai](https://storytell.ai), a tool to extract insights from internal videos
-1. [Campsite](https://campsite.design), a home for your design team's work-in-progress
 1. [Upstash](https://upstash.com/), a database for the serverless world
 1. [Zed](https://zed.dev), a text editor for the 21st century
+1. [Storytell.ai](https://storytell.ai), an AI tool to extract signal from noise
+1. [Campsite](https://campsite.design), a home for your design team's work-in-progress
+1. [Muse](https://museapp.com), a tool for thought for deep work
+1. [StackShare](https://stackshare.io), a system of record for tech stacks
+1. [Abbot](https://ab.bot), a copilot for customer success in Slack
+1. [Remote First Capital](https://www.remotefirstcapital.com/), a fund by Andreas Klinger
 1. [Rome](https://rome.tools), a modern JavaScript toolchain
 1. [Magic Bell](https://magicbell.io), an embeddable notification system
-1. [Abbot](https://ab.bot), a hosted chat bot making ChatOps easier to adopt
 1. [DevJobs](https://devjobs.at), a job matching platform for developers
 1. [Outsmartly](https://www.outsmartly.com/), a CDN for performantly personalizing websites
-1. [Remote First Capital](https://www.remotefirstcapital.com/), a fund by Andreas Klinger
 1. [Along](https://along.video) ([rip](https://twitter.com/alongvideo/status/1610361111513288704)), an online video platform focussed on creators
