@@ -10,7 +10,7 @@ import WideSection from "../../components/WideSection";
   />
 </PageHeader>
 
-I irregularly angel invest small checks ($2500-$5000) of my own money in early-stage startups I'm excited about. Think of me as an advisor with skin in the game — I love helping with tricky, ambiguous problems, providing access to my network and audience, or even just lending an ear to founders building exciting new things.
+I irregularly angel invest $5k checks of my own money in early-stage startups I'm excited about. Think of me as an advisor with skin in the game — I love helping with tricky, ambiguous problems, providing access to my network and audience, or even just lending an ear to founders building exciting new things.
 
 > Max is one of our highest value-add investors: he constantly gives us good product feedback and knows everything about open source. On top of that, every time he talks about us to his developer audience our stats go wild.
 >
