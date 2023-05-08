@@ -10,21 +10,21 @@ import WideSection from "../../components/WideSection";
   />
 </PageHeader>
 
-I irregularly angel invest $5k checks of my own money in early-stage startups I'm excited about. Think of me as an advisor with skin in the game — I love helping with tricky, ambiguous problems, providing access to my network and audience, or even just lending an ear to founders building exciting new things.
+Together with [Sue Odio](https://sueodio.com), I angel invest small $5k checks in early-stage startups we're excited about. Think of us as advisors with skin in the game — we love helping with tricky, ambiguous problems, providing access to our networks and audiences, or even just lending an ear.
 
 > Max is one of our highest value-add investors: he constantly gives us good product feedback and knows everything about open source. On top of that, every time he talks about us to his developer audience our stats go wild.
 >
 > – Brendan Falk, CEO Fig
 
-If you're founding a startup and think this could be a good fit I'd love to meet you. [DM me on Twitter](https://twitter.com/mxstbr) or <a href="mailto:contact@mxstbr.com">send me an email</a> and let's chat!
+If you're founding a startup and think this could be a good fit we'd love to meet you. [DM me on Twitter](https://twitter.com/mxstbr) or <a href="mailto:contact@mxstbr.com">send me an email</a> and let's chat!
 
-### What I invest in
+### What we invest in
 
-I invest if I think I can provide value to you, whether through advice, audience, network, credibility or anything else. If I can't help you at all, it probably doesn't make sense for you to take my money.
+We invest first-and-foremost in the people. Our main filter is "Do we believe these founders can go through the one-of-a-kind challenge of building a company that can change the world?"
 
-I love investing in products that I (would) use myself, even more so if they're products aimed at developers.
+We love investing early to make the most of the limited amount of money we have. The earlier, the better.
 
-I love investing early to make the most of the limited amount of money I have. The earlier, the better.
+I personally love investing in products that I (would) use myself, even more so if they're products aimed at developers.
 
 ### Investments
 
