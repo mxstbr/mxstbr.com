@@ -12,11 +12,13 @@ import WideSection from "../../components/WideSection";
 
 Together with [Sue Odio](https://sueodio.com), we angel invest small ($2.5k - $5k) checks in early-stage startups we're excited about. Think of us as advisors with skin in the game — we love helping with tricky, ambiguous problems, providing access to our networks and audiences, or even just lending an ear.
 
-> Max is one of our highest value-add investors: he constantly gives us good product feedback and knows everything about open source. On top of that, every time he talks about us to his developer audience our stats go wild.
+> Max is one of our highest value-add investors: he constantly gives us good product feedback and knows everything about open source.
+> 
+> On top of that, every time he talks about us to his developer audience our stats go wild.
 >
 > – Brendan Falk, CEO Fig
 
-If you're founding a startup and think this could be a good fit we'd love to meet you. [DM me on Twitter](https://twitter.com/mxstbr) or <a href="mailto:contact@mxstbr.com">send me an email</a> and let's chat!
+If you're founding a startup and think this could be a good fit we'd love to meet you. <a href="mailto:contact@mxstbr.com">Send us an email</a> and let's chat!
 
 ### What we invest in
 
