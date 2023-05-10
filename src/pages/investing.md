@@ -18,7 +18,7 @@ Together with [Sue Odio](https://sueodio.com), we angel invest small ($2.5k - $5
 >
 > – Brendan Falk, CEO Fig
 
-If you're founding a startup and think this could be a good fit we'd love to meet you. <a href="mailto:contact@mxstbr.com">Send us an email</a> and let's chat!
+If you're founding a startup and think this could be a good fit we'd love to meet you. <a href="mailto:contact@mxstbr.com?cc=suemko@gmail.com">Send us an email</a> and let's chat!
 
 ### What we invest in
 
