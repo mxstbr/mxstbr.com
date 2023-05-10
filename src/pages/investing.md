@@ -10,7 +10,7 @@ import WideSection from "../../components/WideSection";
   />
 </PageHeader>
 
-Together with [Sue Odio](https://sueodio.com), I angel invest small $5k checks in early-stage startups we're excited about. Think of us as advisors with skin in the game — we love helping with tricky, ambiguous problems, providing access to our networks and audiences, or even just lending an ear.
+Together with [Sue Odio](https://sueodio.com), we angel invest small ($2.5k - $5k) checks in early-stage startups we're excited about. Think of us as advisors with skin in the game — we love helping with tricky, ambiguous problems, providing access to our networks and audiences, or even just lending an ear.
 
 > Max is one of our highest value-add investors: he constantly gives us good product feedback and knows everything about open source. On top of that, every time he talks about us to his developer audience our stats go wild.
 >
