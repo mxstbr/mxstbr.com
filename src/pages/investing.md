@@ -45,10 +45,10 @@ So far, I have invested in:
 1. [StackShare](https://stackshare.io), a system of record for tech stacks
 1. [Abbot](https://ab.bot), a copilot for customer success in Slack
 1. [Remote First Capital](https://www.remotefirstcapital.com/), a fund by Andreas Klinger
-1. [Rome](https://rome.tools), a modern JavaScript toolchain
 1. [Magic Bell](https://magicbell.io), an embeddable notification system
 1. [DevJobs](https://devjobs.at), a job matching platform for developers
 1. [Outsmartly](https://www.outsmartly.com/), a CDN for performantly personalizing websites
 1. [Muse](https://museapp.com) ([acq. by bootstrapper](https://museapp.com/end-and-beginning/)), a tool for thought for deep work
 1. [Fig](https://fig.io) ([acq. by AWS](https://fig.io/blog/post/fig-joins-aws)), a terminal for the 21st century
 1. [Along](https://along.video) ([sunset](https://twitter.com/alongvideo/status/1610361111513288704)), an online video platform focussed on creators
+1. [Rome](https://rome.tools) ([dissolved](https://biomejs.dev/blog/annoucing-biome/)), a modern JavaScript toolchain
