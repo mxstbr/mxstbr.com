@@ -1,0 +1,16 @@
+BEGIN:VCARD
+VERSION:4.0
+EMAIL;type=WORK:max@stellate.co
+PHOTO;MEDIATYPE=image/jpeg:https://mxstbr.com/static/images/headshot.jpeg
+TZ:America/Los_Angeles
+URL:https://stellate.co
+URL:https://mxstbr.com
+URL:https://linkedin.com/in/mxstbr
+URL:https://github.com/mxstbr
+URL:https://twitter.com/mxstbr
+URL:https://instagram.com/mxstbr
+N:Max Stoiber
+ORG:Stellate
+TITLE:CEO
+GEO:geo:37.77,-122.42
+END:VCARD
