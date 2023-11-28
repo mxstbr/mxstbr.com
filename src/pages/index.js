@@ -61,23 +61,18 @@ class Homepage extends React.Component<Props> {
               <sup style={{ verticalAlign: "super", fontSize: "0.75em" }}>
                 1
               </sup>
-            </Link>
+            </Link>{" "}
+            I also <Link href="/investing">angel invest</Link> in early-stage
+            startups that I'm passionate about.
           </Paragraph>
 
           <Paragraph centered>
-            I also make <Link href="https://bedrock.mxstbr.com">Bedrock</Link>,
-            the premium full-stack SaaS boilerplate, and{" "}
-            <Link href="/investing">angel invest</Link> in early-stage startups{" "}
-            that I'm passionate about.
-          </Paragraph>
-
-          <Paragraph centered>
-            Previously, I worked on JavaScript tooling at{" "}
-            <Link href="https://gatsbyjs.com">Gatsby</Link> and architected a
-            greenfield React app at{" "}
-            <Link href="https://github.com">GitHub</Link> after they acquired my
-            startup <Link href="https://spectrum.chat">Spectrum</Link>, the
-            community platform of the future.
+            Previously, I worked on R&D around visual editing for React &
+            GraphQL apps at <Link href="https://gatsbyjs.com">Gatsby</Link> and
+            real-time messaging at <Link href="https://github.com">GitHub</Link>{" "}
+            after they acquired my startup{" "}
+            <Link href="https://spectrum.chat">Spectrum</Link>, the community
+            platform of the future.
           </Paragraph>
 
           <Paragraph centered>

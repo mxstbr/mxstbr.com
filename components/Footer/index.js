@@ -58,13 +58,7 @@ export default (props: {}) => (
   >
     <Layout width={[1, 0.5]}>
       <Flex flexDirection={["column", "row"]}>
-        <FooterColumn title="About this place" width={0.5}>
-          <Text color="#666" lineHeight={1.5}>
-            Welcome to my personal website! I'm @mxstbr, a DevTools startup
-            founder in San Francisco. 🌁🇺🇸
-          </Text>
-        </FooterColumn>
-        <FooterColumn last title="Social Stuff">
+        <FooterColumn last title="Socials">
           <FooterListItem
             Icon={GitHub}
             href="https://github.com/mxstbr/mxstbr.com"
@@ -82,9 +76,9 @@ export default (props: {}) => (
           <FooterListItem
             Icon={AtSign}
             rel="me"
-            href="https://mastodon.mxstbr.com/@mxstbr"
+            href="https://linkedin.com/in/mxstbr"
           >
-            Follow me on Mastodon
+            Connect with me on LinkedIn
           </FooterListItem>
           <FooterListItem Icon={Camera} href="https://instagram.com/mxstbr">
             See my stories on Instagram
