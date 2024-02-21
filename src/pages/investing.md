@@ -13,7 +13,7 @@ import WideSection from "../../components/WideSection";
 Together with [Sue Odio](https://sueodio.com), we angel invest small ($2.5k - $5k) checks in early-stage startups we're excited about. Think of us as advisors with skin in the game — we love helping with tricky, ambiguous problems, providing access to our networks and audiences, or even just lending an ear.
 
 > Max is one of our highest value-add investors: he constantly gives us good product feedback and knows everything about open source.
-> 
+>
 > On top of that, every time he talks about us to his developer audience our stats go wild.
 >
 > – Brendan Falk, CEO Fig
@@ -37,9 +37,9 @@ So far, I have invested in:
 1. [Raycast](https://raycast.com), an extensible Spotlight for developers
 1. [DX](https://getdx.com/), a developer experience platform
 1. [Clerk](https://clerk.dev), a frontend-first user management solution
-1. [Liveblocks](https://liveblocks.io), a toolchain to build real-time collaborative products
 1. [Upstash](https://upstash.com/), a database for the serverless world
 1. [Zed](https://zed.dev), a text editor for the 21st century
+1. [Liveblocks](https://liveblocks.io), a toolchain to build real-time collaborative products
 1. [Arcjet](https://arcjet.com/), a developer-first approach to security
 1. [Campsite](https://campsite.design), a home for your design team's work-in-progress
 1. [StackShare](https://stackshare.io), a system of record for tech stacks
