@@ -7,7 +7,6 @@ import type { RebassProps } from "rebass";
 const baseListStyles = css`
   padding-left: 1em;
   list-style: initial;
-  list-style-position: outside;
   font-family: ${props => props.theme.fonts.system};
 `;
 
@@ -26,5 +25,10 @@ export const OrderedList = styled(Box).attrs({
 `;
 
 export const ListItem = (props: RebassProps) => (
-  <Paragraph style={{ fontSize: "18px" }} my={1} {...props} as="li" />
+  <Paragraph
+    style={{ fontSize: "18px", display: "inline-block" }}
+    my={1}
+    {...props}
+    as="li"
+  />
 );
