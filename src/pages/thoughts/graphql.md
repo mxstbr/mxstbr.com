@@ -2,7 +2,7 @@ import BlogPost from "../../../components/BlogPost";
 
 export const meta = {
   published: true,
-  publishedAt: "2024-04-11",
+  publishedAt: "2024-04-10",
   title: "You probably don't need GraphQL",
   summary:
     "It might be surprising to hear the co-founder of a GraphQL company say you probably don't need it. Let me explain.",
