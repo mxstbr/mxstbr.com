@@ -1,12 +1,12 @@
 import BlogPost from "../../../components/BlogPost";
 
 export const meta = {
-  published: false,
+  published: true,
   publishedAt: "2024-04-11",
   title: "You probably don't need GraphQL",
   summary:
     "It might be surprising to hear the co-founder of a GraphQL company say you probably don't need it. Let me explain.",
-  image: "TODO",
+  image: "/static/images/graphql.png",
   likes: 0
 };
 
@@ -34,7 +34,7 @@ But GraphQL wasn’t made for those use cases.
 
 Facebook invented GraphQL as a central intermediary layer between their many end-user-facing clients and many data sources. They made a new language (and thus toolchain) to enable it to work across microservices written in different languages.
 
-That makes it a heavy-handed solution for the problem of “I want client-side data access to be typesafe.” Inevitably, better solutions for those use cases emerged, like tRPC, and overtook GraphQL in adoption. And, with the advent of React server components, many of these use cases are yet again poised to be even further simplified.
+That makes it a heavy-handed solution for the problem of “I want client-side data access to be typesafe.” Inevitably, better solutions for those use cases emerged (like tRPC) and overtook GraphQL in adoption. And, with the advent of React server components, many of these use cases are yet again poised to be even further simplified.
 
 ## So then, who even needs GraphQL?
 
@@ -64,7 +64,7 @@ GraphQL centralizes the data access of each entity/resource. When an underlying 
 
 Going one step further, GraphQL enables clients to specify their data needs on a component level with fragments. (e.g., a `UserAvatar` component can abstractly specify that it needs `UserType.avatarUrl`) So, even on the client, changes must be applied only to the specific components the change is related to!
 
-#### 4. Security and performance are a game of whack-a-mole, with issues popping up left, right, and center
+#### 4. Security and performance are a game of whack-a-mole
 
 GraphQL is the central data access layer for clients, so you can enforce security and performance SLAs at as fine-grained a level as you need. Similarly to per-endpoint for REST APIs, you can enforce limits per-operation in GraphQL, but you can also go more fine-grained and limit per-type or even per-field.
 
