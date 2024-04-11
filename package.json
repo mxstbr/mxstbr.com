@@ -70,7 +70,8 @@
     "yaml-front-matter": "^4.0.0"
   },
   "resolutions": {
-    "node-fetch": "2.6.1"
+    "node-fetch": "2.6.1",
+    "sharp": "^0.29.0"
   },
   "husky": {
     "hooks": {
