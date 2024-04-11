@@ -72,8 +72,6 @@ GraphQL is the central data access layer for clients, so you can enforce securit
 
 If your company is running into one (or more!) of these problems, you owe it to yourselves to consider adding GraphQL to your stack.
 
-_Stay tuned for my next essay, which will explain the counterintuitive path that we have learned works best to adopt GraphQL successfully. (subscribe to the newsletter below if you don’t want to miss it!)_
-
 If you don’t have any of these problems today, you might wonder, “When will I hit these problems?” The answer is that it’s difficult to predict because it depends on your specific use case. Some companies scale to 50 engineers and millions of users without hitting any of these problems. Others hit multiple of these problems while building their MVPs.
 
 To give some guidance from my experience: at the latest when you have 100+ engineers, you will likely run into at least one of these problems.
@@ -81,3 +79,5 @@ To give some guidance from my experience: at the latest when you have 100+ engin
 That’s why most of the responders to my tweet were right: they probably don’t need GraphQL.
 
 One thing is for certain, though: whenever you hit any of these problems, GraphQL will be there to solve them for you.
+
+_Stay tuned for my next essay, which will explain the counterintuitive path that we have learned works best to adopt GraphQL successfully. (subscribe to the newsletter below if you don’t want to miss it!)_
