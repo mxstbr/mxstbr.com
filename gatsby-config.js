@@ -38,9 +38,6 @@ module.exports = {
     FAST_DEV: true
   },
   plugins: [
-    `gatsby-plugin-image`,
-    `gatsby-plugin-sharp`,
-    `gatsby-transformer-sharp`,
     `gatsby-plugin-styled-components`,
     `gatsby-plugin-flow`,
     `gatsby-plugin-react-helmet`,

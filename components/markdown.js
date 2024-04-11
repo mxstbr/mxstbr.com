@@ -1,11 +1,10 @@
 import React from "react";
 import styled from "styled-components";
-import { Box } from "rebass";
+import { Box, Image } from "rebass";
 import { H2, H3, H4 } from "./Heading";
 import Paragraph from "./Paragraph";
 import Link from "./Link";
 import { UnorderedList, OrderedList, ListItem } from "./HtmlLists";
-import Image from "./Image";
 import Blockquote from "./Blockquote";
 
 const Code = styled(Box).attrs(props => ({
@@ -53,7 +52,7 @@ export default {
   ul: UnorderedList,
   ol: OrderedList,
   li: (props: {||}) => <ListItem {...props} />,
-  img: Image,
+  img: props => <Image {...props} />,
   pre: Pre,
   code: Code,
   inlineCode: InlineCode,
