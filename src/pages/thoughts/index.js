@@ -33,6 +33,8 @@ export default () => {
   `);
   const oldPosts = data.allOldBlogPost.nodes;
 
+  console.log(blogposts);
+
   return (
     <>
       <PageHeader
