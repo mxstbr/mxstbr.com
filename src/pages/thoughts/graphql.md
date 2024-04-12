@@ -7,7 +7,7 @@ export const meta = {
   summary:
     "It might be surprising to hear the co-founder of a GraphQL company say you probably don't need it. Let me explain.",
   image: "/static/images/graphql.png",
-  likes: 80
+  likes: 135
 };
 
 export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;
