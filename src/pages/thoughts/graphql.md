@@ -34,13 +34,13 @@ But GraphQL wasn’t made for those use cases.
 
 Facebook invented GraphQL as a central intermediary layer between their many end-user-facing clients and many data sources. They made a new language (and thus toolchain) to enable it to work across microservices written in different languages.
 
-That makes it a heavy-handed solution for the problem of “I want client-side data access to be typesafe.” Inevitably, better solutions for those use cases emerged (like tRPC) and overtook GraphQL in adoption. And, with the advent of React server components, many of these use cases are yet again poised to be even further simplified.
+That makes it a heavy-handed solution for the problem of “I want client-side data access to be typesafe.” **Inevitably, better solutions for those use cases emerged (like tRPC) and overtook GraphQL in adoption.** And, with the advent of React server components, many of these use cases are yet again poised to be even further simplified.
 
 ## So then, who even needs GraphQL?
 
 The difficulty of answering “Who needs GraphQL?” is that GraphQL solves many different problems. When you speak with two people who use it, you will inevitably get two different answers about _why_ they’re using it.
 
-Not only that, but GraphQL doesn’t obviously _solve_ all of these many different problems; many just kind of… disappear when you’re using GraphQL. That makes it difficult to realize that GraphQL solves them because you “have to have been there before” to see which problems quietly disappeared.
+Not only that, but **GraphQL doesn’t obviously _solve_ all of these many different problems; many just kind of… disappear when you’re using GraphQL.** That makes it difficult to realize that GraphQL solves them because you “have to have been there before” to see which problems quietly disappeared.
 
 I would know: as part of my job of running a GraphQL company, I’ve spent the last three years speaking with thousands of engineers at hundreds of companies about their APIs, especially ones building with GraphQL.
 
@@ -74,7 +74,7 @@ If your company is running into one (or more!) of these problems, you owe it to 
 
 If you don’t have any of these problems today, you might wonder, “When will I hit these problems?” The answer is that it’s difficult to predict because it depends on your specific use case. Some companies scale to 50 engineers and millions of users without hitting any of these problems. Others hit multiple of these problems while building their MVPs.
 
-To give some guidance from my experience: at the latest when you have 100+ engineers, you will likely run into at least one of these problems.
+To give some guidance from my experience: **at the latest when you have 100+ engineers, you will likely run into at least one of these problems.**
 
 That’s why most of the responders to my tweet were right: they probably don’t need GraphQL.
 
