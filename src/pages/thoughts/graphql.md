@@ -56,7 +56,7 @@ On top of that, you can monitor which clients are using which fields because the
 
 #### 2. Slow loading times because of request waterfalls and/or overfetching
 
-With GraphQL, a client sends one request for all the data it needs to render the whole page/view, and the server resolves all of it and sends it back in one response—without the duplication introduced by BFFs. (the client can even ask the server to stream above-the-fold data first with the `@defer` and `@stream` directives)
+With GraphQL, a client sends one request for all the data it needs to render the whole page/view, and the server resolves all of it and sends it back in one response—without the duplication introduced by <abbr title="Backend for Frontend">BFF</abbr>s. (the client can even ask the server to stream above-the-fold data first with the `@defer` and `@stream` directives)
 
 #### 3. Difficult maintenance and endpoint discovery due to hundreds of duplicative one-off endpoints
 
