@@ -1,4 +1,4 @@
-import BlogPost from "../../../components/BlogPost";
+import BlogPost from '../blogpost'
 
 export const meta = {
   published: true,
@@ -10,7 +10,7 @@ export const meta = {
   likes: 975
 };
 
-export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;
+<BlogPost meta={meta}>
 
 I asked, [“Why are you not using GraphQL?”](https://twitter.com/mxstbr/status/1765821895742828915) on Twitter, and most of the 150+ responses were some form of “I don’t need it.”
 
@@ -81,3 +81,5 @@ That’s why most of the responders to my tweet were right: they probably don’
 One thing is for certain, though: whenever you hit any of these problems, GraphQL will be there to solve them for you.
 
 _Stay tuned for my next essay, which will explain the counterintuitive path that we have learned works best to adopt GraphQL successfully. (subscribe to the newsletter below if you don’t want to miss it!)_
+
+</BlogPost>

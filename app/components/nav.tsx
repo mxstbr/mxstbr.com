@@ -8,6 +8,9 @@ const navItems = {
   '/oss': {
     name: 'open source',
   },
+  '/investing': {
+    name: 'investments',
+  },
 }
 
 export function Navbar() {

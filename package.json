@@ -6,7 +6,11 @@
     "start": "next start"
   },
   "dependencies": {
+    "@mdx-js/loader": "^3.0.1",
+    "@mdx-js/react": "^3.0.1",
+    "@next/mdx": "^14.2.3",
     "@tailwindcss/postcss": "4.0.0-alpha.13",
+    "@types/mdx": "^2.0.13",
     "@types/node": "20.11.17",
     "@types/react": "18.2.55",
     "@types/react-dom": "18.2.19",
@@ -15,7 +19,6 @@
     "@vercel/speed-insights": "^1.0.9",
     "geist": "1.2.2",
     "next": "canary",
-    "next-mdx-remote": "^4.4.1",
     "postcss": "^8.4.35",
     "react": "18.2.0",
     "react-dom": "18.2.0",

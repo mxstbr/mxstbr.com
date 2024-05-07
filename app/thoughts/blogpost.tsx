@@ -1,5 +1,4 @@
 import { notFound } from 'next/navigation'
-import { CustomMDX } from 'app/components/mdx'
 import { formatDate, getBlogPosts } from 'app/thoughts/utils'
 import { baseUrl } from 'app/sitemap'
 
@@ -51,12 +50,10 @@ export function generateMetadata({ params }) {
   }
 }
 
-export default function Blog({ params }) {
-  let post = getBlogPosts().find((post) => post.slug === params.slug)
+export default function Blog({ meta, children }) {
+  const post = getBlogPosts().find((post) => post.metadata.title === meta.title)
 
-  if (!post) {
-    notFound()
-  }
+  if (!post) notFound()
 
   return (
     <section>
@@ -90,9 +87,7 @@ export default function Blog({ params }) {
           {formatDate(post.metadata.publishedAt)}
         </p>
       </div>
-      <article className="prose">
-        <CustomMDX source={post.content} />
-      </article>
+      <article className="prose">{children}</article>
     </section>
   )
 }

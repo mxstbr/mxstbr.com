@@ -22,7 +22,23 @@ function parseFrontmatter(fileContent: string) {
 }
 
 function getMDXFiles(dir) {
-  return fs.readdirSync(dir).filter((file) => path.extname(file) === '.mdx')
+  let files: string[] = []
+
+  const subfolders = fs
+    .readdirSync(dir, { withFileTypes: true })
+    .filter((dirent) => dirent.isDirectory())
+    .map((dirent) => dirent.name)
+
+  for (const subfolder of subfolders) {
+    const subfolderPath = path.join(dir, subfolder)
+    const subfolderFiles = fs
+      .readdirSync(subfolderPath)
+      .filter((file) => file === 'page.mdx') // Only include page.mdx files
+      .map((file) => path.join(subfolder, file))
+    files.push(...subfolderFiles)
+  }
+
+  return files
 }
 
 function readMDXFile(filePath) {
@@ -34,7 +50,7 @@ function getMDXData(dir) {
   let mdxFiles = getMDXFiles(dir)
   return mdxFiles.map((file) => {
     let { metadata, content } = readMDXFile(path.join(dir, file))
-    let slug = path.basename(file, path.extname(file))
+    let slug = path.basename(path.dirname(file))
 
     return {
       metadata,
@@ -45,7 +61,7 @@ function getMDXData(dir) {
 }
 
 export function getBlogPosts() {
-  return getMDXData(path.join(process.cwd(), 'app', 'thoughts', 'posts')).sort(
+  return getMDXData(path.join(process.cwd(), 'app', 'thoughts')).sort(
     (a, b) => {
       if (new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)) {
         return -1
