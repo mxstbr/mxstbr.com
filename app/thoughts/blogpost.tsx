@@ -51,7 +51,10 @@ export function generateMetadata({ params }) {
 }
 
 export default function Blog({ meta, children }) {
-  const post = getBlogPosts().find((post) => post.metadata.title === meta.title)
+  // Show drafts if people have direct links to them
+  const post = getBlogPosts({ drafts: true }).find(
+    (post) => post.metadata.title === meta.title
+  )
 
   if (!post) notFound()
 

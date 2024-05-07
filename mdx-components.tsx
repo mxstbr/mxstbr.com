@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { highlight } from 'sugar-high'
 import React from 'react'
 import { MDXComponents } from 'mdx/types'
+import Prose from 'app/components/prose'
 
 function Table({ data }) {
   let headers = data.headers.map((header, index) => (
@@ -88,7 +89,7 @@ function createHeading(level) {
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
-    wrapper: ({ children }) => <div className="prose">{children}</div>,
+    wrapper: ({ children }) => <Prose>{children}</Prose>,
     h1: createHeading(1),
     h2: createHeading(2),
     h3: createHeading(3),

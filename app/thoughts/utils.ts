@@ -7,7 +7,9 @@ type Metadata = {
   title: string
   publishedAt: string
   summary: string
+  published: boolean
   image?: string
+  views?: number
 }
 
 function parseFrontmatter(fileContent: string) {
@@ -60,15 +62,19 @@ function getMDXData(dir) {
   })
 }
 
-export function getBlogPosts() {
-  return getMDXData(path.join(process.cwd(), 'app', 'thoughts')).sort(
-    (a, b) => {
+export function getBlogPosts({ drafts = false }: { drafts?: boolean } = {}) {
+  return getMDXData(path.join(process.cwd(), 'app', 'thoughts'))
+    .sort((a, b) => {
       if (new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)) {
         return -1
       }
       return 1
-    }
-  )
+    })
+    .filter((post) => {
+      if (drafts) return true
+
+      return post.metadata.published
+    })
 }
 
 export function formatDate(date: string, includeRelative = false) {
