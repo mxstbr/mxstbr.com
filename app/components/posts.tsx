@@ -5,6 +5,14 @@ import { ItemList, ItemListItem } from './item-list'
 export function BlogPosts() {
   let allBlogs = getBlogPosts()
 
+  const dates = allBlogs.map((post) =>
+    new Date(post.metadata.publishedAt).getTime()
+  )
+  const newest = Math.max(...dates)
+  const oldest = Math.min(...dates)
+  const years = (newest - oldest) / 1000 / 60 / 60 / 24 / 365
+  const averagePerYear = (allBlogs.length / years).toFixed(2)
+
   return (
     <div className="space-y-8">
       <ItemList>
@@ -30,25 +38,30 @@ export function BlogPosts() {
           />
         ))}
       </ItemList>
-      <form
-        action="https://buttondown.email/api/emails/embed-subscribe/mxstbr"
-        method="post"
-        target="popupwindow"
-        className="flex flex-row space-x-4"
-      >
-        <input
-          type="email"
-          name="email"
-          placeholder="your@email.com"
-          className="flex-1 rounded-sm px-2 py-1"
-        />
-        <input type="hidden" value="1" name="embed" />
-        <input
-          type="submit"
-          value="Get notified of new essays"
-          className="px-4 py-1 bg-slate-900 text-white rounded-sm"
-        />
-      </form>
+      <div className="space-y-2">
+        <form
+          action="https://buttondown.email/api/emails/embed-subscribe/mxstbr"
+          method="post"
+          target="popupwindow"
+          className="flex flex-row space-x-4"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="your@email.com"
+            className="w-full rounded-sm px-2 py-1"
+          />
+          <input type="hidden" value="1" name="embed" />
+          <input
+            type="submit"
+            value="Get notified of new essays"
+            className="px-4 py-1 bg-slate-900 text-white rounded-sm"
+          />
+        </form>
+        <span className="text-neutral-600">
+          Average: {averagePerYear} essays/year
+        </span>
+      </div>
     </div>
   )
 }
