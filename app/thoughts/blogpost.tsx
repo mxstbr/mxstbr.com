@@ -72,6 +72,7 @@ export default function Blog({ meta, children }) {
               ? `${baseUrl}${post.metadata.image}`
               : `/og?title=${encodeURIComponent(post.metadata.title)}`,
             url: `${baseUrl}/thoughts/${post.slug}`,
+            // TODO
             author: {
               '@type': 'Person',
               name: 'My Portfolio',

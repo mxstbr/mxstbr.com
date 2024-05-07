@@ -19,12 +19,34 @@ export default async function OSS() {
         {repos
           .sort((a, b) => b.stargazerCount - a.stargazerCount)
           .map((repo) => (
-            <li key={repo.nameWithOwner}>
-              <a href={`https://github.com${repo.nameWithOwner}`}>
-                {repo.nameWithOwner}
-              </a>
-              : {repo.stargazerCount.toLocaleString()} stars
+            <li
+              key={repo.nameWithOwner}
+              className="flex flex-col space-y-1 mb-4"
+            >
+              <div className="w-full flex flex-col md:flex-row space-x-0 md:space-x-2">
+                <p className="text-neutral-600 dark:text-neutral-400 w-[120px] tabular-nums">
+                  {repo.stargazerCount} stars
+                </p>
+                <div>
+                  <p className="text-neutral-900 dark:text-neutral-100 tracking-tight">
+                    <a
+                      className="underline"
+                      href={`https://github.com${repo.nameWithOwner}`}
+                    >
+                      {repo.nameWithOwner}
+                    </a>
+                  </p>
+                  <p className="text-neutral-600">{repo.description}</p>
+                </div>
+              </div>
             </li>
+
+            // <li key={repo.nameWithOwner}>
+            //   <a href={`https://github.com${repo.nameWithOwner}`}>
+            //     {repo.nameWithOwner}
+            //   </a>
+            //   : {repo.stargazerCount.toLocaleString()} stars
+            // </li>
           ))}
       </ul>
     </div>
