@@ -1,30 +1,54 @@
 import Link from 'next/link'
-import { formatDate, getBlogPosts } from 'app/thoughts/utils'
+import { getBlogPosts } from 'app/thoughts/utils'
+import { ItemList, ItemListItem } from './item-list'
 
 export function BlogPosts() {
   let allBlogs = getBlogPosts()
 
   return (
-    <div className="space-y-4">
-      {allBlogs.map((post) => (
-        <div key={post.slug} className="flex flex-col space-y-1 mb-4">
-          <div className="flex items-center space-x-4">
-            <Link
-              href={`/thoughts/${post.slug}`}
-              className="text-neutral-900 dark:text-neutral-100  shrink-0"
-            >
-              <p>{post.metadata.title}</p>
-            </Link>
-            <span className="w-full border-t border-gray-300 border-dashed shrink dark:border-gray-800"></span>
-            <p className="text-neutral-600 text-right dark:text-neutral-400 tabular-nums shrink-0">
-              {post.metadata.views.toLocaleString(undefined, {
-                maximumFractionDigits: 0,
-              })}{' '}
-              views
-            </p>
-          </div>
-        </div>
-      ))}
+    <div className="space-y-8">
+      <ItemList>
+        {allBlogs.map((post) => (
+          <ItemListItem
+            key={post.slug}
+            left={
+              <Link
+                href={`/thoughts/${post.slug}`}
+                className="text-neutral-900 dark:text-neutral-100  shrink-0"
+              >
+                {post.metadata.title}
+              </Link>
+            }
+            right={
+              <>
+                {post.metadata.views.toLocaleString(undefined, {
+                  maximumFractionDigits: 0,
+                })}{' '}
+                views
+              </>
+            }
+          />
+        ))}
+      </ItemList>
+      <form
+        action="https://buttondown.email/api/emails/embed-subscribe/mxstbr"
+        method="post"
+        target="popupwindow"
+        className="flex flex-row space-x-4"
+      >
+        <input
+          type="email"
+          name="email"
+          placeholder="your@email.com"
+          className="flex-1 rounded-sm px-2 py-1"
+        />
+        <input type="hidden" value="1" name="embed" />
+        <input
+          type="submit"
+          value="Get notified of new essays"
+          className="px-4 py-1 bg-slate-900 text-white rounded-sm"
+        />
+      </form>
     </div>
   )
 }

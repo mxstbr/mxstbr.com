@@ -1,4 +1,5 @@
 import { investments } from './investments'
+import { ItemList, ItemListItem } from '../components/item-list'
 
 ## Angel Investing
 
@@ -22,10 +23,16 @@ I personally love investing in products that I (would) use myself, even more so 
 
 So far, I have invested in:
 
-<ol>
-  {investments.map(investment => (
-    <li key={investment.href}>
-      <a href={investment.href}>{investment.name}</a>: {investment.description}
-    </li>
+<ItemList>
+  {investments.map((investment) => (
+    <ItemListItem
+      key={investment.href}
+      left={
+        <a target="_blank" href={investment.href}>
+          {investment.name}
+        </a>
+      }
+      right={investment.description}
+    />
   ))}
-</ol>
+</ItemList>

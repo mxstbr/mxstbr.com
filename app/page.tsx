@@ -4,7 +4,7 @@ import { getRepos } from './github'
 import ossProjects from './data/oss-projects'
 import { investments } from './investing/investments'
 import Link from 'next/link'
-import Intro from './intro.mdx'
+import { ItemList, ItemListItem } from './components/item-list'
 
 export const revalidate = 3600 // revalidate every hour
 
@@ -16,7 +16,7 @@ export default async function Home() {
   )
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-16">
       <Section title="TL;DR">
         <ItemList>
           <li>
@@ -90,44 +90,29 @@ export default async function Home() {
             />
           ))}
         </ItemList>
-        <p>See all →</p>
+        <Link href="/oss" className="text-neutral-600">
+          More →
+        </Link>
       </Section>
 
       <Section title="Angel Investments">
         <ItemList>
           {investments.slice(0, 6).map((investment) => (
-            <li key={investment.href}>
-              <a target="_blank" href={investment.href}>
-                {investment.name}
-              </a>
-              , {investment.description}
-            </li>
+            <ItemListItem
+              key={investment.href}
+              left={
+                <a target="_blank" href={investment.href}>
+                  {investment.name}
+                </a>
+              }
+              right={investment.description}
+            />
           ))}
         </ItemList>
-        <p>See all →</p>
+        <Link href="/investing" className="text-neutral-600">
+          More →
+        </Link>
       </Section>
-
-      {Array.from(Array(100)).map((_, i) => (
-        <br key={i} />
-      ))}
-    </div>
-  )
-}
-
-function ItemList(props: { children: React.ReactNode }) {
-  return <ul className="space-y-4">{props.children}</ul>
-}
-
-function ItemListItem(props) {
-  return (
-    <div className="flex items-center space-x-4">
-      <p className="text-neutral-900 dark:text-neutral-100 shrink-0">
-        {props.left}
-      </p>
-      <span className="w-full border-t border-gray-300 border-dashed shrink dark:border-gray-800"></span>
-      <p className="text-neutral-600 text-right dark:text-neutral-400 tabular-nums shrink-0">
-        {props.right}
-      </p>
     </div>
   )
 }
