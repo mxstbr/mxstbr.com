@@ -33,7 +33,7 @@ export default async function OSS() {
                 stars
               </div>
               <div>
-                <p className="text-neutral-900 dark:text-neutral-100 tracking-tight">
+                <p className="text-neutral-900 dark:text-neutral-100 ">
                   <a
                     className="underline"
                     href={`https://github.com${repo.nameWithOwner}`}

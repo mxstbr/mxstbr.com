@@ -8,8 +8,8 @@ type Metadata = {
   publishedAt: string
   summary: string
   published: boolean
+  views: number
   image?: string
-  views?: number
 }
 
 function parseFrontmatter(fileContent: string) {
@@ -20,7 +20,14 @@ function parseFrontmatter(fileContent: string) {
   const meta = eval('(' + match[1] + ')')
   let content = fileContent.replace(META, '').trim()
 
-  return { metadata: meta as Metadata, content }
+  return {
+    metadata: {
+      // Default views to 0
+      views: 0,
+      ...meta,
+    } as Metadata,
+    content,
+  }
 }
 
 function getMDXFiles(dir) {

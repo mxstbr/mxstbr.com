@@ -3,6 +3,8 @@ import { BlogPosts } from 'app/components/posts'
 import { getRepos } from './github'
 import ossProjects from './data/oss-projects'
 import { investments } from './investing/investments'
+import Link from 'next/link'
+import Intro from './intro.mdx'
 
 export const revalidate = 3600 // revalidate every hour
 
@@ -16,28 +18,15 @@ export default async function Home() {
   return (
     <div className="space-y-12">
       <Section title="TL;DR">
-        <SectionList>
+        <ItemList>
           <li>
-            Founder & CEO of <a href="https://stellate.co">Stellate</a>, the
+            CEO & co-founder of <a href="https://stellate.co">Stellate</a>, the
             GraphQL CDN
           </li>
           <li>
-            Previously founder & CTO of Spectrum (
-            <a
-              href="https://hub.packtpub.com/github-acquires-spectrum-a-community-centric-conversational-platform/"
-              target="_blank"
-            >
-              acq. by GitHub
-            </a>
-            ) and Staff Software Engineer at{' '}
-            <a href="https://gatsbyjs.com" target="_blank">
-              Gatsby
-            </a>
+            <Link href="/oss">Creator of open source projects</Link> used by
+            millions of developers
           </li>
-          <li>
-            Creator of open source projects used by millions of developers
-          </li>
-          <li>Angel investor in 20+ early-stage startups</li>
           <li>
             <a href="https://github.com/mxstbr/ama/issues/46">
               Speciality coffee barista
@@ -47,63 +36,65 @@ export default async function Home() {
               backcountry skier
             </a>
           </li>
-          <li>Austrian living in San Francisco</li>
+          <li>Austrian 🇦🇹 in San Francisco</li>
           <li>
-            Follow me on <a href="https://linkedin.com/in/mxstbr">LinkedIn</a>,{' '}
+            <a href="https://linkedin.com/in/mxstbr">LinkedIn</a>,{' '}
             <a href="https://twitter.com/mxstbr">Twitter</a>,{' '}
-            <a href="https://github.com/mxstbr">GitHub</a>, and{' '}
+            <a href="https://github.com/mxstbr">GitHub</a>,{' '}
             <a href="https://instagram.com/mxstbr">Instagram</a>
           </li>
-        </SectionList>
+        </ItemList>
       </Section>
 
       <Section title="Essays">
         <BlogPosts />
       </Section>
 
-      <Section title="Projects">
-        <SectionList>
-          {projects.map((project) => (
-            <li key={project.name} className="flex flex-col space-y-1 mb-4">
-              <div className="w-full flex flex-col md:flex-row space-x-0 md:space-x-2">
-                <p className="text-neutral-600 dark:text-neutral-400 w-[120px] tabular-nums">
-                  {project.timeframe}
-                </p>
-                <div>
-                  <p className="text-neutral-900 dark:text-neutral-100 tracking-tight">
-                    <a className="underline" href={project.href}>
-                      {project.name}
-                    </a>
-                    : {project.description}
-                  </p>
-                  <p className="text-neutral-600">{project.role}</p>
-                </div>
-              </div>
-            </li>
+      <Section title="Work">
+        <ItemList>
+          {work.map((project) => (
+            <ItemListItem
+              key={project.name}
+              left={<Link href={project.href}>{project.name}</Link>}
+              right={
+                <>
+                  <span>{project.role}</span>
+                  <span className="ml-4 text-neutral-500 text-right tabular-nums shrink-0">
+                    {project.timeframe}
+                  </span>
+                </>
+              }
+            />
           ))}
-        </SectionList>
+        </ItemList>
       </Section>
 
       <Section title="Open Source Projects">
-        <SectionList>
+        <ItemList>
           {repos.map((repo) => (
-            <li key={repo.nameWithOwner}>
-              <a href={`https://github.com${repo.nameWithOwner}`}>
-                {repo.nameWithOwner}
-              </a>
-              :{' '}
-              {repo.stargazerCount.toLocaleString(undefined, {
-                maximumFractionDigits: 0,
-              })}{' '}
-              stars
-            </li>
+            <ItemListItem
+              key={repo.nameWithOwner}
+              left={
+                <a href={`https://github.com${repo.nameWithOwner}`}>
+                  {repo.nameWithOwner}
+                </a>
+              }
+              right={
+                <>
+                  {repo.stargazerCount.toLocaleString(undefined, {
+                    maximumFractionDigits: 0,
+                  })}{' '}
+                  stars
+                </>
+              }
+            />
           ))}
-        </SectionList>
+        </ItemList>
         <p>See all →</p>
       </Section>
 
       <Section title="Angel Investments">
-        <SectionList>
+        <ItemList>
           {investments.slice(0, 6).map((investment) => (
             <li key={investment.href}>
               <a target="_blank" href={investment.href}>
@@ -112,7 +103,7 @@ export default async function Home() {
               , {investment.description}
             </li>
           ))}
-        </SectionList>
+        </ItemList>
         <p>See all →</p>
       </Section>
 
@@ -123,8 +114,22 @@ export default async function Home() {
   )
 }
 
-function SectionList(props: { children: React.ReactNode }) {
-  return <ul className="space-y-2">{props.children}</ul>
+function ItemList(props: { children: React.ReactNode }) {
+  return <ul className="space-y-4">{props.children}</ul>
+}
+
+function ItemListItem(props) {
+  return (
+    <div className="flex items-center space-x-4">
+      <p className="text-neutral-900 dark:text-neutral-100 shrink-0">
+        {props.left}
+      </p>
+      <span className="w-full border-t border-gray-300 border-dashed shrink dark:border-gray-800"></span>
+      <p className="text-neutral-600 text-right dark:text-neutral-400 tabular-nums shrink-0">
+        {props.right}
+      </p>
+    </div>
+  )
 }
 
 function Section({
@@ -142,19 +147,35 @@ function Section({
   )
 }
 
-const projects = [
+const work = [
   {
     name: 'Stellate',
-    description: 'The GraphQL CDN',
     role: 'CEO & Co-founder',
     timeframe: '2021–now',
     href: 'https://stellate.co',
   },
   {
-    name: 'styled-components',
-    description: 'CSS-in-JS for React apps (40,112 stars)',
-    role: 'Co-creator',
-    timeframe: '2016–2020',
-    href: 'https://stellate.co',
+    name: 'Gatsby',
+    role: 'Senior Staff Software Engineer',
+    timeframe: '2020–2021',
+    href: 'https://gatsbyjs.com',
+  },
+  {
+    name: 'GitHub',
+    role: 'Software Engineer',
+    timeframe: '2018–2020',
+    href: 'https://github.com',
+  },
+  {
+    name: 'Spectrum',
+    role: 'CTO & Co-founder',
+    timeframe: '2017–2018',
+    href: 'https://spectrum.chat',
+  },
+  {
+    name: 'Thinkmill',
+    role: 'Open Source Developer',
+    timeframe: '2016–2017',
+    href: 'https://thinkmill.com.au',
   },
 ]

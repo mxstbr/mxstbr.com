@@ -75,17 +75,15 @@ export default function Blog({ meta, children }) {
               ? `${baseUrl}${post.metadata.image}`
               : `/og?title=${encodeURIComponent(post.metadata.title)}`,
             url: `${baseUrl}/thoughts/${post.slug}`,
-            // TODO
             author: {
               '@type': 'Person',
-              name: 'My Portfolio',
+              '@id': 'mxstbr',
+              name: 'Max Stoiber',
             },
           }),
         }}
       />
-      <h1 className="title font-semibold text-2xl tracking-tighter">
-        {post.metadata.title}
-      </h1>
+      <h1 className="title font-semibold text-2xl er">{post.metadata.title}</h1>
       <div className="flex justify-between items-center mt-2 mb-8 text-sm">
         <p className="text-sm text-neutral-600 dark:text-neutral-400">
           {formatDate(post.metadata.publishedAt)}
