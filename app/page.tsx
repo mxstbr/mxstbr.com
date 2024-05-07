@@ -37,12 +37,6 @@ export default async function Home() {
             </a>
           </li>
           <li>Austrian 🇦🇹 in San Francisco</li>
-          <li>
-            <a href="https://linkedin.com/in/mxstbr">LinkedIn</a>,{' '}
-            <a href="https://twitter.com/mxstbr">Twitter</a>,{' '}
-            <a href="https://github.com/mxstbr">GitHub</a>,{' '}
-            <a href="https://instagram.com/mxstbr">Instagram</a>
-          </li>
         </ItemList>
       </Section>
 
