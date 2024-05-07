@@ -1,6 +1,8 @@
 import fs from 'fs'
 import path from 'path'
 
+const META = /export\s+const\s+meta\s+=\s+(\{(\n|.)*?\n\})/
+
 type Metadata = {
   title: string
   publishedAt: string
@@ -9,21 +11,14 @@ type Metadata = {
 }
 
 function parseFrontmatter(fileContent: string) {
-  let frontmatterRegex = /---\s*([\s\S]*?)\s*---/
-  let match = frontmatterRegex.exec(fileContent)
-  let frontMatterBlock = match![1]
-  let content = fileContent.replace(frontmatterRegex, '').trim()
-  let frontMatterLines = frontMatterBlock.trim().split('\n')
-  let metadata: Partial<Metadata> = {}
+  const match = META.exec(fileContent)
+  if (!match || typeof match[1] !== 'string')
+    throw new Error(`${name} needs to export const meta = {}`)
 
-  frontMatterLines.forEach((line) => {
-    let [key, ...valueArr] = line.split(': ')
-    let value = valueArr.join(': ').trim()
-    value = value.replace(/^['"](.*)['"]$/, '$1') // Remove quotes
-    metadata[key.trim() as keyof Metadata] = value
-  })
+  const meta = eval('(' + match[1] + ')')
+  let content = fileContent.replace(META, '').trim()
 
-  return { metadata: metadata as Metadata, content }
+  return { metadata: meta as Metadata, content }
 }
 
 function getMDXFiles(dir) {
