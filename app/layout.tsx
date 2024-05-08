@@ -55,7 +55,7 @@ export default function RootLayout({
         inter.className
       )}
     >
-      <body className="antialiased max-w-xl mx-4 mt-8 lg:mx-auto">
+      <body className="antialiased max-w-xl mt-8 px-4 mx-auto">
         <main className="flex-auto min-w-0 mt-6 flex flex-col px-2 space-y-24">
           <Navbar />
           {children}

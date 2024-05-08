@@ -17,7 +17,7 @@ export default async function Home() {
   )
 
   return (
-    <Columns>
+    <Columns className="space-y-16 2xl:space-y-0 2xl:space-x-16 ">
       <Section title="TL;DR">
         <ItemList>
           <ItemListItem
@@ -70,7 +70,7 @@ export default async function Home() {
 
       <div className="relative flex-1">
         {/* Background */}
-        <div className="absolute -top-6 -left-6 -right-6 -bottom-6 bg-slate-50 rounded-md border border-solid border-slate-200" />
+        <div className="absolute -top-6 -left-6 -right-6 -bottom-6 bg-slate-50 sm:rounded-md border border-solid border-slate-200" />
         <Section className="relative">
           <h2 className="font-bold relative">Essays</h2>
           <BlogPosts />
