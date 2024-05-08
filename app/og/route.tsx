@@ -3,7 +3,7 @@ import { ImageResponse } from 'next/og'
 // TODO
 export function GET(request: Request) {
   let url = new URL(request.url)
-  let title = url.searchParams.get('title') || 'Next.js Portfolio Starter'
+  let title = url.searchParams.get('title') || 'Max Stoiber (@mxstbr)'
 
   return new ImageResponse(
     (

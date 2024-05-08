@@ -28,9 +28,9 @@ export async function GET() {
   const rssFeed = `<?xml version="1.0" encoding="UTF-8" ?>
   <rss version="2.0">
     <channel>
-        <title>My Portfolio</title>
+        <title>Max Stoiber's Essays</title>
         <link>${baseUrl}</link>
-        <description>This is my portfolio RSS feed</description>
+        <description>CEO & co-founder of Stellate, creator of styled-components and react-boilerplate and angel investor in early-stage startups.</description>
         ${itemsXml}
     </channel>
   </rss>`

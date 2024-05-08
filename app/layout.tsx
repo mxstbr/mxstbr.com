@@ -11,8 +11,8 @@ import { baseUrl } from './sitemap'
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: 'Max Stoiber',
-    template: '%s | Max Stoiber',
+    default: 'Max Stoiber (@mxstbr)',
+    template: '%s | Max Stoiber (@mxstbr)',
   },
   description:
     'CEO & co-founder of Stellate, creator of styled-components and react-boilerplate and angel investor in early-stage startups.',

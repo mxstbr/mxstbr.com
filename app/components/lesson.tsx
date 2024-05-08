@@ -16,10 +16,7 @@ export default function Lesson(props: Props) {
       </div>
       <div className="relative">
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden flex items-center">
-          <div className="ml-[-30px] bg-white">
-            {/* TODO:              */}
-            {/* <Award className="w-20 h-20" /> */}
-          </div>
+          <div className="ml-[-30px] bg-white"></div>
         </div>
       </div>
     </div>
