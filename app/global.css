@@ -83,10 +83,6 @@ table {
   white-space: nowrap;
 }
 
-.title {
-  text-wrap: balance;
-}
-
 .full-bleed {
   width: 100vw;
   position: relative;

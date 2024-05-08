@@ -1,6 +1,5 @@
 import BlogPost from "../blogpost";
 import Lesson from "../../components/Lesson";
-import TwinMacroExample from "../../../components/TwinMacroExample";
 
 export const meta = {
   published: true,
@@ -19,8 +18,8 @@ If you have not seen it before, here is the canonical Tailwind example from thei
 
 ```html
 <div class="shadow-lg flex bg-white rounded-lg p-6 leading-normal">
-  <img class="h-24 w-24 rounded-full mx-auto mx-0 mr-6" src="avatar.jpg" />
-  <div class="text-center text-left">
+  <img class="h-24 w-24 rounded-full mx-0 mr-6" src="avatar.jpg" />
+  <div class="text-left">
     <h1 class="text-lg">Erin Lindford</h1>
     <h2 class="text-purple-500">Customer Support</h2>
     <p class="text-gray-600">erinlindford@example.com</p>
@@ -28,36 +27,13 @@ If you have not seen it before, here is the canonical Tailwind example from thei
   </div>
 </div>
 ```
-
-<style>{`
-.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -2px rgba(0,0,0,.05); }
-.p-6 { padding: 1.5rem; }
-.leading-normal { line-height: 1.5; }
-.rounded-lg { border-radius: .5rem; }
-.bg-white { background-color: #fff; }
-.h-16 { height: 4rem; }
-.w-16 { width: 4rem; }
-.rounded-full { border-radius: 9999px; }
-.mx-auto { margin-left: auto; margin-right: auto; }
-.text-center { text-align: center; }
-.text-lg { font-size: 1.125rem; }
-.text-purple-500 { color: #9f7aea; }
-.text-gray-600 { color: #718096; }
-.flex { display: flex; }
-.h-24 { height: 6rem; }
-.w-24 { width: 6rem; }
-.mx-0 { margin-left: 0; margin-right: 0; }
-.mr-6 { margin-right: 1.5rem; }
-.text-left { text-align: left; }
-`}</style>
-
 <div className="shadow-lg flex bg-white rounded-lg p-6 leading-normal" style={{ fontFamily: "sans-serif", wordBreak: "break-all" }}>
   <img
     alt="Avatar of Erin Lindford"
-    className="h-24 w-24 rounded-full mx-auto mx-0 mr-6" 
+    className="h-24 w-24 rounded-full mx-0 m-0 mr-6" 
     src="https://randomuser.me/api/portraits/women/17.jpg"
   />
-  <div className="text-center text-left">
+  <div className="text-left">
     <div className="text-lg">Erin Lindford</div>
     <div className="text-purple-500">Customer Support</div>
     <div className="text-gray-600">erinlindford@example.com</div>
@@ -120,7 +96,19 @@ const Card = () => (
 )
 ```
 
-<TwinMacroExample />
+<div className="shadow-lg flex bg-white rounded-lg p-6 leading-normal" style={{ fontFamily: "sans-serif", wordBreak: "break-all" }}>
+  <img
+    alt="Avatar of Erin Lindford"
+    className="h-24 w-24 rounded-full mx-0 m-0 mr-6" 
+    src="https://randomuser.me/api/portraits/women/17.jpg"
+  />
+  <div className="text-left">
+    <div className="text-lg">Erin Lindford</div>
+    <div className="text-purple-500">Customer Support</div>
+    <div className="text-gray-600">erinlindford@example.com</div>
+    <div className="text-gray-600">(555) 765-4321</div>
+  </div>
+</div>
 
 <br />
 
