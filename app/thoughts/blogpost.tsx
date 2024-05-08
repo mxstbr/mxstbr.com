@@ -60,44 +60,52 @@ export default function Blog({ meta, children }) {
   if (!post) notFound()
 
   return (
-    <section>
-      <script
-        type="application/ld+json"
-        suppressHydrationWarning
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'BlogPosting',
-            headline: post.metadata.title,
-            datePublished: post.metadata.publishedAt,
-            dateModified: post.metadata.publishedAt,
-            description: post.metadata.summary,
-            image: post.metadata.image
-              ? `${baseUrl}${post.metadata.image}`
-              : `/og?title=${encodeURIComponent(post.metadata.title)}`,
-            url: `${baseUrl}/thoughts/${post.slug}`,
-            author: {
-              '@type': 'Person',
-              '@id': 'mxstbr',
-              name: 'Max Stoiber',
-            },
-          }),
-        }}
-      />
-      <h1 className="title font-bold text-4xl mb-0">{post.metadata.title}</h1>
-      <div className="flex items-center space-x-6 mb-8 text-sm">
-        <p className="text-sm text-neutral-600 dark:text-neutral-400">
-          {formatDate(post.metadata.publishedAt)}
-        </p>
-        <p className="text-sm text-neutral-600 dark:text-neutral-400">
-          {post.metadata.views.toLocaleString(undefined, {
-            maximumFractionDigits: 0,
-          })}{' '}
-          views
-        </p>
+    <div className="2xl:space-y-0 2xl:space-x-16 2xl:w-screen relative 2xl:ml-[-50vw] 2xl:mr-[-50vw] 2xl:inset-x-2/4 2xl:flex 2xl:flex-row 2xl:justify-between 2xl:px-12">
+      <div className="flex-1" />
+      <div className="flex-1">
+        <section>
+          <script
+            type="application/ld+json"
+            suppressHydrationWarning
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'BlogPosting',
+                headline: post.metadata.title,
+                datePublished: post.metadata.publishedAt,
+                dateModified: post.metadata.publishedAt,
+                description: post.metadata.summary,
+                image: post.metadata.image
+                  ? `${baseUrl}${post.metadata.image}`
+                  : `/og?title=${encodeURIComponent(post.metadata.title)}`,
+                url: `${baseUrl}/thoughts/${post.slug}`,
+                author: {
+                  '@type': 'Person',
+                  '@id': 'mxstbr',
+                  name: 'Max Stoiber',
+                },
+              }),
+            }}
+          />
+          <h1 className="title font-bold text-4xl mb-0">
+            {post.metadata.title}
+          </h1>
+          <div className="flex items-center space-x-6 mb-8 text-sm">
+            <p className="text-sm text-neutral-600 dark:text-neutral-400">
+              {formatDate(post.metadata.publishedAt)}
+            </p>
+            <p className="text-sm text-neutral-600 dark:text-neutral-400">
+              {post.metadata.views.toLocaleString(undefined, {
+                maximumFractionDigits: 0,
+              })}{' '}
+              views
+            </p>
+          </div>
+          {/* TODO: Fix heading levels across all blog posts */}
+          <Prose className="prose-lg">{children}</Prose>
+        </section>
       </div>
-      {/* TODO: Fix heading levels across all blog posts */}
-      <Prose className="prose-lg">{children}</Prose>
-    </section>
+      <div className="flex-1" />
+    </div>
   )
 }

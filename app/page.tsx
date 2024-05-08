@@ -31,8 +31,8 @@ export default async function Home() {
           <ItemListItem
             left={
               <>
-                <Link href="/oss">Creator of open source projects</Link> used by
-                millions of devs
+                (Co-)creator of <Link href="/oss">open source projects</Link>{' '}
+                used by millions
               </>
             }
             right={`💻`}
@@ -40,8 +40,8 @@ export default async function Home() {
           <ItemListItem
             left={
               <>
-                <Link href="/investing">Angel investor</Link> in early-stage
-                startups
+                <Link href="/investing">Angel investor</Link> in{' '}
+                {investments.length}+ startups
               </>
             }
             right={`🚀`}
@@ -61,7 +61,7 @@ export default async function Home() {
             right={`🎿`}
           ></ItemListItem>
           <ItemListItem
-            left={<>Austrian in San Francisco</>}
+            left={<>Austrian living in San Francisco</>}
             right={`🌁`}
           ></ItemListItem>
         </ItemList>
