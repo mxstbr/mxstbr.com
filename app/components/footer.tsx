@@ -1,3 +1,5 @@
+import { Column, Columns } from './layout-columns'
+
 function ArrowIcon() {
   return (
     <svg
@@ -17,64 +19,70 @@ function ArrowIcon() {
 
 export default function Footer() {
   return (
-    <footer className="text-center w-full mx-auto pb-16">
-      <ul className="font-sm flex flex-col space-x-0 space-y-2 text-neutral-600 sm:flex-row sm:space-x-4 sm:space-y-0 dark:text-neutral-300">
-        <li>
-          <a
-            className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
-            rel="noopener noreferrer"
-            target="_blank"
-            href="/rss"
-          >
-            <ArrowIcon />
-            <p className="ml-2 h-7">rss</p>
-          </a>
-        </li>
-        <li>
-          <a
-            className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
-            rel="noopener noreferrer"
-            target="_blank"
-            href="https://twitter.com/mxstbr"
-          >
-            <ArrowIcon />
-            <p className="ml-2 h-7">twitter</p>
-          </a>
-        </li>
-        <li>
-          <a
-            className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
-            rel="noopener noreferrer"
-            target="_blank"
-            href="https://github.com/mxstbr"
-          >
-            <ArrowIcon />
-            <p className="ml-2 h-7">github</p>
-          </a>
-        </li>
-        <li>
-          <a
-            className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
-            rel="noopener noreferrer"
-            target="_blank"
-            href="https://linkedin.com/in/mxstbr"
-          >
-            <ArrowIcon />
-            <p className="ml-2 h-7">linkedin</p>
-          </a>
-        </li>
-        <li>
-          <a
-            className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
-            rel="noopener noreferrer"
-            target="_blank"
-            href="https://instagram.com/mxstbr"
-          >
-            <ArrowIcon />
-            <p className="ml-2 h-7">instagram</p>
-          </a>
-        </li>
-      </ul>
-    </footer>
+    <Columns>
+      <Column />
+      <Column>
+        <footer className="text-center w-full mx-auto pb-16">
+          <ul className="font-sm w-full flex flex-row justify-between text-neutral-600 dark:text-neutral-300">
+            <li>
+              <a
+                className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
+                rel="noopener noreferrer"
+                target="_blank"
+                href="/rss"
+              >
+                <ArrowIcon />
+                <p className="ml-2 h-7">rss</p>
+              </a>
+            </li>
+            <li>
+              <a
+                className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
+                rel="noopener noreferrer"
+                target="_blank"
+                href="https://twitter.com/mxstbr"
+              >
+                <ArrowIcon />
+                <p className="ml-2 h-7">twitter</p>
+              </a>
+            </li>
+            <li>
+              <a
+                className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
+                rel="noopener noreferrer"
+                target="_blank"
+                href="https://github.com/mxstbr"
+              >
+                <ArrowIcon />
+                <p className="ml-2 h-7">github</p>
+              </a>
+            </li>
+            <li>
+              <a
+                className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
+                rel="noopener noreferrer"
+                target="_blank"
+                href="https://linkedin.com/in/mxstbr"
+              >
+                <ArrowIcon />
+                <p className="ml-2 h-7">linkedin</p>
+              </a>
+            </li>
+            <li>
+              <a
+                className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
+                rel="noopener noreferrer"
+                target="_blank"
+                href="https://instagram.com/mxstbr"
+              >
+                <ArrowIcon />
+                <p className="ml-2 h-7">instagram</p>
+              </a>
+            </li>
+          </ul>
+        </footer>
+      </Column>
+      <Column />
+    </Columns>
   )
 }

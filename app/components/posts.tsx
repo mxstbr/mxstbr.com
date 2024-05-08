@@ -43,7 +43,7 @@ export function BlogPosts() {
           action="https://buttondown.email/api/emails/embed-subscribe/mxstbr"
           method="post"
           target="popupwindow"
-          className="flex flex-row items-center space-x-4 pb-8"
+          className="flex flex-row items-center space-x-4 pb-4"
         >
           <input
             type="email"
