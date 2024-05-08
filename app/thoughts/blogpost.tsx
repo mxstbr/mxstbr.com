@@ -88,6 +88,7 @@ export default function Blog({ meta, children }) {
         <p className="text-sm text-neutral-600 dark:text-neutral-400">
           {formatDate(post.metadata.publishedAt)}
         </p>
+        {/* TODO: Views */}
       </div>
       <article className="prose">{children}</article>
     </section>

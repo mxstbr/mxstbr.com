@@ -1,3 +1,4 @@
+// TODO: Update list of investments based on mxstbr.com/investing
 export const investments = [
   {
     name: 'Fly.io',
