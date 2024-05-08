@@ -8,9 +8,8 @@ export function BlogPosts() {
   const dates = allBlogs.map((post) =>
     new Date(post.metadata.publishedAt).getTime()
   )
-  const newest = new Date()
   const oldest = Math.min(...dates)
-  const years = (newest - oldest) / 1000 / 60 / 60 / 24 / 365
+  const years = (new Date().getTime() - oldest) / 1000 / 60 / 60 / 24 / 365
   const averagePerYear = (allBlogs.length / years).toFixed(3)
 
   return (
