@@ -19,28 +19,51 @@ export default async function Home() {
     <div className="space-y-16 2xl:space-y-0 2xl:space-x-16 2xl:w-screen relative 2xl:ml-[-50vw] 2xl:mr-[-50vw] 2xl:inset-x-2/4 2xl:flex 2xl:flex-row 2xl:justify-between 2xl:px-12">
       <Section title="TL;DR">
         <ItemList>
-          <li>
-            CEO & co-founder of <a href="https://stellate.co">Stellate</a>, the
-            GraphQL CDN
-          </li>
-          <li>
-            <Link href="/oss">Creator of open source projects</Link> used by
-            millions of developers
-          </li>
-          <li>
-            <Link href="/investing">Angel investor</Link> in early-stage
-            startups
-          </li>
-          <li>
-            <a href="https://github.com/mxstbr/ama/issues/46">
-              Speciality coffee barista
-            </a>{' '}
-            and{' '}
-            <a href="https://www.youtube.com/watch?v=19kDOIwzTfE">
-              backcountry skier
-            </a>
-          </li>
-          <li>Austrian 🇦🇹 in San Francisco</li>
+          <ItemListItem
+            left={
+              <>
+                CEO & co-founder of <a href="https://stellate.co">Stellate</a>,
+                the GraphQL CDN
+              </>
+            }
+            right={`⚡`}
+          ></ItemListItem>
+          <ItemListItem
+            left={
+              <>
+                <Link href="/oss">Creator of open source projects</Link> used by
+                millions of devs
+              </>
+            }
+            right={`💻`}
+          ></ItemListItem>
+          <ItemListItem
+            left={
+              <>
+                <Link href="/investing">Angel investor</Link> in early-stage
+                startups
+              </>
+            }
+            right={`🚀`}
+          ></ItemListItem>
+          <ItemListItem
+            left={
+              <>
+                <a href="https://github.com/mxstbr/ama/issues/46">
+                  Speciality coffee barista
+                </a>{' '}
+                and{' '}
+                <a href="https://www.youtube.com/watch?v=19kDOIwzTfE">
+                  backcountry skier
+                </a>
+              </>
+            }
+            right={`🎿`}
+          ></ItemListItem>
+          <ItemListItem
+            left={<>Austrian in San Francisco</>}
+            right={`🌁`}
+          ></ItemListItem>
         </ItemList>
       </Section>
 
