@@ -8,7 +8,7 @@ export function BlogPosts() {
   const dates = allBlogs.map((post) =>
     new Date(post.metadata.publishedAt).getTime()
   )
-  const newest = Math.max(...dates)
+  const newest = new Date()
   const oldest = Math.min(...dates)
   const years = (newest - oldest) / 1000 / 60 / 60 / 24 / 365
   const averagePerYear = (allBlogs.length / years).toFixed(3)
@@ -60,9 +60,7 @@ export function BlogPosts() {
             />
             <div
               className="text-neutral-500 dark:text-neutral-400 text-sm underline decoration-dotted cursor-help"
-              title={`Published ${allBlogs.length} essays in ${years.toFixed(
-                2
-              )} years`}
+              title={`${allBlogs.length} essays in ${years.toFixed(2)} years`}
             >
               Average: {averagePerYear} essays/year
             </div>
