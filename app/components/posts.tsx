@@ -14,7 +14,7 @@ export function BlogPosts() {
   const averagePerYear = (allBlogs.length / years).toFixed(3)
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-12 relative">
       <ItemList>
         {allBlogs.map((post) => (
           <ItemListItem

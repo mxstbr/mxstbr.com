@@ -5,6 +5,7 @@ import ossProjects from './data/oss-projects'
 import { investments } from './investing/investments'
 import Link from 'next/link'
 import { ItemList, ItemListItem } from './components/item-list'
+import { Columns } from './components/layout-columns'
 
 export const revalidate = 3600 // revalidate every hour
 
@@ -16,7 +17,7 @@ export default async function Home() {
   )
 
   return (
-    <div className="space-y-16 2xl:space-y-0 2xl:space-x-16 2xl:w-screen relative 2xl:ml-[-50vw] 2xl:mr-[-50vw] 2xl:inset-x-2/4 2xl:flex 2xl:flex-row 2xl:justify-between 2xl:px-12">
+    <Columns>
       <Section title="TL;DR">
         <ItemList>
           <ItemListItem
@@ -67,9 +68,14 @@ export default async function Home() {
         </ItemList>
       </Section>
 
-      <Section title="Essays">
-        <BlogPosts />
-      </Section>
+      <div className="relative flex-1">
+        {/* Background */}
+        <div className="absolute -top-6 -left-6 -right-6 -bottom-6 bg-slate-50 rounded-md border border-solid border-slate-200" />
+        <Section className="relative">
+          <h2 className="font-bold relative">Essays</h2>
+          <BlogPosts />
+        </Section>
+      </div>
 
       <Section title="Work">
         <ItemList>
@@ -135,20 +141,22 @@ export default async function Home() {
           More →
         </Link>
       </Section> */}
-    </div>
+    </Columns>
   )
 }
 
 function Section({
   title,
   children,
+  className,
 }: {
-  title: string
+  title?: string
   children: React.ReactNode
+  className?: string
 }) {
   return (
-    <div className="space-y-6 flex-1">
-      <h2 className="font-bold">{title}</h2>
+    <div className={`space-y-6 flex-1 ${className}`}>
+      {title && <h2 className="font-bold">{title}</h2>}
       {children}
     </div>
   )
