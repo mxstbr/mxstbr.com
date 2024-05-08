@@ -49,18 +49,20 @@ export function BlogPosts() {
             type="email"
             name="email"
             placeholder="your@email.com"
-            className="w-full rounded-sm px-2 py-1"
+            className="w-full rounded-sm px-2 py-1 self-start dark:bg-black dark:text-white"
           />
           <input type="hidden" value="1" name="embed" />
-          <input
-            type="submit"
-            value="Get notified of new essays"
-            className="px-4 py-1 bg-slate-900 text-white rounded-sm"
-          />
+          <div className="text-center space-y-1">
+            <input
+              type="submit"
+              value="Get notified of new essays"
+              className="px-4 py-1 bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 dark:border-slate-100 rounded-sm"
+            />
+            <div className="text-neutral-500 dark:text-neutral-400 text-sm">
+              Average: {averagePerYear} essays/year
+            </div>
+          </div>
         </form>
-        <span className="text-neutral-600">
-          Average: {averagePerYear} essays/year
-        </span>
       </div>
     </div>
   )

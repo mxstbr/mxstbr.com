@@ -16,7 +16,7 @@ export default async function Home() {
   )
 
   return (
-    <div className="space-y-16">
+    <div className="space-y-16 2xl:space-y-0 2xl:space-x-16 2xl:w-screen relative 2xl:ml-[-50vw] 2xl:mr-[-50vw] 2xl:inset-x-2/4 2xl:flex 2xl:flex-row 2xl:justify-between 2xl:px-12">
       <Section title="TL;DR">
         <ItemList>
           <li>
@@ -26,6 +26,10 @@ export default async function Home() {
           <li>
             <Link href="/oss">Creator of open source projects</Link> used by
             millions of developers
+          </li>
+          <li>
+            <Link href="/investing">Angel investor</Link> in early-stage
+            startups
           </li>
           <li>
             <a href="https://github.com/mxstbr/ama/issues/46">
@@ -63,7 +67,7 @@ export default async function Home() {
         </ItemList>
       </Section>
 
-      <Section title="Open Source Projects">
+      {/* <Section title="Open Source Projects">
         <ItemList>
           {repos.map((repo) => (
             <ItemListItem
@@ -106,7 +110,7 @@ export default async function Home() {
         <Link href="/investing" className="text-neutral-600">
           More →
         </Link>
-      </Section>
+      </Section> */}
     </div>
   )
 }
@@ -119,7 +123,7 @@ function Section({
   children: React.ReactNode
 }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 flex-1">
       <h2 className="font-bold">{title}</h2>
       {children}
     </div>
