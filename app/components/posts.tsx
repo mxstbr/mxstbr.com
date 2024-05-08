@@ -3,6 +3,7 @@ import { getBlogPosts } from 'app/thoughts/utils'
 import { ItemList, ItemListItem } from './item-list'
 
 export function BlogPosts() {
+  // TODO: Also count archived posts.
   let allBlogs = getBlogPosts()
 
   const dates = allBlogs.map((post) =>

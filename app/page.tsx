@@ -51,18 +51,19 @@ export default async function Home() {
       <Section title="Work">
         <ItemList>
           {work.map((project) => (
-            <ItemListItem
-              key={project.name}
-              left={<Link href={project.href}>{project.name}</Link>}
-              right={
-                <div className="flex align-center">
-                  <div>{project.role}</div>
-                  <div className="ml-4 text-neutral-500 text-right tabular-nums shrink-0">
-                    {project.timeframe}
+            <div className="flex flex-row" key={project.name}>
+              <ItemListItem
+                left={<Link href={project.href}>{project.name}</Link>}
+                right={
+                  <div className="flex align-center">
+                    <div>{project.role}</div>
                   </div>
-                </div>
-              }
-            />
+                }
+              />
+              <div className="ml-4 w-[6em] text-neutral-500 text-right tabular-nums shrink-0">
+                {project.timeframe}
+              </div>
+            </div>
           ))}
         </ItemList>
       </Section>
