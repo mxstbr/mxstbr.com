@@ -7,9 +7,7 @@ type Metadata = {
   title: string
   publishedAt: string
   summary: string
-  // TODO: state: 'draft' | 'published' | 'archived'
-  // + archived support instead
-  published: boolean
+  state: 'draft' | 'published' | 'archived'
   views: number
   image?: string
 }
@@ -71,7 +69,10 @@ function getMDXData(dir) {
   })
 }
 
-export function getBlogPosts({ drafts = false }: { drafts?: boolean } = {}) {
+export function getBlogPosts({
+  drafts = false,
+  archived = false,
+}: { drafts?: boolean; archived?: boolean } = {}) {
   return getMDXData(path.join(process.cwd(), 'app', 'thoughts'))
     .sort((a, b) => {
       if (new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)) {
@@ -80,9 +81,10 @@ export function getBlogPosts({ drafts = false }: { drafts?: boolean } = {}) {
       return 1
     })
     .filter((post) => {
-      if (drafts) return true
+      if (drafts && post.metadata.state === 'draft') return true
+      if (archived && post.metadata.state === 'archived') return true
 
-      return post.metadata.published
+      return post.metadata.state === 'published'
     })
 }
 

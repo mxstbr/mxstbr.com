@@ -2,10 +2,9 @@ import { baseUrl } from 'app/sitemap'
 import { getBlogPosts } from 'app/thoughts/utils'
 
 export async function GET() {
-  let allBlogs = await getBlogPosts()
+  let allBlogs = await getBlogPosts({ archived: true })
 
   const itemsXml = allBlogs
-    .filter((post) => post.metadata.published)
     .sort((a, b) => {
       if (new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)) {
         return -1
@@ -17,7 +16,7 @@ export async function GET() {
         `<item>
           <title>${post.metadata.title}</title>
           <link>${baseUrl}/thoughts/${post.slug}</link>
-          <description>${post.metadata.summary || ''}</description>
+          <description>${escapeXml(post.metadata.summary || '')}</description>
           <pubDate>${new Date(
             post.metadata.publishedAt
           ).toUTCString()}</pubDate>
@@ -30,7 +29,7 @@ export async function GET() {
     <channel>
         <title>Max Stoiber's Essays</title>
         <link>${baseUrl}</link>
-        <description>CEO & co-founder of Stellate, creator of styled-components and react-boilerplate and angel investor in early-stage startups.</description>
+        <description>CEO and co-founder of Stellate, creator of styled-components and react-boilerplate and angel investor in early-stage startups.</description>
         ${itemsXml}
     </channel>
   </rss>`
@@ -39,5 +38,23 @@ export async function GET() {
     headers: {
       'Content-Type': 'text/xml',
     },
+  })
+}
+
+// From: https://stackoverflow.com/a/27979933
+function escapeXml(unsafe) {
+  return unsafe.replace(/[<>&'"]/g, function (c) {
+    switch (c) {
+      case '<':
+        return '&lt;'
+      case '>':
+        return '&gt;'
+      case '&':
+        return '&amp;'
+      case "'":
+        return '&apos;'
+      case '"':
+        return '&quot;'
+    }
   })
 }
