@@ -62,6 +62,12 @@ pre {
   scrollbar-width: none; /* Firefox */
 }
 
+@media (prefers-color-scheme: dark) {
+  pre {
+    @apply bg-neutral-900;
+  }
+}
+
 /* Remove Safari input shadow on mobile */
 input[type='text'],
 input[type='email'] {

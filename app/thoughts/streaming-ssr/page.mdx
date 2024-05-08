@@ -1,6 +1,4 @@
-import BlogPost from "../../../components/BlogPost";
-import Browser from "../../../components/BrowserDemo";
-import Lesson from "../../../components/Lesson";
+import BlogPost from '../blogpost'
 
 export const meta = {
   published: false,
@@ -11,12 +9,13 @@ export const meta = {
   views: 2030
 };
 
-export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;
+<BlogPost meta={meta}>
 
 *Originally published on the [Zeit blog](https://web.archive.org/web/20180211132841if_/https://zeit.co/blog/streaming-server-rendering-at-spectrum)*
 
 React 16 introduced streaming server-side rendering, which allows you to send down HTML in chunks in parallel to rendering it. This enables a faster time to first byte and first meaningful paint for your users since the initial markup arrives in the browser sooner.
 
+{/* TODO: Move all old images over */}
 ![](/static/images/renderToString.png)
 
 Streams are also asynchronous, contrary to `renderToString`, and handle backpressure well. This enables your Node.js server to render multiple requests at the same time and stay responsive in challenging conditions. It can pause React's rendering if the network is saturated, and makes it so heavier requests doesn't block lighter requests for a prolonged period of time. Since we were having some performance issues in our server-side rendering worker for [Spectrum](https://spectrum.chat) we recently implemented streaming, which turned out to have an interesting impact on our HTML caching.
@@ -153,3 +152,5 @@ app.use('*', (request, response) => {
 
 An example of how to use the `createCacheStream` util to cache HTML
 As you can see, we're piping the rendering stream (faucet) into the cache stream (duplicating water filter) which passes the HTML on to the response (drain). Also note how we write the beginnging and the end of the HTML to the `cacheStream` instead of directly to the response to make sure our caching layer is aware of those bits of markup. That's all there is to it, that's how we cache the streamed HTML at [Spectrum](https://spectrum.chat/)! As always, there's things to improve in any code (this doesn't handle cache stampedes, for example), but it's serving us alright in production today.
+
+</BlogPost>

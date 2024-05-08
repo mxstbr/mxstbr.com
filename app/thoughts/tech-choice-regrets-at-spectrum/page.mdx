@@ -1,4 +1,4 @@
-import BlogPost from "../../../components/BlogPost";
+import BlogPost from '../blogpost'
 import Lesson from "../../../components/Lesson";
 
 export const meta = {
@@ -10,7 +10,7 @@ export const meta = {
   views: 3305 + 37831
 };
 
-export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;
+<BlogPost meta={meta}>
 
 👋 I am Max, the technical co-founder of [Spectrum](https://spectrum.chat). Spectrum is an [open source](https://github.com/withspectrum/spectrum) chat app for large online communities and was recently acquired by GitHub. We are a team of three with a predominantly frontend and design background and have worked on it for close to two years.
 
@@ -96,3 +96,5 @@ To summarize, here are the six lessons I am taking away for my next projects:
 1. Prioritize community size and active maintenance, especially in unfamiliar territory.
 1. Deliberately assess cutting edge technologies, bias towards conservative choices.
 1. Be open with your roadmap to learn about your users priorities.
+
+</BlogPost>

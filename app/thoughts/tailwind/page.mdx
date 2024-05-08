@@ -1,5 +1,5 @@
-import BlogPost from "../../../components/BlogPost";
-import Lesson from "../../../components/Lesson";
+import BlogPost from "../blogpost";
+import Lesson from "../../components/Lesson";
 import TwinMacroExample from "../../../components/TwinMacroExample";
 
 export const meta = {
@@ -11,7 +11,7 @@ export const meta = {
   views: 43985
 };
 
-export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;
+<BlogPost meta={meta}>
 
 [Tailwind](https://tailwindcss.com) is an atomic CSS framework that has taken the frontend world by storm. It gives developers without a deep understanding of design the ability to build visually gorgeous, modern user interfaces. 
 
@@ -181,3 +181,5 @@ The ideal setup for both developer _and_ user experience!
 Rather than taking two steps forward with Tailwind's system and one step backward with atomic CSS, let's take five steps forward. Together.
 
 [^1]: CSS-in-JS automatically extracts the critical CSS for the requested page and inlines it into a `<style>` tag. That means the first-paint with CSS-in-JS will _always_ be faster as it saves both an extra network request for the `.css` file as well as sending less CSS code to the client. While the Time To Interactive for small apps will be slightly slower (as the JavaScript bundle includes the CSS-in-JS library you use) once your app grows the network request for the larger CSS file can outweigh any CSS-in-JS library and can cause a slower Time To Interactive as well.&nbsp;
+
+</BlogPost>

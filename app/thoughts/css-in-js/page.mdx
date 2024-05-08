@@ -1,6 +1,6 @@
-import BlogPost from "../../../components/BlogPost";
-import Browser from "../../../components/BrowserDemo";
-import Lesson from "../../../components/Lesson";
+import BlogPost from "../blogpost";
+import Browser from "../../components/browser";
+import Lesson from "../../components/lesson";
 
 export const meta = {
   published: true,
@@ -12,7 +12,7 @@ export const meta = {
   views: 7008 + 59834
 };
 
-export default ({ children }) => <BlogPost meta={meta}>{children}</BlogPost>;
+<BlogPost meta={meta}>
 
 For three years, I have styled my web apps without any `.css` files. Instead, I have written all the CSS in JavaScript.
 
@@ -105,3 +105,5 @@ Thousands of companies use CSS-in-JS in production, including [Reddit](https://r
 If you are using a JavaScript framework to build a web app with components, CSS-in-JS is probably a good fit. Especially if you are part of a team where everybody understands basic JavaScript.
 
 If you are not sure how to get started, I would recommend trying it out and seeing for yourself how good it feels! ✌️
+
+</BlogPost>

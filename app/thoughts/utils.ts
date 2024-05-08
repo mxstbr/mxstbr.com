@@ -7,6 +7,8 @@ type Metadata = {
   title: string
   publishedAt: string
   summary: string
+  // TODO: state: 'draft' | 'published' | 'archived'
+  // + archived support instead
   published: boolean
   views: number
   image?: string
