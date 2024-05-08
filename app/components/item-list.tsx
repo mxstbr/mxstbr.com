@@ -4,7 +4,7 @@ export function ItemList(props: { children: React.ReactNode }) {
 
 export function ItemListItem(props) {
   return (
-    <li className="flex items-center space-x-4 pl-0">
+    <li className="flex flex-1 items-center space-x-4 pl-0">
       <div className="text-neutral-900 dark:text-neutral-100 shrink-0">
         {props.left}
       </div>
