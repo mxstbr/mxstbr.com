@@ -55,12 +55,12 @@ export default async function Home() {
               key={project.name}
               left={<Link href={project.href}>{project.name}</Link>}
               right={
-                <>
-                  <span>{project.role}</span>
-                  <span className="ml-4 text-neutral-500 text-right tabular-nums shrink-0">
+                <div className="flex align-center">
+                  <div>{project.role}</div>
+                  <div className="ml-4 text-neutral-500 text-right tabular-nums shrink-0">
                     {project.timeframe}
-                  </span>
-                </>
+                  </div>
+                </div>
               }
             />
           ))}
@@ -123,7 +123,7 @@ function Section({
   children: React.ReactNode
 }) {
   return (
-    <div className="space-y-4 flex-1">
+    <div className="space-y-6 flex-1">
       <h2 className="font-bold">{title}</h2>
       {children}
     </div>

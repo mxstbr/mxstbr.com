@@ -13,12 +13,13 @@ export default async function OSS() {
 
   return (
     <>
-      <Prose className="mb-16">
+      <Prose className="mb-12">
         <h2>Open Source Projects</h2>
         <p>
-          Open source projects I have (co-)created or maintained are used on
-          more than 1% of all public, crawlable websites and have a total of{' '}
+          Open source projects I have (co-)created are used on more than 1% of
+          all public, crawlable websites and have a total of{' '}
           {repos
+            .filter((repo) => repo.owner !== false)
             .reduce((total, repo) => total + repo.stargazerCount, 0)
             .toLocaleString()}{' '}
           stars on GitHub:

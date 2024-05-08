@@ -2,9 +2,6 @@ import Link from 'next/link'
 import LogoWrapper from './logo-wrapper'
 
 const navItems = {
-  '/thoughts': {
-    name: 'essays',
-  },
   '/oss': {
     name: 'open source',
   },

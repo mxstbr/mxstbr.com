@@ -11,10 +11,10 @@ export function BlogPosts() {
   const newest = Math.max(...dates)
   const oldest = Math.min(...dates)
   const years = (newest - oldest) / 1000 / 60 / 60 / 24 / 365
-  const averagePerYear = (allBlogs.length / years).toFixed(2)
+  const averagePerYear = (allBlogs.length / years).toFixed(3)
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       <ItemList>
         {allBlogs.map((post) => (
           <ItemListItem
@@ -56,9 +56,14 @@ export function BlogPosts() {
             <input
               type="submit"
               value="Get notified of new essays"
-              className="px-4 py-1 bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 dark:border-slate-100 rounded-sm"
+              className="px-4 py-1 cursor-pointer bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 dark:border-slate-100 rounded-sm"
             />
-            <div className="text-neutral-500 dark:text-neutral-400 text-sm">
+            <div
+              className="text-neutral-500 dark:text-neutral-400 text-sm underline decoration-dotted cursor-help"
+              title={`Published ${allBlogs.length} essays in ${years.toFixed(
+                2
+              )} years`}
+            >
               Average: {averagePerYear} essays/year
             </div>
           </div>

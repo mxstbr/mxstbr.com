@@ -1,7 +1,7 @@
 type OpenSourceProject = {
   repo: string
   name?: string
-  description: string
+  description?: string
   featured?: boolean
   owner?: boolean
 }
@@ -249,6 +249,15 @@ const ossProjects: Array<OpenSourceProject> = [
   {
     repo: 'nice-boys/components',
     description: "@brianlovin and @mxstbr's component library",
+  },
+  {
+    repo: 'StellateHQ/fuse',
+  },
+  {
+    repo: 'mxstbr/karabiner',
+  },
+  {
+    repo: 'StellateHQ/future-founder-promise',
   },
 ]
 

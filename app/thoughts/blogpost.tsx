@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { formatDate, getBlogPosts } from 'app/thoughts/utils'
 import { baseUrl } from 'app/sitemap'
+import Prose from 'app/components/prose'
 
 export async function generateStaticParams() {
   let posts = getBlogPosts()
@@ -83,14 +84,20 @@ export default function Blog({ meta, children }) {
           }),
         }}
       />
-      <h1 className="title font-semibold text-2xl er">{post.metadata.title}</h1>
-      <div className="flex justify-between items-center mt-2 mb-8 text-sm">
+      <h1 className="title font-bold text-4xl mb-0">{post.metadata.title}</h1>
+      <div className="flex items-center space-x-6 mb-8 text-sm">
         <p className="text-sm text-neutral-600 dark:text-neutral-400">
           {formatDate(post.metadata.publishedAt)}
         </p>
-        {/* TODO: Views */}
+        <p className="text-sm text-neutral-600 dark:text-neutral-400">
+          {post.metadata.views.toLocaleString(undefined, {
+            maximumFractionDigits: 0,
+          })}{' '}
+          views
+        </p>
       </div>
-      <article className="prose">{children}</article>
+      {/* TODO: Fix heading levels across all blog posts */}
+      <Prose className="prose-lg">{children}</Prose>
     </section>
   )
 }
