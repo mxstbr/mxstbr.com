@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { formatDate, getBlogPosts } from 'app/thoughts/utils'
 import { baseUrl } from 'app/sitemap'
 import Prose from 'app/components/prose'
+import { Column, Columns } from 'app/components/layout-columns'
 
 export async function generateStaticParams() {
   let posts = getBlogPosts()
@@ -51,6 +52,7 @@ export function generateMetadata({ params }) {
   }
 }
 
+// TODO: Fix mxstbr.com/thoughts/tailwind width.
 export default function Blog({ meta, children }) {
   // Show drafts & archived posts if people have direct links to them
   const post = getBlogPosts({ drafts: true, archived: true }).find(
@@ -60,9 +62,9 @@ export default function Blog({ meta, children }) {
   if (!post) notFound()
 
   return (
-    <div className="2xl:space-y-0 2xl:space-x-16 2xl:w-screen relative 2xl:ml-[-50vw] 2xl:mr-[-50vw] 2xl:inset-x-2/4 2xl:flex 2xl:flex-row 2xl:justify-between 2xl:px-12">
-      <div className="flex-1" />
-      <div className="flex-1">
+    <Columns>
+      <Column />
+      <Column>
         <section>
           <script
             type="application/ld+json"
@@ -87,6 +89,7 @@ export default function Blog({ meta, children }) {
               }),
             }}
           />
+
           <h1 className="title font-bold text-4xl mb-0">
             {post.metadata.title}
           </h1>
@@ -104,8 +107,8 @@ export default function Blog({ meta, children }) {
           {/* TODO: Fix heading levels across all blog posts */}
           <Prose className="prose-lg">{children}</Prose>
         </section>
-      </div>
-      <div className="flex-1" />
-    </div>
+      </Column>
+      <Column />
+    </Columns>
   )
 }

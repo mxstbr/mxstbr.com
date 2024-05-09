@@ -16,7 +16,11 @@ export async function GET() {
         `<item>
           <title>${post.metadata.title}</title>
           <link>${baseUrl}/thoughts/${post.slug}</link>
-          <description>${escapeXml(post.metadata.summary || '')}</description>
+          <guid>${baseUrl}/thoughts/${post.slug}</guid>
+          <description>${
+            // NOTE: We need to double escape, apparently: https://validator.w3.org/feed/docs/warning/NotHtml.html
+            escapeXml(escapeXml(post.metadata.summary || ''))
+          }</description>
           <pubDate>${new Date(
             post.metadata.publishedAt
           ).toUTCString()}</pubDate>
@@ -25,11 +29,12 @@ export async function GET() {
     .join('\n')
 
   const rssFeed = `<?xml version="1.0" encoding="UTF-8" ?>
-  <rss version="2.0">
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>Max Stoiber's Essays</title>
         <link>${baseUrl}</link>
         <description>CEO and co-founder of Stellate, creator of styled-components and react-boilerplate and angel investor in early-stage startups.</description>
+        <atom:link href="https://mxstbr.com/rss" rel="self" type="application/rss+xml" />
         ${itemsXml}
     </channel>
   </rss>`
