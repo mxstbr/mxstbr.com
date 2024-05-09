@@ -79,6 +79,36 @@ export default function RootLayout({
           <Analytics />
           <SpeedInsights />
         </main>
+        <script
+          type="application/ld+json"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'http://schema.org',
+              '@type': 'Person',
+              id: 'mxstbr',
+              email: 'mailto:contact@mxstbr.com',
+              image: '/static/images/headshot.jpeg',
+              jobTitle: 'Senior Software Engineer',
+              familyName: 'Stoiber',
+              givenName: 'Max',
+              name: 'Max Stoiber',
+              birthPlace: 'Vienna, Austria',
+              birthDate: '1997-01-04',
+              height: '185 cm',
+              gender: 'male',
+              nationality: 'Austria',
+              url: 'https://mxstbr.com',
+              sameAs: [
+                'https://mxstbr.blog',
+                'https://www.facebook.com/mxstbr',
+                'https://www.linkedin.com/in/max-stoiber-46698678',
+                'http://twitter.com/mxstbr',
+                'http://instagram.com/mxstbr',
+              ],
+            }),
+          }}
+        />
       </body>
     </html>
   )
