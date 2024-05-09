@@ -3,7 +3,7 @@ import { formatDate, getBlogPosts } from 'app/thoughts/utils'
 import { prodUrl } from 'app/sitemap'
 import Prose from 'app/components/prose'
 import { CenterPage, Columns } from 'app/components/layout-columns'
-import { size } from 'app/og/route'
+import { size } from 'app/og/utils'
 
 export async function generateStaticParams() {
   let posts = getBlogPosts()

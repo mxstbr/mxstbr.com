@@ -1,11 +1,6 @@
 import { ImageResponse } from 'next/og'
 import type { SatoriOptions } from 'next/dist/compiled/@vercel/og/satori'
 
-export const size = {
-  width: 1200,
-  height: 630,
-}
-
 async function getFonts(): Promise<SatoriOptions['fonts']> {
   const [interRegular, interBold] = await Promise.all([
     fetch(new URL('./Inter-Regular.woff', import.meta.url)).then((res) =>

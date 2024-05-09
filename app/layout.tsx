@@ -6,7 +6,7 @@ import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import Footer from './components/footer'
 import { prodUrl } from './sitemap'
-import { size } from './og/route'
+import { size } from './og/utils'
 
 export const metadata: Metadata = {
   metadataBase: new URL(prodUrl),

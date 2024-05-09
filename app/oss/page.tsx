@@ -3,7 +3,7 @@ import ossProjects from '../data/oss-projects'
 import Prose from 'app/components/prose'
 import { CenterPage } from 'app/components/layout-columns'
 import { Metadata } from 'next'
-import { size } from 'app/og/route'
+import { size } from 'app/og/utils'
 import { prodUrl } from 'app/sitemap'
 
 export const metadata: Metadata = {
