@@ -35,6 +35,16 @@ html {
   min-width: 360px;
 }
 
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 500px) {
+  html {
+    font-size: 16px;
+  }
+}
+
 a {
   @apply underline;
 }
