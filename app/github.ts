@@ -22,7 +22,7 @@ export async function getRepos(repos: Array<string>): Promise<Array<Repo>> {
   const res = await fetch('https://api.github.com/graphql', {
     method: 'POST',
     headers: {
-      Authorization: 'Bearer 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',
+      Authorization: `Bearer ${process.env.GITHUB_ACCESS_TOKEN}`,
       'Content-Type': 'application/json',
       Accept: 'application/json',
     },
