@@ -3,20 +3,19 @@ import { getBlogPosts } from 'app/thoughts/utils'
 import { ItemList, ItemListItem } from './item-list'
 
 export function BlogPosts() {
-  // TODO: Also count archived posts.
-  let allBlogs = getBlogPosts()
+  let publishedBlogs = getBlogPosts()
 
-  const dates = allBlogs.map((post) =>
+  const dates = getBlogPosts({ archived: true }).map((post) =>
     new Date(post.metadata.publishedAt).getTime()
   )
   const oldest = Math.min(...dates)
   const years = (new Date().getTime() - oldest) / 1000 / 60 / 60 / 24 / 365
-  const averagePerYear = (allBlogs.length / years).toFixed(3)
+  const averagePerYear = (dates.length / years).toFixed(3)
 
   return (
     <div className="space-y-12 relative">
       <ItemList>
-        {allBlogs.map((post) => (
+        {publishedBlogs.map((post) => (
           <ItemListItem
             key={post.slug}
             left={
@@ -60,7 +59,9 @@ export function BlogPosts() {
             />
             <div
               className="absolute -bottom-6 left-0 right-0 text-center text-neutral-500 dark:text-neutral-400 text-sm underline decoration-dotted cursor-help"
-              title={`${allBlogs.length} essays in ${years.toFixed(2)} years`}
+              title={`${dates.length} essays (${
+                dates.length - publishedBlogs.length
+              } archived) in ${years.toFixed(2)} years`}
             >
               Average: {averagePerYear} essays/year
             </div>

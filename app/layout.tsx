@@ -8,7 +8,6 @@ import Footer from './components/footer'
 import { prodUrl } from './sitemap'
 import { size } from './og/route'
 
-// TODO: Fixme.
 export const metadata: Metadata = {
   metadataBase: new URL(prodUrl),
   title: {

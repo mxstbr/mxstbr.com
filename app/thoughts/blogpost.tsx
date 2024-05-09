@@ -27,7 +27,6 @@ function generateOgImage(post) {
   }`
 }
 
-// TODO: THIS DOESN'T WORK! params is undefined.
 export const generateMeta = (meta) => () => {
   let post = getBlogPosts().find((post) => post.metadata.title === meta.title)
 

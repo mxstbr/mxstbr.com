@@ -34,7 +34,6 @@ async function getFonts(): Promise<SatoriOptions['fonts']> {
 
 export const runtime = 'edge'
 
-// TODO
 export async function GET(request: Request) {
   let url = new URL(request.url)
   let title = url.searchParams.get('title')
