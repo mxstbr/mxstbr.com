@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import LogoWrapper from './logo-wrapper'
+import { CenterPage } from './layout-columns'
 
 const navItems = {
   '/oss': {
@@ -12,8 +12,7 @@ const navItems = {
 
 export function Navbar() {
   return (
-    <div className="2xl:space-y-0 2xl:space-x-16 2xl:w-screen relative 2xl:ml-[-50vw] 2xl:mr-[-50vw] 2xl:inset-x-2/4 2xl:flex 2xl:flex-row 2xl:justify-between 2xl:px-12">
-      <div className="flex-1" />
+    <CenterPage>
       <aside className="flex-1">
         <div className="lg:sticky lg:top-20">
           <nav
@@ -42,7 +41,6 @@ export function Navbar() {
           </nav>
         </div>
       </aside>
-      <div className="flex-1" />
-    </div>
+    </CenterPage>
   )
 }

@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import { formatDate, getBlogPosts } from 'app/thoughts/utils'
 import { baseUrl } from 'app/sitemap'
 import Prose from 'app/components/prose'
-import { Column, Columns } from 'app/components/layout-columns'
+import { CenterPage, Columns } from 'app/components/layout-columns'
 
 export async function generateStaticParams() {
   let posts = getBlogPosts()
@@ -62,53 +62,47 @@ export default function Blog({ meta, children }) {
   if (!post) notFound()
 
   return (
-    <Columns>
-      <Column />
-      <Column>
-        <section>
-          <script
-            type="application/ld+json"
-            suppressHydrationWarning
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify({
-                '@context': 'https://schema.org',
-                '@type': 'BlogPosting',
-                headline: post.metadata.title,
-                datePublished: post.metadata.publishedAt,
-                dateModified: post.metadata.publishedAt,
-                description: post.metadata.summary,
-                image: post.metadata.image
-                  ? `${baseUrl}${post.metadata.image}`
-                  : `/og?title=${encodeURIComponent(post.metadata.title)}`,
-                url: `${baseUrl}/thoughts/${post.slug}`,
-                author: {
-                  '@type': 'Person',
-                  '@id': 'mxstbr',
-                  name: 'Max Stoiber',
-                },
-              }),
-            }}
-          />
+    <CenterPage>
+      <section>
+        <script
+          type="application/ld+json"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'BlogPosting',
+              headline: post.metadata.title,
+              datePublished: post.metadata.publishedAt,
+              dateModified: post.metadata.publishedAt,
+              description: post.metadata.summary,
+              image: post.metadata.image
+                ? `${baseUrl}${post.metadata.image}`
+                : `/og?title=${encodeURIComponent(post.metadata.title)}`,
+              url: `${baseUrl}/thoughts/${post.slug}`,
+              author: {
+                '@type': 'Person',
+                '@id': 'mxstbr',
+                name: 'Max Stoiber',
+              },
+            }),
+          }}
+        />
 
-          <h1 className="title font-bold text-4xl mb-0">
-            {post.metadata.title}
-          </h1>
-          <div className="flex items-center space-x-6 mb-8 text-sm">
-            <p className="text-sm text-neutral-600 dark:text-neutral-400">
-              {formatDate(post.metadata.publishedAt)}
-            </p>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400">
-              {post.metadata.views.toLocaleString(undefined, {
-                maximumFractionDigits: 0,
-              })}{' '}
-              views
-            </p>
-          </div>
-          {/* TODO: Fix heading levels across all blog posts */}
-          <Prose className="prose-lg">{children}</Prose>
-        </section>
-      </Column>
-      <Column />
-    </Columns>
+        <h1 className="title font-bold text-4xl mb-0">{post.metadata.title}</h1>
+        <div className="flex items-center space-x-6 mb-8 text-sm">
+          <p className="text-sm text-neutral-600 dark:text-neutral-400">
+            {formatDate(post.metadata.publishedAt)}
+          </p>
+          <p className="text-sm text-neutral-600 dark:text-neutral-400">
+            {post.metadata.views.toLocaleString(undefined, {
+              maximumFractionDigits: 0,
+            })}{' '}
+            views
+          </p>
+        </div>
+        {/* TODO: Fix heading levels across all blog posts */}
+        <Prose className="prose-lg">{children}</Prose>
+      </section>
+    </CenterPage>
   )
 }

@@ -1,9 +1,11 @@
 import { investments } from './investments'
 import { ItemList, ItemListItem } from '../components/item-list'
+import { CenterPage } from '../components/layout-columns'
+import Prose from '../components/prose'
 
-<div className="2xl:space-y-0 2xl:space-x-16 2xl:w-screen relative 2xl:ml-[-50vw] 2xl:mr-[-50vw] 2xl:inset-x-2/4 2xl:flex 2xl:flex-row 2xl:justify-between 2xl:px-12">
-  <div className="flex-1" />
-  <div className="flex-1">
+<CenterPage>
+
+<Prose>
 
 ## Angel Investing
 
@@ -41,6 +43,6 @@ So far, I have invested in:
   ))}
 </ItemList>
 
-</div>
-<div className="flex-1" />
-</div>
+</Prose>
+
+</CenterPage>

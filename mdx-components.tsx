@@ -89,7 +89,6 @@ function createHeading(level) {
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
-    wrapper: ({ children }) => <Prose>{children}</Prose>,
     h1: createHeading(1),
     h2: createHeading(2),
     h3: createHeading(3),

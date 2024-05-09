@@ -1,12 +1,34 @@
-export function Columns(props) {
+type Props = {
+  left?: React.ReactNode
+  middle?: React.ReactNode
+  right?: React.ReactNode
+} & React.DetailedHTMLProps<
+  React.HTMLAttributes<HTMLDivElement>,
+  HTMLDivElement
+>
+
+export function Columns({ left, middle, right, ...props }: Props) {
   return (
     <div
       {...props}
-      className={`2xl:w-screen relative 2xl:ml-[-50vw] 2xl:mr-[-50vw] 2xl:inset-x-2/4 2xl:flex 2xl:flex-row 2xl:justify-between 2xl:px-12 ${props.className}`}
-    />
+      className={`${/* ~16" screen styling */ ''}
+        2xl:grid 2xl:grid-cols-3 2xl:grid-flow-col
+        ${/* Mobile & small screen styling */ ''}
+        grid grid-cols-1 justify-items-center
+        ${props.className || ''}
+      `.replace(/\s+/g, ' ')}
+    >
+      <Column>{left}</Column>
+      <Column>{middle}</Column>
+      <Column>{right}</Column>
+    </div>
   )
 }
 
-export function Column(props) {
-  return <div {...props} className={`flex-1`} />
+export function CenterPage({ children }) {
+  return <Columns middle={children} />
+}
+
+function Column(props) {
+  return <div {...props} className={`w-full max-w-prose 2xl:max-w-full`} />
 }

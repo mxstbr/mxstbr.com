@@ -1,7 +1,4 @@
 import { BlogPosts } from 'app/components/posts'
-
-import { getRepos } from './github'
-import ossProjects from './data/oss-projects'
 import { investments } from './investing/investments'
 import Link from 'next/link'
 import { ItemList, ItemListItem } from './components/item-list'
@@ -10,94 +7,94 @@ import { Columns } from './components/layout-columns'
 export const revalidate = 3600 // revalidate every hour
 
 export default async function Home() {
-  const repos = await getRepos(
-    ossProjects
-      .filter((project) => project.featured)
-      .map((project) => project.repo)
-  )
-
   return (
-    <Columns className="space-y-16 2xl:space-y-0 2xl:space-x-16 ">
-      <Section title="TL;DR">
-        <ItemList>
-          <ItemListItem
-            left={
-              <>
-                CEO & co-founder of <a href="https://stellate.co">Stellate</a>,
-                the GraphQL CDN
-              </>
-            }
-            right={`⚡`}
-          ></ItemListItem>
-          <ItemListItem
-            left={
-              <>
-                (Co-)creator of <Link href="/oss">open source projects</Link>{' '}
-                used by millions
-              </>
-            }
-            right={`💻`}
-          ></ItemListItem>
-          <ItemListItem
-            left={
-              <>
-                <Link href="/investing">Angel investor</Link> in{' '}
-                {investments.length}+ startups
-              </>
-            }
-            right={`🚀`}
-          ></ItemListItem>
-          <ItemListItem
-            left={
-              <>
-                <a href="https://github.com/mxstbr/ama/issues/46">
-                  Speciality coffee barista
-                </a>{' '}
-                and{' '}
-                <a href="https://www.youtube.com/watch?v=19kDOIwzTfE">
-                  backcountry skier
-                </a>
-              </>
-            }
-            right={`🎿`}
-          ></ItemListItem>
-          <ItemListItem
-            left={<>Austrian living in San Francisco</>}
-            right={`🌁`}
-          ></ItemListItem>
-        </ItemList>
-      </Section>
-
-      <div className="relative flex-1">
-        {/* Background */}
-        <div className="absolute -top-6 -left-6 -right-6 -bottom-6 bg-slate-50 sm:rounded-md border border-solid border-slate-200" />
-        <Section className="relative">
-          <h2 className="font-bold relative">Essays</h2>
-          <BlogPosts />
+    <Columns
+      className="gap-16"
+      left={
+        <Section title="TL;DR">
+          <ItemList>
+            <ItemListItem
+              left={
+                <>
+                  CEO & co-founder of <a href="https://stellate.co">Stellate</a>
+                  , the GraphQL CDN
+                </>
+              }
+              right={`⚡`}
+            ></ItemListItem>
+            <ItemListItem
+              left={
+                <>
+                  (Co-)creator of <Link href="/oss">open source projects</Link>{' '}
+                  used by millions
+                </>
+              }
+              right={`💻`}
+            ></ItemListItem>
+            <ItemListItem
+              left={
+                <>
+                  <Link href="/investing">Angel investor</Link> in{' '}
+                  {investments.length}+ startups
+                </>
+              }
+              right={`🚀`}
+            ></ItemListItem>
+            <ItemListItem
+              left={
+                <>
+                  <a href="https://github.com/mxstbr/ama/issues/46">
+                    Speciality coffee barista
+                  </a>{' '}
+                  and{' '}
+                  <a href="https://www.youtube.com/watch?v=19kDOIwzTfE">
+                    backcountry skier
+                  </a>
+                </>
+              }
+              right={`🎿`}
+            ></ItemListItem>
+            <ItemListItem
+              left={<>Austrian living in San Francisco</>}
+              right={`🌁`}
+            ></ItemListItem>
+          </ItemList>
         </Section>
-      </div>
-
-      <Section title="Work">
-        <ItemList>
-          {work.map((project) => (
-            <div className="flex flex-row" key={project.name}>
-              <ItemListItem
-                left={<Link href={project.href}>{project.name}</Link>}
-                right={
-                  <div className="flex align-center">
-                    <div>{project.role}</div>
-                  </div>
-                }
-              />
-              <div className="ml-4 w-[6em] text-neutral-500 text-right tabular-nums shrink-0">
-                {project.timeframe}
+      }
+      middle={
+        <div className="relative flex-1">
+          {/* Background */}
+          <div className="absolute -top-6 -left-6 -right-6 -bottom-6 bg-slate-50 sm:rounded-md border border-solid border-slate-200" />
+          <Section className="relative">
+            <h2 className="font-bold relative">Essays</h2>
+            <BlogPosts />
+          </Section>
+        </div>
+      }
+      right={
+        <Section title="Work">
+          <ItemList>
+            {work.map((project) => (
+              <div className="flex flex-row" key={project.name}>
+                <ItemListItem
+                  left={<Link href={project.href}>{project.name}</Link>}
+                  right={
+                    <div className="flex align-center">
+                      <div>{project.role}</div>
+                    </div>
+                  }
+                />
+                <div className="ml-4 w-[6em] text-neutral-500 text-right tabular-nums shrink-0">
+                  {project.timeframe}
+                </div>
               </div>
-            </div>
-          ))}
-        </ItemList>
-      </Section>
+            ))}
+          </ItemList>
+        </Section>
+      }
+    />
 
-      {/* <Section title="Open Source Projects">
+    /* <Section title="Open Source Projects">
         <ItemList>
           {repos.map((repo) => (
             <ItemListItem
@@ -140,8 +137,7 @@ export default async function Home() {
         <Link href="/investing" className="text-neutral-600">
           More →
         </Link>
-      </Section> */}
-    </Columns>
+      </Section> */
   )
 }
 
