@@ -3,6 +3,9 @@ module.exports = {
   content: ['./app/**/*.{js,ts,jsx,tsx,mdx}', './mdx-components.tsx'],
   theme: {
     extend: {
+      screens: {
+        xs: '500px',
+      },
       typography: ({ theme }) => ({
         gray: {
           css: {

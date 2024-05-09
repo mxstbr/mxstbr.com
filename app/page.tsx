@@ -84,7 +84,7 @@ export default async function Home() {
                     </div>
                   }
                 />
-                <div className="ml-4 w-[6em] text-neutral-500 text-right tabular-nums shrink-0">
+                <div className="hidden xs:block ml-4 w-[6em] text-neutral-500 text-right tabular-nums shrink-0">
                   {project.timeframe}
                 </div>
               </div>
