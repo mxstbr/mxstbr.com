@@ -4,6 +4,7 @@ import { prodUrl } from 'app/sitemap'
 import Prose from 'app/components/prose'
 import { CenterPage, Columns } from 'app/components/layout-columns'
 import { size } from 'app/og/utils'
+import { NewsletterSignupForm } from 'app/components/newsletter-form'
 
 export async function generateStaticParams() {
   let posts = getBlogPosts()
@@ -113,6 +114,7 @@ export default function Blog({ meta, children }) {
         </div>
         <Prose className="prose-lg">{children}</Prose>
       </section>
+      <NewsletterSignupForm className="mt-16" />
     </CenterPage>
   )
 }

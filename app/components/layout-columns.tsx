@@ -7,7 +7,13 @@ type Props = {
   HTMLDivElement
 >
 
-export function Columns({ left, middle, right, ...props }: Props) {
+export function Columns({
+  left,
+  middle,
+  right,
+  className = '',
+  ...props
+}: Props) {
   return (
     <div
       {...props}
@@ -15,7 +21,7 @@ export function Columns({ left, middle, right, ...props }: Props) {
         2xl:grid 2xl:grid-cols-3 2xl:grid-flow-col
         ${/* Mobile & small screen styling */ ''}
         grid grid-cols-1 justify-items-center
-        ${props.className || ''}
+        ${className}
       `.replace(/\s+/g, ' ')}
     >
       <Column>{left}</Column>
