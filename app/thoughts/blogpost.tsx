@@ -101,7 +101,6 @@ export default function Blog({ meta, children }) {
         />
 
         <h1 className="title font-bold text-4xl mb-2">{post.metadata.title}</h1>
-        {/* TODO: Archived or draft warning marker. */}
         <div className="flex items-center space-x-6 mb-8 text-sm">
           <p className="text-sm text-neutral-600 dark:text-neutral-400">
             {formatDate(post.metadata.publishedAt)}
@@ -113,6 +112,19 @@ export default function Blog({ meta, children }) {
             views
           </p>
         </div>
+        {post.metadata.state !== 'published' && (
+          <div className="bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-100 p-4 rounded-lg mb-8">
+            <p className="font-bold">
+              This essay is{' '}
+              {post.metadata.state === 'archived' ? 'archived' : 'a draft.'}
+            </p>
+            <p>
+              {post.metadata.state === 'draft'
+                ? 'Please DO NOT SHARE this essay, it is not ready for public consumption yet.'
+                : "This essay might contain outdated information. I've preserved it for historical accuracy, but it might not be relevant anymore."}
+            </p>
+          </div>
+        )}
         <Prose className="prose-lg">{children}</Prose>
       </section>
       <NewsletterSignupForm className="mt-16" />
