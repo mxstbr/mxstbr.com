@@ -10,6 +10,9 @@ export const meta = {
   views: 1762 + 4802
 };
 
+import { generateMeta } from '../blogpost'
+export const generateMetadata = generateMeta(meta)
+
 <BlogPost meta={meta}>
 
 The cat is out of the bag: I am joining [Gatsby](https://gatsbyjs.com) to work on open source R&D projects, including [Blocks](https://blocks-ui.com), [theme-ui](https://theme-ui.com), [mdx](https://mdxjs.com) and Gatsby themes!

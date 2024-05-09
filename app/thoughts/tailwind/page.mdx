@@ -9,6 +9,9 @@ export const meta = {
   views: 43985
 };
 
+import { generateMeta } from '../blogpost'
+export const generateMetadata = generateMeta(meta)
+
 <BlogPost meta={meta}>
 
 [Tailwind](https://tailwindcss.com) is an atomic CSS framework that has taken the frontend world by storm. It gives developers without a deep understanding of design the ability to build visually gorgeous, modern user interfaces. 

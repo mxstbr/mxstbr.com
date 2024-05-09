@@ -8,6 +8,9 @@ export const meta = {
   views: 39384 + 35680,
 }
 
+import { generateMeta } from '../blogpost'
+export const generateMetadata = generateMeta(meta)
+
 <BlogPost meta={meta}>
 
 We should ban margin from our components. Hear me out.

@@ -11,6 +11,9 @@ export const meta = {
   views: 7008 + 59834
 };
 
+import { generateMeta } from '../blogpost'
+export const generateMetadata = generateMeta(meta)
+
 <BlogPost meta={meta}>
 
 For three years, I have styled my web apps without any `.css` files. Instead, I have written all the CSS in JavaScript.

@@ -1,4 +1,4 @@
-import BlogPost, { generateMeta } from '../blogpost'
+import BlogPost from '../blogpost'
 
 export const meta = {
   state: 'published',
@@ -11,6 +11,7 @@ export const meta = {
 
 {/* Last checked views: May 8th, 2024 */}
 
+import { generateMeta } from '../blogpost'
 export const generateMetadata = generateMeta(meta)
 
 <BlogPost meta={meta}>

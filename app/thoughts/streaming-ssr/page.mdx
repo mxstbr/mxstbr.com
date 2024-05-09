@@ -8,6 +8,9 @@ export const meta = {
   views: 2030
 };
 
+import { generateMeta } from '../blogpost'
+export const generateMetadata = generateMeta(meta)
+
 <BlogPost meta={meta}>
 
 *Originally published on the [Zeit blog](https://web.archive.org/web/20180211132841if_/https://zeit.co/blog/streaming-server-rendering-at-spectrum)*

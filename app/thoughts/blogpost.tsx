@@ -101,6 +101,7 @@ export default function Blog({ meta, children }) {
         />
 
         <h1 className="title font-bold text-4xl mb-2">{post.metadata.title}</h1>
+        {/* TODO: Archived or draft warning marker. */}
         <div className="flex items-center space-x-6 mb-8 text-sm">
           <p className="text-sm text-neutral-600 dark:text-neutral-400">
             {formatDate(post.metadata.publishedAt)}
