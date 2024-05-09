@@ -1,8 +1,9 @@
 import { notFound } from 'next/navigation'
 import { formatDate, getBlogPosts } from 'app/thoughts/utils'
-import { baseUrl } from 'app/sitemap'
+import { prodUrl } from 'app/sitemap'
 import Prose from 'app/components/prose'
 import { CenterPage, Columns } from 'app/components/layout-columns'
+import { size } from 'app/og/route'
 
 export async function generateStaticParams() {
   let posts = getBlogPosts()
@@ -12,8 +13,24 @@ export async function generateStaticParams() {
   }))
 }
 
-export function generateMetadata({ params }) {
-  let post = getBlogPosts().find((post) => post.slug === params.slug)
+function generateOgImage(post) {
+  if (post.metadata.image) return post.metadata.image
+
+  return `${prodUrl}/og?title=${encodeURIComponent(
+    post.metadata.title
+  )}&subtitle=${
+    post.metadata.views > 0
+      ? `${post.metadata.views.toLocaleString(undefined, {
+          maximumFractionDigits: 0,
+        })} views`
+      : ''
+  }`
+}
+
+// TODO: THIS DOESN'T WORK! params is undefined.
+export const generateMeta = (meta) => () => {
+  let post = getBlogPosts().find((post) => post.metadata.title === meta.title)
+
   if (!post) {
     return
   }
@@ -22,11 +39,8 @@ export function generateMetadata({ params }) {
     title,
     publishedAt: publishedTime,
     summary: description,
-    image,
   } = post.metadata
-  let ogImage = image
-    ? image
-    : `${baseUrl}/og?title=${encodeURIComponent(title)}`
+  let ogImage = generateOgImage(post)
 
   return {
     title,
@@ -36,10 +50,11 @@ export function generateMetadata({ params }) {
       description,
       type: 'article',
       publishedTime,
-      url: `${baseUrl}/thoughts/${post.slug}`,
+      url: `${prodUrl}/thoughts/${post.slug}`,
       images: [
         {
           url: ogImage,
+          ...size,
         },
       ],
     },
@@ -52,7 +67,6 @@ export function generateMetadata({ params }) {
   }
 }
 
-// TODO: Fix mxstbr.com/thoughts/tailwind width.
 export default function Blog({ meta, children }) {
   // Show drafts & archived posts if people have direct links to them
   const post = getBlogPosts({ drafts: true, archived: true }).find(
@@ -75,10 +89,8 @@ export default function Blog({ meta, children }) {
               datePublished: post.metadata.publishedAt,
               dateModified: post.metadata.publishedAt,
               description: post.metadata.summary,
-              image: post.metadata.image
-                ? `${baseUrl}${post.metadata.image}`
-                : `/og?title=${encodeURIComponent(post.metadata.title)}`,
-              url: `${baseUrl}/thoughts/${post.slug}`,
+              image: generateOgImage(post),
+              url: `${prodUrl}/thoughts/${post.slug}`,
               author: {
                 '@type': 'Person',
                 '@id': 'mxstbr',

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { CenterPage } from './layout-columns'
 
-const navItems = {
+export const navItems = {
   '/oss': {
     name: 'open source',
   },
@@ -16,7 +16,7 @@ export function Navbar() {
       <aside className="flex-1">
         <div className="lg:sticky lg:top-20">
           <nav
-            className="flex flex-row items-start justify-between relative px-0 pb-0 fade md:overflow-auto scroll-pr-6 md:relative"
+            className="flex flex-row items-start justify-between relative px-0 pb-0 fade scroll-pr-6"
             id="nav"
           >
             <Link

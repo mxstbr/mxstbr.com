@@ -1,4 +1,4 @@
-import { baseUrl } from 'app/sitemap'
+import { prodUrl } from 'app/sitemap'
 import { getBlogPosts } from 'app/thoughts/utils'
 
 export async function GET() {
@@ -15,8 +15,8 @@ export async function GET() {
       (post) =>
         `<item>
           <title>${post.metadata.title}</title>
-          <link>${baseUrl}/thoughts/${post.slug}</link>
-          <guid>${baseUrl}/thoughts/${post.slug}</guid>
+          <link>${prodUrl}/thoughts/${post.slug}</link>
+          <guid>${prodUrl}/thoughts/${post.slug}</guid>
           <description>${
             // NOTE: We need to double escape, apparently: https://validator.w3.org/feed/docs/warning/NotHtml.html
             escapeXml(escapeXml(post.metadata.summary || ''))
@@ -32,7 +32,7 @@ export async function GET() {
   <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>Max Stoiber's Essays</title>
-        <link>${baseUrl}</link>
+        <link>${prodUrl}</link>
         <description>CEO and co-founder of Stellate, creator of styled-components and react-boilerplate and angel investor in early-stage startups.</description>
         <atom:link href="https://mxstbr.com/rss" rel="self" type="application/rss+xml" />
         ${itemsXml}

@@ -2,6 +2,39 @@ import { investments } from './investments'
 import { ItemList, ItemListItem } from '../components/item-list'
 import { CenterPage } from '../components/layout-columns'
 import Prose from '../components/prose'
+import { size } from 'app/og/route'
+import { prodUrl } from 'app/sitemap'
+
+export const metadata = {
+  title: 'Angel Investing',
+  description:
+    "I angel invest in early-stage startups I'm excited about. Learn more about how I decide and which investments I've already made!",
+  openGraph: {
+    title: 'Angel Investing | Max Stoiber (@mxstbr)',
+    description:
+      "I angel invest in early-stage startups I'm excited about. Learn more about how I decide and which investments I've already made!",
+    url: `${prodUrl}/investing`,
+    siteName: 'Max Stoiber (@mxstbr)',
+    locale: 'en_US',
+    type: 'website',
+    images: [
+      {
+        url: '/og?title=Angel%20Investing',
+        alt: 'Max Stoiber (@mxstbr)',
+        ...size,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Angel Investing | Max Stoiber (@mxstbr)',
+    description:
+      "I angel invest in early-stage startups I'm excited about. Learn more about how I decide and which investments I've already made!",
+    site: '@mxstbr',
+    creator: '@mxstbr',
+    images: ['/og?title=Angel%20Investing'],
+  },
+}
 
 <CenterPage>
 

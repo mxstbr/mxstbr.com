@@ -2,6 +2,40 @@ import { getRepos } from '../github'
 import ossProjects from '../data/oss-projects'
 import Prose from 'app/components/prose'
 import { CenterPage } from 'app/components/layout-columns'
+import { Metadata } from 'next'
+import { size } from 'app/og/route'
+import { prodUrl } from 'app/sitemap'
+
+export const metadata: Metadata = {
+  title: 'Open Source Projects',
+  description:
+    'All the open source projects I have (co-)created over the years.',
+  openGraph: {
+    title: 'Open Source Projects | Max Stoiber (@mxstbr)',
+    description:
+      'All the open source projects I have (co-)created over the years.',
+    url: `${prodUrl}/oss`,
+    siteName: 'Max Stoiber (@mxstbr)',
+    locale: 'en_US',
+    type: 'website',
+    images: [
+      {
+        url: '/og?title=Open%20Source%20Projects',
+        alt: 'Max Stoiber (@mxstbr)',
+        ...size,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Open Source Projects | Max Stoiber (@mxstbr)',
+    description:
+      'All the open source projects I have (co-)created over the years.',
+    site: '@mxstbr',
+    creator: '@mxstbr',
+    images: ['/og?title=Open%20Source%20Projects'],
+  },
+}
 
 export default async function OSS() {
   const repos = await getRepos(ossProjects.map((project) => project.repo)).then(

@@ -1,4 +1,4 @@
-import { baseUrl } from 'app/sitemap'
+import { prodUrl } from 'app/sitemap'
 
 export default function robots() {
   return {
@@ -7,6 +7,6 @@ export default function robots() {
         userAgent: '*',
       },
     ],
-    sitemap: `${baseUrl}/sitemap.xml`,
+    sitemap: `${prodUrl}/sitemap.xml`,
   }
 }

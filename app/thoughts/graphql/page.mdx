@@ -1,4 +1,4 @@
-import BlogPost from '../blogpost'
+import BlogPost, { generateMeta } from '../blogpost'
 
 export const meta = {
   state: 'published',
@@ -8,6 +8,8 @@ export const meta = {
     "It might be surprising to hear the co-founder of a GraphQL company say you probably don't need it. Let me explain.",
  views: 19386
 };
+
+export const generateMetadata = generateMeta(meta)
 
 <BlogPost meta={meta}>
 

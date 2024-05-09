@@ -5,11 +5,12 @@ import { Navbar } from './components/nav'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import Footer from './components/footer'
-import { baseUrl } from './sitemap'
+import { prodUrl } from './sitemap'
+import { size } from './og/route'
 
 // TODO: Fixme.
 export const metadata: Metadata = {
-  metadataBase: new URL(baseUrl),
+  metadataBase: new URL(prodUrl),
   title: {
     default: 'Max Stoiber (@mxstbr)',
     template: '%s | Max Stoiber (@mxstbr)',
@@ -17,13 +18,29 @@ export const metadata: Metadata = {
   description:
     'CEO & co-founder of Stellate, creator of styled-components and react-boilerplate and angel investor in early-stage startups.',
   openGraph: {
-    title: 'Max Stoiber',
+    title: 'Max Stoiber (@mxstbr)',
     description:
       'CEO & co-founder of Stellate, creator of styled-components and react-boilerplate and angel investor in early-stage startups.',
-    url: baseUrl,
-    siteName: 'Max Stoiber',
+    url: prodUrl,
+    siteName: 'Max Stoiber (@mxstbr)',
     locale: 'en_US',
     type: 'website',
+    images: [
+      {
+        url: '/og',
+        alt: 'Max Stoiber (@mxstbr)',
+        ...size,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Max Stoiber (@mxstbr)',
+    description:
+      'CEO & co-founder of Stellate, creator of styled-components and react-boilerplate and angel investor in early-stage startups.',
+    site: '@mxstbr',
+    creator: '@mxstbr',
+    images: ['/og'],
   },
   robots: {
     index: true,
