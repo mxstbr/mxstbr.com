@@ -7,7 +7,7 @@ export function NewsletterSignupForm({ className = '' }) {
   )
   const oldest = Math.min(...dates)
   const years = (new Date().getTime() - oldest) / 1000 / 60 / 60 / 24 / 365
-  const averagePerYear = (posts.length / years).toFixed(3)
+  const averagePerYear = (posts.length / years).toFixed(2).replace('.', ',')
 
   return (
     <div className={`space-y-2 ${className}`}>
@@ -31,7 +31,7 @@ export function NewsletterSignupForm({ className = '' }) {
             className="px-4 h-full py-1 cursor-pointer bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 dark:border-slate-100 rounded-sm"
           />
           <div
-            className="absolute -bottom-6 left-0 right-0 text-center text-neutral-500 dark:text-neutral-400 text-sm underline decoration-dotted cursor-help"
+            className="absolute -bottom-6 left-0 right-0 text-center text-neutral-500 dark:text-neutral-400 text-sm underline decoration-dotted decoration-neutral-300 dark:decoration-neutral-500 cursor-help"
             title={`${dates.length} essays (${
               dates.length -
               posts.filter((post) => post.metadata.state === 'published').length

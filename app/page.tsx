@@ -64,7 +64,7 @@ export default async function Home() {
       middle={
         <div className="relative flex-1">
           {/* Background */}
-          <div className="absolute -top-6 -left-6 -right-6 -bottom-6 bg-slate-50 sm:rounded-md border border-solid border-slate-200" />
+          <div className="absolute -top-6 -left-6 -right-6 -bottom-6 bg-slate-50 dark:bg-neutral-900 sm:rounded-md border border-solid border-slate-200 dark:border-neutral-700" />
           <Section className="relative">
             <h2 className="font-bold relative">Essays</h2>
             <BlogPosts />
