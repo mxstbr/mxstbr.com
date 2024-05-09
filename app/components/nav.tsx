@@ -21,7 +21,7 @@ export function Navbar() {
           >
             <Link
               href="/"
-              className="transition-all hover:text-neutral-800 dark:hover:text-neutral-200 flex align-middle relative py-1 pr-2 no-underline"
+              className="transition-all hover:text-slate-800 dark:hover:text-slate-200 flex align-middle relative py-1 pr-2 no-underline"
             >
               <h1 className="font-bold">mxstbr</h1>
             </Link>
@@ -31,7 +31,7 @@ export function Navbar() {
                   <Link
                     key={path}
                     href={path}
-                    className="transition-all hover:text-neutral-800 dark:hover:text-neutral-200 flex align-middle relative py-1 px-3 no-underline"
+                    className="transition-all hover:text-slate-800 dark:hover:text-slate-200 flex align-middle relative py-1 px-3 no-underline"
                   >
                     {name}
                   </Link>

@@ -15,7 +15,7 @@ export function BlogPosts() {
             left={
               <Link
                 href={`/thoughts/${post.slug}`}
-                className="text-neutral-900 dark:text-neutral-100  shrink-0"
+                className="text-slate-900 dark:text-slate-100  shrink-0"
               >
                 {post.metadata.title}
               </Link>

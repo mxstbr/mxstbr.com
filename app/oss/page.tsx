@@ -86,14 +86,14 @@ function Repo({ repo }) {
       key={repo.nameWithOwner}
       className="w-full flex flex-col md:flex-row space-x-0 md:space-x-2"
     >
-      <div className="text-neutral-600 shrink-0 dark:text-neutral-400 w-[120px] tabular-nums">
+      <div className="text-slate-600 shrink-0 dark:text-slate-400 w-[120px] tabular-nums">
         {repo.stargazerCount.toLocaleString(undefined, {
           maximumFractionDigits: 0,
         })}{' '}
         stars
       </div>
       <div>
-        <p className="text-neutral-900 dark:text-neutral-100 ">
+        <p className="text-slate-900 dark:text-slate-100 ">
           <a
             className="underline"
             href={`https://github.com${repo.nameWithOwner}`}
@@ -102,9 +102,7 @@ function Repo({ repo }) {
           </a>
           {repo.owner === false ? ` (maintainer)` : null}
         </p>
-        <p className="text-neutral-600 dark:text-neutral-400">
-          {repo.description}
-        </p>
+        <p className="text-slate-600 dark:text-slate-400">{repo.description}</p>
       </div>
     </li>
   )

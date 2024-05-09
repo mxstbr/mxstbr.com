@@ -21,10 +21,10 @@ export default function Footer() {
   return (
     <CenterPage>
       <footer className="text-center w-full mx-auto pb-16">
-        <ul className="font-sm w-full flex flex-row justify-between text-neutral-600 dark:text-neutral-300">
+        <ul className="font-sm w-full flex flex-row justify-between text-slate-600 dark:text-slate-300">
           <li>
             <a
-              className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
+              className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100"
               rel="noopener noreferrer"
               target="_blank"
               href="/rss"
@@ -35,7 +35,7 @@ export default function Footer() {
           </li>
           <li>
             <a
-              className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
+              className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100"
               rel="noopener noreferrer"
               target="_blank"
               href="https://twitter.com/mxstbr"
@@ -46,7 +46,7 @@ export default function Footer() {
           </li>
           <li>
             <a
-              className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
+              className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100"
               rel="noopener noreferrer"
               target="_blank"
               href="https://github.com/mxstbr"
@@ -57,7 +57,7 @@ export default function Footer() {
           </li>
           <li>
             <a
-              className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
+              className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100"
               rel="noopener noreferrer"
               target="_blank"
               href="https://linkedin.com/in/mxstbr"
@@ -68,7 +68,7 @@ export default function Footer() {
           </li>
           <li>
             <a
-              className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
+              className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100"
               rel="noopener noreferrer"
               target="_blank"
               href="https://instagram.com/mxstbr"

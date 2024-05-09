@@ -52,7 +52,7 @@ export async function GET(request: Request) {
           >
             {root ? 'Max Stoiber' : title}
           </h2>
-          <div tw="absolute flex flex-row text-3xl -bottom-12 text-neutral-600">
+          <div tw="absolute flex flex-row text-3xl -bottom-12 text-slate-600">
             {root ? 'CEO & Co-Founder, Stellate' : subtitle}
           </div>
         </div>

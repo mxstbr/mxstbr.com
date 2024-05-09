@@ -64,7 +64,7 @@ export default async function Home() {
       middle={
         <div className="relative flex-1">
           {/* Background */}
-          <div className="absolute -top-6 -left-6 -right-6 -bottom-6 bg-slate-50 dark:bg-neutral-900 sm:rounded-md border border-solid border-slate-200 dark:border-neutral-700" />
+          <div className="absolute -top-6 -left-6 -right-6 -bottom-6 bg-slate-50 dark:bg-slate-900 sm:rounded-md border border-solid border-slate-200 dark:border-slate-700" />
           <Section className="relative">
             <h2 className="font-bold relative">Essays</h2>
             <BlogPosts />
@@ -84,7 +84,7 @@ export default async function Home() {
                     </div>
                   }
                 />
-                <div className="hidden xs:block ml-4 w-[6em] text-neutral-500 text-right tabular-nums shrink-0">
+                <div className="hidden xs:block ml-4 w-[6em] text-slate-500 text-right tabular-nums shrink-0">
                   {project.timeframe}
                 </div>
               </div>
@@ -115,7 +115,7 @@ export default async function Home() {
             />
           ))}
         </ItemList>
-        <Link href="/oss" className="text-neutral-600">
+        <Link href="/oss" className="text-slate-600">
           More →
         </Link>
       </Section>
@@ -134,7 +134,7 @@ export default async function Home() {
             />
           ))}
         </ItemList>
-        <Link href="/investing" className="text-neutral-600">
+        <Link href="/investing" className="text-slate-600">
           More →
         </Link>
       </Section> */

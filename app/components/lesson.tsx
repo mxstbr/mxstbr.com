@@ -10,7 +10,7 @@ type Props = {
 
 export default function Lesson(props: Props) {
   return (
-    <div className="text-gray-500 bg-gray-50 dark:bg-gray-900 dark:text-gray-300 rounded-xl p-8 border border-gray-100 dark:border-gray-800 my-4">
+    <div className="text-slate-500 bg-slate-50 dark:bg-slate-900 dark:text-slate-300 rounded-xl p-8 border border-slate-100 dark:border-slate-800 my-4">
       <div>
         <strong>{props.title}</strong>: <span>{props.body}</span>
       </div>

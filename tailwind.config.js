@@ -7,11 +7,11 @@ module.exports = {
         xs: '500px',
       },
       typography: ({ theme }) => ({
-        gray: {
+        slate: {
           css: {
-            '--tw-prose-pre-bg': theme('colors.neutral.50'),
+            '--tw-prose-pre-bg': theme('colors.slate.50'),
             '--tw-prose-pre-code': theme('colors.black'),
-            '--tw-prose-invert-pre-bg': theme('colors.neutral.900'),
+            '--tw-prose-invert-pre-bg': theme('colors.slate.900'),
             '--tw-prose-invert-pre-code': theme('colors.white'),
           },
         },
