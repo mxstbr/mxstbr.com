@@ -58,6 +58,8 @@ const cx = (...classes) => classes.filter(Boolean).join(' ')
 
 const inter = Inter({ subsets: ['latin'] })
 
+export const dynamic = 'error'
+
 export default function RootLayout({
   children,
 }: {
