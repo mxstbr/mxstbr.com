@@ -21,7 +21,7 @@ export function NewsletterSignupForm({ className = '' }) {
           type="email"
           name="email"
           placeholder="your@email.com"
-          className="w-full rounded-sm px-2 py-1 border-slate-200 dark:border-slate-700 dark:bg-black dark:text-white"
+          className="w-full rounded-sm px-2 py-1 border-slate-300 dark:border-slate-700 dark:bg-black dark:text-white"
         />
         <input type="hidden" value="1" name="embed" />
         <div className="relative">
