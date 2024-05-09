@@ -16,7 +16,7 @@ export const meta = {
 
 With the benefit of hindsight, here are the technology choices I regret and the lessons I have learned.
 
-### Regret 1: Not using react-native-web
+## Regret 1: Not using react-native-web
 
 A big part of Spectrum's appeal is that the content is public and search-indexed, which is why we built the website before native apps.
 
@@ -29,7 +29,7 @@ On top of that, we should have also optimised the website for mobile first. A gr
   body="Building a good product is all about experimentation and momentum. Optimize for iteration speed and flexibility."
 />
 
-### Regret 2: Not using Next.js
+## Regret 2: Not using Next.js
 
 We needed server-side rendering for SEO purposes ([client-side rendering does not cut it](https://twitter.com/mxstbr/status/985188986414161921)) but had already built a first version of the app with [create-react-app](https://github.com/facebook/create-react-app). We thought about switching to [Next.js](https://nextjs.org), but I decided that reworking the routing and data fetching would be more effort than building our own server-side rendering server.
 
@@ -42,7 +42,7 @@ Next.js offers an amazing development experience and fast performance out of the
   body="Use existing solutions for technological problems where possible, particularly ones you do not understand deeply."
 />
 
-### Regret 3: Using RethinkDB
+## Regret 3: Using RethinkDB
 
 I chose [RethinkDB](https://www.rethinkdb.com) as our primary data store mainly because of [changefeeds](https://rethinkdb.com/docs/changefeeds/javascript/). They allow you to listen to live updates on (almost) any query. I thought this would reduce complexity by avoiding a separate PubSub system for real-time functionality.
 
@@ -64,7 +64,7 @@ Nowadays, I would choose a more established database (Postgres?) and build a Pub
   first={false}
 />
 
-### Regret 4: Using DraftJS and WYSIWYG editing
+## Regret 4: Using DraftJS and WYSIWYG editing
 
 Writing is one of the primary activities on Spectrum, so we wanted the experience to be great. I decided to replace our plaintext markdown input with a custom WYSIWYG editor based on [Draft.js](https://draftjs.org), which had recently been released by Facebook.
 
@@ -84,7 +84,7 @@ Another framework might have worked better, but in reality we should have focuse
   first={false}
 />
 
-### Takeaways
+## Takeaways
 
 Changing these decisions would not have made Spectrum a better product by itself. Yet, it would have saved us time and allowed us to spend more time experimenting.
 

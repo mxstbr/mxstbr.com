@@ -14,12 +14,11 @@ export const meta = {
 
 React 16 introduced streaming server-side rendering, which allows you to send down HTML in chunks in parallel to rendering it. This enables a faster time to first byte and first meaningful paint for your users since the initial markup arrives in the browser sooner.
 
-{/* TODO: Move all old images over */}
 ![](/static/images/renderToString.png)
 
 Streams are also asynchronous, contrary to `renderToString`, and handle backpressure well. This enables your Node.js server to render multiple requests at the same time and stay responsive in challenging conditions. It can pause React's rendering if the network is saturated, and makes it so heavier requests doesn't block lighter requests for a prolonged period of time. Since we were having some performance issues in our server-side rendering worker for [Spectrum](https://spectrum.chat) we recently implemented streaming, which turned out to have an interesting impact on our HTML caching.
 
-### Using `renderToNodeStream`
+## Using `renderToNodeStream`
 
 The API for streaming server-side rendering isn't all that different from the standard `renderToString` API. Here's what it looks like:
 
@@ -45,7 +44,7 @@ app.use('*', (request, response) => {
 An example of a streaming server-side rendering route
 When I first saw a similar piece of code in the React docs, it was pretty confusing because I'd never worked with Node.js streams before. Let's dig into those for a second.
 
-#### How Streams Work
+### How Streams Work
 
 `renderToNodeStream` returns a readable stream, which I imagine as a faucet: it has an underlying source of data (the tank holding the water) that's waiting to be read by a consumer (waiting for the valve to be opened). To consume a readable stream (open the valve), we would listen to its "data" event, which is triggered whenever there is a new chunk of data to be read. In our case, the source is React rendering our frontend:
 
@@ -66,7 +65,7 @@ Not too complex, eh? Try running that in your app and you'll see chunks of HTML 
 
 As you can see above, streaming decreases the Time-To-First-Byte, because the server sends the first bit of HTML sooner, and the Time-To-First-Meaningful-Paint, because the critical markup arrives at the browser earlier due to parallelization. Jackpot! 🏆
 
-### Caching HTML in Node.js
+## Caching HTML in Node.js
 
 For [Spectrum](https://spectrum.chat), we cache public pages in Redis to avoid React rendering them a million times over even though it's always the same HTML in the end. We don't cache anything for authenticated users because we install a ServiceWorker on first load, which serves an app shell locally on subsequent page visits, and this app shell fetches data from our API directly—no more server rendering! For public pages we previously monkey-patched `response.send` to cache them before responding to the user:
 
@@ -98,7 +97,7 @@ app.use('*', (request, response, next) => {
 A tiny middleware for serving cached files
 The million dollar question at this point is of course "How do you cache HTML when you're streaming the response?". Apart from the obvious issue that `response.send` isn't called anymore you also never have access to the entire HTML document. By the time the renderer finishes rendering most of it will long have been sent to the user!
 
-#### Caching Streamed HTML
+### Caching Streamed HTML
 
 Since I wasn't very familiar with streams [I turned to the Node.js community and asked them how to do this](https://spectrum.chat/thread/0cd94785-f87c-4171-9bb0-a31c6b66fb45) (shoutout to [@mafintosh](https://twitter.com/mafintosh) and [@xander76](https://twitter.com/xander76) who patiently explained it all). It turns out there's a third class of streams which allows us to cache the HTML: transform streams. Continuing the faucet analogy, a transform stream could, for example, be a water filter. You pass data (water) to the transform stream, which can transform it (clean it from gunk) before passing it on to the next stream. In our case, we don't actually want to transform the data. Instead, we want to buffer all the HTML chunks of a single request in memory as they come along, then concatenate them together once we're all done, and store the entire HTML document in the cache (imagine a water filter that duplicates each atom and stores it in a tank until all the water has flown). Here's our tiny utility function for creating a caching transform stream:
 

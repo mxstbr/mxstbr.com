@@ -99,7 +99,7 @@ export default function Blog({ meta, children }) {
           }}
         />
 
-        <h1 className="title font-bold text-4xl mb-0">{post.metadata.title}</h1>
+        <h1 className="title font-bold text-4xl mb-2">{post.metadata.title}</h1>
         <div className="flex items-center space-x-6 mb-8 text-sm">
           <p className="text-sm text-neutral-600 dark:text-neutral-400">
             {formatDate(post.metadata.publishedAt)}
@@ -111,7 +111,6 @@ export default function Blog({ meta, children }) {
             views
           </p>
         </div>
-        {/* TODO: Fix heading levels across all blog posts */}
         <Prose className="prose-lg">{children}</Prose>
       </section>
     </CenterPage>

@@ -47,7 +47,7 @@ Many people think Tailwind is cool because it uses atomic CSS. Here is the thing
 
 Hear me out.
 
-### The key to Tailwind
+## The key to Tailwind
 
 We have had [atomic](https://github.com/basscss/basscss/commit/ed65eec980c4899d930f2c293f70bc619573456f) [CSS](https://github.com/tachyons-css/tachyons/commit/7f27af8d52d8ed03615e23a9db5ff33fc8153729) [frameworks](https://medium.com/buzzfeed-design/introducing-solid-1c16b1bf4868) for almost a decade but none of them have been as critically acclaimed as Tailwind. What makes it different?
 
@@ -57,7 +57,7 @@ This does require some design _taste_, but most frontend engineers I know have d
 
 Tailwind's system is a masterpiece of design. I, and many other developers all around the world, feel empowered by and love it.
 
-### The problem with Tailwind
+## The problem with Tailwind
 
 The atomic CSS framework is basically a delivery mechanism that allows developers to apply the system to their UIs. It's undeniable that it has a fantastic developer experience: once you get used to the custom vocabulary you feel like you are flying!
 
@@ -67,7 +67,7 @@ However, we have learned over the past decade that [atomic CSS has downsides](ht
 - Due to file-size considerations, [Tailwind does not include all variants](https://tailwindcss.com/docs/hover-focus-and-other-states#default-variants-reference) (e.g. `hover:`, `sm:`) for all utilities by default. It leaves it to you to manually configure which ones you need for every single CSS property.
 - Atomic CSS is not ideal for performance. No tooling can extract the _per-page_ critical CSS, so you end up shipping more CSS to the browser than necessary. The bigger and more dynamic the app, the more unnecessary code you will ship.[^1]
 
-### Tailwind without the downsides
+## Tailwind without the downsides
 
 Brent Jackson, the creator of one of the original atomic CSS libraries, said it best in [his post on atomic CSS](https://jxnblk.com/blog/two-steps-forward/):
 
