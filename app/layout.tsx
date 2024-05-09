@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google'
 import { Navbar } from './components/nav'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import Script from 'next/script'
 import Footer from './components/footer'
 import { prodUrl } from './sitemap'
 import { size } from './og/utils'
@@ -76,9 +77,11 @@ export default function RootLayout({
           <Navbar />
           {children}
           <Footer />
-          <Analytics />
-          <SpeedInsights />
         </main>
+        <Analytics />
+        <SpeedInsights />
+        {/* Splitbee */}
+        <Script async data-api="/_sb" src="/sb.js"></Script>
         <script
           type="application/ld+json"
           suppressHydrationWarning
