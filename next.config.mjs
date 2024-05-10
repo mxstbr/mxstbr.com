@@ -5,6 +5,9 @@ const nextConfig = {
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
   experimental: {
     ppr: true,
+    outputFileTracingIncludes: {
+      '**': ['./app/thoughts'],
+    },
   },
   async redirects() {
     return [
