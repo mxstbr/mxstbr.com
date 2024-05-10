@@ -3,8 +3,7 @@
   "scripts": {
     "dev": "next dev",
     "update-essay-views": "tsm update-essay-views.ts",
-    "build": "next build",
-    "postbuild": "tsm sync-essays-to-github.ts",
+    "build": "next build && tsm sync-essays-to-github.ts",
     "start": "next start"
   },
   "dependencies": {
