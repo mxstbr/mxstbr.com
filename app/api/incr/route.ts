@@ -1,5 +1,4 @@
 import { Redis } from '@upstash/redis'
-import { getBlogPosts } from '../../thoughts/utils'
 import { NextRequest, NextResponse } from 'next/server'
 import { waitUntil } from '@vercel/functions'
 
@@ -8,8 +7,7 @@ const redis = Redis.fromEnv()
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const body = await req.json()
   const slug = body.slug as string | undefined
-  const posts = getBlogPosts()
-  if (!slug || !posts.find((post) => post.slug === slug)) {
+  if (!slug) {
     return new NextResponse('Slug not found', { status: 400 })
   }
 
