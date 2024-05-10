@@ -6,6 +6,8 @@ import { size } from 'app/og/utils'
 import { NewsletterSignupForm } from 'app/components/newsletter-form'
 import { ReportView } from 'app/components/report-view'
 import { Redis } from '@upstash/redis'
+import { Suspense } from 'react'
+import Views from 'app/components/views'
 
 export async function generateStaticParams() {
   let posts = getBlogPosts()
@@ -109,10 +111,9 @@ export default async function Blog({ meta, children }) {
             {formatDate(post.metadata.publishedAt)}
           </p>
           <p className="text-sm text-slate-600 dark:text-slate-400">
-            {post.metadata.views.toLocaleString(undefined, {
-              maximumFractionDigits: 0,
-            })}{' '}
-            views
+            <Suspense fallback={null}>
+              <Views slug={post.slug} />
+            </Suspense>
           </p>
         </div>
         {post.metadata.state !== 'published' && (
