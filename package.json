@@ -26,13 +26,13 @@
     "autoprefixer": "^10.4.19",
     "geist": "1.2.2",
     "next": "14.3.0-canary.54",
+    "postcss": "^8.4.38",
     "react": "19.0.0-beta-04b058868c-20240508",
     "react-dom": "19.0.0-beta-04b058868c-20240508",
     "react-tweet": "^3.2.1",
     "sugar-high": "^0.6.0",
     "tailwindcss": "^3.0.0",
     "tsm": "^2.3.0",
-    "typescript": "5.3.3",
-    "postcss": "^8.4.38"
+    "typescript": "5.3.3"
   }
 }

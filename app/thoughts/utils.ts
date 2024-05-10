@@ -29,51 +29,46 @@ function parseFrontmatter(fileContent: string) {
     content,
   }
 }
-
-function getMDXFiles(dir) {
+export function getBlogPosts({
+  drafts = false,
+  archived = false,
+}: { drafts?: boolean; archived?: boolean } = {}) {
   let files: string[] = []
 
   const subfolders = fs
-    .readdirSync(dir, { withFileTypes: true })
+    .readdirSync(path.resolve(process.cwd(), './app', 'thoughts'), {
+      withFileTypes: true,
+    })
     .filter((dirent) => dirent.isDirectory())
     .map((dirent) => dirent.name)
 
   for (const subfolder of subfolders) {
-    const subfolderPath = path.join(dir, subfolder)
+    const subfolderPath = path.join(
+      path.resolve(process.cwd(), './app', 'thoughts'),
+      subfolder
+    )
     const subfolderFiles = fs
       .readdirSync(subfolderPath)
-      .filter((file) => file === 'page.mdx') // Only include page.mdx files
+      .filter((file) => file === 'page.mdx')
       .map((file) => path.join(subfolder, file))
     files.push(...subfolderFiles)
   }
 
   return files
-}
+    .map((file) => {
+      let rawContent = fs.readFileSync(
+        path.join(path.resolve(process.cwd(), './app', 'thoughts'), file),
+        'utf-8'
+      )
+      let { metadata, content } = parseFrontmatter(rawContent)
+      let slug = path.basename(path.dirname(file))
 
-function readMDXFile(filePath) {
-  let rawContent = fs.readFileSync(filePath, 'utf-8')
-  return parseFrontmatter(rawContent)
-}
-
-function getMDXData(dir) {
-  let mdxFiles = getMDXFiles(dir)
-  return mdxFiles.map((file) => {
-    let { metadata, content } = readMDXFile(path.join(dir, file))
-    let slug = path.basename(path.dirname(file))
-
-    return {
-      metadata,
-      slug,
-      content,
-    }
-  })
-}
-
-export function getBlogPosts({
-  drafts = false,
-  archived = false,
-}: { drafts?: boolean; archived?: boolean } = {}) {
-  return getMDXData(path.resolve(process.cwd(), './app', 'thoughts'))
+      return {
+        metadata,
+        slug,
+        content,
+      }
+    })
     .sort((a, b) => {
       if (new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)) {
         return -1
