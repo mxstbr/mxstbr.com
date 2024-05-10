@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { getBlogPosts } from 'app/thoughts/utils'
 import { ItemList, ItemListItem } from './item-list'
 import { NewsletterSignupForm } from './newsletter-form'
+import Views from './views'
+import { Suspense } from 'react'
 
 export function BlogPosts() {
   let publishedBlogs = getBlogPosts()
@@ -21,12 +23,9 @@ export function BlogPosts() {
               </Link>
             }
             right={
-              <>
-                {post.metadata.views.toLocaleString(undefined, {
-                  maximumFractionDigits: 0,
-                })}{' '}
-                views
-              </>
+              <Suspense fallback={null}>
+                <Views slug={post.slug} />
+              </Suspense>
             }
           />
         ))}
