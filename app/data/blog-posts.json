@@ -1,0 +1,72 @@
+[
+  {
+    "metadata": {
+      "views": 19387,
+      "state": "published",
+      "publishedAt": "2024-04-10",
+      "title": "You probably don't need GraphQL",
+      "summary": "It might be surprising to hear the co-founder of a GraphQL company say you probably don't need it. Let me explain."
+    },
+    "slug": "graphql"
+  },
+  {
+    "metadata": {
+      "views": 43986,
+      "state": "published",
+      "publishedAt": "2020-12-07",
+      "title": "Why I Love Tailwind",
+      "summary": "Why Tailwind is blowing up, why I (the creator of styled-components) love it and how I avoid the downsides of atomic CSS."
+    },
+    "slug": "tailwind"
+  },
+  {
+    "metadata": {
+      "views": 75065,
+      "state": "published",
+      "publishedAt": "2020-03-24",
+      "title": "Margin considered harmful",
+      "summary": "We should ban margin from our React components. Hear me out."
+    },
+    "slug": "margin"
+  },
+  {
+    "metadata": {
+      "views": 6565,
+      "state": "archived",
+      "publishedAt": "2020-02-03",
+      "title": "I am joining Gatsby",
+      "summary": "I am joining Gatsby to work on open source R&D projects including Blocks, the visual editor for React apps, theme-ui, mdx and Gatsby themes! 🎉"
+    },
+    "slug": "gatsby"
+  },
+  {
+    "metadata": {
+      "views": 66843,
+      "state": "published",
+      "publishedAt": "2019-02-18",
+      "title": "Why I Write CSS in JavaScript",
+      "summary": "For three years, I have written all my CSS in JavaScript. In fact, I am the creator of styled-components, one of the most popular CSS-in-JS libraries. Let me explain why."
+    },
+    "slug": "css-in-js"
+  },
+  {
+    "metadata": {
+      "views": 41137,
+      "state": "published",
+      "publishedAt": "2019-01-16",
+      "title": "Tech Choices I Regret at Spectrum",
+      "summary": "Spectrum is an open source chat app for large online communities. With the benefit of hindsight, here are the technology choices I regret."
+    },
+    "slug": "tech-choice-regrets-at-spectrum"
+  },
+  {
+    "metadata": {
+      "views": 2031,
+      "state": "archived",
+      "publishedAt": "2018-02-07",
+      "title": "Streaming Server-Side Rendering and Caching",
+      "summary": "We recently implemented streaming server-side rendering and caching for Spectrum, here is how"
+    },
+    "slug": "streaming-ssr"
+  }
+]
