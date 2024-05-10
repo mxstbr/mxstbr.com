@@ -28,7 +28,9 @@ function generateOgImage(post) {
 }
 
 export const generateMeta = (meta) => () => {
-  let post = getBlogPosts().find((post) => post.metadata.title === meta.title)
+  let post = getBlogPosts({ archived: true, drafts: true }).find(
+    (post) => post.metadata.title === meta.title
+  )
 
   if (!post) {
     return
