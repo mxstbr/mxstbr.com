@@ -46,8 +46,8 @@ export default async function OSS() {
   )
 
   return (
-    <>
-      <Prose className="mb-12">
+    <div className="space-y-12">
+      <Prose>
         <h2>Open Source Projects</h2>
         <p>
           Open source projects I have (co-)created are used on more than 1% of
@@ -67,7 +67,7 @@ export default async function OSS() {
             <Repo repo={repo} key={repo.nameWithOwner} />
           ))}
       </ul>
-      <ul className="space-y-4 mt-16">
+      <ul className="space-y-4">
         {repos
           .filter((repo) => repo.owner === false)
           .sort((a, b) => b.stargazerCount - a.stargazerCount)
@@ -75,7 +75,7 @@ export default async function OSS() {
             <Repo repo={repo} key={repo.nameWithOwner} />
           ))}
       </ul>
-    </>
+    </div>
   )
 }
 
