@@ -2,7 +2,6 @@ import { notFound } from 'next/navigation'
 import { formatDate, getBlogPosts } from 'app/thoughts/utils'
 import { prodUrl } from 'app/sitemap'
 import Prose from 'app/components/prose'
-import { CenterPage, Columns } from 'app/components/layout-columns'
 import { size } from 'app/og/utils'
 import { NewsletterSignupForm } from 'app/components/newsletter-form'
 
@@ -76,7 +75,7 @@ export default function Blog({ meta, children }) {
   if (!post) notFound()
 
   return (
-    <CenterPage>
+    <>
       <section>
         <script
           type="application/ld+json"
@@ -128,6 +127,6 @@ export default function Blog({ meta, children }) {
         <Prose className="prose-lg">{children}</Prose>
       </section>
       <NewsletterSignupForm className="mt-16" />
-    </CenterPage>
+    </>
   )
 }

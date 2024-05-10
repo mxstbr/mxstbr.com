@@ -2,97 +2,90 @@ import { BlogPosts } from './components/posts'
 import { investments } from './investing/investments'
 import Link from 'next/link'
 import { ItemList, ItemListItem } from './components/item-list'
-import { Columns } from './components/layout-columns'
 
 export const revalidate = 3600 // revalidate every hour
 
 export default async function Home() {
   return (
-    <Columns
-      className="gap-16"
-      left={
-        <Section title="TL;DR">
-          <ItemList>
-            <ItemListItem
-              left={
-                <>
-                  CEO & co-founder of <a href="https://stellate.co">Stellate</a>
-                  , the GraphQL CDN
-                </>
-              }
-              right={`⚡`}
-            ></ItemListItem>
-            <ItemListItem
-              left={
-                <>
-                  (Co-)creator of <Link href="/oss">open source projects</Link>{' '}
-                  used by millions
-                </>
-              }
-              right={`💻`}
-            ></ItemListItem>
-            <ItemListItem
-              left={
-                <>
-                  <Link href="/investing">Angel investor</Link> in{' '}
-                  {investments.length}+ startups
-                </>
-              }
-              right={`🚀`}
-            ></ItemListItem>
-            <ItemListItem
-              left={
-                <>
-                  <a href="https://github.com/mxstbr/ama/issues/46">
-                    Speciality coffee barista
-                  </a>{' '}
-                  and{' '}
-                  <a href="https://www.youtube.com/watch?v=19kDOIwzTfE">
-                    backcountry skier
-                  </a>
-                </>
-              }
-              right={`🎿`}
-            ></ItemListItem>
-            <ItemListItem
-              left={<>Austrian living in San Francisco</>}
-              right={`🌁`}
-            ></ItemListItem>
-          </ItemList>
+    <div className="space-y-20">
+      <Section title="TL;DR">
+        <ItemList>
+          <ItemListItem
+            left={
+              <>
+                CEO & co-founder of <a href="https://stellate.co">Stellate</a>,
+                the GraphQL CDN
+              </>
+            }
+            right={`⚡`}
+          ></ItemListItem>
+          <ItemListItem
+            left={
+              <>
+                (Co-)creator of <Link href="/oss">open source projects</Link>{' '}
+                used by millions
+              </>
+            }
+            right={`💻`}
+          ></ItemListItem>
+          <ItemListItem
+            left={
+              <>
+                <Link href="/investing">Angel investor</Link> in{' '}
+                {investments.length}+ startups
+              </>
+            }
+            right={`🚀`}
+          ></ItemListItem>
+          <ItemListItem
+            left={
+              <>
+                <a href="https://github.com/mxstbr/ama/issues/46">
+                  Speciality coffee barista
+                </a>{' '}
+                and{' '}
+                <a href="https://www.youtube.com/watch?v=19kDOIwzTfE">
+                  backcountry skier
+                </a>
+              </>
+            }
+            right={`🎿`}
+          ></ItemListItem>
+          <ItemListItem
+            left={<>Austrian living in San Francisco</>}
+            right={`🌁`}
+          ></ItemListItem>
+        </ItemList>
+      </Section>
+
+      <div className="relative flex-1">
+        {/* Background */}
+        <div className="absolute -top-6 -left-6 -right-6 -bottom-6 bg-slate-100 dark:bg-slate-900 sm:rounded-md border border-solid border-slate-300 dark:border-slate-700" />
+        <Section className="relative">
+          <h2 className="font-bold relative">Essays</h2>
+          <BlogPosts />
         </Section>
-      }
-      middle={
-        <div className="relative flex-1">
-          {/* Background */}
-          <div className="absolute -top-6 -left-6 -right-6 -bottom-6 bg-slate-100 dark:bg-slate-900 sm:rounded-md border border-solid border-slate-300 dark:border-slate-700" />
-          <Section className="relative">
-            <h2 className="font-bold relative">Essays</h2>
-            <BlogPosts />
-          </Section>
-        </div>
-      }
-      right={
-        <Section title="Work">
-          <ItemList>
-            {work.map((project) => (
-              <div className="flex flex-row" key={project.name}>
-                <ItemListItem
-                  left={<Link href={project.href}>{project.name}</Link>}
-                  right={
-                    <div className="flex align-center">
-                      <div>{project.role}</div>
-                    </div>
-                  }
-                />
-                <div className="hidden xs:block ml-4 w-[6em] text-slate-500 text-right tabular-nums shrink-0">
-                  {project.timeframe}
-                </div>
+      </div>
+      <Section title="Work">
+        <ItemList>
+          {work.map((project) => (
+            <div className="flex flex-row" key={project.name}>
+              <ItemListItem
+                left={<Link href={project.href}>{project.name}</Link>}
+                right={
+                  <div className="flex align-center">
+                    <div>{project.role}</div>
+                  </div>
+                }
+              />
+              <div className="hidden xs:block ml-4 w-[6em] text-slate-500 text-right tabular-nums shrink-0">
+                {project.timeframe}
               </div>
-            ))}
-          </ItemList>
-        </Section>
-      }
-    />
+            </div>
+          ))}
+        </ItemList>
+      </Section>
+    </div>
 
     /* <Section title="Open Source Projects">
         <ItemList>

@@ -72,7 +72,7 @@ export default function RootLayout({
       )}
     >
       <body className="antialiased mt-8 px-4 mx-auto">
-        <main className="flex-auto min-w-0 mt-6 flex flex-col px-2 space-y-24">
+        <main className="min-w-0 max-w-prose mx-auto mt-6 px-2 space-y-24">
           <Navbar />
           {children}
           <Footer />

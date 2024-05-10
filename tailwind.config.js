@@ -9,7 +9,7 @@ module.exports = {
       typography: ({ theme }) => ({
         slate: {
           css: {
-            '--tw-prose-pre-bg': theme('colors.slate.50'),
+            '--tw-prose-pre-bg': theme('colors.slate.100'),
             '--tw-prose-pre-code': theme('colors.black'),
             '--tw-prose-invert-pre-bg': theme('colors.slate.900'),
             '--tw-prose-invert-pre-code': theme('colors.white'),

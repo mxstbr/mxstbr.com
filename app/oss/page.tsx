@@ -1,7 +1,6 @@
 import { getRepos } from '../github'
 import ossProjects from '../data/oss-projects'
 import Prose from 'app/components/prose'
-import { CenterPage } from 'app/components/layout-columns'
 import { Metadata } from 'next'
 import { size } from 'app/og/utils'
 import { prodUrl } from 'app/sitemap'
@@ -47,7 +46,7 @@ export default async function OSS() {
   )
 
   return (
-    <CenterPage>
+    <>
       <Prose className="mb-12">
         <h2>Open Source Projects</h2>
         <p>
@@ -76,7 +75,7 @@ export default async function OSS() {
             <Repo repo={repo} key={repo.nameWithOwner} />
           ))}
       </ul>
-    </CenterPage>
+    </>
   )
 }
 

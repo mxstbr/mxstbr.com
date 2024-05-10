@@ -1,5 +1,3 @@
-import { CenterPage, Columns } from './layout-columns'
-
 function ArrowIcon() {
   return (
     <svg
@@ -19,66 +17,64 @@ function ArrowIcon() {
 
 export default function Footer() {
   return (
-    <CenterPage>
-      <footer className="text-center w-full mx-auto pb-16">
-        <ul className="font-sm w-full flex flex-row justify-between text-slate-600 dark:text-slate-300">
-          <li>
-            <a
-              className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100"
-              rel="noopener noreferrer"
-              target="_blank"
-              href="/rss"
-            >
-              <ArrowIcon />
-              <p className="ml-2 h-7">rss</p>
-            </a>
-          </li>
-          <li>
-            <a
-              className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100"
-              rel="noopener noreferrer"
-              target="_blank"
-              href="https://twitter.com/mxstbr"
-            >
-              <ArrowIcon />
-              <p className="ml-2 h-7">twitter</p>
-            </a>
-          </li>
-          <li>
-            <a
-              className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100"
-              rel="noopener noreferrer"
-              target="_blank"
-              href="https://github.com/mxstbr"
-            >
-              <ArrowIcon />
-              <p className="ml-2 h-7">github</p>
-            </a>
-          </li>
-          <li>
-            <a
-              className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100"
-              rel="noopener noreferrer"
-              target="_blank"
-              href="https://linkedin.com/in/mxstbr"
-            >
-              <ArrowIcon />
-              <p className="ml-2 h-7">linkedin</p>
-            </a>
-          </li>
-          <li>
-            <a
-              className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100"
-              rel="noopener noreferrer"
-              target="_blank"
-              href="https://instagram.com/mxstbr"
-            >
-              <ArrowIcon />
-              <p className="ml-2 h-7">instagram</p>
-            </a>
-          </li>
-        </ul>
-      </footer>
-    </CenterPage>
+    <footer className="w-full mx-auto pb-16">
+      <ul className="font-sm w-full flex flex-row justify-between text-slate-600 dark:text-slate-300">
+        <li>
+          <a
+            className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100"
+            rel="noopener noreferrer"
+            target="_blank"
+            href="/rss"
+          >
+            <ArrowIcon />
+            <p className="ml-2 h-7">rss</p>
+          </a>
+        </li>
+        <li>
+          <a
+            className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100"
+            rel="noopener noreferrer"
+            target="_blank"
+            href="https://twitter.com/mxstbr"
+          >
+            <ArrowIcon />
+            <p className="ml-2 h-7">twitter</p>
+          </a>
+        </li>
+        <li>
+          <a
+            className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100"
+            rel="noopener noreferrer"
+            target="_blank"
+            href="https://github.com/mxstbr"
+          >
+            <ArrowIcon />
+            <p className="ml-2 h-7">github</p>
+          </a>
+        </li>
+        <li>
+          <a
+            className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100"
+            rel="noopener noreferrer"
+            target="_blank"
+            href="https://linkedin.com/in/mxstbr"
+          >
+            <ArrowIcon />
+            <p className="ml-2 h-7">linkedin</p>
+          </a>
+        </li>
+        <li>
+          <a
+            className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100"
+            rel="noopener noreferrer"
+            target="_blank"
+            href="https://instagram.com/mxstbr"
+          >
+            <ArrowIcon />
+            <p className="ml-2 h-7">instagram</p>
+          </a>
+        </li>
+      </ul>
+    </footer>
   )
 }
