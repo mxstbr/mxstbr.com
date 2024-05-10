@@ -89,7 +89,7 @@ export default function RootLayout({
               '@type': 'Person',
               id: 'mxstbr',
               email: 'mailto:contact@mxstbr.com',
-              image: '/static/images/headshot.jpeg',
+              image: 'https://mxstbr.com/static/images/headshot.jpeg',
               jobTitle: 'Senior Software Engineer',
               familyName: 'Stoiber',
               givenName: 'Max',
