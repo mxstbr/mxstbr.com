@@ -52,8 +52,9 @@ async function main() {
     const fileContent = fs.readFileSync(filePath, 'utf-8')
     const updatedContent = fileContent.replace(
       /export const meta = {([\s\S]*?)(?:^|,\s*)(views:\s*(?:\d+\s*\+\s*\d+|\d+))\s*,?\s*}/,
-      (match, properties, currentViews) => {
+      (match, properties) => {
         const viewCount = views.find((v) => v.slug === post.slug)?.views || 0
+        if (viewCount === post.metadata.views) return match
         console.log(
           `Updating ${post.slug} with view count ${viewCount} (before: ${post.metadata.views})`
         )
