@@ -73,8 +73,7 @@ export function getBlogPosts({
   drafts = false,
   archived = false,
 }: { drafts?: boolean; archived?: boolean } = {}) {
-  console.log(__dirname)
-  return getMDXData(__dirname)
+  return getMDXData(path.join(__dirname, '../', 'thoughts'))
     .sort((a, b) => {
       if (new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)) {
         return -1
