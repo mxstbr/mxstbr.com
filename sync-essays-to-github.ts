@@ -1,7 +1,7 @@
 import { Octokit } from '@octokit/rest'
-import env from '@next/env'
 import { getBlogPosts } from './app/thoughts/utils'
 
+import env from '@next/env'
 const projectDir = process.cwd()
 env.loadEnvConfig(projectDir)
 

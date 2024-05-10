@@ -4,6 +4,8 @@ import { prodUrl } from 'app/sitemap'
 import Prose from 'app/components/prose'
 import { size } from 'app/og/utils'
 import { NewsletterSignupForm } from 'app/components/newsletter-form'
+import { ReportView } from 'app/components/report-view'
+import { Redis } from '@upstash/redis'
 
 export async function generateStaticParams() {
   let posts = getBlogPosts()
@@ -68,7 +70,7 @@ export const generateMeta = (meta) => () => {
   }
 }
 
-export default function Blog({ meta, children }) {
+export default async function Blog({ meta, children }) {
   // Show drafts & archived posts if people have direct links to them
   const post = getBlogPosts({ drafts: true, archived: true }).find(
     (post) => post.metadata.title === meta.title
@@ -129,6 +131,7 @@ export default function Blog({ meta, children }) {
         <Prose className="prose-lg">{children}</Prose>
       </section>
       <NewsletterSignupForm className="mt-16" />
+      <ReportView slug={post.slug} />
     </>
   )
 }
