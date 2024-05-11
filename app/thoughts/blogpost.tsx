@@ -9,6 +9,8 @@ import { Redis } from '@upstash/redis'
 import { Suspense } from 'react'
 import Views from 'app/components/views'
 
+const redis = Redis.fromEnv()
+
 export async function generateStaticParams() {
   let posts = getBlogPosts()
 
@@ -17,21 +19,24 @@ export async function generateStaticParams() {
   }))
 }
 
-function generateOgImage(post) {
+async function generateOgImage(post) {
   if (post.metadata.image) return post.metadata.image
+
+  const views =
+    (await redis.get<number>(['pageviews', 'essay', post.slug].join(':'))) || 0
 
   return `${prodUrl}/og?title=${encodeURIComponent(
     post.metadata.title
   )}&subtitle=${
-    post.metadata.views > 0
-      ? `${post.metadata.views.toLocaleString(undefined, {
+    views > 0
+      ? `${views.toLocaleString(undefined, {
           maximumFractionDigits: 0,
         })} views`
       : ''
   }`
 }
 
-export const generateMeta = (meta) => () => {
+export const generateMeta = (meta) => async () => {
   let post = getBlogPosts({ archived: true, drafts: true }).find(
     (post) => post.metadata.title === meta.title
   )
@@ -45,7 +50,7 @@ export const generateMeta = (meta) => () => {
     publishedAt: publishedTime,
     summary: description,
   } = post.metadata
-  let ogImage = generateOgImage(post)
+  let ogImage = await generateOgImage(post)
 
   return {
     title,

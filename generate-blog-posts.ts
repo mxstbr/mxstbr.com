@@ -29,10 +29,7 @@ function parseFrontmatter(fileContent: string) {
   }
 }
 
-function getBlogPosts({
-  drafts = false,
-  archived = false,
-}: { drafts?: boolean; archived?: boolean } = {}) {
+function getBlogPosts() {
   let files: string[] = []
 
   const subfolders = fs
@@ -74,16 +71,10 @@ function getBlogPosts({
       }
       return 1
     })
-    .filter((post) => {
-      if (drafts && post.metadata.state === 'draft') return true
-      if (archived && post.metadata.state === 'archived') return true
-
-      return post.metadata.state === 'published'
-    })
 }
 
 async function main() {
-  const posts = getBlogPosts({ archived: true, drafts: true })
+  const posts = getBlogPosts()
   writeFileSync('./app/data/blog-posts.json', JSON.stringify(posts, null, 2))
 }
 

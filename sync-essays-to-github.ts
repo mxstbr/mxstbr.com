@@ -38,9 +38,12 @@ async function main() {
         (post) =>
           `### [${post.metadata.title}](https://mxstbr.com/thoughts/${
             post.slug
-          }) (${post.metadata.views.toLocaleString(undefined, {
-            maximumFractionDigits: 0,
-          })} views)\n\n${post.metadata.summary}`
+          }) (${
+            // TODO: Move to Redis
+            post.metadata.views.toLocaleString(undefined, {
+              maximumFractionDigits: 0,
+            })
+          } views)\n\n${post.metadata.summary}`
       )
       .join('\n\n')
     console.log('New content:')
