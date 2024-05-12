@@ -64,7 +64,7 @@ async function main() {
       repo: 'mxstbr',
       path: 'README.md',
       message:
-        'bot: update essays (see https://github.com/mxstbr/mxstbr.com/blob/master/sync-essays-to-github.ts)',
+        'bot: update essays\n\n(see https://github.com/mxstbr/mxstbr.com/blob/master/sync-essays-to-github.ts)',
       content: Buffer.from(newContent).toString('base64'),
       sha: response.data.sha,
     })
