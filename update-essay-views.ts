@@ -56,7 +56,12 @@ async function main() {
         const viewCount = views.find((v) => v.slug === post.slug)?.views || 0
         if (viewCount === post.metadata.views) return match
         console.log(
-          `Updating ${post.slug} with view count ${viewCount} (before: ${post.metadata.views})`
+          `Updating ${post.slug} with view count ${viewCount.toLocaleString(
+            undefined,
+            {
+              maximumFractionDigits: 0,
+            }
+          )} (+${viewCount - post.metadata.views})`
         )
         return `export const meta = {\n  ${properties
           .trim()
