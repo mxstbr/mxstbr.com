@@ -38,7 +38,7 @@ export async function GET(request: Request) {
   return new ImageResponse(
     (
       <div
-        tw="flex flex-col w-full h-full items-center justify-center bg-white"
+        tw="flex flex-col w-full h-full items-center justify-center bg-slate-50 text-slate-900"
         style={{ fontFamily: '"Inter"' }}
       >
         <div tw="absolute top-0 left-0 right-0 flex flex-row w-full justify-between items-center px-16 pt-8">
