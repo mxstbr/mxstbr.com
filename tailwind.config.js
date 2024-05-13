@@ -7,8 +7,15 @@ module.exports = {
         xs: '500px',
       },
       typography: ({ theme }) => ({
+        // "slate" has to match components/prose.tsx
         slate: {
           css: {
+            a: {
+              fontWeight: 'inherit',
+            },
+            code: {
+              fontWeight: 'inherit',
+            },
             '--tw-prose-pre-bg': theme('colors.slate.100'),
             '--tw-prose-pre-code': theme('colors.black'),
             '--tw-prose-invert-pre-bg': theme('colors.slate.900'),

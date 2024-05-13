@@ -1,0 +1,88 @@
+import BlogPost from "../blogpost";
+
+export const meta = {
+  state: 'draft',
+  publishedAt: "2024-05-17",
+  // The Unique Dynamics of Building Developer Tools
+  // Why Only the Best Dev tools Make the Cut
+  title: "Why dev tools must be great to win",
+  summary: "TODO",
+  views: 0
+};
+
+import { generateMeta } from '../blogpost'
+export const generateMetadata = generateMeta(meta)
+
+<BlogPost meta={meta}>
+
+Developer tools are different compared to tools for other professions in one very important way:
+
+**The same people that build the tools are the people that use the tools.**
+
+This is not true for almost all other professions, in tech and especially outside of tech.
+
+For example, bakers will rarely invent a novel oven because building a commercial-grade oven is a totally different skill set than making bread. 
+
+Even professions where people do regularly build their own tools can't really bring them to the rest of the world easily. For example, blacksmiths often make their own hammers and anvils, but how do you go from being a blacksmith who makes a better hammer to distributing that hammer to lots of other people?
+
+That requires a lot of work, effort, and a skill set (building a product business) that they don’t need as part of their usual work.
+
+## Dev tools are different
+
+**We software engineers build our own “commercial-grade” tools, abstractions, and APIs every day.** It’s a routine part of our craft to be tackling a task and build a shared abstraction to simplify our work.
+
+**On top of that, sharing a solution with _the entire world_ is as simple as `git push`!**
+
+That is a big part of the reason why the day-to-day work of software engineers changes so dramatically every year with new frameworks, libraries, and packages replacing old ways of doing things. Innovation in our space happens at a rapid clip because the same people that build the tools are the people that use the tools.
+
+However, this also has some big implications for trying to build a business selling tools to developers.
+
+## What this means for Dev tools as an industry
+
+### Build vs. Buy is a huge hurdle
+
+The first is that Build vs. Buy is a huge hurdle to overcome for businesses trying to sell to engineering organizations.
+
+Whenever we at [Stellate](https://stellate.co) meet an organization that needs our GraphQL edge caching, their engineering team inevitably asks, “Why shouldn’t we just build this?”
+
+That's a really good question. Truthfully, they could! We build our tools the same way that they build their software, so there's technically nothing stopping them from building their own solution.
+
+### There will always be a free, open-source version
+
+Individual developers have strong personal incentives to open source solutions to common problems because if one of their open source solutions becomes popular it can really accelerate their career. (in fact, [that's what my career is based on](https://mxs.is/doc)!)
+
+So, if you ship a novel, good solution to a problem, it will almost certainly be copied in the open source world—not out of malice, but because of the incentives.
+
+### Dev tools have to be great
+
+These two implications combined mean that in order to build a business in dev tools, you have to build something extremely good.
+
+You have to spend *years* making it the best version of a solution. That’s the only way other developers will look at your solution and will go, "Actually, building this is going to take me too long and the open source version isn’t nearly as good, so I will buy your product instead." Otherwise, if they can copy your abstraction in a few hours or days, they will.
+
+A few examples from [my own angel investing portfolio](/investments) (which is dev tools-heavy given my background and expertise):
+
+#### 1. [Zed](https://zed.dev)
+
+The Atom team spent years trying to build the best code editor (going as far as inventing Electron!), and then started a new company from scratch in Rust with all their learnings to make Zed.
+
+Now, years later, it’s taking off.
+
+#### 2. [Clerk](https://clerk.dev)
+
+This team had to battle building a user management solution that covers every possible authentication use case and yet is easy to use with any front-end framework and secure.
+
+Now, years later, it's taking off.
+
+#### 3. [Incident.io](https://incident.io)
+
+This team's job at Monzo was to build incident tooling to support the level of scale and reliability that being one of the fastest-growing digital-first banks requires. They left Monzo with all those learnings and started building the product that they had always wanted.
+
+Now, years later, it's taking off.
+
+----
+
+What all these stories have in common is that the most promising dev tools companies look like overnight successes, but were always years in the making.
+
+In order to "win" in dev tools, it's not just enough to be good. You have to be great.
+
+</BlogPost>
