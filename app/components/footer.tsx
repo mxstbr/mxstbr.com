@@ -1,3 +1,9 @@
+import LinkedIn from 'react-feather/dist/icons/linkedin'
+import Instagram from 'react-feather/dist/icons/instagram'
+import GitHub from 'react-feather/dist/icons/github'
+import Twitter from 'react-feather/dist/icons/twitter'
+import RSS from 'react-feather/dist/icons/rss'
+
 function ArrowIcon() {
   return (
     <svg
@@ -21,57 +27,57 @@ export default function Footer() {
       <ul className="font-sm w-full flex flex-row justify-between text-slate-600 dark:text-slate-300">
         <li>
           <a
-            className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100"
+            className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100 no-underline"
             rel="noopener noreferrer"
             target="_blank"
             href="/rss"
           >
-            <ArrowIcon />
-            <p className="ml-2 h-7">rss</p>
+            <RSS size={16} />
+            <p className="ml-2">RSS</p>
           </a>
         </li>
         <li>
           <a
-            className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100"
+            className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100 no-underline"
             rel="noopener noreferrer"
             target="_blank"
             href="https://twitter.com/mxstbr"
           >
-            <ArrowIcon />
-            <p className="ml-2 h-7">twitter</p>
+            <Twitter size={16} />
+            <p className="ml-2">Twitter</p>
           </a>
         </li>
         <li>
           <a
-            className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100"
+            className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100 no-underline"
             rel="noopener noreferrer"
             target="_blank"
             href="https://github.com/mxstbr"
           >
-            <ArrowIcon />
-            <p className="ml-2 h-7">github</p>
+            <GitHub size={16} />
+            <p className="ml-2">GitHub</p>
           </a>
         </li>
         <li>
           <a
-            className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100"
+            className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100 no-underline"
             rel="noopener noreferrer"
             target="_blank"
             href="https://linkedin.com/in/mxstbr"
           >
-            <ArrowIcon />
-            <p className="ml-2 h-7">linkedin</p>
+            <LinkedIn size={16} />
+            <p className="ml-2">LinkedIn</p>
           </a>
         </li>
         <li>
           <a
-            className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100"
+            className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100 no-underline"
             rel="noopener noreferrer"
             target="_blank"
             href="https://instagram.com/mxstbr"
           >
-            <ArrowIcon />
-            <p className="ml-2 h-7">instagram</p>
+            <Instagram size={16} />
+            <p className="ml-2">Instagram</p>
           </a>
         </li>
       </ul>

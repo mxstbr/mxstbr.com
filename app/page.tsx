@@ -62,7 +62,7 @@ export default async function Home() {
         {/* Background */}
         <div className="absolute -top-6 -left-6 -right-6 -bottom-6 bg-slate-100 dark:bg-slate-900 sm:rounded-md border border-solid border-slate-300 dark:border-slate-700" />
         <Section className="relative">
-          <h2 className="font-bold relative">Essays</h2>
+          <h2 className="font-bold relative text-lg">Essays</h2>
           <BlogPosts />
         </Section>
       </div>
@@ -145,7 +145,7 @@ function Section({
 }) {
   return (
     <div className={`space-y-6 flex-1 ${className}`}>
-      {title && <h2 className="font-bold">{title}</h2>}
+      {title && <h2 className="font-bold text-lg">{title}</h2>}
       {children}
     </div>
   )

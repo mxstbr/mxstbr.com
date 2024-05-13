@@ -27,6 +27,7 @@
     "next": "^14.2.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-feather": "^2.0.10",
     "react-tweet": "^3.2.1",
     "sugar-high": "^0.6.0",
     "tsm": "^2.3.0",
