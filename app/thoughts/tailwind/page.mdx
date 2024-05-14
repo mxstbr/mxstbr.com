@@ -1,20 +1,21 @@
-import BlogPost from "../blogpost";
-import Lesson from "../../components/lesson";
+import BlogPost from '../blogpost'
+import Lesson from '../../components/lesson'
 
 export const meta = {
   state: 'published',
-  publishedAt: "2020-12-07",
-  title: "Why I Love Tailwind",
-  summary: "Why Tailwind is blowing up, why I (the creator of styled-components) love it and how I avoid the downsides of atomic CSS.",
-  views: 44021
-};
+  publishedAt: '2020-12-07',
+  title: 'Why I Love Tailwind',
+  summary:
+    'Why Tailwind is blowing up, why I (the creator of styled-components) love it and how I avoid the downsides of atomic CSS.',
+  views: 44021,
+}
 
 import { generateMeta } from '../blogpost'
 export const generateMetadata = generateMeta(meta)
 
 <BlogPost meta={meta}>
 
-[Tailwind](https://tailwindcss.com) is an atomic CSS framework that has taken the frontend world by storm. It gives developers without a deep understanding of design the ability to build visually gorgeous, modern user interfaces. 
+[Tailwind](https://tailwindcss.com) is an atomic CSS framework that has taken the frontend world by storm. It gives developers without a deep understanding of design the ability to build visually gorgeous, modern user interfaces.
 
 If you have not seen it before, here is the canonical Tailwind example from their original homepage:
 
@@ -29,10 +30,14 @@ If you have not seen it before, here is the canonical Tailwind example from thei
   </div>
 </div>
 ```
-<div className="shadow-lg flex bg-white rounded-lg p-6 leading-normal" style={{ fontFamily: "sans-serif", wordBreak: "break-all" }}>
+
+<div
+  className="shadow-lg flex bg-white rounded-lg p-6 leading-normal"
+  style={{ fontFamily: 'sans-serif', wordBreak: 'break-all' }}
+>
   <img
     alt="Avatar of Erin Lindford"
-    className="h-24 w-24 rounded-full mx-0 m-0 mr-6" 
+    className="h-24 w-24 rounded-full mx-0 m-0 mr-6"
     src="https://randomuser.me/api/portraits/women/17.jpg"
   />
   <div className="text-left">
@@ -83,11 +88,14 @@ How? [twin.macro](https://github.com/ben-rogerson/twin.macro).
 Let me illustrate. Here is the canonical Tailwind example built with [twin.macro](https://github.com/ben-rogerson/twin.macro) and React:
 
 ```jsx
-import "twin.macro"
+import 'twin.macro'
 
 const Card = () => (
   <div tw="shadow-lg md:flex bg-white rounded-lg p-6 leading-normal">
-    <img tw="h-16 w-16 md:h-24 md:w-24 rounded-full mx-auto md:mx-0 md:mr-6" src="avatar.jpg" />
+    <img
+      tw="h-16 w-16 md:h-24 md:w-24 rounded-full mx-auto md:mx-0 md:mr-6"
+      src="avatar.jpg"
+    />
     <div tw="text-center md:text-left">
       <h1 tw="text-lg">Erin Lindford</h1>
       <h2 tw="text-purple-500">Customer Support</h2>
@@ -98,10 +106,13 @@ const Card = () => (
 )
 ```
 
-<div className="shadow-lg flex bg-white rounded-lg p-6 leading-normal" style={{ fontFamily: "sans-serif", wordBreak: "break-all" }}>
+<div
+  className="shadow-lg flex bg-white rounded-lg p-6 leading-normal"
+  style={{ fontFamily: 'sans-serif', wordBreak: 'break-all' }}
+>
   <img
     alt="Avatar of Erin Lindford"
-    className="h-24 w-24 rounded-full mx-0 m-0 mr-6" 
+    className="h-24 w-24 rounded-full mx-0 m-0 mr-6"
     src="https://randomuser.me/api/portraits/women/17.jpg"
   />
   <div className="text-left">
@@ -119,20 +130,20 @@ Unsurprisingly, the result looks identical — we are still using the same syste
 However, under the hood this automatically compiles the class names to the actual CSS they refer to (with [the css prop](https://medium.com/styled-components/announcing-native-support-for-the-css-prop-in-styled-components-245ca5252feb)):
 
 ```jsx
-import "twin.macro"
+import 'twin.macro'
 
-<div tw="text-center md:text-left" />
+;<div tw="text-center md:text-left" />
 
 // ↓↓↓↓↓ turns into ↓↓↓↓↓
 
-import "styled-components/macro"
+import 'styled-components/macro'
 
-<div 
+;<div
   css={{
-    textAlign: "center",
-    "@media (min-width: 768px)": {
-      "textAlign":"left"
-    }
+    textAlign: 'center',
+    '@media (min-width: 768px)': {
+      textAlign: 'left',
+    },
   }}
 />
 ```
@@ -147,7 +158,7 @@ You get to use Tailwind's system and developer experience _and_ take advantage o
   <div
     tw="text-center md:text-left"
     css={{`
-      &:hover { 
+      &:hover {
         background-image: url("/bg.png");
       }
     `}}
@@ -157,16 +168,28 @@ You get to use Tailwind's system and developer experience _and_ take advantage o
 - You can use all variants in all combinations with all utilities allowing for even more expression within the system. Since twin.macro runs at build-time, you don't have to worry about configuration or file size:
 
   ```jsx
-  import "twin.macro"
+  import 'twin.macro'
 
-  <div tw="sm:hover:first:bg-black">...</div>
+  ;<div tw="sm:hover:first:bg-black">...</div>
   ```
 
 - You get fully automatic critical CSS extraction and code splitting. Users will only load exactly the styles they need for the page they requested — nothing more and nothing less! CSS performance does not get better.[^1]
 
 The ideal setup for both developer _and_ user experience!
 
-<Lesson title="Lesson" body={<>use <a href="https://github.com/ben-rogerson/twin.macro" target="_blank">twin.macro</a> to leverage Tailwind's marvelous system and developer experience without the downsides of atomic CSS.</>} />
+<Lesson
+  title="Lesson"
+  body={
+    <>
+      use{' '}
+      <a href="https://github.com/ben-rogerson/twin.macro" target="_blank">
+        twin.macro
+      </a>{' '}
+      to leverage Tailwind's marvelous system and developer experience without
+      the downsides of atomic CSS.
+    </>
+  }
+/>
 
 Rather than taking two steps forward with Tailwind's system and one step backward with atomic CSS, let's take five steps forward. Together.
 

@@ -2,18 +2,19 @@ import BlogPost from '../blogpost'
 
 export const meta = {
   state: 'archived',
-  publishedAt: "2018-02-07",
-  title: "Streaming Server-Side Rendering and Caching",
-  summary: "We recently implemented streaming server-side rendering and caching for Spectrum, here is how",
-  views: 2032
-};
+  publishedAt: '2018-02-07',
+  title: 'Streaming Server-Side Rendering and Caching',
+  summary:
+    'We recently implemented streaming server-side rendering and caching for Spectrum, here is how',
+  views: 2032,
+}
 
 import { generateMeta } from '../blogpost'
 export const generateMetadata = generateMeta(meta)
 
 <BlogPost meta={meta}>
 
-*Originally published on the [Zeit blog](https://web.archive.org/web/20180211132841if_/https://zeit.co/blog/streaming-server-rendering-at-spectrum)*
+_Originally published on the [Zeit blog](https://web.archive.org/web/20180211132841if_/https://zeit.co/blog/streaming-server-rendering-at-spectrum)_
 
 React 16 introduced streaming server-side rendering, which allows you to send down HTML in chunks in parallel to rendering it. This enables a faster time to first byte and first meaningful paint for your users since the initial markup arrives in the browser sooner.
 
@@ -26,22 +27,22 @@ Streams are also asynchronous, contrary to `renderToString`, and handle backpres
 The API for streaming server-side rendering isn't all that different from the standard `renderToString` API. Here's what it looks like:
 
 ```js
-import { renderToNodeStream } from 'react-dom/server';
-import Frontend from '../client';
+import { renderToNodeStream } from 'react-dom/server'
+import Frontend from '../client'
 
 app.use('*', (request, response) => {
   // Send the start of your HTML to the browser
-  response.write('<html><head><title>Page</title></head><body><div id="root">');
+  response.write('<html><head><title>Page</title></head><body><div id="root">')
 
   // Render your frontend to a stream and pipe it to the response
-  const stream = renderToNodeStream(<Frontend />);
-  stream.pipe(response, { end: 'false' });
+  const stream = renderToNodeStream(<Frontend />)
+  stream.pipe(response, { end: 'false' })
 
   // When React finishes rendering send the rest of your HTML to the browser
   stream.on('end', () => {
-    response.end('</div></body></html>');
-  });
-});
+    response.end('</div></body></html>')
+  })
+})
 ```
 
 An example of a streaming server-side rendering route
@@ -52,13 +53,13 @@ When I first saw a similar piece of code in the React docs, it was pretty confus
 `renderToNodeStream` returns a readable stream, which I imagine as a faucet: it has an underlying source of data (the tank holding the water) that's waiting to be read by a consumer (waiting for the valve to be opened). To consume a readable stream (open the valve), we would listen to its "data" event, which is triggered whenever there is a new chunk of data to be read. In our case, the source is React rendering our frontend:
 
 ```js
-import { renderToNodeStream } from 'react-dom/server';
+import { renderToNodeStream } from 'react-dom/server'
 
-const stream = renderToNodeStream(<Frontend />);
+const stream = renderToNodeStream(<Frontend />)
 
 stream.on('data', (data) => {
-  console.log(JSON.stringify(data));
-});
+  console.log(JSON.stringify(data))
+})
 ```
 
 Listening to a rendering stream's data event
@@ -73,12 +74,13 @@ As you can see above, streaming decreases the Time-To-First-Byte, because the se
 For [Spectrum](https://spectrum.chat), we cache public pages in Redis to avoid React rendering them a million times over even though it's always the same HTML in the end. We don't cache anything for authenticated users because we install a ServiceWorker on first load, which serves an app shell locally on subsequent page visits, and this app shell fetches data from our API directly—no more server rendering! For public pages we previously monkey-patched `response.send` to cache them before responding to the user:
 
 ```js
-const originalSend = response.send;
+const originalSend = response.send
 
 response.send = (html, ...other) => {
   // Make sure not to cache (possibly temporary) error states
-  if (response.statusCode > 100 && response.statusCode < 300) cache.put(request.path, html)
-  originalSend(html, ...other);
+  if (response.statusCode > 100 && response.statusCode < 300)
+    cache.put(request.path, html)
+  originalSend(html, ...other)
 }
 ```
 
@@ -89,10 +91,10 @@ Combined with a tiny Express middleware this allowed us to cache across many ins
 app.use('*', (request, response, next) => {
   if (cache.has(request.path)) {
     // Return the HTML for this path from the cache if it exists
-    cache.get(request.path).then(html => response.send(html));
+    cache.get(request.path).then((html) => response.send(html))
   } else {
     // Otherwise go on and render it
-    next();
+    next()
   }
 })
 ```
@@ -105,17 +107,17 @@ The million dollar question at this point is of course "How do you cache HTML wh
 Since I wasn't very familiar with streams [I turned to the Node.js community and asked them how to do this](https://spectrum.chat/thread/0cd94785-f87c-4171-9bb0-a31c6b66fb45) (shoutout to [@mafintosh](https://twitter.com/mafintosh) and [@xander76](https://twitter.com/xander76) who patiently explained it all). It turns out there's a third class of streams which allows us to cache the HTML: transform streams. Continuing the faucet analogy, a transform stream could, for example, be a water filter. You pass data (water) to the transform stream, which can transform it (clean it from gunk) before passing it on to the next stream. In our case, we don't actually want to transform the data. Instead, we want to buffer all the HTML chunks of a single request in memory as they come along, then concatenate them together once we're all done, and store the entire HTML document in the cache (imagine a water filter that duplicates each atom and stores it in a tank until all the water has flown). Here's our tiny utility function for creating a caching transform stream:
 
 ```js
-import { Transform } from 'stream';
+import { Transform } from 'stream'
 
 const createCacheStream = (key) => {
-  const bufferedChunks = [];
+  const bufferedChunks = []
   return new Transform({
     // transform() is called with each chunk of data
     transform(data, enc, cb) {
       // We store the chunk of data (which is a Buffer) in memory
-      bufferedChunks.push(data);
+      bufferedChunks.push(data)
       // Then pass the data unchanged onwards to the next stream
-      cb(null, data);
+      cb(null, data)
     },
 
     // flush() is called when everything is done
@@ -123,9 +125,9 @@ const createCacheStream = (key) => {
       // We concatenate all the buffered chunks of HTML to get the full HTML
       // then cache it at "key"
       cache.set(key, Buffer.concat(bufferedChunks))
-      cb();
-    }
-  });
+      cb()
+    },
+  })
 }
 ```
 
@@ -135,19 +137,21 @@ Now we can use that in our server-side rendering code:
 ```js
 app.use('*', (request, response) => {
   // Create the cache stream and pipe it into the response
-  let cacheStream = createCacheStream(request.path);
-  cacheStream.pipe(response);
+  let cacheStream = createCacheStream(request.path)
+  cacheStream.pipe(response)
 
   // Write the first bit of HTML into it
-  cacheStream.write('<html><head><title>Page</title></head><body><div id="root">');
+  cacheStream.write(
+    '<html><head><title>Page</title></head><body><div id="root">'
+  )
 
   // Create the rendering stream and pipe it into the cache stream
-  const renderStream = renderToNodeStream(<Frontend />);
-  renderStream.pipe(cacheStream, { end: false });
+  const renderStream = renderToNodeStream(<Frontend />)
+  renderStream.pipe(cacheStream, { end: false })
   renderStream.on('end', () => {
     // Once it's done rendering write the rest of the HTML
-    cacheStream.end('</div></body></html>');
-  });
+    cacheStream.end('</div></body></html>')
+  })
 })
 ```
 

@@ -1,15 +1,15 @@
-import BlogPost from "../blogpost";
-import Browser from "../../components/browser";
-import Lesson from "../../components/lesson";
+import BlogPost from '../blogpost'
+import Browser from '../../components/browser'
+import Lesson from '../../components/lesson'
 
 export const meta = {
   state: 'published',
-  publishedAt: "2019-02-18",
-  title: "Why I Write CSS in JavaScript",
+  publishedAt: '2019-02-18',
+  title: 'Why I Write CSS in JavaScript',
   summary:
-    "For three years, I have written all my CSS in JavaScript. In fact, I am the creator of styled-components, one of the most popular CSS-in-JS libraries. Let me explain why.",
-  views: 66852
-};
+    'For three years, I have written all my CSS in JavaScript. In fact, I am the creator of styled-components, one of the most popular CSS-in-JS libraries. Let me explain why.',
+  views: 66852,
+}
 
 import { generateMeta } from '../blogpost'
 export const generateMetadata = generateMeta(meta)
@@ -27,14 +27,14 @@ Developers have created [different flavors of CSS-in-JS](https://github.com/mich
 Using it with React looks like this:
 
 ```js
-import styled from "styled-components";
+import styled from 'styled-components'
 
 const Title = styled.h1`
   color: palevioletred;
   font-size: 18px;
-`;
+`
 
-const App = () => <Title>Hello World!</Title>;
+const App = () => <Title>Hello World!</Title>
 ```
 
 This renders a palevioletred `<h1>` with a font size of 18px to the DOM:
