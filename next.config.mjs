@@ -1,4 +1,5 @@
 import createMDX from '@next/mdx'
+import smartypants from 'remark-smartypants'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -36,6 +37,10 @@ const nextConfig = {
   },
 }
 
-const withMDX = createMDX()
+const withMDX = createMDX({
+  options: {
+    remarkPlugins: [smartypants],
+  },
+})
 
 export default withMDX(nextConfig)
