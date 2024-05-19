@@ -95,7 +95,7 @@ function Repo({ repo }) {
         <p className="text-slate-900 dark:text-slate-100 ">
           <a
             className="underline"
-            href={`https://github.com${repo.nameWithOwner}`}
+            href={`https://github.com/${repo.nameWithOwner}`}
           >
             {repo.nameWithOwner}
           </a>
