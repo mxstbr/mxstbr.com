@@ -2,6 +2,8 @@ import { BlogPosts } from './components/posts'
 import { investments } from './investing/investments'
 import Link from 'next/link'
 import { ItemList, ItemListItem } from './components/item-list'
+import { formatDate } from './thoughts/utils'
+import ExternalLink from 'react-feather/dist/icons/external-link'
 
 export const revalidate = 3600 // revalidate every hour
 
@@ -66,6 +68,37 @@ export default async function Home() {
           <BlogPosts />
         </Section>
       </div>
+
+      <Section
+        title={
+          <a
+            href="/notes"
+            target="_blank"
+            className="flex flex-row items-center no-underline hover:underline"
+          >
+            Notes <ExternalLink size={16} className="ml-2" />
+          </a>
+        }
+      >
+        <ItemList>
+          {notes.map((note) => (
+            <ItemListItem
+              key={note.href}
+              left={
+                <a target="_blank" href={note.href}>
+                  {note.name}
+                </a>
+              }
+              right={
+                <div className="flex align-center">
+                  <div>{formatDate(note.updatedAt)}</div>
+                </div>
+              }
+            />
+          ))}
+        </ItemList>
+      </Section>
+
       <Section title="Work">
         <ItemList>
           {work.map((project) => (
@@ -139,7 +172,7 @@ function Section({
   children,
   className,
 }: {
-  title?: string
+  title?: string | React.ReactNode
   children: React.ReactNode
   className?: string
 }) {
@@ -150,6 +183,19 @@ function Section({
     </div>
   )
 }
+
+const notes = [
+  {
+    name: 'Developer tools are different than tools for any other profession',
+    updatedAt: '2024-05-20T07:32',
+    href: 'https://mxstbr.com/notes/Developer+tools+are+different+than+tools+for+any+other+profession',
+  },
+  {
+    name: 'Developer tools startups are almost impossible',
+    updatedAt: '2024-05-20T07:31',
+    href: 'https://mxstbr.com/notes/Developer+tools+startups+are+almost+impossible',
+  },
+]
 
 const work = [
   {
