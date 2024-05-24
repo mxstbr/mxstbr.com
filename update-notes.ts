@@ -21,12 +21,10 @@ async function main() {
 
   const notes = visibleNoteNames.map((name) => ({
     updatedAt: data[name].frontmatter.updatedAt,
-    name,
+    name: name.replace(/\.md$/, ''),
     // Obsidian Publish just replaces spaces with +
     // @ref https://forum.obsidian.md/t/publish-support-for-lowercase-and-kebab-case-slugs-in-urls/32463
-    href:
-      'https://mxstbr.com/notes/' +
-      name.replace(/\s+/g, '+').replace(/\.md$/, ''),
+    href: 'https://mxstbr.com/notes/' + nameToSlug(name),
   }))
 
   const prettierConfig = await prettier.resolveConfig('app/data/notes.tsx')
@@ -44,3 +42,7 @@ async function main() {
 }
 
 main()
+
+function nameToSlug(name: string) {
+  return name.replace(/\s+/g, '+').replace(/\.md$/, '')
+}
