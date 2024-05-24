@@ -1,3 +1,4 @@
+// TODO: Auto generate from Obsidian
 export const notes = [
   {
     href: 'https://mxstbr.com/notes/Welcome+to+my+notes!',
@@ -13,5 +14,10 @@ export const notes = [
     name: 'Developer tools startups are almost impossible',
     updatedAt: '2024-05-20T07:31',
     href: 'https://mxstbr.com/notes/Developer+tools+startups+are+almost+impossible',
+  },
+  {
+    name: 'Kernel of good strategy (template)',
+    updatedAt: '2024-05-24T07:12',
+    href: 'https://mxstbr.com/notes/Kernel+of+Good+Strategy+(Template)',
   },
 ]
