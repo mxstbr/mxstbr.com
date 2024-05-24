@@ -16,8 +16,8 @@ export const notes = [
     href: 'https://mxstbr.com/notes/Developer+tools+startups+are+almost+impossible',
   },
   {
-    name: 'Kernel of good strategy (template)',
+    name: 'Kernel of good strategy (Template)',
     updatedAt: '2024-05-24T07:12',
-    href: 'https://mxstbr.com/notes/Kernel+of+Good+Strategy+(Template)',
+    href: 'https://mxstbr.com/notes/Kernel+of+good+strategy+(Template)',
   },
 ]
