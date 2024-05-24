@@ -85,7 +85,12 @@ export default async function Home() {
           {notes
             .filter(
               (note) =>
-                note.href !== 'https://mxstbr.com/notes/Welcome+to+my+notes!'
+                note.href !== 'https://mxstbr.com/notes/Welcome+to+my+notes!',
+            )
+            .sort(
+              (a, b) =>
+                new Date(b.updatedAt).getTime() -
+                new Date(a.updatedAt).getTime(),
             )
             .map((note) => (
               <ItemListItem
