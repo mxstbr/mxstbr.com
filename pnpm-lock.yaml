@@ -59,6 +59,9 @@ dependencies:
   next:
     specifier: ^14.2.3
     version: 14.2.3(react-dom@18.2.0)(react@18.2.0)
+  prettier:
+    specifier: ^3.2.5
+    version: 3.2.5
   react:
     specifier: 18.2.0
     version: 18.2.0
@@ -2302,6 +2305,12 @@ packages:
       nanoid: 3.3.7
       picocolors: 1.0.0
       source-map-js: 1.2.0
+
+  /prettier@3.2.5:
+    resolution: {integrity: sha512-3/GWa9aOC0YeD7LUfvOG2NiDyhOWRvt1k+rcKhOuYnMY24iiCphgneUfJDyFXd6rZCAnuLBv6UeAULtrhT/F4A==}
+    engines: {node: '>=14'}
+    hasBin: true
+    dev: false
 
   /prop-types@15.8.1:
     resolution: {integrity: sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==}
