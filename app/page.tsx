@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { ItemList, ItemListItem } from './components/item-list'
 import { formatDate } from './thoughts/utils'
 import ExternalLink from 'react-feather/dist/icons/external-link'
+import { notes } from './data/notes'
 
 export const revalidate = 3600 // revalidate every hour
 
@@ -81,21 +82,26 @@ export default async function Home() {
         }
       >
         <ItemList>
-          {notes.map((note) => (
-            <ItemListItem
-              key={note.href}
-              left={
-                <a target="_blank" href={note.href}>
-                  {note.name}
-                </a>
-              }
-              right={
-                <div className="flex align-center">
-                  <div>{formatDate(note.updatedAt)}</div>
-                </div>
-              }
-            />
-          ))}
+          {notes
+            .filter(
+              (note) =>
+                note.href !== 'https://mxstbr.com/notes/Welcome+to+my+notes!'
+            )
+            .map((note) => (
+              <ItemListItem
+                key={note.href}
+                left={
+                  <a target="_blank" href={note.href}>
+                    {note.name}
+                  </a>
+                }
+                right={
+                  <div className="flex align-center">
+                    <div>{formatDate(note.updatedAt)}</div>
+                  </div>
+                }
+              />
+            ))}
         </ItemList>
       </Section>
 
@@ -183,19 +189,6 @@ function Section({
     </div>
   )
 }
-
-const notes = [
-  {
-    name: 'Developer tools are different than tools for any other profession',
-    updatedAt: '2024-05-20T07:32',
-    href: 'https://mxstbr.com/notes/Developer+tools+are+different+than+tools+for+any+other+profession',
-  },
-  {
-    name: 'Developer tools startups are almost impossible',
-    updatedAt: '2024-05-20T07:31',
-    href: 'https://mxstbr.com/notes/Developer+tools+startups+are+almost+impossible',
-  },
-]
 
 const work = [
   {

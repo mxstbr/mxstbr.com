@@ -1,0 +1,17 @@
+export const notes = [
+  {
+    href: 'https://mxstbr.com/notes/Welcome+to+my+notes!',
+    updatedAt: '2024-05-20T07:33',
+    name: 'Welcome to my notes!',
+  },
+  {
+    name: 'Developer tools are different than tools for any other profession',
+    updatedAt: '2024-05-20T07:32',
+    href: 'https://mxstbr.com/notes/Developer+tools+are+different+than+tools+for+any+other+profession',
+  },
+  {
+    name: 'Developer tools startups are almost impossible',
+    updatedAt: '2024-05-20T07:31',
+    href: 'https://mxstbr.com/notes/Developer+tools+startups+are+almost+impossible',
+  },
+]
