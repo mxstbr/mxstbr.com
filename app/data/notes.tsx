@@ -2,14 +2,9 @@
 
 export const notes = [
   {
-    updatedAt: '2024-05-24T15:33',
-    name: '1-on-1 (template)',
-    href: 'https://mxstbr.com/notes/1-on-1+(template)',
-  },
-  {
-    updatedAt: '2024-05-24T15:33',
-    name: 'How I think about 1-on-1s',
-    href: 'https://mxstbr.com/notes/How+I+think+about+1-on-1s',
+    updatedAt: '2024-05-24T15:43',
+    name: 'Architectural Decision Record (ADR) Template',
+    href: 'https://mxstbr.com/notes/Architectural+Decision+Record+(ADR)+Template',
   },
   {
     updatedAt: '2024-05-20T07:31',
@@ -30,5 +25,15 @@ export const notes = [
     updatedAt: '2024-05-24T15:05',
     name: 'Kernel of good strategy (Template)',
     href: 'https://mxstbr.com/notes/Kernel+of+good+strategy+(Template)',
+  },
+  {
+    updatedAt: '2024-05-24T15:33',
+    name: '1-on-1 (template)',
+    href: 'https://mxstbr.com/notes/1-on-1+(template)',
+  },
+  {
+    updatedAt: '2024-05-24T15:33',
+    name: 'How I think about 1-on-1s',
+    href: 'https://mxstbr.com/notes/How+I+think+about+1-on-1s',
   },
 ]
