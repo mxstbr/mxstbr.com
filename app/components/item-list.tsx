@@ -10,7 +10,7 @@ export function ItemListItem(props) {
         className="w-full border-t border-slate-300 border-dashed dark:border-slate-500 min-w-4"
         style={{ flexShrink: 999999 }}
       ></span>
-      <div className="text-slate-600 text-right dark:text-slate-400 tabular-nums xs:shrink-0">
+      <div className="text-slate-600 text-right dark:text-slate-400 tabular-nums shrink-0">
         {props.right}
       </div>
     </li>

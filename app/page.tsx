@@ -118,13 +118,13 @@ export default async function Home() {
                 left={<Link href={project.href}>{project.name}</Link>}
                 right={
                   <div className="flex align-center">
-                    <div>{project.role}</div>
+                    <div className="hidden xs:block ">{project.role}</div>
+                    <div className="ml-4 w-[6em] text-slate-500 text-right tabular-nums shrink-0">
+                      {project.timeframe}
+                    </div>
                   </div>
                 }
               />
-              <div className="hidden xs:block ml-4 w-[6em] text-slate-500 text-right tabular-nums shrink-0">
-                {project.timeframe}
-              </div>
             </div>
           ))}
         </ItemList>
