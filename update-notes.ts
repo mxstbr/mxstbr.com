@@ -20,7 +20,7 @@ async function main() {
   )
 
   const notes = visibleNoteNames.map((name) => ({
-    updatedAt: data[name].frontmatter.updatedAt,
+    updatedAt: data[name].frontmatter.updated,
     name: name.replace(/\.md$/, ''),
     // Obsidian Publish just replaces spaces with +
     // @ref https://forum.obsidian.md/t/publish-support-for-lowercase-and-kebab-case-slugs-in-urls/32463
