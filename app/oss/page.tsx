@@ -60,8 +60,8 @@ export default async function OSS() {
           >
             to build over 1.2 million websites
           </a>
-          , including almost 10% of the top 10k most visited websites. These
-          open source projects have a total of{' '}
+          , including almost 10% of the top 10k. These open source projects have
+          a total of{' '}
           {repos
             .filter((repo) => repo.owner !== false)
             .reduce((total, repo) => total + repo.stargazerCount, 0)
