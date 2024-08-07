@@ -53,15 +53,15 @@ export default async function OSS() {
           <a href="https://npmtrends.com/styled-components">
             Millions of developers
           </a>{' '}
-          have used open source projects that I have (co-)created to build{' '}
+          have used open source projects that I have (co-)created{' '}
           <a
             href="https://trends.builtwith.com/framework/Styled-Components"
             target="_blank"
           >
-            over 1.2 million websites, including almost 10% of the top 10k most
-            visited websites
+            to build over 1.2 million websites
           </a>
-          . These open source projects have a total of{' '}
+          , including almost 10% of the top 10k most visited websites. These
+          open source projects have a total of{' '}
           {repos
             .filter((repo) => repo.owner !== false)
             .reduce((total, repo) => total + repo.stargazerCount, 0)
