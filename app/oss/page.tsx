@@ -42,7 +42,7 @@ export default async function OSS() {
       repos.map((repo) => ({
         ...ossProjects.find((project) => repo.nameWithOwner === project.repo),
         ...repo,
-      }))
+      })),
   )
 
   return (
@@ -50,8 +50,18 @@ export default async function OSS() {
       <Prose>
         <h2>Open Source Projects</h2>
         <p>
-          Open source projects I have (co-)created are used on more than 1% of
-          all public, crawlable websites and have a total of{' '}
+          <a href="https://npmtrends.com/styled-components">
+            Millions of developers
+          </a>{' '}
+          have used open source projects that I have (co-)created to build{' '}
+          <a
+            href="https://trends.builtwith.com/framework/Styled-Components"
+            target="_blank"
+          >
+            over 1.2 million websites, including almost 10% of the top 10k most
+            visited websites
+          </a>
+          . These open source projects have a total of{' '}
           {repos
             .filter((repo) => repo.owner !== false)
             .reduce((total, repo) => total + repo.stargazerCount, 0)
