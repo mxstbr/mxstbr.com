@@ -1,13 +1,13 @@
 export const investments = [
   {
     name: 'Fly.io',
-    description: 'a platform for running global apps',
+    description: 'a developer-focused cloud for deploying apps close to users',
     href: 'https://fly.io',
   },
 
   {
     name: 'Incident.io',
-    description: 'a platform for incident management and response',
+    description: 'the #1 platform for incident management',
     href: 'https://incident.io',
   },
 
@@ -19,25 +19,25 @@ export const investments = [
 
   {
     name: 'DX',
-    description: 'a developer experience platform',
+    description: 'the developer experience platform',
     href: 'https://getdx.com',
   },
 
   {
     name: 'Clerk',
-    description: 'a frontend-first user management solution',
+    description: 'a complete suite to authenticate and manage users',
     href: 'https://clerk.com',
   },
 
   {
     name: 'Upstash',
-    description: 'a database for the serverless world',
+    description: 'a data platform for the serverless world',
     href: 'https://upstash.com',
   },
 
   {
     name: 'Zed',
-    description: 'a text editor for the 21st century',
+    description: 'a high-performance, multiplayer code editor',
     href: 'https://zed.dev',
   },
 
@@ -48,21 +48,15 @@ export const investments = [
   },
 
   {
-    name: 'Arcjet',
-    description: 'a security layer for Node.js',
-    href: 'https://arcjet.com',
-  },
-
-  {
     name: 'Campsite',
     description: 'an all-in-one team communication app',
     href: 'https://campsite.co',
   },
 
   {
-    name: 'StackShare',
-    description: 'a system of record for tech stacks',
-    href: 'https://stackshare.com',
+    name: 'Arcjet',
+    description: 'a security layer for Node.js',
+    href: 'https://arcjet.com',
   },
 
   {
@@ -99,6 +93,12 @@ export const investments = [
     name: 'Fig (acq. by AWS)',
     description: 'a terminal for the 21st century',
     href: 'https://fig.io',
+  },
+
+  {
+    name: 'StackShare (acq. by Fossa)',
+    description: 'a system of record for tech stacks',
+    href: 'https://stackshare.io/posts/stackshare-is-now-part-of-fossa',
   },
 
   {
