@@ -22,7 +22,7 @@ export const notes = [
     href: 'https://mxstbr.com/notes/Developer+tools+startups+are+almost+impossible',
   },
   {
-    updatedAt: '2024-06-03T16:27',
+    updatedAt: '2024-08-09T16:54',
     name: 'Do checkin questions at the beginning of every meeting to encourage connection',
     href: 'https://mxstbr.com/notes/Do+checkin+questions+at+the+beginning+of+every+meeting+to+encourage+connection',
   },
@@ -42,7 +42,7 @@ export const notes = [
     href: 'https://mxstbr.com/notes/Recurring+meeting+notes+(Template)',
   },
   {
-    updatedAt: '2024-06-03T16:27',
+    updatedAt: '2024-08-09T16:57',
     name: 'Thoughts on using Obsidian for notes',
     href: 'https://mxstbr.com/notes/Thoughts+on+using+Obsidian+for+notes',
   },

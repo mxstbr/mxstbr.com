@@ -15,8 +15,12 @@ async function main() {
   const allNoteNames = Object.keys(data)
   const visibleNoteNames = allNoteNames.filter(
     // Filter out Images/headshot.jpeg if navigationHiddenItems: ["Images"]
+    // as well as publish.js, publish.css, etc. who have no data
     // NOTE: This can easily break.
-    (name) => !navigationHiddenItems.includes(name.split('/')[0]),
+    (name) =>
+      !navigationHiddenItems.includes(name.split('/')[0]) &&
+      data[name] !== null &&
+      !!data[name].frontmatter,
   )
 
   const notes = visibleNoteNames.map((name) => ({
