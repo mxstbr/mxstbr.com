@@ -30,15 +30,13 @@ One specific margin around a component cannot be ideal for all instances of the 
 
 #### 3. Margin conflicts with how designers think
 
-Defining margin in a component defines it globally for all instances of the component.
-
-But designers think about space in relation and context: they define how far a component should be from another component _in a specific layout/context_, not globally.
+Defining margin in a component defines it globally for all instances of the component. But designers think about space in relation and context: they define how far a component should be from another component _in a specific layout/context_, not globally.
 
 ## Use spacers instead
 
-Instead of margin I have started using spacers, either components and class names, which **move the responsibility of managing space to the parent-level.**
+Instead of margin I have started using spacers (either -components or -class names), which **move the responsibility of managing space to the parent-level.**
 
-For example, the Braid design system popularized the [`Stack` component](https://seek-oss.github.io/braid-design-system/components/Stack):
+For example, the Braid design system popularized the idea of a [`Stack` component](https://seek-oss.github.io/braid-design-system/components/Stack):
 
 ```jsx
 <Stack space={3}>
@@ -64,7 +62,7 @@ TailwindCSS popularized [space between](https://tailwindcss.com/docs/space) and 
 </div>
 ```
 
-Under the hood, they still use the `margin` CSS properties with a [lobotomized owl selector](https://alistapart.com/article/axiomatic-css-and-lobotomized-owls/) or the `gap` property (for flexbox and grid layouts):
+Under the hood, both spacer components and class names still use the `margin` CSS properties with a [lobotomized owl selector](https://alistapart.com/article/axiomatic-css-and-lobotomized-owls/) or the `gap` property (for flexbox and grid layouts):
 
 ```css
 .space-x-3 > * + * {
@@ -86,9 +84,7 @@ Spacers can restrict spacing values to steps on a scale. That way, all spacing a
 
 #### 2. Spacers force us to build more encapsulated, and thus reusable, components
 
-Spacers define how far a component should be from another component in a specific instance.
-
-They force you to define space in relation and context—instead of globally for all instances of a component at once.
+Spacers define how far a component should be from another component in a specific instance. They force you to define space in relation and context instead of globally for all instances of a component at once.
 
 #### 3. Spacers bring us closer to how designers think
 
