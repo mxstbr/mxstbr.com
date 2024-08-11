@@ -16,13 +16,11 @@ export const generateMetadata = generateMeta(meta)
 
 We should ban margin from our components. Hear me out.
 
-Margin breaks component encapsulation. A well-built component should not affect anything outside itself.
+1. Margin breaks component encapsulation. A well-built component should not affect anything outside itself.
 
-Margin makes reusability harder. Good components are usable in any context or layout.
+2. Margin makes reusability harder. Good components are usable in any context or layout.
 
-Margin conflicts with how designers think. Designers think about space in relation and context. They define how far a component should be from another component in a specific instance.
-
-By banning margin from all components you have to build more reusable and encapsulated components.
+3. Margin conflicts with how designers think. Designers think about space in relation and context, they define how far a component should be from another component _in a specific instance._
 
 ## Use spacer components or spacer class names
 
@@ -76,7 +74,9 @@ Spacers can restrict spacing values to steps on a scale. That way, all spacing a
 
 #### 2. Spacers force us to build more encapsulated, and thus reusable, components
 
-Spacers define how far a component should be from another component in a specific instance. They force you to define space in relation and context—instead of globally for all instances of a component at once.
+Spacers define how far a component should be from another component in a specific instance.
+
+They force you to define space in relation and context—instead of globally for all instances of a component at once.
 
 #### 3. Spacers bring us closer to how designers think
 
