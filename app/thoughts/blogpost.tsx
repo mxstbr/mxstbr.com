@@ -19,7 +19,7 @@ function generateOgImage(post) {
   if (post.metadata.image) return post.metadata.image
 
   return `${prodUrl}/og?title=${encodeURIComponent(
-    post.metadata.title
+    post.metadata.title,
   )}&subtitle=${
     post.metadata.views > 0
       ? `${post.metadata.views.toLocaleString(undefined, {
@@ -31,7 +31,7 @@ function generateOgImage(post) {
 
 export const generateMeta = (meta) => () => {
   let post = getBlogPosts({ archived: true, drafts: true }).find(
-    (post) => post.metadata.title === meta.title
+    (post) => post.metadata.title === meta.title,
   )
 
   if (!post) {
@@ -73,7 +73,7 @@ export const generateMeta = (meta) => () => {
 export default async function Blog({ meta, children }) {
   // Show drafts & archived posts if people have direct links to them
   const post = getBlogPosts({ drafts: true, archived: true }).find(
-    (post) => post.metadata.title === meta.title
+    (post) => post.metadata.title === meta.title,
   )
 
   if (!post) notFound()
@@ -90,7 +90,8 @@ export default async function Blog({ meta, children }) {
               '@type': 'BlogPosting',
               headline: post.metadata.title,
               datePublished: post.metadata.publishedAt,
-              dateModified: post.metadata.publishedAt,
+              dateModified:
+                post.metadata.updatedAt || post.metadata.publishedAt,
               description: post.metadata.summary,
               image: generateOgImage(post),
               url: `${prodUrl}/thoughts/${post.slug}`,
@@ -109,6 +110,14 @@ export default async function Blog({ meta, children }) {
             {post.metadata.state === 'draft'
               ? 'Unpublished draft'
               : formatDate(post.metadata.publishedAt)}
+            {post.metadata.updatedAt && (
+              <>
+                <span className="mx-1">&middot;</span>
+                <span className="text-slate-600 dark:text-slate-400">
+                  Updated {formatDate(post.metadata.updatedAt)}
+                </span>
+              </>
+            )}
           </p>
           {post.metadata.views > 0 && (
             <p className="text-sm text-slate-600 dark:text-slate-400">

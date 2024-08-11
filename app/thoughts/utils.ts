@@ -6,6 +6,7 @@ const META = /export\s+const\s+meta\s+=\s+(\{(\n|.)*?\n\})/
 type Metadata = {
   title: string
   publishedAt: string
+  updatedAt?: string
   summary: string
   state: 'draft' | 'published' | 'archived'
   views: number

@@ -7,7 +7,7 @@ export const prodUrl = 'https://mxstbr.com'
 export default async function sitemap() {
   let blogs = getBlogPosts({ archived: true }).map((post) => ({
     url: `${prodUrl}/thoughts/${post.slug}`,
-    lastModified: post.metadata.publishedAt,
+    lastModified: post.metadata.updatedAt || post.metadata.publishedAt,
   }))
 
   let notesPages = notes.map((note) => ({

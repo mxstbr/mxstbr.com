@@ -22,9 +22,10 @@ export async function GET() {
             escapeXml(escapeXml(post.metadata.summary || ''))
           }</description>
           <pubDate>${new Date(
-            post.metadata.publishedAt
+            post.metadata.publishedAt,
           ).toUTCString()}</pubDate>
-        </item>`
+          ${post.metadata.updatedAt ? `<lastBuildDate>${new Date(post.metadata.updatedAt).toUTCString()}</lastBuildDate>` : ''}
+        </item>`,
     )
     .join('\n')
 

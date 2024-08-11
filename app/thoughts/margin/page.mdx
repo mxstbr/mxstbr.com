@@ -3,9 +3,10 @@ import BlogPost from '../blogpost'
 export const meta = {
   state: 'published',
   publishedAt: '2020-03-24',
+  updatedAt: '2024-08-11',
   title: 'Margin considered harmful',
   summary: 'We should ban margin from our React components. Hear me out.',
-  views: 75823
+  views: 75823,
 }
 
 import { generateMeta } from '../blogpost'
@@ -23,9 +24,9 @@ Margin conflicts with how designers think. Designers think about space in relati
 
 By banning margin from all components you have to build more reusable and encapsulated components.
 
-## Moving responsibility
+## Use spacer components or classnames
 
-Instead of margin I have started using spacer components, which move the responsibility of managing space to the parent-level.
+Instead of margin I have started using spacers, either components and classnames, which move the responsibility of managing space to the parent-level.
 
 For example, the Braid design system popularized the [`Stack` component](https://seek-oss.github.io/braid-design-system/components/Stack):
 
@@ -37,17 +38,37 @@ For example, the Braid design system popularized the [`Stack` component](https:/
 </Stack>
 ```
 
-Using spacer components has implications that are not obvious _a priori_.
+TailwindCSS popularized ["space between" utility classnames](https://tailwindcss.com/docs/space) for both axis (`x` and `y`):
 
-Spacer components (such as `Stack` above) can restrict spacing values to steps on a scale. That way, all spacing automatically aligns to the grid.
+```jsx
+<div className="space-x-3">
+  <Item />
+  <Item />
+  <Item />
+</div>
+```
 
-Spacer components define how far a component should be from another component in a specific instance. You have to define space in relation and context.
+Under the hood, they still use the `margin` CSS properties, but apply them with a [lobotomized owl selector](https://alistapart.com/article/axiomatic-css-and-lobotomized-owls/):
+
+```css
+.space-x-3 > * + * {
+  margin-top: 0.75rem;
+}
+```
+
+### The benefits
+
+Using spacers has implications that are not obvious _a priori_.
+
+Spacers can restrict spacing values to steps on a scale. That way, all spacing automatically aligns to the grid.
+
+Spacers define how far a component should be from another component in a specific instance. They force you to define space in relation and context, instead of globally for all instances of a component at once.
 
 Who else thinks about space in relation and context? Designers.
 
-Spacer components bring us closer to how designers think. They make our designs more consistent and they force us to build more reusable and encapsulated components.
+So, spacers bring us closer to how designers think. They make our designs more consistent and they force us to build more reusable and encapsulated components.
 
-Use spacer components. Ban margin.
+Use spacers. Ban margin.
 
 ---
 
