@@ -27,6 +27,11 @@ export const notes = [
     href: 'https://mxstbr.com/notes/Do+checkin+questions+at+the+beginning+of+every+meeting+to+encourage+connection',
   },
   {
+    updatedAt: '2024-08-11T11:21',
+    name: "Don't compliment people for their talent",
+    href: "https://mxstbr.com/notes/Don't+compliment+people+for+their+talent",
+  },
+  {
     updatedAt: '2024-06-03T16:27',
     name: 'How I think about 1-on-1s',
     href: 'https://mxstbr.com/notes/How+I+think+about+1-on-1s',
