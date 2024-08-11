@@ -18,19 +18,21 @@ We should ban margin from our components.
 
 Hear me out.
 
-## The problems with using margins in component-based systems
+## The problems with using margins in a component
 
 #### 1. Margin breaks component encapsulation
 
 A component should not affect anything outside it's own visual boundaries. Defining margin inside a component adds “invisible” space outside the component's visual boundaries.
 
-#### 2. Margin makes reusability harder
+#### 2. Margin makes component reusability harder
 
 One specific margin around a component cannot be ideal for all instances of the component. Different layouts and contexts require different spacing.
 
 #### 3. Margin conflicts with how designers think
 
-Designers think about space in relation and context: they define how far a component should be from another component in a specific layout and context—not globally.
+Defining margin in a component defines it globally for all instances of the component.
+
+But designers think about space in relation and context: they define how far a component should be from another component _in a specific layout/context_, not globally.
 
 ## Use spacers instead
 
@@ -80,7 +82,7 @@ Using spacers has implications that are not obvious _a priori_.
 
 #### 1. Spacers keep our user interfaces consistent
 
-Spacers can restrict spacing values to steps on a scale. That way, all spacing automatically aligns to the grid.
+Spacers can restrict spacing values to steps on a scale. That way, all spacing automatically aligns to a grid and is consistent across our UIs.
 
 #### 2. Spacers force us to build more encapsulated, and thus reusable, components
 
@@ -92,7 +94,9 @@ They force you to define space in relation and context—instead of globally for
 
 Who else thinks about space in relation and context? Designers.
 
-So: Use spacers. Ban margin.
+---
+
+So: **Use spacers. Ban margin.**
 
 ---
 
