@@ -24,9 +24,9 @@ Margin conflicts with how designers think. Designers think about space in relati
 
 By banning margin from all components you have to build more reusable and encapsulated components.
 
-## Use spacer components or classnames
+## Use spacer components or spacer class names
 
-Instead of margin I have started using spacers, either components and classnames, which move the responsibility of managing space to the parent-level.
+Instead of margin I have started using spacers, either components and class names, which move the responsibility of managing space to the parent-level.
 
 For example, the Braid design system popularized the [`Stack` component](https://seek-oss.github.io/braid-design-system/components/Stack):
 
@@ -38,7 +38,7 @@ For example, the Braid design system popularized the [`Stack` component](https:/
 </Stack>
 ```
 
-TailwindCSS popularized [space between](https://tailwindcss.com/docs/space) and, for flexbox and grid, [gap](https://tailwindcss.com/docs/gap) utility classnames:
+TailwindCSS popularized [space between](https://tailwindcss.com/docs/space) and, for flexbox and grid, [gap](https://tailwindcss.com/docs/gap) utility class names:
 
 ```jsx
 <div className="space-x-3">
@@ -70,19 +70,19 @@ Under the hood, they still use the `margin` CSS properties with a [lobotomized o
 
 Using spacers has implications that are not obvious _a priori_.
 
+#### 1. Spacers keep our user interfaces consistent
+
 Spacers can restrict spacing values to steps on a scale. That way, all spacing automatically aligns to the grid.
 
-Spacers define how far a component should be from another component in a specific instance. They force you to define space in relation and context, instead of globally for all instances of a component at once.
+#### 2. Spacers force us to build more encapsulated, and thus reusable, components
+
+Spacers define how far a component should be from another component in a specific instance. They force you to define space in relation and context—instead of globally for all instances of a component at once.
+
+#### 3. Spacer brings us closer to how designers think
 
 Who else thinks about space in relation and context? Designers.
 
-So:
-
-1. Spacers bring us closer to how designers think
-2. Spacers make our designs more consistent by aligning all spacing to a grid
-3. Spacers force us to build more reusable and encapsulated components
-
-Use spacers. Ban margin.
+So: Use spacers. Ban margin.
 
 ---
 
