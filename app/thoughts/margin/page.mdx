@@ -14,17 +14,27 @@ export const generateMetadata = generateMeta(meta)
 
 <BlogPost meta={meta}>
 
-We should ban margin from our components. Hear me out.
+We should ban margin from our components.
 
-1. Margin breaks component encapsulation. A well-built component should not affect anything outside itself.
+Hear me out.
 
-2. Margin makes reusability harder. Good components are usable in any context or layout.
+## The problems with using margins in component-based systems
 
-3. Margin conflicts with how designers think. Designers think about space in relation and context, they define how far a component should be from another component _in a specific instance._
+#### 1. Margin breaks component encapsulation
 
-## Use spacer components or spacer class names
+A component should not affect anything outside it's own visual boundaries. Defining margin inside a component adds “invisible” space outside the component's visual boundaries.
 
-Instead of margin I have started using spacers, either components and class names, which move the responsibility of managing space to the parent-level.
+#### 2. Margin makes reusability harder
+
+One specific margin around a component cannot be ideal for all instances of the component. Different layouts and contexts require different spacing.
+
+#### 3. Margin conflicts with how designers think
+
+Designers think about space in relation and context: they define how far a component should be from another component in a specific layout and context—not globally.
+
+## Use spacers instead
+
+Instead of margin I have started using spacers, either components and class names, which **move the responsibility of managing space to the parent-level.**
 
 For example, the Braid design system popularized the [`Stack` component](https://seek-oss.github.io/braid-design-system/components/Stack):
 
@@ -36,7 +46,7 @@ For example, the Braid design system popularized the [`Stack` component](https:/
 </Stack>
 ```
 
-TailwindCSS popularized [space between](https://tailwindcss.com/docs/space) and, for flexbox and grid, [gap](https://tailwindcss.com/docs/gap) utility class names:
+TailwindCSS popularized [space between](https://tailwindcss.com/docs/space) and [gap](https://tailwindcss.com/docs/gap) (for flexbox and grid) utility class names:
 
 ```jsx
 <div className="space-x-3">
@@ -52,7 +62,7 @@ TailwindCSS popularized [space between](https://tailwindcss.com/docs/space) and,
 </div>
 ```
 
-Under the hood, they still use the `margin` CSS properties with a [lobotomized owl selector](https://alistapart.com/article/axiomatic-css-and-lobotomized-owls/) or use the `gap` property with flexbox and grid layouts:
+Under the hood, they still use the `margin` CSS properties with a [lobotomized owl selector](https://alistapart.com/article/axiomatic-css-and-lobotomized-owls/) or the `gap` property (for flexbox and grid layouts):
 
 ```css
 .space-x-3 > * + * {
@@ -64,7 +74,7 @@ Under the hood, they still use the `margin` CSS properties with a [lobotomized o
 }
 ```
 
-### The benefits
+### The benefits of spacers
 
 Using spacers has implications that are not obvious _a priori_.
 
