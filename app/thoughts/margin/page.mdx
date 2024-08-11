@@ -38,7 +38,7 @@ For example, the Braid design system popularized the [`Stack` component](https:/
 </Stack>
 ```
 
-TailwindCSS popularized ["space between" utility classnames](https://tailwindcss.com/docs/space) for both axis (`x` and `y`):
+TailwindCSS popularized [space between](https://tailwindcss.com/docs/space) and, for flexbox and grid, [gap](https://tailwindcss.com/docs/gap) utility classnames:
 
 ```jsx
 <div className="space-x-3">
@@ -46,13 +46,23 @@ TailwindCSS popularized ["space between" utility classnames](https://tailwindcss
   <Item />
   <Item />
 </div>
+
+<div className="gap-3 flex">
+  <Item />
+  <Item />
+  <Item />
+</div>
 ```
 
-Under the hood, they still use the `margin` CSS properties, but apply them with a [lobotomized owl selector](https://alistapart.com/article/axiomatic-css-and-lobotomized-owls/):
+Under the hood, they still use the `margin` CSS properties with a [lobotomized owl selector](https://alistapart.com/article/axiomatic-css-and-lobotomized-owls/) or use the `gap` property with flexbox and grid layouts:
 
 ```css
 .space-x-3 > * + * {
   margin-top: 0.75rem;
+}
+
+.gap-3 {
+  gap: 0.75rem;
 }
 ```
 
