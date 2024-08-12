@@ -6,12 +6,16 @@ module.exports = {
       screens: {
         xs: '500px',
       },
+      colors: {
+        'slate-350': '#B0BCCD',
+      },
       typography: ({ theme }) => ({
         // "slate" has to match components/prose.tsx
         slate: {
           css: {
             a: {
               fontWeight: 'inherit',
+              color: 'inherit',
             },
             code: {
               fontWeight: 'inherit',
