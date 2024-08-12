@@ -78,17 +78,17 @@ Under the hood, both spacer components and class names still use the `margin` CS
 
 Moving the responsibility of managing space to the parent-level has benefits that aren't obvious.
 
-#### 1. Spacers keep our spacing consistent
+#### 1. Spacers force us to build more encapsulated, and thus reusable, components
+
+Using spacers means none of your components define their own margins. Instead, you exclusively define how far a component should be from another component in a specific instance with a spacer.
+
+#### 2. Spacers bring us closer to how designers think
+
+Spacers force you to define space in relation and context instead of globally for all instances of a component at once. Who else thinks about space in relation and context? Designers.
+
+#### 3. Bonus: Spacers keep our spacing consistent
 
 Spacers can restrict spacing values to steps on a scale. (e.g., `space-x-3` -> `margin-left: 0.75rem`) That way, all spacing automatically aligns to a grid and is consistent.
-
-#### 2. Spacers force us to build more encapsulated, and thus reusable, components
-
-Spacers define how far a component should be from another component in a specific instance. They force you to define space in relation and context instead of globally for all instances of a component at once.
-
-#### 3. Spacers bring us closer to how designers think
-
-Who else thinks about space in relation and context? Designers.
 
 So: **Use spacers. Ban margin.**
 
