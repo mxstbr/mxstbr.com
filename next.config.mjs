@@ -33,15 +33,6 @@ const nextConfig = {
         source: '/_sb/:slug',
         destination: 'https://hive.splitbee.io/:slug',
       },
-      {
-        source: '/notes',
-        destination: 'https://publish.obsidian.md/serve?url=mxstbr.com/notes',
-      },
-      {
-        source: '/notes/:path*',
-        destination:
-          'https://publish.obsidian.md/serve?url=mxstbr.com/notes/:path*',
-      },
     ]
   },
 }
