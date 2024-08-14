@@ -9,6 +9,9 @@ import { formatDate } from '../../thoughts/utils'
 import { size } from '../../og/utils'
 import { getNote, getNotes } from '../../github'
 
+// Generate all notes pages statically
+export const dynamicParams = false
+export const dynamic = 'force-static'
 export async function generateStaticParams() {
   return (await getNotes()).map((note) => note.frontmatter.slug)
 }
