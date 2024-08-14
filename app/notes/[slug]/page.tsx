@@ -23,7 +23,10 @@ export async function generateMetadata({ params }) {
     publishedAt: publishedTime,
     summary: description,
   } = note.frontmatter
-  let ogImage = generateOgImage(note.frontmatter.title)
+  let ogImage = generateOgImage(
+    note.frontmatter.title,
+    note.frontmatter.publishedAt,
+  )
 
   return {
     title,
@@ -81,7 +84,7 @@ export default async function Page({ params }) {
             datePublished: frontmatter.publishedAt,
             dateModified: frontmatter.updatedAt || frontmatter.publishedAt,
             description: frontmatter.summary,
-            image: generateOgImage(frontmatter.title),
+            image: generateOgImage(frontmatter.title, frontmatter.publishedAt),
             url: `${prodUrl}/notes/${params.slug}`,
             author: {
               '@type': 'Person',
@@ -113,6 +116,6 @@ export default async function Page({ params }) {
   )
 }
 
-function generateOgImage(title) {
-  return `${prodUrl}/og?title=${encodeURIComponent(title)}&subtitle=Note`
+function generateOgImage(title: string, publishedAt: string) {
+  return `${prodUrl}/og?title=${encodeURIComponent(title)}&subtitle=Note published on ${formatDate(publishedAt)}`
 }
