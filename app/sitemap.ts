@@ -1,6 +1,6 @@
 import { getBlogPosts } from 'app/thoughts/utils'
 import { navItems } from './components/nav'
-import { notes } from './data/notes'
+import { getNotes } from './github'
 
 export const prodUrl = 'https://mxstbr.com'
 
@@ -10,9 +10,11 @@ export default async function sitemap() {
     lastModified: post.metadata.updatedAt || post.metadata.publishedAt,
   }))
 
+  const notes = await getNotes()
+
   let notesPages = notes.map((note) => ({
-    url: note.href,
-    lastModified: note.updatedAt,
+    url: `${prodUrl}/notes/${note.frontmatter.slug}`,
+    lastModified: note.frontmatter.updatedAt || note.frontmatter.publishedAt,
   }))
 
   let routes = ['', ...Object.keys(navItems)].map((route) => ({

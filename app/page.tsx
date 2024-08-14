@@ -4,11 +4,13 @@ import Link from 'next/link'
 import { ItemList, ItemListItem } from './components/item-list'
 import { formatDate } from './thoughts/utils'
 import ExternalLink from 'react-feather/dist/icons/external-link'
-import { notes } from './data/notes'
+import { getNotes } from './github'
 
 export const revalidate = 3600 // revalidate every hour
 
 export default async function Home() {
+  const notes = await getNotes()
+
   return (
     <div className="space-y-20">
       <Section title="TL;DR">
@@ -70,39 +72,34 @@ export default async function Home() {
         </Section>
       </div>
 
-      <Section
-        title={
-          <a
-            href="/notes"
-            target="_blank"
-            className="flex flex-row items-center no-underline hover:underline"
-          >
-            Notes <ExternalLink size={16} className="ml-2" />
-          </a>
-        }
-      >
+      <Section title="Notes">
         <ItemList>
           {notes
-            .filter(
-              (note) =>
-                note.href !== 'https://mxstbr.com/notes/Welcome+to+my+notes!',
-            )
             .sort(
               (a, b) =>
-                new Date(b.updatedAt).getTime() -
-                new Date(a.updatedAt).getTime(),
+                new Date(
+                  b.frontmatter.updatedAt || b.frontmatter.publishedAt,
+                ).getTime() -
+                new Date(
+                  a.frontmatter.updatedAt || a.frontmatter.publishedAt,
+                ).getTime(),
             )
             .map((note) => (
               <ItemListItem
-                key={note.href}
+                key={note.frontmatter.slug}
                 left={
-                  <a target="_blank" href={note.href}>
-                    {note.name}
-                  </a>
+                  <Link href={`/notes/${note.frontmatter.slug}`}>
+                    {note.frontmatter.title}
+                  </Link>
                 }
                 right={
                   <div className="flex align-center">
-                    <div>{formatDate(note.updatedAt)}</div>
+                    <div>
+                      {formatDate(
+                        note.frontmatter.updatedAt ||
+                          note.frontmatter.publishedAt,
+                      )}
+                    </div>
                   </div>
                 }
               />
