@@ -90,9 +90,10 @@ export async function getNotes(): Promise<Array<Note>> {
   return Object.keys(files)
     .filter((filename) => filename.endsWith('.md'))
     .map((filename) => {
-      if (!files[filename] || !files[filename].content) throw new Error('wtf')
+      const file = files[filename]
+      if (!file || !file.content) throw new Error('wtf')
 
-      const { data, content } = matter(files[filename].content)
+      const { data, content } = matter(file.content)
       return {
         frontmatter: {
           ...data,
