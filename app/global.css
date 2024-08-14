@@ -45,10 +45,14 @@ html {
   }
 }
 
-.prose a,
 a {
   @apply underline decoration-slate-300 decoration-2 hover:decoration-slate-350;
   @apply dark:decoration-slate-600 dark:hover:decoration-slate-500;
+}
+
+.prose a {
+  @apply underline decoration-slate-400 decoration-2 hover:decoration-slate-500;
+  @apply dark:decoration-slate-500 dark:hover:decoration-slate-400;
 }
 
 .prose .anchor {
