@@ -95,14 +95,10 @@ export default async function Page({ params }) {
         }}
       />
 
-      <div className="bg-slate-100 border-slate-200 border dark:bg-yellow-900 text-slate-700 dark:text-yellow-100 p-4 rounded-lg mb-8">
-        💡 The below is a <strong>note</strong>: my notes aren't as polished as
-        my essays, but they are developed enough for me to share.
-      </div>
       <h1 className="title font-bold text-4xl mb-2">{frontmatter.title}</h1>
       <div className="flex items-center space-x-6 mb-8 text-sm">
         <p className="text-sm text-slate-600 dark:text-slate-400">
-          {formatDate(frontmatter.publishedAt)}
+          Note published on {formatDate(frontmatter.publishedAt)}
           {frontmatter.updatedAt && (
             <>
               <span className="mx-1">&middot;</span>
