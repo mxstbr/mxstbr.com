@@ -1,9 +1,4 @@
-import { Octokit } from '@octokit/rest'
 import matter from 'gray-matter'
-
-const octokit = new Octokit({
-  auth: process.env.GITHUB_ACCESS_TOKEN,
-})
 
 /**
  * Repositories
@@ -57,17 +52,22 @@ export async function getRepos(repos: Array<string>): Promise<Array<Repo>> {
 const NOTES_GIST_ID = '29f4eebada6196debb1b085a844e49aa'
 
 export async function getGistFiles() {
-  const response = await octokit.gists.get({
-    gist_id: NOTES_GIST_ID,
+  const data = await fetch({
+    url: `https://api.github.com/gists/${NOTES_GIST_ID}`,
+    method: 'GET',
+    // @ts-ignore
+    next: { revalidate: 300 },
+  }).then((res) => {
+    if (!res.ok) throw new Error('Failed to fetch gists.')
+
+    return res.json()
   })
 
-  const { files } = response.data
-
-  if (!files || response.status !== 200) {
+  if (!data.files) {
     throw new Error('Could not get gist.')
   }
 
-  return files
+  return data.files
 }
 
 type Frontmatter = {
