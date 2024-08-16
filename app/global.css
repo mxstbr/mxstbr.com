@@ -69,6 +69,10 @@ a {
   @apply visible;
 }
 
+.prose li p {
+  margin: 0;
+}
+
 pre::-webkit-scrollbar {
   display: none;
 }

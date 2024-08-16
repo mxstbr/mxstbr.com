@@ -3,7 +3,6 @@ import Image from 'next/image'
 import { codeToHtml } from 'shiki/bundle/web'
 import React from 'react'
 import { MDXComponents } from 'mdx/types'
-import Prose from 'app/components/prose'
 
 function Table({ data }) {
   let headers = data.headers.map((header, index) => (
