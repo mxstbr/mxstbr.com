@@ -51,24 +51,34 @@ export async function getRepos(repos: Array<string>): Promise<Array<Repo>> {
 
 const NOTES_GIST_ID = '29f4eebada6196debb1b085a844e49aa'
 
-export async function getGistFiles() {
-  const data = await fetch({
-    url: `https://api.github.com/gists/${NOTES_GIST_ID}`,
-    method: 'GET',
-    // @ts-ignore
-    next: { revalidate: 300 },
-  }).then((res) => {
-    if (!res.ok) throw new Error('Failed to fetch gists.')
-
-    return res.json()
-  })
-
-  if (!data.files) {
-    throw new Error('Could not get gist.')
+const GET_POSTS_QUERY = /* GraphQL */ `
+  {
+    publication(host: "mxstbr.com/notes") {
+      id
+      posts(first: 50) {
+        edges {
+          node {
+            id
+            slug
+            title
+            coverImage {
+              url
+            }
+            content {
+              markdown
+            }
+            publishedAt
+            updatedAt
+            seo {
+              title
+              description
+            }
+          }
+        }
+      }
+    }
   }
-
-  return data.files
-}
+`
 
 type Frontmatter = {
   title: string
@@ -84,41 +94,33 @@ type Note = {
 }
 
 export async function getNotes(): Promise<Array<Note>> {
-  const files = await getGistFiles()
+  const { data } = await fetch(`https://gql.hashnode.com`, {
+    method: 'POST',
+    headers: {
+      Authorization: `c15db134-2e49-4ecd-8843-d88e8222aa52`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      query: GET_POSTS_QUERY,
+    }),
+  }).then((res) => res.json())
 
-  // @ts-ignore
-  return Object.keys(files)
-    .filter((filename) => filename.endsWith('.md'))
-    .map((filename) => {
-      const file = files[filename]
-      if (!file || !file.content) throw new Error('wtf')
-
-      const { data, content } = matter(file.content)
-      return {
-        frontmatter: {
-          ...data,
-          slug: filename.replace('.md', ''),
-        },
-        content,
-      }
-    })
+  return data.publication.posts.edges.map(({ node: post }) => ({
+    frontmatter: {
+      title: post.title,
+      summary: post.seo.description,
+      slug: post.slug,
+      publishedAt: post.publishedAt,
+      updatedAt: post.updatedAt,
+    },
+    content: post.content.markdown,
+  }))
 }
 
 export async function getNote(
   slug,
 ): Promise<{ content: string; frontmatter: Frontmatter } | null> {
-  const files = await getGistFiles()
-  const file = files[slug + '.md']
-  if (!file || !file.content) return null
+  const notes = await getNotes()
 
-  const { data, content } = matter(file.content)
-
-  return {
-    // @ts-ignore
-    frontmatter: {
-      ...data,
-      slug,
-    },
-    content,
-  }
+  return notes.find((note) => note.frontmatter.slug === slug) || null
 }
