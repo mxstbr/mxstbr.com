@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { ItemList, ItemListItem } from './components/item-list'
 import { formatDate } from './thoughts/utils'
 import ExternalLink from 'react-feather/dist/icons/external-link'
-import { getNotes } from './github'
+import { getNotes } from './data/notes'
 
 export const revalidate = 3600 // revalidate every hour
 

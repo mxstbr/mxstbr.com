@@ -1,6 +1,6 @@
 import { getBlogPosts } from 'app/thoughts/utils'
 import { navItems } from './components/nav'
-import { getNotes } from './github'
+import { getNotes } from './data/notes'
 
 export const prodUrl = 'https://mxstbr.com'
 
