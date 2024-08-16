@@ -8,6 +8,7 @@ import { prodUrl } from '../../sitemap'
 import { formatDate } from '../../thoughts/utils'
 import { size } from '../../og/utils'
 import { getNote, getNotes } from '../../github'
+import { useMDXComponents } from '../../../mdx-components'
 
 export async function generateStaticParams() {
   return (await getNotes()).map((note) => note.frontmatter.slug)
@@ -68,6 +69,8 @@ export default async function Page({ params }) {
     {
       ...runtime,
       remarkPlugins: [remarkSmartypants, remarkGfm],
+      // @ts-ignore
+      useMDXComponents: useMDXComponents,
     },
   )
 

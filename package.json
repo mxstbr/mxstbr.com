@@ -34,7 +34,7 @@
     "react-tweet": "^3.2.1",
     "remark-gfm": "^4.0.0",
     "remark-smartypants": "^3.0.1",
-    "sugar-high": "^0.6.0",
+    "shiki": "^1.13.0",
     "tsm": "^2.3.0",
     "typescript": "5.3.3"
   },

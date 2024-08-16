@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { highlight } from 'sugar-high'
+import { codeToHtml } from 'shiki/bundle/web'
 import React from 'react'
 import { MDXComponents } from 'mdx/types'
 import Prose from 'app/components/prose'
@@ -49,8 +49,21 @@ function RoundedImage(props) {
   return <Image alt={props.alt} className="rounded-lg" {...props} />
 }
 
-function Code({ children, ...props }) {
-  let codeHTML = highlight(children)
+async function Code({ children, ...props }) {
+  const lang = props.className?.replace('language-', '')
+  let codeHTML = lang
+    ? await codeToHtml(children, {
+        structure: 'inline',
+        lang,
+        themes: {
+          light: 'solarized-light',
+          dark: 'solarized-dark',
+        },
+        colorReplacements: {
+          '#fdf6e3': 'var(--tw-prose-pre-bg)',
+        },
+      })
+    : children
   return <code dangerouslySetInnerHTML={{ __html: codeHTML }} {...props} />
 }
 
@@ -78,7 +91,7 @@ function createHeading(level) {
           className: 'anchor',
         }),
       ],
-      children
+      children,
     )
   }
 
