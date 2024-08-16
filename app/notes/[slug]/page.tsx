@@ -7,7 +7,7 @@ import Prose from '../../components/prose'
 import { prodUrl } from '../../sitemap'
 import { formatDate } from '../../thoughts/utils'
 import { size } from '../../og/utils'
-import { getNote, getNotes } from '../../github'
+import { getNote, getNotes } from '../../data/notes'
 import { useMDXComponents } from '../../../mdx-components'
 
 export async function generateStaticParams() {
