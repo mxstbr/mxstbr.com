@@ -90,12 +90,7 @@ export default async function Home() {
                 }
                 right={
                   <div className="flex align-center">
-                    <div>
-                      {formatDate(
-                        note.frontmatter.updatedAt ||
-                          note.frontmatter.publishedAt,
-                      )}
-                    </div>
+                    <div>{formatDate(note.frontmatter.publishedAt)}</div>
                   </div>
                 }
               />
