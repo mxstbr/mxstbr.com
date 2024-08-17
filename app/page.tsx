@@ -77,12 +77,8 @@ export default async function Home() {
           {notes
             .sort(
               (a, b) =>
-                new Date(
-                  b.frontmatter.updatedAt || b.frontmatter.publishedAt,
-                ).getTime() -
-                new Date(
-                  a.frontmatter.updatedAt || a.frontmatter.publishedAt,
-                ).getTime(),
+                new Date(b.frontmatter.publishedAt).getTime() -
+                new Date(a.frontmatter.publishedAt).getTime(),
             )
             .map((note) => (
               <ItemListItem
