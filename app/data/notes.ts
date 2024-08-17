@@ -52,7 +52,9 @@ export async function getNotes(): Promise<Array<Note>> {
     body: JSON.stringify({
       query: GET_POSTS_QUERY,
     }),
-    cache: 'no-store',
+    next: {
+      revalidate: 300,
+    },
   }).then((res) => res.json())
 
   return data.publication.posts.edges.map(({ node: post }) => ({
