@@ -3,8 +3,8 @@ import { investments } from './investing/investments'
 import Link from 'next/link'
 import { ItemList, ItemListItem } from './components/item-list'
 import { formatDate } from './thoughts/utils'
-import ExternalLink from 'react-feather/dist/icons/external-link'
 import { getNotes } from './data/notes'
+import StellateIcon from './components/stellate-icon'
 
 export const revalidate = 3600 // revalidate every hour
 
@@ -22,7 +22,7 @@ export default async function Home() {
                 the GraphQL CDN
               </>
             }
-            right={`⚡`}
+            right={<StellateIcon height="1em" />}
           ></ItemListItem>
           <ItemListItem
             left={
@@ -31,7 +31,7 @@ export default async function Home() {
                 used by millions
               </>
             }
-            right={`💻`}
+            right={`💅`}
           ></ItemListItem>
           <ItemListItem
             left={
@@ -40,7 +40,7 @@ export default async function Home() {
                 {investments.length}+ startups
               </>
             }
-            right={`🚀`}
+            right={`👼`}
           ></ItemListItem>
           <ItemListItem
             left={
