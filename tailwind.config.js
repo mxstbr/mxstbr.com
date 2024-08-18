@@ -26,6 +26,7 @@ module.exports = {
             '--tw-prose-pre-code': theme('colors.black'),
             '--tw-prose-invert-pre-bg': theme('colors.slate.900'),
             '--tw-prose-invert-pre-code': theme('colors.white'),
+            '--tw-prose-quotes': 'var(--tw-prose-body)',
           },
         },
       }),
