@@ -3,23 +3,46 @@ import Link from 'next/link'
 import { getNotes } from '../data/notes'
 import { formatDate } from '../thoughts/utils'
 import Prose from '../components/prose'
+import Tag from 'react-feather/dist/icons/tag'
 
 export default async function WritingPage() {
   const notes = await getNotes()
 
+  const allTags = notes.flatMap((note) => note.frontmatter.tags)
+  const tags = [
+    // @ts-ignore
+    ...new Map(allTags.map((tag) => [tag.slug, tag])).values(),
+  ]
+
   return (
     <div className="space-y-12">
       <Prose>
-        <h2>Notes</h2>
+        <h1>Notes</h1>
         <p>
           The below is my{' '}
           <Link href="/notes/digital-garden">digital garden</Link>, my
-          collection of links, notes and explorations that I'm actively tending
-          to. They're either still budding or they're too small as a standalone
+          collection of notes and explorations that I'm actively tending to.
+          They're either still budding or they're too small as a standalone
           essay. For my evergreen, refined thoughts check out my{' '}
           <Link href="/">essays</Link>.
         </p>
       </Prose>
+      <h2 className="font-bold text-2xl">By Topic</h2>
+      <ul className="grid grid-cols-2 gap-2">
+        {tags.map((tag) => {
+          return (
+            <li key={tag.slug} className="bg-white shadow-sm p-2">
+              <Link
+                href={`/notes/topics/${tag.slug}`}
+                className="flex flex-row gap-1 items-center"
+              >
+                <Tag size="0.8em" className="mt-1" /> {tag.name}
+              </Link>
+            </li>
+          )
+        })}
+      </ul>
+      <h2 className="font-bold text-2xl">All Notes</h2>
       <ul className="space-y-4">
         {notes
           .sort(
@@ -36,7 +59,13 @@ export default async function WritingPage() {
                 <Link href={`/notes/${note.frontmatter.slug}`}>
                   {note.frontmatter.title}
                 </Link>
-                {/* <p className="text-slate-500">{note.frontmatter.summary}</p> */}
+                {/* <div className="text-slate-500 flex flex-row gap-4 items-center">
+                  {note.frontmatter.tags?.map((tag) => (
+                    <span className="flex flex-row gap-1 items-center">
+                      <Tag size="0.8em" className="mt-1" /> {tag.slug}
+                    </span>
+                  ))}
+                </div> */}
               </div>
             </li>
           ))}

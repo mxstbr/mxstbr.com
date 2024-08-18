@@ -24,6 +24,11 @@ const GET_POSTS_QUERY = /* GraphQL */ `
               title
               description
             }
+            tags {
+              id
+              name
+              slug
+            }
           }
         }
       }
@@ -36,6 +41,10 @@ type Frontmatter = {
   slug: string
   publishedAt: string
   updatedAt?: string
+  tags?: Array<{
+    name: string
+    slug: string
+  }>
 }
 type Note = {
   frontmatter: Frontmatter
@@ -64,6 +73,15 @@ export async function getNotes(): Promise<Array<Note>> {
       slug: post.slug,
       publishedAt: post.publishedAt,
       updatedAt: post.updatedAt,
+      tags: post.tags.map((tag) => ({
+        slug: tag.slug,
+        // Hashnode has inconsistent tag name capitalization, so I manually capitalize each word
+        name: tag.name
+          .trim()
+          .split(' ')
+          .map((word) => word[0].toUpperCase() + word.substring(1))
+          .join(' '),
+      })),
     },
     content: post.content.markdown,
   }))

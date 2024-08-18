@@ -48,7 +48,7 @@ export default async function OSS() {
   return (
     <div className="space-y-12">
       <Prose>
-        <h2>Open Source Projects</h2>
+        <h1>Open Source Projects</h1>
         <p>
           <a href="https://npmtrends.com/styled-components">
             Millions of developers
