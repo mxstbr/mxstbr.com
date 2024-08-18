@@ -12,6 +12,7 @@ import { getNote, getNotes } from '../../data/notes'
 import { useMDXComponents } from '../../../mdx-components'
 import Link from 'next/link'
 import ArrowLeft from 'react-feather/dist/icons/arrow-left'
+import Tag from 'react-feather/dist/icons/tag'
 
 export async function generateStaticParams() {
   return (await getNotes()).map((note) => note.frontmatter.slug)
@@ -58,7 +59,8 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function Page({ params }) {
-  const note = await getNote(params.slug)
+  const notes = await getNotes()
+  const note = notes.find((note) => note.frontmatter.slug === params.slug)
 
   if (!note) return notFound()
 
@@ -75,6 +77,12 @@ export default async function Page({ params }) {
       // @ts-ignore
       useMDXComponents: useMDXComponents,
     },
+  )
+
+  const relatedNotes = notes.filter((maybeRelatedNote) =>
+    maybeRelatedNote.frontmatter.tags?.some((tag) =>
+      note.frontmatter.tags?.map((tag) => tag.slug).includes(tag.slug),
+    ),
   )
 
   return (
@@ -105,27 +113,80 @@ export default async function Page({ params }) {
         href="/notes"
         className="flex flex-row items-center gap-2 uppercase text-sm font-bold tracking-wider  no-underline hover:underline"
       >
-        <ArrowLeft size="1em" /> Notes
+        <ArrowLeft size="1em" /> All Notes
       </Link>
       <h1 className="title font-bold text-4xl mt-6 mb-3">
         {frontmatter.title}
       </h1>
-      <div className="flex items-center space-x-6 mb-6">
-        <p className="text-md text-slate-600 dark:text-slate-400">
+      <div className="text-md flex items-center flex-wrap space-x-4 mb-6 text-slate-600 dark:text-slate-400">
+        <span>
           {formatDate(frontmatter.publishedAt)}
-          {frontmatter.updatedAt && (
-            <>
-              <span className="mx-1">&middot;</span>
-              <span className="text-slate-600 dark:text-slate-400">
-                Updated {formatDate(frontmatter.updatedAt)}
-              </span>
-            </>
-          )}
-        </p>
+          {frontmatter.updatedAt &&
+            formatDate(frontmatter.updatedAt) !==
+              formatDate(frontmatter.publishedAt) && (
+              <> (updated {formatDate(frontmatter.updatedAt)})</>
+            )}
+        </span>
+        {frontmatter.tags?.length && frontmatter.tags?.length > 0 && (
+          <>
+            <span>|</span>
+            {frontmatter.tags?.map((tag) => (
+              <Link
+                href={`/notes/topics/${tag.slug}`}
+                className="flex flex-row gap-1 items-center"
+              >
+                <Tag size="0.8em" className="text-slate-500" />
+                {tag.name}
+              </Link>
+            ))}
+          </>
+        )}
       </div>
       <Prose className="prose-lg">
         <MDXContent />
+        <hr />
       </Prose>
+      {relatedNotes.length > 0 && (
+        <div>
+          <h1 className="text-2xl font-bold mt-12 mb-8">
+            Related Notes about{' '}
+            {note.frontmatter.tags?.map((tag) => tag.name).join(' & ')}
+          </h1>
+          <ul className="space-y-4">
+            {relatedNotes
+              .sort(
+                (a, b) =>
+                  new Date(b.frontmatter.publishedAt).getTime() -
+                  new Date(a.frontmatter.publishedAt).getTime(),
+              )
+              .map((note) => (
+                <li
+                  key={note.frontmatter.slug}
+                  className="flex flex-row space-x-4"
+                >
+                  <div className="w-32 font-mono shrink-0 tabular-nums text-slate-500">
+                    {formatDate(note.frontmatter.publishedAt)}
+                  </div>
+                  <div className="space-y-1">
+                    <Link href={`/notes/${note.frontmatter.slug}`}>
+                      {note.frontmatter.title}
+                    </Link>
+                    <p className="text-slate-500 flex flex-row gap-4">
+                      {note.frontmatter.tags?.map((tag) => (
+                        <Link
+                          href={`/notes/topics/${tag.slug}`}
+                          className="flex flex-row items-center gap-2 no-underline hover:underline"
+                        >
+                          <Tag size="0.8em" /> {tag.name}
+                        </Link>
+                      ))}
+                    </p>
+                  </div>
+                </li>
+              ))}
+          </ul>
+        </div>
+      )}
     </section>
   )
 }

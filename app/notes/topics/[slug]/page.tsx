@@ -1,9 +1,10 @@
 import React from 'react'
 import Link from 'next/link'
+import { notFound } from 'next/navigation'
+import ArrowLeft from 'react-feather/dist/icons/arrow-left'
 import Prose from '../../../components/prose'
 import { getNotes } from '../../../data/notes'
 import { formatDate } from '../../../thoughts/utils'
-import { notFound } from 'next/navigation'
 
 export default async function Page({ params }) {
   const allNotes = await getNotes()
@@ -20,10 +21,18 @@ export default async function Page({ params }) {
 
   return (
     <div className="space-y-8">
-      <Prose>
-        <h1>{tag.name}</h1>
-        <p>Notes and explorations related to {tag.name}.</p>
-      </Prose>
+      <div>
+        <Link
+          href="/notes"
+          className="flex flex-row items-center gap-2 uppercase text-sm font-bold tracking-wider no-underline hover:underline"
+        >
+          <ArrowLeft size="1em" /> All Notes
+        </Link>
+        <h1 className="my-6 text-4xl font-bold">{tag.name}</h1>
+        <Prose>
+          <p>Notes and explorations related to {tag.name}.</p>
+        </Prose>
+      </div>
       <ul className="space-y-4">
         {notes
           .sort(
