@@ -73,6 +73,10 @@ a {
   margin: 0;
 }
 
+mark {
+  @apply bg-yellow-100 text-yellow-950 dark:bg-yellow-950 dark:text-yellow-200;
+}
+
 pre::-webkit-scrollbar {
   display: none;
 }
