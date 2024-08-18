@@ -1,10 +1,11 @@
 import { prodUrl } from 'app/sitemap'
 import { getBlogPosts } from 'app/thoughts/utils'
+import { getNotes } from '../data/notes'
 
 export async function GET() {
   let allBlogs = await getBlogPosts({ archived: true })
 
-  const itemsXml = allBlogs
+  const blogXml = allBlogs
     .sort((a, b) => {
       if (new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)) {
         return -1
@@ -29,6 +30,28 @@ export async function GET() {
     )
     .join('\n')
 
+  const notes = await getNotes()
+  const notesXml = notes
+    .sort(
+      (a, b) =>
+        new Date(b.frontmatter.publishedAt).getTime() -
+        new Date(a.frontmatter.publishedAt).getTime(),
+    )
+    .map(
+      (note) => `<item>
+      <title>${note.frontmatter.title}</title>
+      <link>${prodUrl}/notes/${note.frontmatter.slug}</link>
+      <guid>${prodUrl}/notes/${note.frontmatter.slug}</guid>
+      <description>${
+        // NOTE: We need to double escape, apparently: https://validator.w3.org/feed/docs/warning/NotHtml.html
+        escapeXml(escapeXml(note.frontmatter.summary || ''))
+      }</description>
+      <pubDate>${new Date(note.frontmatter.publishedAt).toUTCString()}</pubDate>
+      ${note.frontmatter.updatedAt ? `<lastBuildDate>${new Date(note.frontmatter.updatedAt).toUTCString()}</lastBuildDate>` : ''}
+    </item>`,
+    )
+    .join('\n')
+
   const rssFeed = `<?xml version="1.0" encoding="UTF-8" ?>
   <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
@@ -36,7 +59,8 @@ export async function GET() {
         <link>${prodUrl}</link>
         <description>CEO and co-founder of Stellate, creator of styled-components and react-boilerplate and angel investor in early-stage startups.</description>
         <atom:link href="https://mxstbr.com/rss" rel="self" type="application/rss+xml" />
-        ${itemsXml}
+        ${blogXml}
+        ${notesXml}
     </channel>
   </rss>`
 
