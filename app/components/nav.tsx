@@ -1,4 +1,6 @@
+import Image from 'next/image'
 import Link from 'next/link'
+import avatar from '../../public/static/images/headshot.jpeg'
 
 export const navItems = {
   '/oss': {
@@ -19,8 +21,15 @@ export function Navbar() {
         >
           <Link
             href="/"
-            className="transition-all hover:text-slate-800 dark:hover:text-slate-200 flex align-middle relative py-1 pr-2 no-underline"
+            className="transition-all hover:text-slate-800 dark:hover:text-slate-200 flex align-middle relative py-1 pr-2 no-underline space-x-2"
           >
+            <Image
+              src={avatar}
+              alt="avatar"
+              width={24}
+              height={24}
+              style={{ borderRadius: 100 }}
+            />
             <h1 className="font-bold">Max Stoiber</h1>
           </Link>
           <div className="flex flex-row space-x-0 -mr-3 ">
