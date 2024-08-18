@@ -144,13 +144,12 @@ export default async function Page({ params }) {
       </div>
       <Prose className="prose-lg">
         <MDXContent />
-        <hr />
       </Prose>
       {relatedNotes.length > 0 && (
-        <div>
-          <h1 className="text-2xl font-bold mt-12 mb-8">
-            Related Notes about{' '}
-            {note.frontmatter.tags?.map((tag) => tag.name).join(' & ')}
+        <div className="bg-slate-100 dark:bg-slate-900 sm:rounded-md border border-solid border-slate-300 dark:border-slate-700 p-8 mt-16">
+          <h1 className="text-lg font-bold mt-0 mb-8">
+            Other notes about{' '}
+            {note.frontmatter.tags?.map((tag) => tag.name).join(' and/or ')}
           </h1>
           <ul className="space-y-4">
             {relatedNotes
