@@ -4,6 +4,7 @@ import { getNotes } from '../data/notes'
 import { formatDate } from '../thoughts/utils'
 import Prose from '../components/prose'
 import Tag from 'react-feather/dist/icons/tag'
+import { ItemList, ItemListItem } from '../components/item-list'
 
 export default async function WritingPage() {
   const notes = await getNotes()
@@ -28,17 +29,24 @@ export default async function WritingPage() {
         </p>
       </Prose>
       <h2 className="font-bold text-2xl">By Topic</h2>
-      <ul className="grid grid-cols-2 gap-2">
+      <ul className="pl-0 grid grid-cols-2 gap-x-8 gap-y-6">
         {tags.map((tag) => {
+          const notesCount = notes.filter((note) =>
+            note.frontmatter.tags?.find((t) => t.slug === tag.slug),
+          ).length
           return (
-            <li key={tag.slug} className="bg-white shadow-sm p-2">
-              <Link
-                href={`/notes/topics/${tag.slug}`}
-                className="flex flex-row gap-1 items-center"
-              >
-                <Tag size="0.8em" className="mt-1" /> {tag.name}
-              </Link>
-            </li>
+            <ItemListItem
+              key={tag.slug}
+              left={
+                <Link
+                  href={`/notes/topics/${tag.slug}`}
+                  className="flex flex-row gap-1 items-center"
+                >
+                  {tag.name}
+                </Link>
+              }
+              right={`${notesCount} notes`}
+            ></ItemListItem>
           )
         })}
       </ul>
