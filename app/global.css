@@ -74,7 +74,7 @@ a {
 }
 
 mark {
-  @apply bg-yellow-100 text-yellow-950 dark:bg-yellow-950 dark:text-yellow-200;
+  @apply bg-yellow-slate-100 text-inherit dark:bg-slate-800;
 }
 
 pre::-webkit-scrollbar {

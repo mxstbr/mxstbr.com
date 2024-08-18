@@ -8,6 +8,8 @@ module.exports = {
       },
       colors: {
         'slate-350': '#B0BCCD',
+        /* Blend 66% yellow-100, 33% slate-100 */
+        'yellow-slate-100': '#FAF8D5',
       },
       typography: ({ theme }) => ({
         // "slate" has to match components/prose.tsx
