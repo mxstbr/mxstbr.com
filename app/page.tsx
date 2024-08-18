@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { ItemList, ItemListItem } from './components/item-list'
 import { formatDate } from './thoughts/utils'
 import { getNotes } from './data/notes'
-import StellateIcon from './components/stellate-icon'
+import { StellateIcon } from './components/stellate-icon'
+import { Section } from './components/section'
 
 export const revalidate = 3600 // revalidate every hour
 
@@ -72,32 +73,6 @@ export default async function Home() {
         </Section>
       </div>
 
-      <Section title="Notes">
-        <ItemList>
-          {notes
-            .sort(
-              (a, b) =>
-                new Date(b.frontmatter.publishedAt).getTime() -
-                new Date(a.frontmatter.publishedAt).getTime(),
-            )
-            .map((note) => (
-              <ItemListItem
-                key={note.frontmatter.slug}
-                left={
-                  <Link href={`/notes/${note.frontmatter.slug}`}>
-                    {note.frontmatter.title}
-                  </Link>
-                }
-                right={
-                  <div className="flex align-center">
-                    <div>{formatDate(note.frontmatter.publishedAt)}</div>
-                  </div>
-                }
-              />
-            ))}
-        </ItemList>
-      </Section>
-
       <Section title="Work">
         <ItemList>
           {work.map((project) => (
@@ -116,68 +91,6 @@ export default async function Home() {
           ))}
         </ItemList>
       </Section>
-    </div>
-
-    /* <Section title="Open Source Projects">
-        <ItemList>
-          {repos.map((repo) => (
-            <ItemListItem
-              key={repo.nameWithOwner}
-              left={
-                <a href={`https://github.com${repo.nameWithOwner}`}>
-                  {repo.nameWithOwner}
-                </a>
-              }
-              right={
-                <>
-                  {repo.stargazerCount.toLocaleString(undefined, {
-                    maximumFractionDigits: 0,
-                  })}{' '}
-                  stars
-                </>
-              }
-            />
-          ))}
-        </ItemList>
-        <Link href="/oss" className="text-slate-600">
-          More →
-        </Link>
-      </Section>
-
-      <Section title="Angel Investments">
-        <ItemList>
-          {investments.slice(0, 6).map((investment) => (
-            <ItemListItem
-              key={investment.href}
-              left={
-                <a target="_blank" href={investment.href}>
-                  {investment.name}
-                </a>
-              }
-              right={investment.description}
-            />
-          ))}
-        </ItemList>
-        <Link href="/investing" className="text-slate-600">
-          More →
-        </Link>
-      </Section> */
-  )
-}
-
-function Section({
-  title,
-  children,
-  className,
-}: {
-  title?: string | React.ReactNode
-  children: React.ReactNode
-  className?: string
-}) {
-  return (
-    <div className={`space-y-6 flex-1 ${className}`}>
-      {title && <h2 className="font-bold text-lg">{title}</h2>}
-      {children}
     </div>
   )
 }

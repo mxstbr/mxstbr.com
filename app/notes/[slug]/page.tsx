@@ -1,3 +1,4 @@
+import React from 'react'
 import { evaluate } from '@mdx-js/mdx'
 import * as runtime from 'react/jsx-runtime'
 import { notFound } from 'next/navigation'
@@ -9,6 +10,8 @@ import { formatDate } from '../../thoughts/utils'
 import { size } from '../../og/utils'
 import { getNote, getNotes } from '../../data/notes'
 import { useMDXComponents } from '../../../mdx-components'
+import Link from 'next/link'
+import ArrowLeft from 'react-feather/dist/icons/arrow-left'
 
 export async function generateStaticParams() {
   return (await getNotes()).map((note) => note.frontmatter.slug)
@@ -98,10 +101,18 @@ export default async function Page({ params }) {
         }}
       />
 
-      <h1 className="title font-bold text-4xl mb-2">{frontmatter.title}</h1>
-      <div className="flex items-center space-x-6 mb-8 text-sm">
-        <p className="text-sm text-slate-600 dark:text-slate-400">
-          Note published on {formatDate(frontmatter.publishedAt)}
+      <Link
+        href="/notes"
+        className="flex flex-row items-center gap-2 uppercase text-sm font-bold tracking-wider  no-underline hover:underline"
+      >
+        <ArrowLeft size="1em" /> Notes
+      </Link>
+      <h1 className="title font-bold text-4xl mt-6 mb-3">
+        {frontmatter.title}
+      </h1>
+      <div className="flex items-center space-x-6 mb-6">
+        <p className="text-md text-slate-600 dark:text-slate-400">
+          {formatDate(frontmatter.publishedAt)}
           {frontmatter.updatedAt && (
             <>
               <span className="mx-1">&middot;</span>

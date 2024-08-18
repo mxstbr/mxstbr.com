@@ -3,6 +3,9 @@ import Link from 'next/link'
 import avatar from '../../public/static/images/headshot.jpeg'
 
 export const navItems = {
+  '/notes': {
+    name: 'Notes',
+  },
   '/oss': {
     name: 'Open Source',
   },

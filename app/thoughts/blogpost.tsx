@@ -104,9 +104,9 @@ export default async function Blog({ meta, children }) {
           }}
         />
 
-        <h1 className="title font-bold text-4xl mb-2">{post.metadata.title}</h1>
-        <div className="flex items-center space-x-6 mb-8 text-sm">
-          <p className="text-sm text-slate-600 dark:text-slate-400">
+        <h1 className="title font-bold text-4xl mb-3">{post.metadata.title}</h1>
+        <div className="flex items-center space-x-6 mb-6">
+          <p className="text-md text-slate-600 dark:text-slate-400">
             {post.metadata.state === 'draft'
               ? 'Unpublished draft'
               : formatDate(post.metadata.publishedAt)}
@@ -120,7 +120,7 @@ export default async function Blog({ meta, children }) {
             )}
           </p>
           {post.metadata.views > 0 && (
-            <p className="text-sm text-slate-600 dark:text-slate-400">
+            <p className="text-md text-slate-600 dark:text-slate-400">
               {post.metadata.views.toLocaleString(undefined, {
                 maximumFractionDigits: 0,
               })}{' '}

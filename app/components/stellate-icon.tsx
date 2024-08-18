@@ -1,6 +1,6 @@
 import React from 'react'
 
-function StellateIcon(props) {
+export function StellateIcon(props) {
   return (
     <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 392 392">
       <path
@@ -14,5 +14,3 @@ function StellateIcon(props) {
     </svg>
   )
 }
-
-export default StellateIcon
