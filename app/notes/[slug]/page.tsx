@@ -79,10 +79,12 @@ export default async function Page({ params }) {
     },
   )
 
-  const relatedNotes = notes.filter((maybeRelatedNote) =>
-    maybeRelatedNote.frontmatter.tags?.some((tag) =>
-      note.frontmatter.tags?.map((tag) => tag.slug).includes(tag.slug),
-    ),
+  const relatedNotes = notes.filter(
+    (maybeRelatedNote) =>
+      maybeRelatedNote.frontmatter.slug !== note.frontmatter.slug &&
+      maybeRelatedNote.frontmatter.tags?.some((tag) =>
+        note.frontmatter.tags?.map((tag) => tag.slug).includes(tag.slug),
+      ),
   )
 
   return (
