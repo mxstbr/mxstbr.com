@@ -2,15 +2,10 @@ import { BlogPosts } from './components/posts'
 import { investments } from './investing/investments'
 import Link from 'next/link'
 import { ItemList, ItemListItem } from './components/item-list'
-import { getNotes } from './data/notes'
 import { StellateIcon } from './components/stellate-icon'
 import { Section } from './components/section'
 
-export const revalidate = 3600 // revalidate every hour
-
 export default async function Home() {
-  const notes = await getNotes()
-
   return (
     <div className="space-y-20">
       <Section title="TL;DR">
