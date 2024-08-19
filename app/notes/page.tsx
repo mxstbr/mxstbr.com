@@ -41,24 +41,18 @@ export default async function WritingPage() {
         <p>
           The below is my{' '}
           <Link href="/notes/digital-garden">digital garden</Link>, my
-          collection of notes and explorations that I'm actively tending to.
-          Some of these notes are still budding and developing; some others are
-          more developed but simply too small for a standalone{' '}
-          <Link href="/">essay</Link>; some others yet I just want to remember
-          and be able to reference. Either way,{' '}
-          <mark>
-            all of the ideas and thoughts below strongly resonate with me
-          </mark>
-          , otherwise I wouldn't have written them down.
+          collection of explorations that I'm actively tending to. Some of these
+          ideas are still developing; some others are more developed but simply
+          too small to be a standalone <Link href="/">essay</Link>; some others
+          yet I just want to remember and be able to reference. Either way,{' '}
+          <mark>all of the ideas below strongly resonate with me</mark>,
+          otherwise they wouldn't be here.
         </p>
         <p>
-          This is my way of defaulting to open and working with the garage door
-          up. <mark>I welcome thoughts, comments, pushback, feedback</mark> on
-          any of these notes; the whole reason I publish them publicly is to be
-          able to sharpen my thinking together with you!
-        </p>
-        <p>
-          If anything here resonates with you, please reach out via{' '}
+          <mark>I welcome thoughts, comments, pushback, feedback</mark> on any
+          of these notes; the whole reason I publish them publicly is to be able
+          to sharpen my thinking together with you. If anything here resonates
+          with you, please reach out via{' '}
           <a href="mailto:contact@mxstbr.com?subject=Digital garden">email</a>{' '}
           or <a href="https://twitter.com/mxstbr">Twitter DMs</a>.
         </p>
