@@ -150,7 +150,10 @@ export default async function Page({ params }) {
       </div>
       <div className="relative">
         {/* Sidebar */}
-        {headings.length > 1 && (
+        {(headings.length > 1 ||
+          (!!headings[0] &&
+            Array.isArray(headings[0].children) &&
+            headings[0].children?.length > 0)) && (
           <div className="top-8 hidden xl:block sticky">
             <div className="absolute -right-8 translate-x-full top-0 w-1/2 text-sm text-slate-500 space-y-2">
               <strong>Table of contents</strong>
