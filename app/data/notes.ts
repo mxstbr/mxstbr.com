@@ -86,7 +86,12 @@ export async function getNotes(): Promise<Array<Note>> {
       })),
       previousSlugs: post.previousSlugs,
     },
-    content: post.content.markdown,
+    content: post.content.markdown
+      // Hashnode serves images with an odd non-standard markdown syntax that looks like this:
+      // ![alt](url.com align="center")
+      // This is a temporary hack to remove that non-standard syntax and make it render until I
+      // figure out a long-term solution for it. Right now, it'd break if I use different alignment.
+      .replaceAll('align="center")', ')'),
   }))
 }
 
