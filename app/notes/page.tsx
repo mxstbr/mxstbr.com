@@ -54,7 +54,7 @@ export default async function WritingPage() {
           to sharpen my thinking together with you. If anything here resonates
           with you, please reach out via{' '}
           <a href="mailto:contact@mxstbr.com?subject=Digital garden">email</a>{' '}
-          or <a href="https://twitter.com/mxstbr">Twitter DMs</a>.
+          or <a href="https://x.com/mxstbr">Twitter/X DMs</a>.
         </p>
       </Prose>
       <h2 className="font-bold text-2xl">By Topic</h2>
