@@ -29,6 +29,7 @@ const GET_POSTS_QUERY = /* GraphQL */ `
               name
               slug
             }
+            previousSlugs
           }
         }
       }
@@ -45,6 +46,7 @@ type Frontmatter = {
     name: string
     slug: string
   }>
+  previousSlugs: Array<string>
 }
 type Note = {
   frontmatter: Frontmatter
@@ -82,6 +84,7 @@ export async function getNotes(): Promise<Array<Note>> {
           .map((word) => word[0].toUpperCase() + word.substring(1))
           .join(' '),
       })),
+      previousSlugs: post.previousSlugs,
     },
     content: post.content.markdown,
   }))
