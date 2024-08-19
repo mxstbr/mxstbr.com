@@ -82,7 +82,7 @@ export default async function WritingPage() {
         })}
       </ul>
       <h2 className="font-bold text-2xl">All Notes</h2>
-      <ul className="space-y-4">
+      <ul className="space-y-6 sm:space-y-4">
         {notes
           .sort(
             (a, b) =>
@@ -90,7 +90,10 @@ export default async function WritingPage() {
               new Date(a.frontmatter.publishedAt).getTime(),
           )
           .map((note) => (
-            <li key={note.frontmatter.slug} className="flex flex-row space-x-4">
+            <li
+              key={note.frontmatter.slug}
+              className="flex flex-col space-y-1 sm:space-y-0 sm:flex-row sm:space-x-4"
+            >
               <div className="w-32 font-mono shrink-0 tabular-nums text-slate-500">
                 {formatDate(note.frontmatter.publishedAt)}
               </div>
