@@ -129,7 +129,7 @@ export default async function Page({ params }) {
               <> (updated {formatDate(frontmatter.updatedAt)})</>
             )}
         </span>
-        {frontmatter.tags?.length && frontmatter.tags?.length > 0 && (
+        {frontmatter.tags?.length && frontmatter.tags?.length > 0 ? (
           <>
             <span>|</span>
             {frontmatter.tags?.map((tag) => (
@@ -143,6 +143,8 @@ export default async function Page({ params }) {
               </Link>
             ))}
           </>
+        ) : (
+          ''
         )}
       </div>
       <div className="relative">
