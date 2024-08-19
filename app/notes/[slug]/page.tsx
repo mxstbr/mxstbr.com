@@ -8,7 +8,7 @@ import Prose from '../../components/prose'
 import { prodUrl } from '../../sitemap'
 import { formatDate } from '../../thoughts/utils'
 import { size } from '../../og/utils'
-import { getNote, getNotes } from '../../data/notes'
+import { getNote, getNotes, type Note } from '../../data/notes'
 import { useMDXComponents } from '../../../mdx-components'
 import Link from 'next/link'
 import ArrowLeft from 'react-feather/dist/icons/arrow-left'
@@ -29,10 +29,7 @@ export async function generateMetadata({ params }) {
     publishedAt: publishedTime,
     summary: description,
   } = note.frontmatter
-  let ogImage = generateOgImage(
-    note.frontmatter.title,
-    note.frontmatter.publishedAt,
-  )
+  let ogImage = generateOgImage(note)
 
   return {
     title,
@@ -103,7 +100,7 @@ export default async function Page({ params }) {
             datePublished: frontmatter.publishedAt,
             dateModified: frontmatter.updatedAt || frontmatter.publishedAt,
             description: frontmatter.summary,
-            image: generateOgImage(frontmatter.title, frontmatter.publishedAt),
+            image: generateOgImage(note),
             url: `${prodUrl}/notes/${params.slug}`,
             author: {
               '@type': 'Person',
@@ -236,8 +233,8 @@ function TOCHeading(props: Heading) {
   )
 }
 
-function generateOgImage(title: string, publishedAt: string) {
-  return `${prodUrl}/og?title=${encodeURIComponent(title)}&subtitle=Note published on ${formatDate(publishedAt)}`
+function generateOgImage(note: Note) {
+  return `${prodUrl}/og?name=${encodeURIComponent("Max Stoiber's Notes")}&title=${encodeURIComponent(note.frontmatter.title)}${note.frontmatter.tags && note.frontmatter.tags.length > 0 ? `&subtitle=${encodeURIComponent(`${note.frontmatter.tags?.map((tag) => `🏷️ ${tag.name}`).join(' ')}`)}` : ''}`
 }
 
 type Heading = {

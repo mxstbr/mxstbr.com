@@ -48,7 +48,8 @@ type Frontmatter = {
   }>
   previousSlugs: Array<string>
 }
-type Note = {
+
+export type Note = {
   frontmatter: Frontmatter
   content: string
 }
