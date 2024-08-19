@@ -1,10 +1,22 @@
 import createMDX from '@next/mdx'
 import smartypants from 'remark-smartypants'
+import { getNotes } from './app/data/notes'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
   async redirects() {
+    const notes = await getNotes()
+    const previousSlugNotesRedirects = notes
+      .filter((note) => note.frontmatter.previousSlugs.length > 0)
+      .flatMap((note) =>
+        note.frontmatter.previousSlugs.map((previousSlug) => ({
+          source: `/notes/${previousSlug}`,
+          destination: `/notes/${note.frontmatter.slug}`,
+          permanent: true,
+        })),
+      )
+
     return [
       {
         source: '/thoughts',
@@ -21,6 +33,7 @@ const nextConfig = {
         destination: '/investing',
         permanent: true,
       },
+      ...previousSlugNotesRedirects,
     ]
   },
   async rewrites() {
