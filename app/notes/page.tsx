@@ -44,8 +44,12 @@ export default async function WritingPage() {
           collection of notes and explorations that I'm actively tending to.
           Some of these notes are still budding and developing; some others are
           more developed but simply too small for a standalone{' '}
-          <Link href="/">essay</Link>. Either way,{' '}
-          <mark>I only note things down that really resonate with me.</mark>
+          <Link href="/">essay</Link>; some others yet I just want to remember
+          and be able to reference. Either way,{' '}
+          <mark>
+            all of the ideas and thoughts below strongly resonate with me
+          </mark>
+          , otherwise I wouldn't have written them down.
         </p>
         <p>
           This is my way of defaulting to open and working with the garage door
