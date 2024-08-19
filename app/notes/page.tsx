@@ -13,7 +13,7 @@ export default async function WritingPage() {
   const tags = [
     // @ts-ignore
     ...new Map(allTags.map((tag) => [tag.slug, tag])).values(),
-  ]
+  ].sort((a, b) => a.name.localeCompare(b.name))
 
   return (
     <div className="space-y-12">
