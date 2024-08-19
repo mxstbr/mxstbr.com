@@ -12,9 +12,15 @@ export const metadata: Metadata = {
   description:
     "My digital garden, my collection of notes and explorations that I'm actively tending to.",
   openGraph: {
+    title: 'Notes',
+    description:
+      "My digital garden, my collection of notes and explorations that I'm actively tending to.",
     images: ['https://mxstbr.com/static/images/digital-garden.jpeg'],
   },
   twitter: {
+    title: 'Notes',
+    description:
+      "My digital garden, my collection of notes and explorations that I'm actively tending to.",
     images: ['https://mxstbr.com/static/images/digital-garden.jpeg'],
   },
 }
