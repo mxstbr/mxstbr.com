@@ -13,6 +13,7 @@ import { useMDXComponents } from '../../../mdx-components'
 import Link from 'next/link'
 import ArrowLeft from 'react-feather/dist/icons/arrow-left'
 import Tag from 'react-feather/dist/icons/tag'
+import { slugify } from '../../slugify'
 
 export async function generateStaticParams() {
   return (await getNotes()).map((note) => note.frontmatter.slug)
@@ -79,6 +80,8 @@ export default async function Page({ params }) {
     },
   )
 
+  const headings = parseMarkdownHeadings(content)
+
   const relatedNotes = notes.filter(
     (maybeRelatedNote) =>
       maybeRelatedNote.frontmatter.slug !== note.frontmatter.slug &&
@@ -134,6 +137,7 @@ export default async function Page({ params }) {
             <span>|</span>
             {frontmatter.tags?.map((tag) => (
               <Link
+                key={tag.slug}
                 href={`/notes/topics/${tag.slug}`}
                 className="flex flex-row gap-1 items-center"
               >
@@ -144,9 +148,25 @@ export default async function Page({ params }) {
           </>
         )}
       </div>
-      <Prose className="prose-lg">
-        <MDXContent />
-      </Prose>
+      <div className="relative">
+        {/* Sidebar */}
+        {headings.length > 1 && (
+          <div className="top-8 hidden xl:block sticky">
+            <div className="absolute -right-8 translate-x-full top-0 w-1/2 text-sm text-slate-500 space-y-2">
+              <strong>Table of contents</strong>
+              <ul className="space-y-2 font-mono tracking-tighter">
+                {headings.map((heading) => (
+                  <TOCHeading key={heading.text} {...heading} />
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+        {/* Content */}
+        <Prose className="prose-lg">
+          <MDXContent />
+        </Prose>
+      </div>
       {relatedNotes.length > 0 && (
         <div className="bg-slate-100 dark:bg-slate-900 sm:rounded-md border border-solid border-slate-300 dark:border-slate-700 p-8 mt-16">
           <h1 className="text-lg font-bold mt-0 mb-8">
@@ -193,6 +213,64 @@ export default async function Page({ params }) {
   )
 }
 
+function TOCHeading(props: Heading) {
+  return (
+    <li>
+      <a
+        className="no-underline hover:underline"
+        href={`#${slugify(props.text)}`}
+      >
+        {`#`.repeat(props.level)} {props.text}
+      </a>
+      {Array.isArray(props.children) && props.children.length > 0 && (
+        <ul className="pl-4 space-y-2 mt-2">
+          {props.children.map((child) => (
+            <TOCHeading key={child.text} {...child} />
+          ))}
+        </ul>
+      )}
+    </li>
+  )
+}
+
 function generateOgImage(title: string, publishedAt: string) {
   return `${prodUrl}/og?title=${encodeURIComponent(title)}&subtitle=Note published on ${formatDate(publishedAt)}`
+}
+
+type Heading = {
+  level: number
+  text: string
+  children?: Heading[]
+}
+
+function parseMarkdownHeadings(markdown) {
+  const lines = markdown.split('\n')
+  const toc: Heading[] = []
+  const stack = [{ level: 0, children: toc }]
+  let inCodeBlock = false
+
+  lines.forEach((line) => {
+    // Check for start or end of code block
+    if (line.trim().startsWith('```')) {
+      inCodeBlock = !inCodeBlock
+    }
+
+    if (!inCodeBlock) {
+      const match = line.match(/^(#{1,6})\s+(.*)$/)
+      if (match) {
+        const level = match[1].length
+        const text = match[2]
+        const item = { level, text, children: [] }
+
+        while (stack.length > 1 && stack[stack.length - 1].level >= level) {
+          stack.pop()
+        }
+
+        stack[stack.length - 1].children.push(item)
+        stack.push(item)
+      }
+    }
+  })
+
+  return toc
 }

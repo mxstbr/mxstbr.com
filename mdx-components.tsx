@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { codeToHtml } from 'shiki/bundle/web'
 import React from 'react'
 import { MDXComponents } from 'mdx/types'
+import { slugify } from './app/slugify'
 
 function Table({ data }) {
   let headers = data.headers.map((header, index) => (
@@ -64,17 +65,6 @@ async function Code({ children, ...props }) {
       })
     : children
   return <code dangerouslySetInnerHTML={{ __html: codeHTML }} {...props} />
-}
-
-function slugify(str) {
-  return str
-    .toString()
-    .toLowerCase()
-    .trim() // Remove whitespace from both ends of a string
-    .replace(/\s+/g, '-') // Replace spaces with -
-    .replace(/&/g, '-and-') // Replace & with 'and'
-    .replace(/[^\w\-]+/g, '') // Remove all non-word characters except for -
-    .replace(/\-\-+/g, '-') // Replace multiple - with single -
 }
 
 function createHeading(level) {
