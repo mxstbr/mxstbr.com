@@ -5,6 +5,21 @@ import ArrowLeft from 'react-feather/dist/icons/arrow-left'
 import Prose from '../../../components/prose'
 import { getNotes } from '../../../data/notes'
 import { formatDate } from '../../../thoughts/utils'
+import type { Metadata } from 'next'
+
+export async function generateMetadata({ params }): Promise<Metadata> {
+  const allNotes = await getNotes()
+  const tag = allNotes
+    .find((note) =>
+      note.frontmatter.tags?.some((tag) => tag.slug === params.slug),
+    )
+    ?.frontmatter.tags?.find((tag) => tag.slug === params.slug)
+
+  return {
+    title: `Notes on ${tag?.name || params.slug}`,
+    description: `Notes and explorations related to ${tag?.name || params.slug}`,
+  }
+}
 
 export default async function Page({ params }) {
   const allNotes = await getNotes()
