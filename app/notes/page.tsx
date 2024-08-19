@@ -5,6 +5,13 @@ import { formatDate } from '../thoughts/utils'
 import Prose from '../components/prose'
 import Tag from 'react-feather/dist/icons/tag'
 import { ItemList, ItemListItem } from '../components/item-list'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Notes',
+  description:
+    "My digital garden, my collection of notes and explorations that I'm actively tending to.",
+}
 
 export default async function WritingPage() {
   const notes = await getNotes()
@@ -23,9 +30,20 @@ export default async function WritingPage() {
           The below is my{' '}
           <Link href="/notes/digital-garden">digital garden</Link>, my
           collection of notes and explorations that I'm actively tending to.
-          They might still budding or simply be too small for a standalone
-          essay. For my refined thoughts check out my evergreen{' '}
-          <Link href="/">essays</Link>.
+          Some of these notes are still budding and developing; some others are
+          more developed but simply too small for a standalone essay. For my
+          refined thoughts check out my evergreen <Link href="/">essays</Link>.
+        </p>
+        <p>
+          This is my way of defaulting to open and working with the garage door
+          up. <mark>I welcome thoughts, comments, pushback, feedback</mark> on
+          any of these notes; the whole reason I publish them publicly is to be
+          able to sharpen my thinking together with you!
+        </p>
+        <p>
+          If anything here resonates in any way, please reach out via{' '}
+          <a href="mailto:contact@mxstbr.com?subject=Digital garden">email</a>{' '}
+          or <a href="https://twitter.com/mxstbr">Twitter DMs</a>.
         </p>
       </Prose>
       <h2 className="font-bold text-2xl">By Topic</h2>
