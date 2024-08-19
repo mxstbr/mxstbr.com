@@ -168,21 +168,9 @@ export default async function Page({ params }) {
                   <div className="w-32 font-mono shrink-0 tabular-nums text-slate-500">
                     {formatDate(note.frontmatter.publishedAt)}
                   </div>
-                  <div className="space-y-1">
-                    <Link href={`/notes/${note.frontmatter.slug}`}>
-                      {note.frontmatter.title}
-                    </Link>
-                    <p className="text-slate-500 flex flex-row gap-4">
-                      {note.frontmatter.tags?.map((tag) => (
-                        <Link
-                          href={`/notes/topics/${tag.slug}`}
-                          className="flex flex-row items-center gap-2 no-underline hover:underline"
-                        >
-                          <Tag size="0.8em" /> {tag.name}
-                        </Link>
-                      ))}
-                    </p>
-                  </div>
+                  <Link href={`/notes/${note.frontmatter.slug}`}>
+                    {note.frontmatter.title}
+                  </Link>
                 </li>
               ))}
           </ul>
