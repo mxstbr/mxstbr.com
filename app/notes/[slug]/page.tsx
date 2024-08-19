@@ -151,7 +151,20 @@ export default async function Page({ params }) {
         <div className="bg-slate-100 dark:bg-slate-900 sm:rounded-md border border-solid border-slate-300 dark:border-slate-700 p-8 mt-16">
           <h1 className="text-lg font-bold mt-0 mb-8">
             Other notes about{' '}
-            {note.frontmatter.tags?.map((tag) => tag.name).join(' and/or ')}
+            {note.frontmatter.tags
+              ?.map((tag) => (
+                <Link
+                  href={`/notes/topics/${tag.slug}`}
+                  className="inline-flex flex-row items-baseline"
+                >
+                  <Tag size="0.8em" className="mr-1" /> {tag.name}
+                </Link>
+              ))
+              .reduce((result, item) => (
+                <>
+                  {result} and/or {item}
+                </>
+              ))}
           </h1>
           <ul className="space-y-4">
             {relatedNotes
