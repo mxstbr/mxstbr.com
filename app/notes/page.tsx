@@ -23,8 +23,8 @@ export default async function WritingPage() {
           The below is my{' '}
           <Link href="/notes/digital-garden">digital garden</Link>, my
           collection of notes and explorations that I'm actively tending to.
-          They're either still budding or they're too small as a standalone
-          essay. For my evergreen, refined thoughts check out my{' '}
+          They might still budding or simply be too small for a standalone
+          essay. For my refined thoughts check out my evergreen{' '}
           <Link href="/">essays</Link>.
         </p>
       </Prose>
