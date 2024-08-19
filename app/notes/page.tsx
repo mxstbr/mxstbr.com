@@ -14,6 +14,9 @@ export const metadata: Metadata = {
   openGraph: {
     images: ['https://mxstbr.com/static/images/digital-garden.jpeg'],
   },
+  twitter: {
+    images: ['https://mxstbr.com/static/images/digital-garden.jpeg'],
+  },
 }
 
 export default async function WritingPage() {
