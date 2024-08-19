@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   title: 'Notes',
   description:
     "My digital garden, my collection of notes and explorations that I'm actively tending to.",
+  openGraph: {
+    images: ['https://mxstbr.com/static/images/digital-garden.jpeg'],
+  },
 }
 
 export default async function WritingPage() {
