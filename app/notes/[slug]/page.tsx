@@ -216,12 +216,12 @@ export default async function Page({ params }) {
 
 function TOCHeading(props: Heading) {
   return (
-    <li>
+    <li className={props.level > 2 ? 'text-xs' : ''}>
       <a
         className="no-underline hover:underline"
         href={`#${slugify(props.text)}`}
       >
-        {`#`.repeat(props.level)} {props.text}
+        {props.text}
       </a>
       {Array.isArray(props.children) && props.children.length > 0 && (
         <ul className="pl-4 space-y-3 mt-2">
