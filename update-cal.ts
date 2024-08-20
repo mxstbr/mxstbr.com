@@ -1,4 +1,5 @@
 import { Redis } from '@upstash/redis'
+// @ts-ignore this file is gitignored and won't exist on Vercel
 import { events } from './madison'
 import env from '@next/env'
 
