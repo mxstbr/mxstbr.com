@@ -41,10 +41,10 @@ export default async function WritingPage() {
         <p>
           The below is my{' '}
           <Link href="/notes/digital-garden">digital garden</Link>, my
-          collection of explorations that I'm actively tending to. Some of these
-          ideas are still developing; some others are more developed but simply
-          too small to be a standalone <Link href="/">essay</Link>; some others
-          yet I just want be able to reference and link to.{' '}
+          collection of explorations. Some of these ideas are still developing
+          and I'm actively tending to them; some others are more developed but
+          simply too small to be a standalone <Link href="/">essay</Link>; some
+          others yet I just want be able to reference and link to.{' '}
           <mark>I only write down ideas that strongly resonate with me</mark>,{' '}
           ones that surprise me or influence my thinking in some major way.
         </p>
