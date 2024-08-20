@@ -1,31 +1,48 @@
 import React from 'react'
-import { redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
+import { Redis } from '@upstash/redis'
 
 import Year from './Year'
-import { events as madisonEvents } from './madison'
+import type { Event } from './data'
+import { redirect } from 'next/navigation'
+import { PasswordForm } from './password-form'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 export const fetchCache = 'force-no-store'
 
-function isMadison(orgId: string) {
-  if (process.env.NODE_ENV === 'development')
-    return orgId === 'org_2RxESyA4xrCUKPz3Ky1sK8u2NqQ'
-  return orgId === 'org_2S11pLk6UvRphZIrCkZfdxKd06R'
+const redis = Redis.fromEnv()
+
+type RedisEvent = Event & {
+  // Dates are stored stringified
+  start: string
+  end: string
 }
 
-async function getEvents(orgId: string) {
-  if (isMadison(orgId)) return madisonEvents
+async function getEvents(password: string) {
+  const data = await redis.json.get(`cal:${password}`)
 
-  return []
+  return (data as RedisEvent[]).map(
+    (event): Event => ({
+      ...event,
+      start: new Date(event.start),
+      end: new Date(event.end),
+    }),
+  )
 }
 
 export default async function Plan() {
-  // const { userId, orgId } = auth();
-  // if (!userId) redirect("/sign-in");
-  // if (!orgId) redirect("/create-organization");
+  const cookieStore = cookies()
+  const password = cookieStore.get('password')
 
-  const events = await getEvents('org_2RxESyA4xrCUKPz3Ky1sK8u2NqQ')
+  if (!password) return <PasswordForm />
+
+  let events
+  try {
+    events = await getEvents(password.value)
+  } catch (err) {
+    return <PasswordForm error="Invalid password." />
+  }
 
   return (
     <div>
