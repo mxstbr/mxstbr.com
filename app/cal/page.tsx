@@ -20,6 +20,9 @@ type RedisEvent = Event & {
 }
 
 async function getEvents(password: string) {
+  if (password !== process.env.CAL_PASSWORD)
+    throw new Error('Invalid password.')
+
   const data = await redis.json.get(`cal:${password}`)
 
   return (data as RedisEvent[]).map(
