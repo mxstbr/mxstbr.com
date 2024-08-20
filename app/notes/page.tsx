@@ -42,9 +42,8 @@ export default async function WritingPage() {
           The below is my{' '}
           <Link href="/notes/digital-garden">digital garden</Link>, my
           collection of explorations. Some of these ideas are still developing
-          and I'm actively tending to them; some others are more developed but
-          too small to be a standalone <Link href="/">essay</Link>; some others
-          yet I just want be able to reference and link to.{' '}
+          and I'm actively tending to them, others are more developed but not
+          worth a <Link href="/">standalone essay</Link>.{' '}
           <mark>I only write down ideas that strongly resonate with me</mark>,{' '}
           ones that surprise me or influence my thinking in some major way.
         </p>
@@ -83,6 +82,12 @@ export default async function WritingPage() {
       <h2 className="font-bold text-2xl">All Notes</h2>
       <ul className="space-y-8 sm:space-y-6">
         {notes
+          // Filter out pure templates (but not notes that also include templates)
+          .filter(
+            (note) =>
+              note.frontmatter.tags?.length !== 1 ||
+              note.frontmatter.tags[0].slug !== 'templates',
+          )
           .sort(
             (a, b) =>
               new Date(b.frontmatter.publishedAt).getTime() -
