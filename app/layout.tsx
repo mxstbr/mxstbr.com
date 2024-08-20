@@ -7,6 +7,7 @@ import Script from 'next/script'
 import Footer from './components/footer'
 import { prodUrl } from './sitemap'
 import { size } from './og/utils'
+import { ReportView } from './components/report-view'
 
 export const metadata: Metadata = {
   metadataBase: new URL(prodUrl),
@@ -68,7 +69,7 @@ export default function RootLayout({
       lang="en"
       className={cx(
         'text-slate-900 bg-slate-50 dark:text-slate-100 dark:bg-slate-950',
-        inter.className
+        inter.className,
       )}
     >
       <body className="antialiased mt-8 px-4 mx-auto">
@@ -78,6 +79,7 @@ export default function RootLayout({
           <Footer />
         </main>
         <Analytics />
+        <ReportView />
         {/* Splitbee */}
         <Script async data-api="/_sb" src="/sb.js"></Script>
         <script

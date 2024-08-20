@@ -4,8 +4,6 @@ import { prodUrl } from 'app/sitemap'
 import Prose from 'app/components/prose'
 import { size } from 'app/og/utils'
 import { NewsletterSignupForm } from 'app/components/newsletter-form'
-import { ReportView } from 'app/components/report-view'
-import { Redis } from '@upstash/redis'
 
 export async function generateStaticParams() {
   let posts = getBlogPosts()
@@ -144,7 +142,6 @@ export default async function Blog({ meta, children }) {
         <Prose className="prose-lg">{children}</Prose>
       </section>
       <NewsletterSignupForm className="mt-16" />
-      <ReportView slug={post.slug} />
     </>
   )
 }

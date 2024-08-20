@@ -16,10 +16,10 @@ async function main() {
     posts.map(async (post) => ({
       views:
         (await redis.get<number>(
-          ['pageviews', 'essay', post.slug].join(':')
+          ['pageviews', `/thoughts/${post.slug}`].join(':'),
         )) ?? 0,
       slug: post.slug,
-    }))
+    })),
   )
 
   // Disallow updating views if the views are lower than whats already been recorded
@@ -28,21 +28,21 @@ async function main() {
     posts.some(
       (post) =>
         post.metadata.views >
-        (views.find((v) => v.slug === post.slug)?.views || 0)
+        (views.find((v) => v.slug === post.slug)?.views || 0),
     )
   ) {
     const lower = posts
       .filter(
         (post) =>
           post.metadata.views >
-          (views.find((v) => v.slug === post.slug)?.views || 0)
+          (views.find((v) => v.slug === post.slug)?.views || 0),
       )
       .map((post) => post.slug)
 
     throw new Error(
       `Views for essay(s) ${lower.join(
-        `, `
-      )} are lower than whats hardcoded in their metadata. Aborting update.`
+        `, `,
+      )} are lower than whats hardcoded in their metadata. Aborting update.`,
     )
   }
 
@@ -60,13 +60,13 @@ async function main() {
             undefined,
             {
               maximumFractionDigits: 0,
-            }
-          )} (+${viewCount - post.metadata.views})`
+            },
+          )} (+${viewCount - post.metadata.views})`,
         )
         return `export const meta = {\n  ${properties
           .trim()
           .replace(/,?\s*$/, '')},\n  views: ${viewCount}\n}`
-      }
+      },
     )
     fs.writeFileSync(filePath, updatedContent, 'utf-8')
   }
