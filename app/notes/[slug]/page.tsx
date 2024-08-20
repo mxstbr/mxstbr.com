@@ -168,45 +168,46 @@ export default async function Page({ params }) {
         </Prose>
       </div>
       {relatedNotes.length > 0 && (
-        <div className="bg-slate-100 dark:bg-slate-900 sm:rounded-md border border-solid border-slate-300 dark:border-slate-700 p-8 mt-16">
-          <h1 className="text-lg font-bold mt-0 mb-8">
-            Other notes about{' '}
-            {note.frontmatter.tags
-              ?.map((tag) => (
-                <Link
-                  href={`/notes/topics/${tag.slug}`}
-                  className="inline-flex flex-row items-baseline"
-                >
-                  <Tag size="0.8em" className="mr-1" /> {tag.name}
-                </Link>
-              ))
-              .reduce((result, item) => (
-                <>
-                  {result} and/or {item}
-                </>
-              ))}
-          </h1>
-          <ul className="space-y-6 sm:space-y-4">
-            {relatedNotes
-              .sort(
-                (a, b) =>
-                  new Date(b.frontmatter.publishedAt).getTime() -
-                  new Date(a.frontmatter.publishedAt).getTime(),
-              )
-              .map((note) => (
+        <div className="my-32 relative">
+          {/* Background */}
+          <div className="absolute -top-10 -left-10 -right-10 -bottom-10 bg-slate-100 dark:bg-slate-900 sm:rounded-md border border-solid border-slate-300 dark:border-slate-700" />
+          <div className="relative">
+            <h1 className="text-xl font-bold mt-0 mb-8">
+              Other notes about{' '}
+              {note.frontmatter.tags
+                ?.map((tag) => (
+                  <Link
+                    href={`/notes/topics/${tag.slug}`}
+                    className="inline-flex flex-row items-baseline"
+                  >
+                    <Tag size="0.8em" className="mr-1" /> {tag.name}
+                  </Link>
+                ))
+                .reduce((result, item) => (
+                  <>
+                    {result} and/or {item}
+                  </>
+                ))}
+            </h1>
+            <ul className="space-y-8 sm:space-y-6 text-lg">
+              {relatedNotes.map((note) => (
                 <li
                   key={note.frontmatter.slug}
-                  className="flex flex-col space-y-1 sm:space-y-0 sm:flex-row sm:space-x-4"
+                  className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-6"
                 >
-                  <div className="w-32 font-mono shrink-0 tabular-nums text-slate-500">
+                  <div className="text-sm sm:text-base font-mono tracking-tight shrink-0 tabular-nums text-slate-500">
                     {formatDate(note.frontmatter.publishedAt)}
                   </div>
-                  <Link href={`/notes/${note.frontmatter.slug}`}>
-                    {note.frontmatter.title}
-                  </Link>
+                  <div className="space-y-2">
+                    <Link href={`/notes/${note.frontmatter.slug}`}>
+                      {note.frontmatter.title}
+                    </Link>
+                    <p className="text-slate-500">{note.frontmatter.summary}</p>
+                  </div>
                 </li>
               ))}
-          </ul>
+            </ul>
+          </div>
         </div>
       )}
     </section>

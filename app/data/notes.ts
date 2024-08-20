@@ -1,7 +1,7 @@
-/**
- * Notes from Gist
- * https://gist.github.com/mxstbr/29f4eebada6196debb1b085a844e49aa
- */
+import { Redis } from '@upstash/redis'
+
+const redis = Redis.fromEnv()
+
 const GET_POSTS_QUERY = /* GraphQL */ `
   {
     publication(host: "mxstbr.com/notes") {
@@ -47,6 +47,7 @@ type Frontmatter = {
     slug: string
   }>
   previousSlugs: Array<string>
+  views: number
 }
 
 export type Note = {
@@ -69,31 +70,41 @@ export async function getNotes(): Promise<Array<Note>> {
     },
   }).then((res) => res.json())
 
-  return data.publication.posts.edges.map(({ node: post }) => ({
-    frontmatter: {
-      title: post.title,
-      summary: post.seo.description,
-      slug: post.slug,
-      publishedAt: post.publishedAt,
-      updatedAt: post.updatedAt,
-      tags: post.tags.map((tag) => ({
-        slug: tag.slug,
-        // Hashnode has inconsistent tag name capitalization, so I manually capitalize each word
-        name: tag.name
-          .trim()
-          .split(' ')
-          .map((word) => word[0].toUpperCase() + word.substring(1))
-          .join(' '),
-      })),
-      previousSlugs: post.previousSlugs,
-    },
-    content: post.content.markdown
-      // Hashnode serves images with an odd non-standard markdown syntax that looks like this:
-      // ![alt](url.com align="center")
-      // This is a temporary hack to remove that non-standard syntax and make it render until I
-      // figure out a long-term solution for it. Right now, it'd break if I use different alignment.
-      .replaceAll('align="center")', ')'),
-  }))
+  return await Promise.all(
+    data.publication.posts.edges.map(async ({ node: post }) => {
+      const views =
+        (await redis.get<number>(
+          ['pageviews', `/notes/${post.slug}`].join(':'),
+        )) ?? 0
+
+      return {
+        frontmatter: {
+          title: post.title,
+          summary: post.seo.description,
+          slug: post.slug,
+          publishedAt: post.publishedAt,
+          updatedAt: post.updatedAt,
+          tags: post.tags.map((tag) => ({
+            slug: tag.slug,
+            // Hashnode has inconsistent tag name capitalization, so I manually capitalize each word
+            name: tag.name
+              .trim()
+              .split(' ')
+              .map((word) => word[0].toUpperCase() + word.substring(1))
+              .join(' '),
+          })),
+          previousSlugs: post.previousSlugs,
+          views,
+        },
+        content: post.content.markdown
+          // Hashnode serves images with an odd non-standard markdown syntax that looks like this:
+          // ![alt](url.com align="center")
+          // This is a temporary hack to remove that non-standard syntax and make it render until I
+          // figure out a long-term solution for it. Right now, it'd break if I use different alignment.
+          .replaceAll('align="center")', ')'),
+      }
+    }),
+  ).then((res) => res.sort((a, b) => b.frontmatter.views - a.frontmatter.views))
 }
 
 export async function getNote(

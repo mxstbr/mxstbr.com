@@ -81,7 +81,7 @@ export default async function WritingPage() {
         })}
       </ul>
       <h2 className="font-bold text-2xl">All Notes</h2>
-      <ul className="space-y-6 sm:space-y-4">
+      <ul className="space-y-8 sm:space-y-6">
         {notes
           .sort(
             (a, b) =>
@@ -91,22 +91,19 @@ export default async function WritingPage() {
           .map((note) => (
             <li
               key={note.frontmatter.slug}
-              className="flex flex-col space-y-1 sm:space-y-0 sm:flex-row sm:space-x-4"
+              className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-6"
             >
-              <div className="w-32 font-mono shrink-0 tabular-nums text-slate-500">
+              <div className="text-sm sm:text-base font-mono tracking-tight shrink-0 tabular-nums text-slate-500">
                 {formatDate(note.frontmatter.publishedAt)}
               </div>
               <div className="space-y-2">
-                <Link href={`/notes/${note.frontmatter.slug}`}>
+                <Link
+                  href={`/notes/${note.frontmatter.slug}`}
+                  className="font-medium"
+                >
                   {note.frontmatter.title}
                 </Link>
-                {/* <div className="text-slate-500 flex flex-row gap-4 items-center">
-                  {note.frontmatter.tags?.map((tag) => (
-                    <span className="flex flex-row gap-1 items-center">
-                      <Tag size="0.8em" className="mt-1" /> {tag.slug}
-                    </span>
-                  ))}
-                </div> */}
+                <p className="text-slate-500">{note.frontmatter.summary}</p>
               </div>
             </li>
           ))}

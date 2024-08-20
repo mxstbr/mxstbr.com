@@ -35,7 +35,7 @@ export default async function Page({ params }) {
   if (!tag) return notFound()
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <div>
         <Link
           href="/notes"
@@ -48,7 +48,7 @@ export default async function Page({ params }) {
           <p>Notes and explorations related to {tag.name}.</p>
         </Prose>
       </div>
-      <ul className="space-y-4">
+      <ul className="space-y-8 sm:space-y-6">
         {notes
           .sort(
             (a, b) =>
@@ -56,12 +56,18 @@ export default async function Page({ params }) {
               new Date(a.frontmatter.publishedAt).getTime(),
           )
           .map((note) => (
-            <li key={note.frontmatter.slug} className="flex flex-row space-x-4">
-              <div className="w-32 font-mono shrink-0 tabular-nums text-slate-500">
+            <li
+              key={note.frontmatter.slug}
+              className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-6"
+            >
+              <div className="text-sm sm:text-base font-mono tracking-tight shrink-0 tabular-nums text-slate-500">
                 {formatDate(note.frontmatter.publishedAt)}
               </div>
-              <div className="space-y-1">
-                <Link href={`/notes/${note.frontmatter.slug}`}>
+              <div className="space-y-2">
+                <Link
+                  href={`/notes/${note.frontmatter.slug}`}
+                  className="font-medium"
+                >
                   {note.frontmatter.title}
                 </Link>
                 <p className="text-slate-500">{note.frontmatter.summary}</p>
