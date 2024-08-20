@@ -1,19 +1,19 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 
-export const ReportView: React.FC<{ slug: string }> = ({ slug }) => {
-  useEffect(() => {
-    if (process.env.NODE_ENV !== 'production') return
+export const ReportView = () => {
+  const pathname = usePathname()
 
+  useEffect(() => {
     fetch('/api/incr', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ slug }),
     })
-  }, [slug])
+  }, [pathname])
 
   return null
 }

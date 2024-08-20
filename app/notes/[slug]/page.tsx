@@ -120,14 +120,10 @@ export default async function Page({ params }) {
       <h1 className="title font-bold text-4xl mt-6 mb-3">
         {frontmatter.title}
       </h1>
-      <div className="text-md flex items-center flex-wrap space-x-4 mb-6 text-slate-600 dark:text-slate-400">
+      <div className="text-md flex items-center flex-wrap gap-x-4 mb-6 text-slate-600 dark:text-slate-400">
         <span>
-          {formatDate(frontmatter.publishedAt)}
-          {frontmatter.updatedAt &&
-            formatDate(frontmatter.updatedAt) !==
-              formatDate(frontmatter.publishedAt) && (
-              <> (updated {formatDate(frontmatter.updatedAt)})</>
-            )}
+          Last updated{' '}
+          {formatDate(frontmatter.updatedAt || frontmatter.publishedAt)}
         </span>
         {frontmatter.tags?.length && frontmatter.tags?.length > 0 ? (
           <>
@@ -148,15 +144,17 @@ export default async function Page({ params }) {
         )}
       </div>
       <div className="relative">
-        {/* Sidebar */}
+        {/* Sidebar TOC */}
         {(headings.length > 1 ||
           (!!headings[0] &&
             Array.isArray(headings[0].children) &&
             headings[0].children?.length > 0)) && (
           <div className="top-8 hidden xl:block sticky">
-            <div className="absolute -right-8 translate-x-full top-0 w-1/2 text-sm text-slate-500 space-y-2">
-              <strong>Table of contents</strong>
-              <ul className="space-y-2 font-mono tracking-tighter">
+            <div className="absolute -right-8 translate-x-full top-0 w-1/2 text-sm text-slate-500 space-y-3">
+              <span className="font-bold uppercase tracking-wider">
+                Table of contents
+              </span>
+              <ul className="space-y-3 font-mono tracking-tighter">
                 {headings.map((heading) => (
                   <TOCHeading key={heading.text} {...heading} />
                 ))}
@@ -225,7 +223,7 @@ function TOCHeading(props: Heading) {
         {`#`.repeat(props.level)} {props.text}
       </a>
       {Array.isArray(props.children) && props.children.length > 0 && (
-        <ul className="pl-4 space-y-2 mt-2">
+        <ul className="pl-4 space-y-3 mt-2">
           {props.children.map((child) => (
             <TOCHeading key={child.text} {...child} />
           ))}
