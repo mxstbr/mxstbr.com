@@ -61,15 +61,23 @@ So far, I have invested in:
 
 <ItemList>
   {investments.map((investment) => (
-    <ItemListItem
-      key={investment.href}
-      left={
+    <li
+      className="flex flex-1 items-center space-x-4 pl-0"
+      key={investment.hrea}
+    >
+      <div className="text-slate-900 dark:text-slate-100 shrink-0">
         <a target="_blank" href={investment.href}>
           {investment.name}
         </a>
-      }
-      right={investment.description}
-    />
+      </div>
+      <span
+        className="w-full border-t border-slate-300 border-dashed dark:border-slate-500 min-w-4"
+        style={{ flexShrink: 999999 }}
+      ></span>
+      <div className="text-slate-600 text-right dark:text-slate-400 tabular-nums">
+        {investment.description}
+      </div>
+    </li>
   ))}
 </ItemList>
 
