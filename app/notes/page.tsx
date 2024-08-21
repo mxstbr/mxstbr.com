@@ -66,7 +66,7 @@ export default async function WritingPage() {
         </p>
       </Prose>
       <h2 className="font-bold text-2xl">By Topic</h2>
-      <ul className="pl-0 grid sm:grid-cols-2 gap-x-8 gap-y-6">
+      <ul className="pl-0 grid sm:grid-cols-2 gap-x-8 gap-y-4 sm:gap-y-6">
         {tags.map((tag) => {
           const notesCount = notes.filter((note) =>
             note.frontmatter.tags?.find((t) => t.slug === tag.slug),
