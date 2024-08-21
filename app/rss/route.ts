@@ -2,8 +2,10 @@ import { prodUrl } from 'app/sitemap'
 import { getBlogPosts } from 'app/thoughts/utils'
 import { getNotes } from '../data/notes'
 
+export const dynamic = 'force-static'
+
 export async function GET() {
-  let allBlogs = await getBlogPosts({ archived: true })
+  let allBlogs = getBlogPosts({ archived: true })
 
   const blogXml = allBlogs
     .sort((a, b) => {
