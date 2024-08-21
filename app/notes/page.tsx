@@ -41,11 +41,11 @@ export default async function WritingPage() {
         <p>
           The below is my{' '}
           <Link href="/notes/digital-garden">digital garden</Link> full of my
-          collection of exploratory notes. Some of these ideas are still
-          developing and I'm actively tending to them, others are more developed
-          but too small for a <Link href="/">standalone essay</Link>. Either
-          way, all of these ideas tickled my brain in some significant way, be
-          it that they surprised or influenced me.
+          exploratory personal notes. Some of these ideas are still developing
+          and I'm actively tending to them, others are more developed but too
+          small for a <Link href="/">standalone essay</Link>. Either way, all of
+          these ideas tickled my brain in some significant way, be it that they
+          surprised or influenced me.
         </p>
         <p>
           <mark>
