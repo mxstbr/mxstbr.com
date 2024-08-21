@@ -3,6 +3,7 @@ import { navItems } from './components/nav'
 import { getNotes } from './data/notes'
 
 export const prodUrl = 'https://mxstbr.com'
+export const dynamic = 'force-static'
 
 export default async function sitemap() {
   let blogs = getBlogPosts({ archived: true }).map((post) => ({
