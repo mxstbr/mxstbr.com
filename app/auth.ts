@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 
-export function auth(): string {
+export function auth(): string | undefined {
   const cookieStore = cookies()
   const password = cookieStore.get('password')
 
