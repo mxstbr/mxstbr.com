@@ -188,7 +188,7 @@ export default async function Page({ params }) {
       {relatedNotes.length > 0 && (
         <div className="my-32 relative">
           {/* Background */}
-          <div className="absolute -top-10 -left-10 -right-10 -bottom-10 bg-slate-100 dark:bg-slate-900 sm:rounded-md border border-solid border-slate-300 dark:border-slate-700" />
+          <div className="absolute -top-6 -left-6 -right-6 -bottom-6 sm:-top-10 sm:-left-10 sm:-right-10 sm:-bottom-10 bg-slate-100 dark:bg-slate-900 sm:rounded-md border border-solid border-slate-300 dark:border-slate-700" />
           <div className="relative">
             <h1 className="text-xl font-bold mt-0 mb-8">
               Other notes about{' '}
