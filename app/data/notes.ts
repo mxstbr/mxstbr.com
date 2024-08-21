@@ -10,6 +10,7 @@ const GET_POSTS_QUERY = /* GraphQL */ `
         edges {
           node {
             id
+            cuid
             slug
             title
             coverImage {
@@ -37,6 +38,7 @@ const GET_POSTS_QUERY = /* GraphQL */ `
   }
 `
 type Frontmatter = {
+  cuid: string
   title: string
   summary: string
   slug: string
@@ -79,6 +81,7 @@ export async function getNotes(): Promise<Array<Note>> {
 
       return {
         frontmatter: {
+          cuid: post.cuid,
           title: post.title,
           summary: post.seo.description,
           slug: post.slug,

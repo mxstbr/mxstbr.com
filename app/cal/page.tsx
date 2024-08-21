@@ -6,6 +6,7 @@ import Year from './Year'
 import type { Event } from './data'
 import { redirect } from 'next/navigation'
 import { PasswordForm } from './password-form'
+import { auth, isMax } from '../auth'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -20,8 +21,7 @@ type RedisEvent = Event & {
 }
 
 async function getEvents(password: string) {
-  if (password !== process.env.CAL_PASSWORD)
-    throw new Error('Invalid password.')
+  if (!isMax()) throw new Error('Invalid password.')
 
   const data = await redis.json.get(`cal:${password}`)
 
@@ -35,14 +35,13 @@ async function getEvents(password: string) {
 }
 
 export default async function Plan() {
-  const cookieStore = cookies()
-  const password = cookieStore.get('password')
+  const password = auth()
 
   if (!password) return <PasswordForm />
 
   let events
   try {
-    events = await getEvents(password.value)
+    events = await getEvents(password)
   } catch (err) {
     return <PasswordForm error="Invalid password." />
   }

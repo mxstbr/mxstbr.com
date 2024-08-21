@@ -13,7 +13,9 @@ import { useMDXComponents } from '../../../mdx-components'
 import Link from 'next/link'
 import ArrowLeft from 'react-feather/dist/icons/arrow-left'
 import Tag from 'react-feather/dist/icons/tag'
+import Edit from 'react-feather/dist/icons/edit-3'
 import { slugify } from '../../slugify'
+import { isMax } from 'app/auth'
 
 export async function generateStaticParams() {
   return (await getNotes()).map((note) => note.frontmatter.slug)
@@ -209,6 +211,16 @@ export default async function Page({ params }) {
             </ul>
           </div>
         </div>
+      )}
+      {/* Admin-only: Edit button */}
+      {isMax() && (
+        <a
+          className="fixed bottom-8 right-8 bg-white rounded-full p-4 shadow-md text-slate-500"
+          target="_blank"
+          href={`https://hashnode.com/edit/${note.frontmatter.cuid}`}
+        >
+          <Edit />
+        </a>
       )}
     </section>
   )
