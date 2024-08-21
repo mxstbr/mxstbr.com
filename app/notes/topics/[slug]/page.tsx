@@ -7,6 +7,15 @@ import { getNotes } from '../../../data/notes'
 import { formatDate } from '../../../thoughts/utils'
 import type { Metadata } from 'next'
 
+export const dynamic = 'force-static'
+export const revalidate = 60
+
+export async function generateStaticParams() {
+  return (await getNotes()).map((note) =>
+    note.frontmatter.tags?.flatMap((tag) => tag.slug),
+  )
+}
+
 export async function generateMetadata({ params }): Promise<Metadata> {
   const allNotes = await getNotes()
   const tag = allNotes

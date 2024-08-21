@@ -7,6 +7,9 @@ import Tag from 'react-feather/dist/icons/tag'
 import { ItemList, ItemListItem } from '../components/item-list'
 import type { Metadata } from 'next'
 
+export const dynamic = 'force-static'
+export const revalidate = 60
+
 export const metadata: Metadata = {
   title: 'Notes',
   description:
