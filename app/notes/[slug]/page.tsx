@@ -122,7 +122,7 @@ export default async function Page({ params }) {
         <ArrowLeft size="1em" /> All Notes
       </Link>
       <div className="relative">
-        <h1 className="title font-bold text-4xl mt-6 mb-6">
+        <h1 className="title font-bold text-3xl xl:text-4xl mt-6 mb-6">
           {frontmatter.title}
         </h1>
 
@@ -130,7 +130,7 @@ export default async function Page({ params }) {
         <div className="my-8 xl:my-0 xl:top-8 xl:sticky">
           <div className="font-mono text-sm text-slate-500 xl:absolute xl:-right-6 xl:pl-6 xl:translate-x-full xl:top-0 xl:w-72 xl:space-y-6 xl:border xl:border-y-0 xl:border-r-0">
             <div className="flex flex-row xl:flex-col xl:gap-y-4">
-              <div className="space-y-1 xl:space-y-2 border-2 border-y-0 border-l-0 pr-6 xl:pr-0 xl:w-full xl:border-none">
+              <div className="shrink-0 space-y-1 xl:space-y-2 border-2 border-y-0 border-l-0 pr-6 xl:pr-0 xl:w-full xl:border-none">
                 <p className="uppercase font-bold">Last updated</p>
                 <div>
                   {formatDate(frontmatter.updatedAt || frontmatter.publishedAt)}
