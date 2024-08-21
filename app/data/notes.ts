@@ -19,6 +19,7 @@ const GET_POSTS_QUERY = /* GraphQL */ `
             content {
               markdown
             }
+            readTimeInMinutes
             publishedAt
             updatedAt
             seo {
@@ -43,6 +44,7 @@ type Frontmatter = {
   summary: string
   slug: string
   publishedAt: string
+  readTimeInMinutes: number
   updatedAt?: string
   tags?: Array<{
     name: string
@@ -83,6 +85,7 @@ export async function getNotes(): Promise<Array<Note>> {
           summary: post.seo.description,
           slug: post.slug,
           publishedAt: post.publishedAt,
+          readTimeInMinutes: post.readTimeInMinutes,
           updatedAt: post.updatedAt,
           tags: post.tags.map((tag) => ({
             slug: tag.slug,

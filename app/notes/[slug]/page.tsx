@@ -158,6 +158,10 @@ export default async function Page({ params }) {
               ) : (
                 ''
               )}
+              <div className="space-y-1 xl:space-y-2 hidden xl:block">
+                <p className="uppercase font-bold">Reading time</p>
+                <div>{note.frontmatter.readTimeInMinutes} mins</div>
+              </div>
             </div>
             {(headings.length > 1 ||
               (!!headings[0] &&
