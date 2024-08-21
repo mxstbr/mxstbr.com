@@ -43,22 +43,24 @@ export default async function WritingPage() {
         <h1>Notes</h1>
         <p>
           This is my <Link href="/notes/digital-garden">digital garden</Link>{' '}
-          where I cultivate my ideas. I share these explorations early, so don't
-          expect polished thoughts. (you can find those in{' '}
+          where I cultivate my ideas. I share these explorations early, so{' '}
+          <mark>don't expect polished thoughts.</mark> (you can find those in{' '}
           <Link href="/">my essays</Link>) If an idea is in this digital garden,
           then it's an idea that tickled my brain in some significant way,
-          something that surprised or influenced me.
+          something that surprised or influenced me, that I want to explore
+          further.
         </p>
         <p>
+          So,{' '}
           <mark>
-            If any of these ideas tickle your brain in some way, I want to hear
+            if any of these ideas tickle your brain in some way, I want to hear
             about it
           </mark>
-          . That kind of conversation is exactly why I{' '}
+          ! That kind of conversation is exactly why I{' '}
           <Link href="/notes/digital-garden#why-publish-it-publicly">
             default to open
           </Link>{' '}
-          with these notes! Contact me via{' '}
+          with these notes. Contact me via{' '}
           <a href="mailto:contact@mxstbr.com?subject=Digital garden">email</a>{' '}
           or <a href="https://x.com/mxstbr">Twitter/X DMs</a>.
         </p>
