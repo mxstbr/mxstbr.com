@@ -16,6 +16,9 @@ import Tag from 'react-feather/dist/icons/tag'
 import { slugify } from '../../slugify'
 import { EditButton } from './edit-button'
 
+export const dynamic = 'force-static'
+export const revalidate = 60
+
 export async function generateStaticParams() {
   return (await getNotes()).map((note) => note.frontmatter.slug)
 }
