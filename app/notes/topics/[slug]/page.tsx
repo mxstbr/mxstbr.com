@@ -50,7 +50,7 @@ export default async function Page({ params }) {
           href="/notes"
           className="flex flex-row items-center gap-2 uppercase text-sm font-bold tracking-wider no-underline hover:underline"
         >
-          <ArrowLeft size="1em" /> All Notes
+          <ArrowLeft size="1em" /> All Topics
         </Link>
         <h1 className="my-6 text-4xl font-bold">{tag.name}</h1>
         <Prose>

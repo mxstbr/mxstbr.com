@@ -122,54 +122,64 @@ export default async function Page({ params }) {
         <ArrowLeft size="1em" /> All Notes
       </Link>
       <div className="relative">
-        {/* Sidebar TOC */}
-        {(headings.length > 1 ||
-          (!!headings[0] &&
-            Array.isArray(headings[0].children) &&
-            headings[0].children?.length > 0)) && (
-          <div className="top-8 hidden xl:block sticky">
-            <div className="absolute -right-4 pl-6 translate-x-full top-0 w-1/2 text-sm text-slate-500 space-y-3  border border-y-0 border-r-0">
-              <span className="font-bold uppercase tracking-wider">
-                Table of contents
-              </span>
-              <ul className="space-y-3 font-mono tracking-tighter">
-                {headings.map((heading) => (
-                  <TOCHeading key={heading.text} {...heading} />
-                ))}
-              </ul>
-            </div>
-          </div>
-        )}
-
         <h1 className="title font-bold text-4xl mt-6 mb-6">
           {frontmatter.title}
         </h1>
-        <hr className="my-6" />
-        <div className="text-md flex justify-between items-center flex-wrap gap-x-4 mb-10 text-slate-500 dark:text-slate-400">
-          <span>
-            Last updated{' '}
-            {formatDate(frontmatter.updatedAt || frontmatter.publishedAt)}
-          </span>
-          {frontmatter.tags?.length && frontmatter.tags?.length > 0 ? (
-            <>
-              <span className="text-slate-300">|</span>
-              <div className="flex flex-row gap-x-4">
-                {frontmatter.tags?.map((tag) => (
-                  <Link
-                    key={tag.slug}
-                    href={`/notes/topics/${tag.slug}`}
-                    className="flex flex-row gap-1 items-center"
-                  >
-                    <Tag size="0.8em" className="opacity-75 text-slate-500" />
-                    {tag.name}
-                  </Link>
-                ))}
+
+        {/* Metadata, renders as sidebar on desktop (> xl) */}
+        <div className="my-8 xl:my-0 xl:top-8 xl:sticky">
+          <div className="font-mono text-sm text-slate-500 xl:absolute xl:-right-6 xl:pl-6 xl:translate-x-full xl:top-0 xl:w-72 xl:space-y-6 xl:border xl:border-y-0 xl:border-r-0">
+            <div className="flex flex-row xl:flex-col xl:gap-y-4">
+              <div className="space-y-1 xl:space-y-2 border-2 border-y-0 border-l-0 pr-6 xl:pr-0 xl:w-full xl:border-none">
+                <p className="uppercase font-bold">Last updated</p>
+                <div>
+                  {formatDate(frontmatter.updatedAt || frontmatter.publishedAt)}
+                </div>
               </div>
-            </>
-          ) : (
-            ''
-          )}
+              {frontmatter.tags?.length && frontmatter.tags?.length > 0 ? (
+                <div className="space-y-1 xl:space-y-2 xl:w-full pl-6 xl:pl-0">
+                  <p className="uppercase font-bold">Topics</p>
+                  <div className="flex flex-row flex-wrap gap-x-2 gap-y-1">
+                    {frontmatter.tags?.map((tag) => (
+                      <Link
+                        key={tag.slug}
+                        href={`/notes/topics/${tag.slug}`}
+                        className="flex flex-row gap-1 items-center"
+                      >
+                        <Tag
+                          size="0.8em"
+                          className="opacity-75 text-slate-500"
+                        />
+                        {tag.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                ''
+              )}
+            </div>
+            {(headings.length > 1 ||
+              (!!headings[0] &&
+                Array.isArray(headings[0].children) &&
+                headings[0].children?.length > 0)) && (
+              <>
+                <hr className="hidden xl:block" />
+                <div className="hidden xl:block space-y-2">
+                  <div className="font-mono font-bold uppercase tracking-wider">
+                    Table of contents
+                  </div>
+                  <ul className="space-y-2 font-mono tracking-tighter">
+                    {headings.map((heading) => (
+                      <TOCHeading key={heading.text} {...heading} />
+                    ))}
+                  </ul>
+                </div>
+              </>
+            )}
+          </div>
         </div>
+
         {/* Content */}
         <Prose className="prose-lg">
           <MDXContent />
@@ -234,7 +244,7 @@ function TOCHeading(props: Heading) {
         {props.text}
       </a>
       {Array.isArray(props.children) && props.children.length > 0 && (
-        <ul className="pl-4 space-y-3 mt-2">
+        <ul className="pl-4 space-y-1 mt-1">
           {props.children.map((child) => (
             <TOCHeading key={child.text} {...child} />
           ))}
@@ -270,15 +280,17 @@ function parseMarkdownHeadings(markdown) {
       const match = line.match(/^(#{1,6})\s+(.*)$/)
       if (match) {
         const level = match[1].length
-        const text = match[2]
-        const item = { level, text, children: [] }
+        if (level === 2) {
+          const text = match[2]
+          const item = { level, text, children: [] }
 
-        while (stack.length > 1 && stack[stack.length - 1].level >= level) {
-          stack.pop()
+          while (stack.length > 1 && stack[stack.length - 1].level >= level) {
+            stack.pop()
+          }
+
+          stack[stack.length - 1].children.push(item)
+          stack.push(item)
         }
-
-        stack[stack.length - 1].children.push(item)
-        stack.push(item)
       }
     }
   })
