@@ -92,7 +92,7 @@ export default async function Page({ params }) {
   )
 
   return (
-    <section>
+    <section className="relative">
       <script
         type="application/ld+json"
         suppressHydrationWarning
@@ -121,32 +121,6 @@ export default async function Page({ params }) {
       >
         <ArrowLeft size="1em" /> All Notes
       </Link>
-      <h1 className="title font-bold text-4xl mt-6 mb-6">
-        {frontmatter.title}
-      </h1>
-      <div className="text-md flex items-center flex-wrap gap-x-4 mb-10 text-slate-500 dark:text-slate-400">
-        <span>
-          Last updated{' '}
-          {formatDate(frontmatter.updatedAt || frontmatter.publishedAt)}
-        </span>
-        {frontmatter.tags?.length && frontmatter.tags?.length > 0 ? (
-          <>
-            <span className="text-slate-300">|</span>
-            {frontmatter.tags?.map((tag) => (
-              <Link
-                key={tag.slug}
-                href={`/notes/topics/${tag.slug}`}
-                className="flex flex-row gap-1 items-center"
-              >
-                <Tag size="0.8em" className="opacity-75 text-slate-500" />
-                {tag.name}
-              </Link>
-            ))}
-          </>
-        ) : (
-          ''
-        )}
-      </div>
       <div className="relative">
         {/* Sidebar TOC */}
         {(headings.length > 1 ||
@@ -166,6 +140,36 @@ export default async function Page({ params }) {
             </div>
           </div>
         )}
+
+        <h1 className="title font-bold text-4xl mt-6 mb-6">
+          {frontmatter.title}
+        </h1>
+        <hr className="my-6" />
+        <div className="text-md flex justify-between items-center flex-wrap gap-x-4 mb-10 text-slate-500 dark:text-slate-400">
+          <span>
+            Last updated{' '}
+            {formatDate(frontmatter.updatedAt || frontmatter.publishedAt)}
+          </span>
+          {frontmatter.tags?.length && frontmatter.tags?.length > 0 ? (
+            <>
+              <span className="text-slate-300">|</span>
+              <div className="flex flex-row gap-x-4">
+                {frontmatter.tags?.map((tag) => (
+                  <Link
+                    key={tag.slug}
+                    href={`/notes/topics/${tag.slug}`}
+                    className="flex flex-row gap-1 items-center"
+                  >
+                    <Tag size="0.8em" className="opacity-75 text-slate-500" />
+                    {tag.name}
+                  </Link>
+                ))}
+              </div>
+            </>
+          ) : (
+            ''
+          )}
+        </div>
         {/* Content */}
         <Prose className="prose-lg">
           <MDXContent />
