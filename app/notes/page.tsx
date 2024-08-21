@@ -42,24 +42,23 @@ export default async function WritingPage() {
       <Prose>
         <h1>Notes</h1>
         <p>
-          The below is my{' '}
-          <Link href="/notes/digital-garden">digital garden</Link> full of my
-          exploratory personal notes. Some of these ideas are still developing
-          and I'm actively tending to them, others are more developed but too
-          small for a <Link href="/">standalone essay</Link>. Either way, all of
-          these ideas tickled my brain in some significant way, be it that they
-          surprised or influenced me.
+          This is my <Link href="/notes/digital-garden">digital garden</Link>{' '}
+          where I cultivate my ideas. I share these explorations early, so don't
+          expect polished thoughts. (you can find those in{' '}
+          <Link href="/">my essays</Link>) If an idea is in this digital garden,
+          then it's an idea that tickled my brain in some significant way,
+          something that surprised or influenced me.
         </p>
         <p>
           <mark>
             If any of these ideas tickle your brain in some way, I want to hear
             about it
           </mark>
-          ! That kind of conversation is exactly why I{' '}
+          . That kind of conversation is exactly why I{' '}
           <Link href="/notes/digital-garden#why-publish-it-publicly">
             default to open
           </Link>{' '}
-          with these notes. You can reach me via{' '}
+          with these notes! Contact me via{' '}
           <a href="mailto:contact@mxstbr.com?subject=Digital garden">email</a>{' '}
           or <a href="https://x.com/mxstbr">Twitter/X DMs</a>.
         </p>
