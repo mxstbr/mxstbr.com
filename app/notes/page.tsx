@@ -51,16 +51,15 @@ export default async function WritingPage() {
           further.
         </p>
         <p>
-          So,{' '}
           <mark>
-            if any of these ideas tickle your brain in some way, I want to hear
+            If any of these ideas tickle your brain in some way, I want to hear
             about it
           </mark>
-          ! That kind of conversation is exactly why I{' '}
+          . That kind of conversation is exactly why I{' '}
           <Link href="/notes/digital-garden#why-publish-it-publicly">
             default to open
           </Link>{' '}
-          with these notes. Contact me via{' '}
+          with these notes! Contact me via{' '}
           <a href="mailto:contact@mxstbr.com?subject=Digital garden">email</a>{' '}
           or <a href="https://x.com/mxstbr">Twitter/X DMs</a>.
         </p>

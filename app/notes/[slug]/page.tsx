@@ -136,6 +136,10 @@ export default async function Page({ params }) {
                   {formatDate(frontmatter.updatedAt || frontmatter.publishedAt)}
                 </div>
               </div>
+              <div className="space-y-1 xl:space-y-2 hidden xl:block">
+                <p className="uppercase font-bold">Reading time</p>
+                <div>{note.frontmatter.readTimeInMinutes} mins</div>
+              </div>
               {frontmatter.tags?.length && frontmatter.tags?.length > 0 ? (
                 <div className="space-y-1 xl:space-y-2 xl:w-full pl-6 xl:pl-0">
                   <p className="uppercase font-bold">Topics</p>
@@ -158,10 +162,6 @@ export default async function Page({ params }) {
               ) : (
                 ''
               )}
-              <div className="space-y-1 xl:space-y-2 hidden xl:block">
-                <p className="uppercase font-bold">Reading time</p>
-                <div>{note.frontmatter.readTimeInMinutes} mins</div>
-              </div>
             </div>
             {(headings.length > 1 ||
               (!!headings[0] &&
