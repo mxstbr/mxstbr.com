@@ -42,8 +42,8 @@ export async function GET(request: Request) {
         tw="flex flex-col w-full h-full items-center justify-center bg-slate-50 text-slate-900"
         style={{ fontFamily: '"Inter"' }}
       >
-        <div tw="absolute top-0 left-0 right-0 flex flex-row w-full justify-between items-center px-16 pt-8 text-slate-600">
-          <h1 tw="font-bold text-4xl">
+        <div tw="absolute top-0 left-0 right-0 flex flex-row w-full justify-between items-center px-16 pt-8 text-slate-500">
+          <h1 tw="font-normal text-3xl">
             {name || (root ? 'mxstbr.com' : 'Max Stoiber')}
           </h1>
           <p tw="text-3xl">@mxstbr</p>
@@ -55,11 +55,11 @@ export async function GET(request: Request) {
           >
             {root ? 'Max Stoiber' : title}
           </h2>
-          <div tw="absolute flex flex-row text-3xl -bottom-16 text-slate-600">
+          <div tw={`text-3xl text-slate-500 ${root ? '' : 'mt-2'}`}>
             {root ? 'CEO & Co-Founder, Stellate' : subtitle}
           </div>
         </div>
-        <div tw="absolute bottom-0 left-0 right-0 flex flex-row w-full justify-between items-center px-16 pb-8 text-3xl"></div>
+        {/* <div tw="absolute bottom-0 left-0 right-0 flex flex-row w-full justify-between items-center px-16 pb-8 text-3xl"></div> */}
       </div>
     ),
     {

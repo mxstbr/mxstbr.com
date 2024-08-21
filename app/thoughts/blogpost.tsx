@@ -16,7 +16,7 @@ export async function generateStaticParams() {
 function generateOgImage(post) {
   if (post.metadata.image) return post.metadata.image
 
-  return `${prodUrl}/og?title=${encodeURIComponent(
+  return `${prodUrl}/og?name=${encodeURIComponent("Max Stoiber's Essays")}&title=${encodeURIComponent(
     post.metadata.title,
   )}&subtitle=${
     post.metadata.views > 0
