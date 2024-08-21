@@ -22,7 +22,7 @@ export function Navbar() {
     >
       <Link
         href="/"
-        className="transition-all hover:text-slate-800 dark:hover:text-slate-200 flex align-middle relative py-1 pr-2 no-underline space-x-2 shrink-0"
+        className="transition-all hover:text-slate-800 dark:hover:text-slate-200 flex items-center relative py-1 pr-2 no-underline space-x-2 shrink-0"
       >
         <Image
           src={avatar}
