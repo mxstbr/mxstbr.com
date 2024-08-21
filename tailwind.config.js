@@ -22,6 +22,9 @@ module.exports = {
             code: {
               fontWeight: 'inherit',
             },
+            blockquote: {
+              fontWeight: 'inherit',
+            },
             '--tw-prose-pre-bg': theme('colors.slate.100'),
             '--tw-prose-pre-code': theme('colors.black'),
             '--tw-prose-invert-pre-bg': theme('colors.slate.900'),

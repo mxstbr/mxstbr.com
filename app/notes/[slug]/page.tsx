@@ -117,10 +117,10 @@ export default async function Page({ params }) {
       >
         <ArrowLeft size="1em" /> All Notes
       </Link>
-      <h1 className="title font-bold text-4xl mt-6 mb-3">
+      <h1 className="title font-bold text-4xl mt-6 mb-6">
         {frontmatter.title}
       </h1>
-      <div className="text-md flex items-center flex-wrap gap-x-4 mb-6 text-slate-600 dark:text-slate-400">
+      <div className="text-md flex items-center flex-wrap gap-x-4 mb-10 text-slate-500 dark:text-slate-400">
         <span>
           Last updated{' '}
           {formatDate(frontmatter.updatedAt || frontmatter.publishedAt)}
