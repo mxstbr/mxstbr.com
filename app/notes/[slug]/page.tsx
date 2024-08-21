@@ -127,14 +127,14 @@ export default async function Page({ params }) {
         </span>
         {frontmatter.tags?.length && frontmatter.tags?.length > 0 ? (
           <>
-            <span>|</span>
+            <span className="text-slate-300">|</span>
             {frontmatter.tags?.map((tag) => (
               <Link
                 key={tag.slug}
                 href={`/notes/topics/${tag.slug}`}
                 className="flex flex-row gap-1 items-center"
               >
-                <Tag size="0.8em" className="text-slate-500" />
+                <Tag size="0.8em" className="opacity-75 text-slate-500" />
                 {tag.name}
               </Link>
             ))}
@@ -150,7 +150,7 @@ export default async function Page({ params }) {
             Array.isArray(headings[0].children) &&
             headings[0].children?.length > 0)) && (
           <div className="top-8 hidden xl:block sticky">
-            <div className="absolute -right-8 translate-x-full top-0 w-1/2 text-sm text-slate-500 space-y-3">
+            <div className="absolute -right-4 pl-6 translate-x-full top-0 w-1/2 text-sm text-slate-500 space-y-3  border border-y-0 border-r-0">
               <span className="font-bold uppercase tracking-wider">
                 Table of contents
               </span>
@@ -180,7 +180,7 @@ export default async function Page({ params }) {
                     href={`/notes/topics/${tag.slug}`}
                     className="inline-flex flex-row items-baseline"
                   >
-                    <Tag size="0.8em" className="mr-1" /> {tag.name}
+                    <Tag size="0.8em" className="opacity-75 mr-1" /> {tag.name}
                   </Link>
                 ))
                 .reduce((result, item) => (

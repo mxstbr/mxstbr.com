@@ -70,7 +70,7 @@ export default async function WritingPage() {
                   href={`/notes/topics/${tag.slug}`}
                   className="flex flex-row gap-1 items-center"
                 >
-                  <Tag size="0.8em" className="text-slate-500" />
+                  <Tag size="0.8em" className="opacity-75 text-slate-500" />
                   {tag.name}
                 </Link>
               }
