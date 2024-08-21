@@ -68,7 +68,7 @@ export default function RootLayout({
     <html
       lang="en"
       className={cx(
-        'text-slate-900 bg-slate-50 dark:text-slate-100 dark:bg-slate-950',
+        'text-slate-900 bg-slate-50 dark:text-slate-100 dark:bg-slate-950 text-[14px] sm:text-[16px]',
         inter.className,
       )}
     >

@@ -35,16 +35,6 @@ html {
   min-width: 360px;
 }
 
-html {
-  font-size: 14px;
-}
-
-@media (min-width: 500px) {
-  html {
-    font-size: 16px;
-  }
-}
-
 a {
   @apply underline decoration-slate-300 decoration-2 hover:decoration-slate-350;
   @apply dark:decoration-slate-600 dark:hover:decoration-slate-500;
