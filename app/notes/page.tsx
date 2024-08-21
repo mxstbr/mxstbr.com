@@ -87,8 +87,8 @@ export default async function WritingPage() {
           )
         })}
       </ul>
-      <h2 className="font-bold text-2xl">All Notes</h2>
-      <ul className="space-y-8 sm:space-y-6">
+      <h2 className="font-bold text-2xl">By Last Updated</h2>
+      <ul>
         {notes
           // Filter out pure templates (but not notes that also include templates)
           .filter(
@@ -98,21 +98,28 @@ export default async function WritingPage() {
           )
           .sort(
             (a, b) =>
-              new Date(b.frontmatter.publishedAt).getTime() -
-              new Date(a.frontmatter.publishedAt).getTime(),
+              new Date(
+                b.frontmatter.updatedAt || b.frontmatter.publishedAt,
+              ).getTime() -
+              new Date(
+                a.frontmatter.updatedAt || a.frontmatter.publishedAt,
+              ).getTime(),
           )
           .map((note) => (
             <li
               key={note.frontmatter.slug}
-              className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-6"
+              className="flex flex-col space-y-2 border-b last:border-b-0 py-8 first:pt-0 last:pb-0"
             >
-              <div className="text-sm sm:text-base font-mono tracking-tight shrink-0 tabular-nums text-slate-500">
-                {formatDate(note.frontmatter.publishedAt)}
+              <div className="shrink-0 tabular-nums text-slate-500">
+                Updated{' '}
+                {formatDate(
+                  note.frontmatter.updatedAt || note.frontmatter.publishedAt,
+                )}
               </div>
               <div className="space-y-2">
                 <Link
                   href={`/notes/${note.frontmatter.slug}`}
-                  className="font-medium"
+                  className="font-medium text-lg"
                 >
                   {note.frontmatter.title}
                 </Link>
