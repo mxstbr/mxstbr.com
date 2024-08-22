@@ -82,7 +82,7 @@ export default function FeedbackForm() {
           </div>
           <textarea
             name="thoughts"
-            placeholder="What's your take?"
+            placeholder="Comments, questions, pushback, feedback,… all welcome"
             value={thoughts}
             onChange={(e) => setThoughts(e.target.value)}
             className="border rounded-md w-full border-slate-300 dark:border-slate-600 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
