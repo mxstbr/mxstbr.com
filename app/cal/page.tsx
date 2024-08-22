@@ -47,7 +47,7 @@ export default async function Plan() {
   }
 
   return (
-    <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] overflow-x-scroll">
+    <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] overflow-x-scroll bg-slate-50 text-slate-900">
       <div className="md:px-16">
         <Year events={events} />
       </div>

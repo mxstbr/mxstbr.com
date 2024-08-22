@@ -345,10 +345,7 @@ function Borders(props: BorderProps) {
           style={{
             width: `100%`,
             // Gray borders need to be below colored borders
-            zIndex:
-              top.length === 1 && top[0] === DEFAULT_BORDER_COLOR
-                ? -1
-                : undefined,
+            zIndex: top.length === 1 && top[0] === DEFAULT_BORDER_COLOR ? 0 : 1,
           }}
         >
           {top.map((color, index) => (
@@ -377,9 +374,7 @@ function Borders(props: BorderProps) {
             width: `100%`,
             // Gray borders need to be below colored borders
             zIndex:
-              bottom.length === 1 && bottom[0] === DEFAULT_BORDER_COLOR
-                ? -1
-                : undefined,
+              bottom.length === 1 && bottom[0] === DEFAULT_BORDER_COLOR ? 0 : 1,
           }}
         >
           {bottom.map((color, index) => (
@@ -409,9 +404,7 @@ function Borders(props: BorderProps) {
             height: `100%`,
             // Gray borders need to be below colored borders
             zIndex:
-              left.length === 1 && left[0] === DEFAULT_BORDER_COLOR
-                ? -1
-                : undefined,
+              left.length === 1 && left[0] === DEFAULT_BORDER_COLOR ? 0 : 1,
           }}
         >
           {left.map((color, index) => (
@@ -441,9 +434,7 @@ function Borders(props: BorderProps) {
             height: `100%`,
             // Gray borders need to be below colored borders
             zIndex:
-              right.length === 1 && right[0] === DEFAULT_BORDER_COLOR
-                ? -1
-                : undefined,
+              right.length === 1 && right[0] === DEFAULT_BORDER_COLOR ? 0 : 1,
           }}
         >
           {right.map((color, index) => (
