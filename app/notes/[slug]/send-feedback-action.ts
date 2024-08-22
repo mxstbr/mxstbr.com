@@ -7,10 +7,20 @@ export async function submitFeedback(formData: FormData, noteSlug: string) {
   if (!thoughts?.toString().trim()) return { success: false }
 
   const result = await sendTelegramMessage(
-    `<em>${email || 'Somebody'} replied to <a href="https://mxstbr.com/notes/${noteSlug}">${noteSlug}</a>:</em>\n<blockquote>${thoughts.toString().trim()}</blockquote>`,
+    `_${email ? escapeForTelegram(email.toString()) : 'Somebody'} replied to [${noteSlug}](https://mxstbr.com/notes/${noteSlug}):_\n>${thoughts
+      .toString()
+      .trim()
+      .split('\n')
+      .map((line) => escapeForTelegram(line))
+      .join('\n>')}`,
   )
 
   return { success: result }
+}
+
+// Escape special chars; from https://stackoverflow.com/questions/40626896/telegram-does-not-escape-some-markdown-characters#comment132933479_71313944
+function escapeForTelegram(string: string) {
+  return string.replace(/([|{\[\]*_~}+)`(#>!=\-.])/gm, '\\$1')
 }
 
 async function sendTelegramMessage(text: string) {
@@ -25,7 +35,7 @@ async function sendTelegramMessage(text: string) {
       body: JSON.stringify({
         chat_id: '1010154965',
         text,
-        parse_mode: 'HTML',
+        parse_mode: 'MarkdownV2',
         link_preview_options: {
           is_disabled: true,
         },
