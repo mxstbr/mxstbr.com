@@ -29,14 +29,8 @@ export default function FeedbackForm() {
   const pathname = usePathname()
 
   useEffect(() => {
-    const checkMobile = () => {
-      console.log('WIDTH:', window.innerWidth)
-      setIsExpanded(window.innerWidth >= 640) // 640px is the 'sm' breakpoint in Tailwind
-    }
-
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
+    // Expand by default on desktop
+    setIsExpanded(window.innerWidth >= 640) // 640px is the 'sm' breakpoint in Tailwind
   }, [])
 
   async function clientAction(formData: FormData) {
