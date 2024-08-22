@@ -7,7 +7,7 @@ export async function submitFeedback(formData: FormData, noteSlug: string) {
   if (!thoughts?.toString().trim()) return { success: false }
 
   const result = await sendTelegramMessage(
-    `_${email ? escapeForTelegram(email.toString()) : 'Somebody'} replied to [${noteSlug}](https://mxstbr.com/notes/${noteSlug}):_\n>${thoughts
+    `_${email ? escapeForTelegram(email.toString()) : 'Somebody'} replied to [${escapeForTelegram(noteSlug)}](https://mxstbr.com/notes/${escapeForTelegram(noteSlug)}):_\n>${thoughts
       .toString()
       .trim()
       .split('\n')
