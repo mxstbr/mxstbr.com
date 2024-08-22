@@ -228,33 +228,46 @@ function Day(props: {
     borders.top = [...borders.top, 'black']
   }
 
+  if (isToday(props.day)) {
+    borders.right = [...borders.right, '#a855f7']
+    borders.left = [...borders.left, '#a855f7']
+    borders.top = [...borders.top, '#a855f7']
+    borders.bottom = [...borders.bottom, '#a855f7']
+  }
+
   return (
     <DayWrapper
-      style={
-        dayEvents.some((evt) => !!evt.background)
-          ? {
-              backgroundImage: dayEvents
-                .filter((evt) => !!evt.background)
-                .map((evt) => patterns[evt.background](evt.color, 0.5))
-                .join(', '),
-            }
-          : undefined
-      }
+      style={{
+        background: dayEvents
+          .filter((evt) => !!evt.background)
+          .map((evt) => patterns[evt.background](evt.color, 0.5))
+          .join(', '),
+      }}
     >
-      <div className="absolute bottom-0 left-0 right-0 top-0 flex flex-col justify-between p-2 box-border">
+      <div
+        className={`absolute bottom-0 left-0 right-0 top-0 flex flex-col justify-between p-2 box-border ${isPast(props.day) && !isToday(props.day) ? 'opacity-30' : ''}`}
+      >
         {/* Borders */}
         <Borders {...borders} />
 
         {/* Day number */}
-        <span>
-          {isFirstDayOfMonth(props.day) ? (
-            <>
-              <strong>{format(props.day, 'MMM')}</strong>
-              <br />
-            </>
-          ) : (
-            format(props.day, 'dd')
-          )}
+        <span className={`text-sm opacity-75`}>
+          <span
+            className={
+              isToday(props.day)
+                ? 'bg-red-500 text-white px-1 py-0.5 rounded-md'
+                : ''
+            }
+          >
+            {isFirstDayOfMonth(props.day) ? (
+              <>
+                <strong>{format(props.day, 'MMM')}</strong>
+                <br />
+              </>
+            ) : (
+              format(props.day, 'dd')
+            )}
+          </span>
         </span>
 
         {/* Labels */}
@@ -269,7 +282,7 @@ function Day(props: {
               return (
                 <span
                   key={evt.label}
-                  className="text-sm"
+                  className="text-xs font-semibold"
                   style={{
                     color: evt.color,
                   }}
@@ -282,11 +295,11 @@ function Day(props: {
             return (
               <span
                 key={evt.label}
-                className={`absolute top-8 z-10 text-lg ${
+                className={`absolute top-8 z-10 ${
                   isWeekEventDaysEven(evt, props.day)
                     ? 'right-0 translate-x-1/2'
                     : 'left-1/2 -translate-x-1/2'
-                } w-max -translate-x-1/2 transform text-center`}
+                } w-max -translate-x-1/2 transform text-center font-medium`}
                 style={{
                   color: evt.color,
                 }}
@@ -295,9 +308,6 @@ function Day(props: {
               </span>
             )
           })}
-
-        {/* Cross out past days */}
-        {isPast(props.day) && !isToday(props.day) && <Cross />}
       </div>
     </DayWrapper>
   )
