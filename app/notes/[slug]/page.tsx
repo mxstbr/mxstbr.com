@@ -15,6 +15,7 @@ import ArrowLeft from 'react-feather/dist/icons/arrow-left'
 import Tag from 'react-feather/dist/icons/tag'
 import { slugify } from '../../slugify'
 import { EditButton } from './edit-button'
+import FeedbackForm from './feedback-form'
 
 export const dynamic = 'force-static'
 export const revalidate = 60
@@ -247,6 +248,7 @@ export default async function Page({ params }) {
       )}
       {/* Admin-only: Edit button */}
       <EditButton cuid={note.frontmatter.cuid} />
+      <FeedbackForm />
     </section>
   )
 }
