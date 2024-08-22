@@ -1,10 +1,13 @@
+import type { NextConfig } from 'next'
 import createMDX from '@next/mdx'
 import smartypants from 'remark-smartypants'
 import { getNotes } from './app/data/notes'
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig: NextConfig = {
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
+  devIndicators: {
+    appIsrStatus: false,
+  },
   async redirects() {
     const notes = await getNotes()
     const previousSlugNotesRedirects = notes

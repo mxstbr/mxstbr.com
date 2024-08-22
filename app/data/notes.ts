@@ -39,6 +39,11 @@ const GET_POSTS_QUERY = /* GraphQL */ `
   }
 `
 
+// Other ideas:
+// 'prototype' | 'beta' | 'production'
+// 'draft' | 'developing' | 'finished'
+// 'braindump' | 'exploring' | 'finished'
+// 'seedling' | 'budding' | 'evergreen'
 type Status = 'sketch' | 'prototype' | 'production'
 
 type Frontmatter = {
@@ -48,10 +53,6 @@ type Frontmatter = {
   slug: string
   publishedAt: string
   readTimeInMinutes: number
-  // Other ideas:
-  // 'prototype' | 'beta' | 'production'
-  // 'draft' | 'developing' | 'finished'
-  // 'braindump' | 'exploring' | 'finished'
   status?: Status
   updatedAt?: string
   tags?: Array<{
