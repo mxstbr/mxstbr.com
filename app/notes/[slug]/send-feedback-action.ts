@@ -24,7 +24,6 @@ function escapeForTelegram(string: string) {
 }
 
 async function sendTelegramMessage(text: string) {
-  console.log(text)
   return await fetch(
     `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
     {
