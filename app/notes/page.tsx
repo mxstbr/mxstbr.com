@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import { Note, getNotes } from '../data/notes'
+import { getNotes } from '../data/notes'
 import { formatDate } from '../thoughts/utils'
 import Prose from '../components/prose'
 import Tag from 'react-feather/dist/icons/tag'
@@ -64,7 +64,7 @@ export default async function WritingPage() {
           or <a href="https://x.com/mxstbr">Twitter/X DMs</a>.
         </p>
       </Prose>
-      <h2 className="font-bold text-3xl">By Topic</h2>
+      <h2 className="font-bold text-2xl">By Topic</h2>
       <ul className="pl-0 grid sm:grid-cols-2 gap-x-8 gap-y-4 sm:gap-y-6">
         {tags.map((tag) => {
           const notesCount = notes.filter((note) =>
@@ -87,60 +87,47 @@ export default async function WritingPage() {
           )
         })}
       </ul>
-      <h2 className="font-bold text-3xl">By Maturity</h2>
-      <ItemListItem left={<h3 className="font-bold text-2xl">Production</h3>} />
-      <NotesList
-        notes={notes.filter((note) => note.frontmatter.status === 'production')}
-      />
-      <ItemListItem left={<h3 className="font-bold text-2xl">Prototype</h3>} />
-      <NotesList
-        notes={notes.filter((note) => note.frontmatter.status === 'prototype')}
-      />
-      <ItemListItem left={<h3 className="font-bold text-2xl">Sketch</h3>} />
-      <NotesList
-        notes={notes.filter(
-          (note) =>
-            note.frontmatter.status === 'sketch' || !note.frontmatter.status,
-        )}
-      />
+      <h2 className="font-bold text-2xl">By Last Updated</h2>
+      <ul>
+        {notes
+          // Filter out pure templates (but not notes that also include templates)
+          .filter(
+            (note) =>
+              note.frontmatter.tags?.length !== 1 ||
+              note.frontmatter.tags[0].slug !== 'templates',
+          )
+          .sort(
+            (a, b) =>
+              new Date(
+                b.frontmatter.updatedAt || b.frontmatter.publishedAt,
+              ).getTime() -
+              new Date(
+                a.frontmatter.updatedAt || a.frontmatter.publishedAt,
+              ).getTime(),
+          )
+          .map((note) => (
+            <li
+              key={note.frontmatter.slug}
+              className="flex flex-col space-y-2 border-b last:border-b-0 py-8 first:pt-0 last:pb-0"
+            >
+              <div className="shrink-0 tabular-nums text-slate-500">
+                Updated{' '}
+                {formatDate(
+                  note.frontmatter.updatedAt || note.frontmatter.publishedAt,
+                )}
+              </div>
+              <div className="space-y-2">
+                <Link
+                  href={`/notes/${note.frontmatter.slug}`}
+                  className="font-medium text-lg"
+                >
+                  {note.frontmatter.title}
+                </Link>
+                <p className="text-slate-500">{note.frontmatter.summary}</p>
+              </div>
+            </li>
+          ))}
+      </ul>
     </div>
-  )
-}
-
-function NotesList({ notes }: { notes: Array<Note> }) {
-  return (
-    <ul>
-      {notes
-        // Filter out pure templates (but not notes that also include templates)
-        .filter(
-          (note) =>
-            note.frontmatter.tags?.length !== 1 ||
-            note.frontmatter.tags[0].slug !== 'templates',
-        )
-        .sort(
-          (a, b) =>
-            new Date(b.frontmatter.publishedAt).getTime() -
-            new Date(a.frontmatter.publishedAt).getTime(),
-        )
-        .map((note) => (
-          <li
-            key={note.frontmatter.slug}
-            className="flex flex-col space-y-2 border-b dark:border-slate-700 last:border-b-0 py-8 first:pt-0 last:pb-0"
-          >
-            <div className="shrink-0 tabular-nums text-slate-500">
-              Created {formatDate(note.frontmatter.publishedAt)}
-            </div>
-            <div className="space-y-2">
-              <Link
-                href={`/notes/${note.frontmatter.slug}`}
-                className="font-medium text-lg"
-              >
-                {note.frontmatter.title}
-              </Link>
-              <p className="text-slate-500">{note.frontmatter.summary}</p>
-            </div>
-          </li>
-        ))}
-    </ul>
   )
 }
