@@ -29,8 +29,11 @@ export default function FeedbackForm() {
   const pathname = usePathname()
 
   useEffect(() => {
-    // Expand by default on desktop
-    setIsExpanded(window.innerWidth >= 640) // 640px is the 'sm' breakpoint in Tailwind
+    const sessionState = sessionStorage.getItem('feedback-form-expanded')
+    // Expand by default on desktop if no session-specific state
+    setIsExpanded(
+      !sessionState ? window.innerWidth >= 640 : JSON.parse(sessionState),
+    ) // 640px is the 'sm' breakpoint in Tailwind
   }, [])
 
   async function clientAction(formData: FormData) {
@@ -68,7 +71,10 @@ export default function FeedbackForm() {
             </h2>
             <button
               type="button"
-              onClick={() => setIsExpanded(false)}
+              onClick={() => {
+                sessionStorage.setItem('feedback-form-expanded', 'false')
+                setIsExpanded(false)
+              }}
               className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
             >
               <ChevronDown size={20} />
@@ -98,7 +104,10 @@ export default function FeedbackForm() {
         </form>
       ) : (
         <button
-          onClick={() => setIsExpanded(true)}
+          onClick={() => {
+            sessionStorage.setItem('feedback-form-expanded', 'true')
+            setIsExpanded(true)
+          }}
           className={`mb-4 mr-4 w-12 h-12 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-full flex items-center justify-center shadow-lg hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors`}
         >
           <MessageSquare size={20} />
