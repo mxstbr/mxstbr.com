@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useFormStatus } from 'react-dom'
 import { Toaster, toast } from 'react-hot-toast'
 import { submitFeedback } from './send-feedback-action'
@@ -24,8 +24,20 @@ function SubmitButton() {
 export default function FeedbackForm() {
   const [thoughts, setThoughts] = useState('')
   const [email, setEmail] = useState('')
-  const [isExpanded, setIsExpanded] = useState(true)
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [isMobile, setIsMobile] = useState(true)
   const pathname = usePathname()
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640) // 640px is the 'sm' breakpoint in Tailwind
+      setIsExpanded(window.innerWidth >= 640)
+    }
+
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   async function clientAction(formData: FormData) {
     const result = await submitFeedback(
@@ -87,7 +99,7 @@ export default function FeedbackForm() {
       ) : (
         <button
           onClick={() => setIsExpanded(true)}
-          className="mb-4 mr-4 w-12 h-12 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-full flex items-center justify-center shadow-lg hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors"
+          className={`mb-4 mr-4 w-12 h-12 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-full flex items-center justify-center shadow-lg hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors`}
         >
           <MessageSquare size={20} />
         </button>
