@@ -45,6 +45,10 @@ a {
   @apply dark:decoration-slate-500 dark:hover:decoration-slate-400;
 }
 
+.prose sup a {
+  @apply no-underline;
+}
+
 .prose .anchor {
   @apply absolute invisible no-underline;
 
