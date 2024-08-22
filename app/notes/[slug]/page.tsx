@@ -150,7 +150,7 @@ export default async function Page({ params }) {
                   </Link>
                 </div>
               )}
-              <div className="space-y-1 xl:space-y-2 hidden xl:block">
+              <div className="space-y-1 xl:space-y-2 block sm:hidden px-6 xl:px-0 border-2 border-y-0 dark:border-slate-700 border-r-0 xl:border-none xl:block">
                 <p className="uppercase font-bold">Reading time</p>
                 <div>{note.frontmatter.readTimeInMinutes} mins</div>
               </div>
