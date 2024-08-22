@@ -5,7 +5,8 @@ import { useFormStatus } from 'react-dom'
 import { Toaster, toast } from 'react-hot-toast'
 import { submitFeedback } from './send-feedback-action'
 import { usePathname } from 'next/navigation'
-import { ChevronDown, MessageSquare } from 'react-feather'
+import { ChevronDown, MessageSquare, HelpCircle } from 'react-feather'
+import Link from 'next/link'
 
 function SubmitButton() {
   const { pending } = useFormStatus()
@@ -25,13 +26,12 @@ export default function FeedbackForm() {
   const [thoughts, setThoughts] = useState('')
   const [email, setEmail] = useState('')
   const [isExpanded, setIsExpanded] = useState(false)
-  const [isMobile, setIsMobile] = useState(true)
   const pathname = usePathname()
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 640) // 640px is the 'sm' breakpoint in Tailwind
-      setIsExpanded(window.innerWidth >= 640)
+      console.log('WIDTH:', window.innerWidth)
+      setIsExpanded(window.innerWidth >= 640) // 640px is the 'sm' breakpoint in Tailwind
     }
 
     checkMobile()
@@ -64,7 +64,13 @@ export default function FeedbackForm() {
         >
           <div className="flex justify-between items-center">
             <h2 className="font-semibold mt-0 dark:text-white">
-              I want to know what you think!
+              I want to know what you think!{' '}
+              {/* <Link href="/notes/digital-garden#why-publish-it-publicly">
+                <HelpCircle
+                  size="1em"
+                  className="inline text-current opacity-50 align-baseline"
+                />
+              </Link> */}
             </h2>
             <button
               type="button"
@@ -76,7 +82,7 @@ export default function FeedbackForm() {
           </div>
           <textarea
             name="thoughts"
-            placeholder="What's your take on this? What resonates or doesn't resonate?"
+            placeholder="What's your take?"
             value={thoughts}
             onChange={(e) => setThoughts(e.target.value)}
             className="border rounded-md w-full border-slate-300 dark:border-slate-600 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
