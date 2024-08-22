@@ -34,6 +34,7 @@
     "react": "19.0.0-rc-1eaccd82-20240816",
     "react-dom": "19.0.0-rc-1eaccd82-20240816",
     "react-feather": "^2.0.10",
+    "react-hot-toast": "^2.4.1",
     "react-tweet": "^3.2.1",
     "remark-gfm": "^4.0.0",
     "remark-smartypants": "^3.0.1",

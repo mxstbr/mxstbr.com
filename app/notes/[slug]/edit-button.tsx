@@ -21,7 +21,7 @@ export function EditButton({ cuid }: { cuid: string }) {
 
   return (
     <a
-      className="fixed bottom-8 right-8 bg-white rounded-full p-4 shadow-md text-slate-500"
+      className="fixed bottom-8 left-8 bg-white rounded-full p-4 shadow-md text-slate-500"
       target="_blank"
       href={`https://hashnode.com/edit/${cuid}`}
     >
