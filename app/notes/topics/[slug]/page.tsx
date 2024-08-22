@@ -71,7 +71,7 @@ export default async function Page({ params }) {
           .map((note) => (
             <li
               key={note.frontmatter.slug}
-              className="flex flex-col space-y-2 border-b last:border-b-0 py-8 first:pt-0 last:pb-0"
+              className="flex flex-col space-y-2 border-b dark:border-slate-700 last:border-b-0 py-8 first:pt-0 last:pb-0"
             >
               <div className="space-y-2">
                 <Link
