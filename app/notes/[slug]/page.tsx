@@ -130,6 +130,19 @@ export default async function Page({ params }) {
         <div className="my-8 xl:my-0 xl:top-8 xl:sticky">
           <div className="font-mono text-sm text-slate-500 xl:absolute xl:-right-6 xl:pl-6 xl:translate-x-full xl:top-0 xl:w-72 xl:space-y-6 xl:border xl:border-y-0 xl:border-r-0">
             <div className="flex flex-row xl:flex-col xl:gap-y-4">
+              {frontmatter.status && (
+                <div className="shrink-0 space-y-1 xl:space-y-2 border-2 border-y-0 border-l-0 pr-6 xl:pr-0 xl:w-full xl:border-none">
+                  <p className="uppercase font-bold">Status</p>
+                  <Link
+                    href={`/notes/digital-garden#denoting-the-maturity-of-my-explorations`}
+                    className="block"
+                  >
+                    {/* Uppercase the status */}
+                    {frontmatter.status[0].toUpperCase() +
+                      frontmatter.status.substring(1)}
+                  </Link>
+                </div>
+              )}
               <div className="shrink-0 space-y-1 xl:space-y-2 border-2 border-y-0 border-l-0 pr-6 xl:pr-0 xl:w-full xl:border-none">
                 <p className="uppercase font-bold">Last updated</p>
                 <div>
