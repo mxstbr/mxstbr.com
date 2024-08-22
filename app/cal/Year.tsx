@@ -228,13 +228,6 @@ function Day(props: {
     borders.top = [...borders.top, 'black']
   }
 
-  if (isToday(props.day)) {
-    borders.right = [...borders.right, '#a855f7']
-    borders.left = [...borders.left, '#a855f7']
-    borders.top = [...borders.top, '#a855f7']
-    borders.bottom = [...borders.bottom, '#a855f7']
-  }
-
   return (
     <DayWrapper
       style={{
@@ -245,7 +238,7 @@ function Day(props: {
       }}
     >
       <div
-        className={`absolute bottom-0 left-0 right-0 top-0 flex flex-col justify-between p-2 box-border ${isPast(props.day) && !isToday(props.day) ? 'opacity-30' : ''}`}
+        className={`absolute bottom-0 left-0 right-0 top-0 flex flex-col justify-between p-2 box-border ${isPast(props.day) && !isToday(props.day) ? 'opacity-20' : ''}`}
       >
         {/* Borders */}
         <Borders {...borders} />
