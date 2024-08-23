@@ -81,7 +81,11 @@ export default async function Page({ params }) {
     // @ts-ignore
     {
       ...runtime,
-      remarkPlugins: [remarkSmartypants, remarkGfm],
+      remarkPlugins: [
+        // @ts-ignore
+        remarkSmartypants,
+        remarkGfm,
+      ],
       // @ts-ignore
       useMDXComponents: useMDXComponents,
     },
@@ -236,8 +240,8 @@ export default async function Page({ params }) {
                   key={note.frontmatter.slug}
                   className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-6"
                 >
-                  <div className="text-sm sm:text-base font-mono tracking-tight shrink-0 tabular-nums text-slate-500">
-                    {formatDate(note.frontmatter.publishedAt)}
+                  <div className="text-2xl">
+                    {EMOJI_FOR_STATUS[note.frontmatter.status]}
                   </div>
                   <div className="space-y-2">
                     <Link href={`/notes/${note.frontmatter.slug}`}>
