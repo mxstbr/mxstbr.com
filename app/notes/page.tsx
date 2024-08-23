@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import { Note, getNotes } from '../data/notes'
+import { EMOJI_FOR_STATUS, Note, getNotes } from '../data/notes'
 import { formatDate } from '../thoughts/utils'
 import Prose from '../components/prose'
 import Tag from 'react-feather/dist/icons/tag'
@@ -69,8 +69,12 @@ export default async function WritingPage() {
           {notes
             .sort(
               (a, b) =>
-                new Date(b.frontmatter.publishedAt).getTime() -
-                new Date(a.frontmatter.publishedAt).getTime(),
+                new Date(
+                  b.frontmatter.updatedAt || b.frontmatter.publishedAt,
+                ).getTime() -
+                new Date(
+                  a.frontmatter.updatedAt || a.frontmatter.publishedAt,
+                ).getTime(),
             )
             .map((note) => (
               <NoteCard key={note.frontmatter.slug} note={note} />
@@ -83,8 +87,10 @@ export default async function WritingPage() {
 
 function NoteCard({ note }: { note: Note }) {
   return (
-    <div className="flex gap-x-2 border rounded-md p-4 break-inside-avoid">
-      <div className="text-lg">🌱</div>
+    <div className="flex gap-x-4 border rounded-md p-4 break-inside-avoid">
+      <div className="text-2xl">
+        {EMOJI_FOR_STATUS[note.frontmatter.status]}
+      </div>
       <div className="flex flex-col gap-2">
         <Link
           href={`/notes/${note.frontmatter.slug}`}

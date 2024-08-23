@@ -123,7 +123,7 @@ export async function getNotes(): Promise<Array<Note>> {
 }
 
 export async function getNote(
-  slug,
+  slug: string,
 ): Promise<{ content: string; frontmatter: Frontmatter } | null> {
   const notes = await getNotes()
 
@@ -136,6 +136,12 @@ const OLD_STATUSES = {
   sketch: 'seedling',
   prototype: 'budding',
   production: 'evergreen',
+}
+
+export const EMOJI_FOR_STATUS: Record<Status, string> = {
+  seedling: '🌱',
+  budding: '🌿',
+  evergreen: '🌳',
 }
 
 function parseStatusFromContent(markdown: string): {

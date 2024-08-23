@@ -8,7 +8,12 @@ import Prose from '../../components/prose'
 import { prodUrl } from '../../sitemap'
 import { formatDate } from '../../thoughts/utils'
 import { size } from '../../og/utils'
-import { getNote, getNotes, type Note } from '../../data/notes'
+import {
+  EMOJI_FOR_STATUS,
+  getNote,
+  getNotes,
+  type Note,
+} from '../../data/notes'
 import { useMDXComponents } from '../../../mdx-components'
 import Link from 'next/link'
 import ArrowLeft from 'react-feather/dist/icons/arrow-left'
@@ -144,6 +149,7 @@ export default async function Page({ params }) {
                     href={`/notes/digital-garden#denoting-the-maturity-of-my-explorations`}
                     className="block"
                   >
+                    {EMOJI_FOR_STATUS[frontmatter.status]}{' '}
                     {/* Uppercase the status */}
                     {frontmatter.status[0].toUpperCase() +
                       frontmatter.status.substring(1)}
