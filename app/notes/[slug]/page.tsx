@@ -8,12 +8,7 @@ import Prose from '../../components/prose'
 import { prodUrl } from '../../sitemap'
 import { formatDate } from '../../thoughts/utils'
 import { size } from '../../og/utils'
-import {
-  EMOJI_FOR_STATUS,
-  getNote,
-  getNotes,
-  type Note,
-} from '../../data/notes'
+import { EMOJI_FOR_STATUS, getNote, getNotes, type Note } from '../hashnode'
 import { useMDXComponents } from '../../../mdx-components'
 import Link from 'next/link'
 import ArrowLeft from 'react-feather/dist/icons/arrow-left'

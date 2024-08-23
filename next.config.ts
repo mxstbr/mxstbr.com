@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next'
 import createMDX from '@next/mdx'
 import smartypants from 'remark-smartypants'
-import { getNotes } from './app/data/notes'
+import { getNotes } from './app/notes/hashnode'
 
 const nextConfig: NextConfig = {
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],

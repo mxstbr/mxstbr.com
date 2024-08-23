@@ -1,6 +1,6 @@
 import { getBlogPosts } from 'app/thoughts/utils'
 import { navItems } from './components/nav'
-import { getNotes } from './data/notes'
+import { getNotes } from './notes/hashnode'
 
 export const prodUrl = 'https://mxstbr.com'
 export const dynamic = 'force-static'

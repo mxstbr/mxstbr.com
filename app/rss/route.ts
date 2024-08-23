@@ -1,6 +1,6 @@
 import { prodUrl } from 'app/sitemap'
 import { getBlogPosts } from 'app/thoughts/utils'
-import { getNotes } from '../data/notes'
+import { getNotes } from '../notes/hashnode'
 
 export const dynamic = 'force-static'
 
