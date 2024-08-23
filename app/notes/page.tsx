@@ -62,6 +62,9 @@ export default async function WritingPage() {
           <a href="mailto:contact@mxstbr.com?subject=Digital garden">email</a>{' '}
           or <a href="https://x.com/mxstbr">Twitter/X DMs</a>.
         </p>
+        <p>
+          <em>Legend: 🌱 = Seedling, 🌿 = Budding, 🌲 = Evergreen</em>
+        </p>
       </Prose>
 
       <div className="lg:px-12 lg:w-screen lg:relative lg:left-1/2 lg:right-1/2 lg:-ml-[50vw] lg:-mr-[50vw] lg:overflow-hidden">
