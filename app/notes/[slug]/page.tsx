@@ -121,41 +121,38 @@ export default async function Page({ params }) {
         }}
       />
 
-      <Link
-        href="/notes"
-        className="flex flex-row items-center gap-2 uppercase text-sm font-bold tracking-wider  no-underline hover:underline"
-      >
-        <ArrowLeft size="1em" /> All Notes
-      </Link>
       <div className="relative">
-        <h1 className="title font-bold text-3xl xl:text-4xl mt-6 mb-6">
+        <Link
+          href="/notes"
+          className="text-slate-700 flex flex-row items-center gap-2 uppercase text-sm font-bold tracking-wider no-underline hover:underline"
+        >
+          <ArrowLeft size="1em" className="text-slate-500" /> All Notes
+        </Link>
+        <h1 className="title font-bold text-4xl leading-tight my-4">
           {frontmatter.title}
         </h1>
-
         {/* Metadata, renders as sidebar on desktop (> xl) */}
         <div className="my-8 xl:my-0 xl:top-8 xl:sticky">
           <div className="font-mono text-sm text-slate-500 xl:absolute xl:-right-6 xl:pl-6 xl:translate-x-full xl:top-0 xl:w-72 xl:space-y-6 xl:border xl:border-y-0 xl:border-r-0 dark:border-slate-700">
             <div className="flex flex-row xl:flex-col xl:gap-y-4">
               <div className="shrink-0 space-y-1 xl:space-y-2 border-2 border-y-0 dark:border-slate-700 border-l-0 pr-6 xl:pr-0 xl:w-full xl:border-none">
+                <p className="uppercase font-bold">Status</p>
+                <Link
+                  href={`/notes/digital-garden#denoting-the-maturity-of-my-explorations`}
+                  className="block"
+                >
+                  {EMOJI_FOR_STATUS[frontmatter.status]}{' '}
+                  {/* Uppercase the status */}
+                  {frontmatter.status[0].toUpperCase() +
+                    frontmatter.status.substring(1)}
+                </Link>
+              </div>
+              <div className=" shrink-0 space-y-1 xl:space-y-2 px-6 xl:px-0 xl:w-full sm:border-2 sm:border-y-0 dark:border-slate-700 sm:border-l-0 xl:border-none">
                 <p className="uppercase font-bold">Last updated</p>
                 <div>
                   {formatDate(frontmatter.updatedAt || frontmatter.publishedAt)}
                 </div>
               </div>
-              {frontmatter.status && (
-                <div className="shrink-0 space-y-1 xl:space-y-2 px-6 xl:px-0 xl:w-full sm:border-2 sm:border-y-0 dark:border-slate-700 sm:border-l-0 xl:border-none">
-                  <p className="uppercase font-bold">Status</p>
-                  <Link
-                    href={`/notes/digital-garden#denoting-the-maturity-of-my-explorations`}
-                    className="block"
-                  >
-                    {EMOJI_FOR_STATUS[frontmatter.status]}{' '}
-                    {/* Uppercase the status */}
-                    {frontmatter.status[0].toUpperCase() +
-                      frontmatter.status.substring(1)}
-                  </Link>
-                </div>
-              )}
               <div className="space-y-1 xl:space-y-2 block sm:hidden px-6 xl:px-0 border-2 border-y-0 dark:border-slate-700 border-r-0 xl:border-none xl:block">
                 <p className="uppercase font-bold">Reading time</p>
                 <div>{note.frontmatter.readTimeInMinutes} mins</div>
@@ -305,17 +302,15 @@ function parseMarkdownHeadings(markdown) {
       const match = line.match(/^(#{1,6})\s+(.*)$/)
       if (match) {
         const level = match[1].length
-        if (level === 2) {
-          const text = match[2]
-          const item = { level, text, children: [] }
+        const text = match[2]
+        const item = { level, text, children: [] }
 
-          while (stack.length > 1 && stack[stack.length - 1].level >= level) {
-            stack.pop()
-          }
-
-          stack[stack.length - 1].children.push(item)
-          stack.push(item)
+        while (stack.length > 1 && stack[stack.length - 1].level >= level) {
+          stack.pop()
         }
+
+        stack[stack.length - 1].children.push(item)
+        stack.push(item)
       }
     }
   })
