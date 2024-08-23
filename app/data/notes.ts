@@ -44,7 +44,7 @@ const GET_POSTS_QUERY = /* GraphQL */ `
 // 'draft' | 'developing' | 'finished'
 // 'braindump' | 'exploring' | 'finished'
 // 'seedling' | 'budding' | 'evergreen'
-type Status = 'sketch' | 'prototype' | 'production'
+type Status = 'seedling' | 'budding' | 'evergreen'
 
 type Frontmatter = {
   cuid: string
@@ -53,7 +53,7 @@ type Frontmatter = {
   slug: string
   publishedAt: string
   readTimeInMinutes: number
-  status?: Status
+  status: Status
   updatedAt?: string
   tags?: Array<{
     name: string
@@ -132,12 +132,22 @@ export async function getNote(
 
 const STATUS_REGEX = /^status-(\w+)$/m
 
+const OLD_STATUSES = {
+  sketch: 'seedling',
+  prototype: 'budding',
+  production: 'evergreen',
+}
+
 function parseStatusFromContent(markdown: string): {
   content: string
-  status?: Status
+  status: Status
 } {
   let status
   const result = markdown.match(STATUS_REGEX)
   if (result) status = result[1]
-  return { content: markdown.replace(STATUS_REGEX, ''), status }
+  if (status) status = OLD_STATUSES[status] || status
+  return {
+    content: markdown.replace(STATUS_REGEX, ''),
+    status: status || 'seedling',
+  }
 }
