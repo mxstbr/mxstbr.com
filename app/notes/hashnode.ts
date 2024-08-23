@@ -44,7 +44,12 @@ const GET_POSTS_QUERY = /* GraphQL */ `
 // 'draft' | 'developing' | 'finished'
 // 'braindump' | 'exploring' | 'finished'
 // 'seedling' | 'budding' | 'evergreen'
-type Status = 'seedling' | 'budding' | 'evergreen'
+type Status =
+  | 'seedling'
+  | 'budding'
+  | 'evergreen'
+  // This is odd to have as "status" but 🤷‍♂️
+  | 'link'
 
 type Frontmatter = {
   cuid: string
@@ -142,6 +147,7 @@ export const EMOJI_FOR_STATUS: Record<Status, string> = {
   seedling: '🌱',
   budding: '🌿',
   evergreen: '🌲',
+  link: '🔗',
 }
 
 function parseStatusFromContent(markdown: string): {

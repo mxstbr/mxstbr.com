@@ -66,7 +66,7 @@ export default async function WritingPage() {
             <Link href="/notes/digital-garden#denoting-the-maturity-of-my-explorations">
               Legend
             </Link>
-            : 🌱 = Seedling, 🌿 = Budding, 🌲 = Evergreen
+            : 🌱 = Seedling, 🌿 = Budding, 🌲 = Evergreen, 🔗 = Link
           </em>
         </p>
       </Prose>

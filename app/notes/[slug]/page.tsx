@@ -131,16 +131,16 @@ export default async function Page({ params }) {
           {frontmatter.title}
         </h1>
 
-        <div className="hidden top-8 xl:block sticky">
-          <div className="font-mono text-sm text-slate-500 absolute -right-6 pl-6 translate-x-full top-0 w-72 space-y-4 border border-y-0 border-r-0 dark:border-slate-700">
-            <div className="space-y-2">
-              <p className="uppercase font-bold">Reading time</p>
-              <div>{note.frontmatter.readTimeInMinutes} mins</div>
-            </div>
-            {(headings.length > 1 ||
-              (!!headings[0] &&
-                Array.isArray(headings[0].children) &&
-                headings[0].children?.length > 0)) && (
+        {(headings.length > 1 ||
+          (!!headings[0] &&
+            Array.isArray(headings[0].children) &&
+            headings[0].children?.length > 0)) && (
+          <div className="hidden top-8 xl:block sticky">
+            <div className="font-mono text-sm text-slate-500 absolute -right-6 pl-6 translate-x-full top-0 w-72 space-y-4 border border-y-0 border-r-0 dark:border-slate-700">
+              <div className="space-y-2">
+                <p className="uppercase font-bold">Reading time</p>
+                <div>{note.frontmatter.readTimeInMinutes} mins</div>
+              </div>
               <div className="space-y-2">
                 <div className="font-mono font-bold uppercase tracking-wider">
                   Table of contents
@@ -151,9 +151,9 @@ export default async function Page({ params }) {
                   ))}
                 </ul>
               </div>
-            )}
+            </div>
           </div>
-        </div>
+        )}
         <div className="my-8">
           <div className="font-mono text-sm text-slate-500 dark:border-slate-700">
             <div className="flex flex-row">
