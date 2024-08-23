@@ -63,7 +63,12 @@ export default async function WritingPage() {
           or <a href="https://x.com/mxstbr">Twitter/X DMs</a>.
         </p>
         <p>
-          <em>Legend: 🌱 = Seedling, 🌿 = Budding, 🌲 = Evergreen</em>
+          <em>
+            <Link href="/notes/digital-garden#denoting-the-maturity-of-my-explorations">
+              Legend
+            </Link>
+            : 🌱 = Seedling, 🌿 = Budding, 🌲 = Evergreen
+          </em>
         </p>
       </Prose>
 
