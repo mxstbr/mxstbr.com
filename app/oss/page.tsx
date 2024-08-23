@@ -1,5 +1,5 @@
 import { getRepos } from '../github'
-import ossProjects from '../data/oss-projects'
+import ossProjects from './data'
 import Prose from 'app/components/prose'
 import { Metadata } from 'next'
 import { size } from 'app/og/utils'
