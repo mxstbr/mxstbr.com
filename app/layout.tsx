@@ -72,7 +72,7 @@ export default function RootLayout({
         inter.className,
       )}
     >
-      <body className="antialiased mt-8 px-4 mx-auto">
+      <body className="antialiased mt-8 px-4 mx-auto overflow-x-hidden">
         <main className="min-w-0 max-w-prose mx-auto mt-6 px-2 space-y-16 ">
           <div className=" space-y-8 sm:space-y-12">
             <Navbar />

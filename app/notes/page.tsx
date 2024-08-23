@@ -4,7 +4,6 @@ import { Note, getNotes } from '../data/notes'
 import { formatDate } from '../thoughts/utils'
 import Prose from '../components/prose'
 import Tag from 'react-feather/dist/icons/tag'
-import { ItemList, ItemListItem } from '../components/item-list'
 import type { Metadata } from 'next'
 
 export const dynamic = 'force-static'
@@ -38,7 +37,7 @@ export default async function WritingPage() {
   ].sort((a, b) => a.name.localeCompare(b.name))
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-16 lg:space-y-20">
       <Prose>
         <h1>Notes</h1>
         <p>
@@ -64,83 +63,48 @@ export default async function WritingPage() {
           or <a href="https://x.com/mxstbr">Twitter/X DMs</a>.
         </p>
       </Prose>
-      <h2 className="font-bold text-3xl">By Topic</h2>
-      <ul className="pl-0 grid sm:grid-cols-2 gap-x-8 gap-y-4 sm:gap-y-6">
-        {tags.map((tag) => {
-          const notesCount = notes.filter((note) =>
-            note.frontmatter.tags?.find((t) => t.slug === tag.slug),
-          ).length
-          return (
-            <ItemListItem
-              key={tag.slug}
-              left={
-                <Link
-                  href={`/notes/topics/${tag.slug}`}
-                  className="flex flex-row gap-1 items-center"
-                >
-                  <Tag size="0.8em" className="opacity-75 text-slate-500" />
-                  {tag.name}
-                </Link>
-              }
-              right={`${notesCount} notes`}
-            ></ItemListItem>
-          )
-        })}
-      </ul>
-      <h2 className="font-bold text-3xl">By Maturity</h2>
-      <ItemListItem left={<h3 className="font-bold text-2xl">Production</h3>} />
-      <NotesList
-        notes={notes.filter((note) => note.frontmatter.status === 'production')}
-      />
-      <ItemListItem left={<h3 className="font-bold text-2xl">Prototype</h3>} />
-      <NotesList
-        notes={notes.filter((note) => note.frontmatter.status === 'prototype')}
-      />
-      <ItemListItem left={<h3 className="font-bold text-2xl">Sketch</h3>} />
-      <NotesList
-        notes={notes.filter(
-          (note) =>
-            note.frontmatter.status === 'sketch' || !note.frontmatter.status,
-        )}
-      />
+
+      <div className="lg:px-12 lg:w-screen lg:relative lg:left-1/2 lg:right-1/2 lg:-ml-[50vw] lg:-mr-[50vw] lg:overflow-hidden">
+        <div className="lg:max-w-screen-xl mx-auto columns-xs gap-8 space-y-8">
+          {notes
+            .sort(
+              (a, b) =>
+                new Date(b.frontmatter.publishedAt).getTime() -
+                new Date(a.frontmatter.publishedAt).getTime(),
+            )
+            .map((note) => (
+              <NoteCard key={note.frontmatter.slug} note={note} />
+            ))}
+        </div>
+      </div>
     </div>
   )
 }
 
-function NotesList({ notes }: { notes: Array<Note> }) {
+function NoteCard({ note }: { note: Note }) {
   return (
-    <ul>
-      {notes
-        // Filter out pure templates (but not notes that also include templates)
-        .filter(
-          (note) =>
-            note.frontmatter.tags?.length !== 1 ||
-            note.frontmatter.tags[0].slug !== 'templates',
-        )
-        .sort(
-          (a, b) =>
-            new Date(b.frontmatter.publishedAt).getTime() -
-            new Date(a.frontmatter.publishedAt).getTime(),
-        )
-        .map((note) => (
-          <li
-            key={note.frontmatter.slug}
-            className="flex flex-col space-y-2 border-b dark:border-slate-700 last:border-b-0 py-8 first:pt-0 last:pb-0"
-          >
-            <div className="shrink-0 tabular-nums text-slate-500">
-              Created {formatDate(note.frontmatter.publishedAt)}
-            </div>
-            <div className="space-y-2">
-              <Link
-                href={`/notes/${note.frontmatter.slug}`}
-                className="font-medium text-lg"
-              >
-                {note.frontmatter.title}
-              </Link>
-              <p className="text-slate-500">{note.frontmatter.summary}</p>
-            </div>
-          </li>
-        ))}
-    </ul>
+    <div className="flex gap-x-2 border rounded-md p-4 break-inside-avoid">
+      <div className="text-lg">🌱</div>
+      <div className="flex flex-col gap-2">
+        <Link
+          href={`/notes/${note.frontmatter.slug}`}
+          className="font-medium text-lg hover:underline"
+        >
+          {note.frontmatter.title}
+        </Link>
+        <div className="flex flex-wrap gap-2 text-slate-500">
+          {note.frontmatter.tags?.map((tag) => (
+            <Link
+              key={tag.slug}
+              href={`/notes/topics/${tag.slug}`}
+              className="text-sm flex flex-row gap-1 items-center no-underline hover:underline"
+            >
+              <Tag size="0.8em" className="opacity-75 text-slate-500" />
+              {tag.name}
+            </Link>
+          ))}
+        </div>
+      </div>
+    </div>
   )
 }
