@@ -61,7 +61,7 @@ export default function FeedbackForm() {
         >
           <div className="flex justify-between items-center">
             <h2 className="font-semibold mt-0 dark:text-white">
-              I want to know what you think!{' '}
+              What is your take on this?{' '}
               {/* <Link href="/notes/digital-garden#why-publish-it-publicly">
                 <HelpCircle
                   size="1em"
@@ -82,7 +82,7 @@ export default function FeedbackForm() {
           </div>
           <textarea
             name="thoughts"
-            placeholder="What is your take on this? Comments, pushback, or feedback highly encouraged."
+            placeholder="I want to know what you think about this. Let's explore together!"
             value={thoughts}
             onChange={(e) => setThoughts(e.target.value)}
             className="border rounded-md w-full border-slate-300 dark:border-slate-600 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
