@@ -141,7 +141,7 @@ const OLD_STATUSES = {
 export const EMOJI_FOR_STATUS: Record<Status, string> = {
   seedling: '🌱',
   budding: '🌿',
-  evergreen: '🌳',
+  evergreen: '🌲',
 }
 
 function parseStatusFromContent(markdown: string): {
