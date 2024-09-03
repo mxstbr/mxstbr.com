@@ -51,6 +51,9 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+  outputFileTracingIncludes: {
+    '/stats': ['./app/thoughts/**/*'],
+  },
 }
 
 const withMDX = createMDX({
