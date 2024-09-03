@@ -5,6 +5,15 @@ import { isMax } from 'app/auth'
 import { notFound } from 'next/navigation'
 import Prose from 'app/components/prose'
 import { ItemList, ItemListItem } from 'app/components/item-list'
+import { Redis } from '@upstash/redis'
+
+const redis = Redis.fromEnv()
+
+async function getLatestViews(slug: string): Promise<number> {
+  return (
+    (await redis.get<number>(['pageviews', `/thoughts/${slug}`].join(':'))) ?? 0
+  )
+}
 
 export default async function StatsPage() {
   if (!isMax()) return notFound()
@@ -12,13 +21,17 @@ export default async function StatsPage() {
   const essays = getBlogPosts({ archived: true })
   const notes = await getNotes()
 
-  const allContent = [
-    ...essays.map((essay) => ({
+  const essaysWithViews = await Promise.all(
+    essays.map(async (essay) => ({
       title: essay.metadata.title,
-      views: essay.metadata.views,
+      views: await getLatestViews(essay.slug),
       type: 'Essay',
       url: `/thoughts/${essay.slug}`,
     })),
+  )
+
+  const allContent = [
+    ...essaysWithViews,
     ...notes.map((note) => ({
       title: note.frontmatter.title,
       views: note.frontmatter.views,
@@ -32,7 +45,7 @@ export default async function StatsPage() {
   return (
     <Prose>
       <h1>
-        Content Stats (Total:{' '}
+        Content Stats (Total Views:{' '}
         {allContent.reduce((sum, item) => sum + item.views, 0).toLocaleString()}
         )
       </h1>
