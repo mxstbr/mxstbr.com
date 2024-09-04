@@ -141,6 +141,7 @@ export default async function Page({ params }) {
                 <p className="uppercase font-bold">Reading time</p>
                 <div>{note.frontmatter.readTimeInMinutes} mins</div>
               </div>
+              <hr />
               <div className="space-y-2">
                 <div className="font-mono font-bold uppercase">
                   Table of contents
