@@ -1,48 +1,55 @@
 'use server'
 
-export async function submitFeedback(formData: FormData, noteSlug: string) {
+import { Resend } from 'resend'
+import { Note } from '../hashnode'
+
+const resend = new Resend(process.env.RESEND_API_KEY)
+
+export async function submitFeedback(formData: FormData, note: Note) {
   const thoughts = formData.get('thoughts')
   const email = formData.get('email')
 
   if (!thoughts?.toString().trim()) return { success: false }
 
-  const result = await sendTelegramMessage(
-    `_${email ? escapeForTelegram(email.toString()) : 'Somebody'} replied to [${escapeForTelegram(noteSlug)}](https://mxstbr.com/notes/${escapeForTelegram(noteSlug)}):_\n>${thoughts
-      .toString()
-      .trim()
-      .split('\n')
-      .map((line) => escapeForTelegram(line))
-      .join('\n>')}`,
-  )
-
-  return { success: result }
-}
-
-// Escape special chars; from https://stackoverflow.com/questions/40626896/telegram-does-not-escape-some-markdown-characters#comment132933479_71313944
-function escapeForTelegram(string: string) {
-  return string.replace(/([|{\[\]*_~}+)`(#>!=\-.])/gm, '\\$1')
-}
-
-async function sendTelegramMessage(text: string) {
-  return await fetch(
-    `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        chat_id: '1010154965',
-        text,
-        parse_mode: 'MarkdownV2',
-        link_preview_options: {
-          is_disabled: true,
-        },
-      }),
-    },
-  ).then(async (res) => {
-    if (!res.ok) console.log(await res.json())
-
-    return res.ok
+  const result = await resend.emails.send({
+    from: `${email?.toString().trim() || ''} <mxstbr@resend.dev>`,
+    to: 'contact@mxstbr.com',
+    subject: `RE: ${note.frontmatter.title}`,
+    html: /* HTML */ `<html>
+      <head></head>
+      <body>
+        ${
+          /* Email preview text hack from https://stackoverflow.com/a/53416681 */ ''
+        }
+        <!--[if !mso]><!-->
+        <span
+          style="display:none !important; visiblility:hidden; opacity:0px; color:transparent; height:0px; width:0px; mso-hide:all; max-height:0px; max-width:0px; line-height:0px; overflow:hidden;"
+          >${thoughts.toString().trim().slice(0, 100)}</span
+        >
+        <!--<![endif]-->
+        <p>
+          ${email || 'Somebody'} replied to
+          <a href="https://mxstbr.com/notes/${note.frontmatter.slug}"
+            >${note.frontmatter.title}</a
+          >:
+        </p>
+        <blockquote
+          class="gmail_quote"
+          style="margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"
+        >
+          ${thoughts
+            .toString()
+            .trim()
+            .split('\n')
+            .map((line) => `<p>${line}</p>`)
+            .join('\n>')}
+        </blockquote>
+      </body>
+    </html>`,
+    replyTo: email?.toString().trim() || undefined,
   })
+
+  console.log(result)
+
+  return { success: result.error === null }
 }

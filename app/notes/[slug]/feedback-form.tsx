@@ -7,6 +7,7 @@ import { submitFeedback } from './send-feedback-action'
 import { usePathname } from 'next/navigation'
 import { ChevronDown, MessageSquare, HelpCircle } from 'react-feather'
 import Link from 'next/link'
+import { Note } from '../hashnode'
 
 function SubmitButton() {
   const { pending } = useFormStatus()
@@ -22,7 +23,7 @@ function SubmitButton() {
   )
 }
 
-export default function FeedbackForm() {
+export default function FeedbackForm({ note }: { note: Note }) {
   const [thoughts, setThoughts] = useState('')
   const [email, setEmail] = useState('')
   const [isExpanded, setIsExpanded] = useState(false)
@@ -37,10 +38,7 @@ export default function FeedbackForm() {
   }, [])
 
   async function clientAction(formData: FormData) {
-    const result = await submitFeedback(
-      formData,
-      pathname.replace('/notes/', ''),
-    )
+    const result = await submitFeedback(formData, note)
     if (result.success) {
       toast.success('Feedback Submitted')
       setThoughts('')

@@ -38,6 +38,7 @@
     "react-tweet": "^3.2.1",
     "remark-gfm": "^4.0.0",
     "remark-smartypants": "^3.0.2",
+    "resend": "^4.0.0",
     "shiki": "^1.14.1",
     "tsm": "^2.3.0",
     "typescript": "5.5.4"

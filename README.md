@@ -22,16 +22,16 @@ pnpm dev
 ### Env vars
 
 ```
-# Used to get the repositories of my OSS projects
+# Used to get the repositories of my OSS projects. Get from github.com
 GITHUB_ACCESS_TOKEN=
-# Used to store view counts of essays & notes
+# Used to store view counts of essays & notes. Get from upstash.com
 UPSTASH_REDIS_REST_URL=
 UPSTASH_REDIS_REST_TOKEN==
-# Used to store the notes content
+# Used to store the notes content. Get from Hashnode.com
 HASHNODE_ACCESS_TOKEN=
-# Optional: Used to send Telegram messages to Max from the feedback form
-TELEGRAM_BOT_TOKEN=
-# Optional: Used on the /cal page for auth
+# Optional: Used to send emails to Max from the feedback form. Get from resend.com
+RESEND_API_KEY=
+# Optional: Used on the /cal page for auth. Pick any random string.
 CAL_PASSWORD=
 ```
 

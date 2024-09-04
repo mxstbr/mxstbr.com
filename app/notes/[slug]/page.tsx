@@ -253,7 +253,7 @@ export default async function Page({ params }) {
       )}
       {/* Admin-only: Edit button */}
       <EditButton cuid={note.frontmatter.cuid} />
-      <FeedbackForm />
+      <FeedbackForm note={note} />
     </section>
   )
 }
