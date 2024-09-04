@@ -18,6 +18,7 @@ const GET_POSTS_QUERY = /* GraphQL */ `
             }
             content {
               markdown
+              html
             }
             readTimeInMinutes
             publishedAt
@@ -71,6 +72,7 @@ type Frontmatter = {
 export type Note = {
   frontmatter: Frontmatter
   content: string
+  contentHtml: string
 }
 
 export async function getNotes(): Promise<Array<Note>> {
@@ -122,6 +124,7 @@ export async function getNotes(): Promise<Array<Note>> {
           // This is a temporary hack to remove that non-standard syntax and make it render until I
           // figure out a long-term solution for it. Right now, it'd break if I use different alignment.
           .replaceAll('align="center")', ')'),
+        contentHtml: post.content.html,
       }
     }),
   ).then((res) => res.sort((a, b) => b.frontmatter.views - a.frontmatter.views))

@@ -44,10 +44,8 @@ export async function GET() {
       <title>${note.frontmatter.title}</title>
       <link>${prodUrl}/notes/${note.frontmatter.slug}</link>
       <guid>${prodUrl}/notes/${note.frontmatter.slug}</guid>
-      <description>${
-        // NOTE: We need to double escape, apparently: https://validator.w3.org/feed/docs/warning/NotHtml.html
-        escapeXml(escapeXml(note.frontmatter.summary || ''))
-      }</description>
+      <description>${note.frontmatter.summary || ''}</description>
+      <content type="html">${note.contentHtml || ''}</content>
       <pubDate>${new Date(note.frontmatter.publishedAt).toUTCString()}</pubDate>
       ${note.frontmatter.updatedAt ? `<lastBuildDate>${new Date(note.frontmatter.updatedAt).toUTCString()}</lastBuildDate>` : ''}
     </item>`,
