@@ -130,9 +130,7 @@ export async function getNotes(): Promise<Array<Note>> {
   ).then((res) => res.sort((a, b) => b.frontmatter.views - a.frontmatter.views))
 }
 
-export async function getNote(
-  slug: string,
-): Promise<{ content: string; frontmatter: Frontmatter } | null> {
+export async function getNote(slug: string): Promise<Note | null> {
   const notes = await getNotes()
 
   return notes.find((note) => note.frontmatter.slug === slug) || null
