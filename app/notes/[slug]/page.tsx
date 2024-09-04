@@ -142,7 +142,7 @@ export default async function Page({ params }) {
                 <div>{note.frontmatter.readTimeInMinutes} mins</div>
               </div>
               <div className="space-y-2">
-                <div className="font-mono font-bold uppercase tracking-wider">
+                <div className="font-mono font-bold uppercase">
                   Table of contents
                 </div>
                 <ul className="space-y-2 font-mono tracking-tighter">
