@@ -6,7 +6,7 @@ This is the source for my personal website and blog [mxstbr.com](https://mxstbr.
 
 - [Next.js](https://nextjs.org) v15
 - [TailwindCSS](https://tailwindcss.com)
-- [TypeScript](https://typescript.org)
+- [TypeScript](https://www.typescriptlang.org/)
 - [MDX](https://mdxjs.com)
 
 ## Development
