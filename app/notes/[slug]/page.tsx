@@ -16,6 +16,7 @@ import Tag from 'react-feather/dist/icons/tag'
 import { slugify } from '../../slugify'
 import { EditButton } from './edit-button'
 import FeedbackForm from './feedback-form'
+import { ReadingTime } from './reading-time'
 
 export const dynamic = 'force-static'
 export const revalidate = 60
@@ -60,6 +61,8 @@ export async function generateMetadata({ params }) {
     },
   }
 }
+
+const NOTE_CONTENT_ELEMENT_ID = 'note-content'
 
 export default async function Page({ params }) {
   const notes = await getNotes()
@@ -120,7 +123,7 @@ export default async function Page({ params }) {
         }}
       />
 
-      <div className="relative">
+      <div className="relative" id={NOTE_CONTENT_ELEMENT_ID}>
         <Link
           href="/notes"
           className="text-slate-700 flex flex-row items-center gap-2 uppercase text-sm font-bold tracking-wider no-underline hover:underline"
@@ -139,7 +142,12 @@ export default async function Page({ params }) {
             <div className="font-mono text-sm text-slate-500 absolute -right-6 pl-6 translate-x-full top-0 w-72 space-y-4 border border-y-0 border-r-0 dark:border-slate-700">
               <div className="space-y-2">
                 <p className="uppercase font-bold">Reading time</p>
-                <div>{note.frontmatter.readTimeInMinutes} mins</div>
+                <div>
+                  <ReadingTime
+                    readTimeInMinutes={note.frontmatter.readTimeInMinutes}
+                    domElementId={NOTE_CONTENT_ELEMENT_ID}
+                  />
+                </div>
               </div>
               <hr />
               <div className="space-y-2">
