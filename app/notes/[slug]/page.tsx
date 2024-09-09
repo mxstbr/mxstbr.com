@@ -123,7 +123,7 @@ export default async function Page({ params }) {
         }}
       />
 
-      <div className="relative" id={NOTE_CONTENT_ELEMENT_ID}>
+      <div className="relative">
         <Link
           href="/notes"
           className="text-slate-700 flex flex-row items-center gap-2 uppercase text-sm font-bold tracking-wider no-underline hover:underline"
@@ -212,7 +212,7 @@ export default async function Page({ params }) {
         {/* Metadata, renders as sidebar on desktop (> xl) */}
 
         {/* Content */}
-        <Prose className="prose-lg">
+        <Prose className="prose-lg" id={NOTE_CONTENT_ELEMENT_ID}>
           <MDXContent />
         </Prose>
       </div>
