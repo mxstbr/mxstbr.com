@@ -35,6 +35,16 @@ html {
   min-width: 360px;
 }
 
+@layer base {
+  html {
+    /* Implement a fluid font size based on viewport width with a minimum size
+       of 12px (0.75rem) and a maximum of 16px (1rem). This also affects all relative size
+       specifications which are directly or indirectly based on the base font
+       size. The result is a zoom effect of the whole layout. */
+    font-size: clamp(0.75rem, calc(0.7rem + 0.55vw), 1rem);
+  }
+}
+
 a {
   @apply underline decoration-slate-300 decoration-2 hover:decoration-slate-350;
   @apply dark:decoration-slate-600 dark:hover:decoration-slate-500;
