@@ -102,7 +102,9 @@ export default async function Blog({ meta, children }) {
           }}
         />
 
-        <h1 className="title font-bold text-4xl mb-3">{post.metadata.title}</h1>
+        <h1 className="title font-bold text-4xl mb-3 text-balance">
+          {post.metadata.title}
+        </h1>
         <div className="flex items-center space-x-6 mb-6">
           <p className="text-md text-slate-600 dark:text-slate-400">
             {post.metadata.state === 'draft'

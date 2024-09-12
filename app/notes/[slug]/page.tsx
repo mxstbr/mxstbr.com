@@ -130,7 +130,7 @@ export default async function Page({ params }) {
         >
           <ArrowLeft size="1em" className="text-slate-500" /> All Notes
         </Link>
-        <h1 className="title font-bold text-4xl leading-tight my-4">
+        <h1 className="title font-bold text-4xl leading-tight my-4 text-balance">
           {frontmatter.title}
         </h1>
 
