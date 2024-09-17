@@ -9,7 +9,7 @@ env.loadEnvConfig(projectDir)
 const redis = Redis.fromEnv()
 
 async function main() {
-  redis.json.set(`cal:${process.env.CAL_PASSWORD}`, '$', events)
+  await redis.json.set(`cal:${process.env.CAL_PASSWORD}`, '$', events)
 }
 
 main()
