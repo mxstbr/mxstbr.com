@@ -25,7 +25,6 @@ import {
   getDay,
   endOfWeek,
   endOfMonth,
-  isFirstDayOfYear,
 } from 'date-fns'
 // @ts-ignore
 import * as patterns from 'hero-patterns'
