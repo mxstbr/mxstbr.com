@@ -9,6 +9,7 @@ import { PasswordForm } from './password-form'
 import { auth, isMax } from '../auth'
 import CreateEventForm from './create-event-form'
 import { DeleteButton } from './delete-button'
+import { addHours, formatDate } from 'date-fns'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -43,8 +44,8 @@ async function createEvent(formData: FormData): Promise<Boolean> {
   const newEvents: Array<Event> = [
     ...existingEvents,
     {
-      start: new Date(start),
-      end: new Date(end),
+      start: addHours(new Date(start), 5),
+      end: addHours(new Date(end), 5),
       label,
       color,
       border: border as 'solid' | undefined,
