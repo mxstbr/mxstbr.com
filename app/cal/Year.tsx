@@ -25,6 +25,7 @@ import {
   getDay,
   endOfWeek,
   endOfMonth,
+  isFirstDayOfYear,
 } from 'date-fns'
 // @ts-ignore
 import * as patterns from 'hero-patterns'
@@ -254,7 +255,12 @@ function Day(props: {
           >
             {isFirstDayOfMonth(props.day) ? (
               <>
-                <strong>{format(props.day, 'MMM')}</strong>
+                <strong>
+                  {format(props.day, 'MMM')}
+                  {format(props.day, 'MMM') === 'Jan'
+                    ? ` ${format(props.day, 'yy')}`
+                    : ''}
+                </strong>
                 <br />
               </>
             ) : (

@@ -8,6 +8,7 @@ import { redirect } from 'next/navigation'
 import { PasswordForm } from './password-form'
 import { auth, isMax } from '../auth'
 import CreateEventForm from './create-event-form'
+import { DeleteButton } from './delete-button'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -70,12 +71,42 @@ async function getEvents(password: string) {
   )
 }
 
+async function deleteEvent(event: Event) {
+  'use server'
+
+  const events: Array<Event> | null = await redis.json.get(
+    `cal:${process.env.CAL_PASSWORD}`,
+  )
+
+  if (!events) return false
+
+  const index = events.findIndex(
+    (evt) =>
+      // @ts-ignore
+      evt.start === event.start.toISOString() &&
+      // @ts-ignore
+      evt.end === event.end.toISOString() &&
+      evt.label === event.label &&
+      evt.color === event.color &&
+      evt.border === event.border &&
+      evt.background === event.background &&
+      evt.labelSize === event.labelSize,
+  )
+
+  if (index === -1) return false
+
+  events.splice(index, 1)
+  await redis.json.set(`cal:${process.env.CAL_PASSWORD}`, '$', events)
+
+  return true
+}
+
 export default async function Plan() {
   const password = auth()
 
   if (!password) return <PasswordForm />
 
-  let events
+  let events: Array<Event> | undefined
   try {
     events = await getEvents(password)
   } catch (err) {
@@ -90,6 +121,40 @@ export default async function Plan() {
         </div>
       </div>
       <CreateEventForm createEventAction={createEvent} />
+      <h2 className="text-lg font-bold mt-24">Raw events list (↓ end date)</h2>
+      <ol className="list-decimal pl-5">
+        {events
+          .sort((a, b) => b.end.getTime() - a.end.getTime())
+          .map((event, index) => (
+            <li key={index} className="mb-4">
+              <p>
+                <strong>Label:</strong> {event.label || <em>Untitled</em>}
+              </p>
+              <p>
+                <strong>Start:</strong> {event.start.toLocaleDateString()}
+              </p>
+              <p>
+                <strong>End:</strong> {event.end.toLocaleDateString()}
+              </p>
+              <p>
+                <strong>Color:</strong> {event.color}
+              </p>
+              {event.border && (
+                <p>
+                  <strong>Border:</strong> {event.border}
+                </p>
+              )}
+              {event.background && (
+                <p>
+                  <strong>Background:</strong> {event.background}
+                </p>
+              )}
+              <p>
+                <DeleteButton deleteEventAction={deleteEvent} event={event} />
+              </p>
+            </li>
+          ))}
+      </ol>
     </>
   )
 }
