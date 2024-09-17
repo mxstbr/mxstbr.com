@@ -42,7 +42,6 @@ async function createEvent(formData: FormData): Promise<Boolean> {
   if (!existingEvents) return false
 
   const newEvents: Array<Event> = [
-    ...existingEvents,
     {
       start: addHours(new Date(start), 5),
       end: addHours(new Date(end), 5),
@@ -51,6 +50,7 @@ async function createEvent(formData: FormData): Promise<Boolean> {
       border: border as 'solid' | undefined,
       background: background as BackgroundPattern | undefined,
     },
+    ...existingEvents,
   ]
 
   await redis.json.set(`cal:${process.env.CAL_PASSWORD}`, '$', newEvents)
