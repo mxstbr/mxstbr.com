@@ -10,6 +10,7 @@ import { auth, isMax } from '../auth'
 import CreateEventForm from './create-event-form'
 import { DeleteButton } from './delete-button'
 import { addHours, formatDate } from 'date-fns'
+import { revalidatePath } from 'next/cache'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -55,6 +56,8 @@ async function createEvent(formData: FormData): Promise<Boolean> {
 
   await redis.json.set(`cal:${process.env.CAL_PASSWORD}`, '$', newEvents)
 
+  revalidatePath(`/cal`)
+
   return true
 }
 
@@ -98,6 +101,8 @@ async function deleteEvent(event: Event) {
 
   events.splice(index, 1)
   await redis.json.set(`cal:${process.env.CAL_PASSWORD}`, '$', events)
+
+  revalidatePath(`/cal`)
 
   return true
 }
