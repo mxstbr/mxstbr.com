@@ -50,6 +50,7 @@ async function createEvent(formData: FormData): Promise<Boolean> {
       color,
       border: border as 'solid' | undefined,
       background: background as BackgroundPattern | undefined,
+      labelSize: start === end ? 'small' : undefined,
     },
     ...existingEvents,
   ]
