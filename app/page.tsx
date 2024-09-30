@@ -14,7 +14,7 @@ export default async function Home() {
           <ItemListItem
             left={
               <>
-                Senior Staff Software Engineer at{' '}
+                Eng Leader for Liquid Storefronts at{' '}
                 <a href="https://shopify.com">Shopify</a>
               </>
             }
