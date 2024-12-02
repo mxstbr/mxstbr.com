@@ -34,6 +34,12 @@ export default function CreateEventForm({
   const [background, setBackground] = useState('')
   const [isExpanded, setIsExpanded] = useState(false)
 
+  useEffect(() => {
+    if (startDate && !endDate) {
+      setEndDate(startDate)
+    }
+  }, [startDate])
+
   async function clientAction(formData: FormData) {
     const startDate = formData.get('startDate')
     const endDate = formData.get('endDate')
