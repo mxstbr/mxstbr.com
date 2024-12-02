@@ -160,6 +160,7 @@ function EventListItem({
   updateEvent: (oldEvent: Event, formData: FormData) => Promise<boolean>
 }) {
   const [isEditing, setIsEditing] = useState(false)
+  const eventId = `${event.start.toISOString()}-${event.end.toISOString()}-${event.label || 'untitled'}`
 
   if (isEditing) {
     return (
@@ -174,7 +175,7 @@ function EventListItem({
   }
 
   return (
-    <li key={index} className="mb-4 dark:text-slate-300">
+    <li id={eventId} key={index} className="mb-4 dark:text-slate-300">
       <p>
         <strong>Label:</strong> {event.label || <em>Untitled</em>}
       </p>

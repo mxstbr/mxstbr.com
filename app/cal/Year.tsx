@@ -268,42 +268,46 @@ function Day(props: {
           </span>
         </span>
 
-        {/* Labels */}
+        {/* Modified Labels section */}
         {dayEvents
           .filter(
             (evt) =>
               evt.label && isMiddleDayOfLongestWeekInInterval(evt, props.day),
           )
           .map((evt) => {
+            const eventId = `${evt.start.toISOString()}-${evt.end.toISOString()}-${evt.label || 'untitled'}`
+
             // Special case: single day events render at the bottom.
             if (evt.labelSize === 'small') {
               return (
-                <span
+                <a
                   key={evt.label}
-                  className="text-xs font-semibold"
+                  href={`#${eventId}`}
+                  className="text-xs font-semibold no-underline"
                   style={{
                     color: evt.color,
                   }}
                 >
                   {evt.label}
-                </span>
+                </a>
               )
             }
 
             return (
-              <span
+              <a
                 key={evt.label}
-                className={`absolute top-8 z-10 ${
+                href={`#${eventId}`}
+                className={`absolute top-8 z-10 no-underline ${
                   isWeekEventDaysEven(evt, props.day)
                     ? 'right-0 translate-x-1/2'
                     : 'left-1/2 -translate-x-1/2'
-                } w-max -translate-x-1/2 transform text-center font-medium`}
+                } w-max text-center font-medium`}
                 style={{
                   color: evt.color,
                 }}
               >
                 {evt.label}
-              </span>
+              </a>
             )
           })}
       </div>
