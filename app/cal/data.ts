@@ -40,3 +40,9 @@ export type Event = {
   label?: string
   labelSize?: 'small'
 }
+
+// Add this new type for Redis storage
+export type RedisEvent = Omit<Event, 'start' | 'end'> & {
+  start: string
+  end: string
+}

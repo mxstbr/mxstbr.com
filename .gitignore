@@ -39,3 +39,4 @@ next-env.d.ts
 
 # personal
 madison.ts
+.env*.local
