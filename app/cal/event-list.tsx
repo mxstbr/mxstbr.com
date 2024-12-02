@@ -30,45 +30,53 @@ function EditEventForm({
     <form action={clientAction} className="mt-2 space-y-4">
       <div className="flex gap-4">
         <div>
-          <label className="block text-sm font-medium mb-1">Start date</label>
+          <label className="block text-sm font-medium mb-1 dark:text-slate-300">
+            Start date
+          </label>
           <input
             name="startDate"
             type="date"
             defaultValue={format(event.start, 'yyyy-MM-dd')}
-            className="text-sm border rounded-md border-slate-300"
+            className="text-sm border rounded-md border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
             required
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">End date</label>
+          <label className="block text-sm font-medium mb-1 dark:text-slate-300">
+            End date
+          </label>
           <input
             name="endDate"
             type="date"
             defaultValue={format(event.end, 'yyyy-MM-dd')}
-            className="text-sm border rounded-md border-slate-300"
+            className="text-sm border rounded-md border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
             required
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Label</label>
+        <label className="block text-sm font-medium mb-1 dark:text-slate-300">
+          Label
+        </label>
         <input
           name="label"
           type="text"
           defaultValue={event.label}
           placeholder="Event label (optional)"
-          className="w-full text-sm border rounded-md border-slate-300"
+          className="w-full text-sm border rounded-md border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400"
         />
       </div>
 
       <div className="flex gap-4">
         <div className="flex-1">
-          <label className="block text-sm font-medium mb-1">Color</label>
+          <label className="block text-sm font-medium mb-1 dark:text-slate-300">
+            Color
+          </label>
           <select
             name="color"
             defaultValue={event.color}
-            className="w-full text-sm border rounded-md border-slate-300"
+            className="w-full text-sm border rounded-md border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
             required
           >
             {Object.entries(colors).map(([name, value]) => (
@@ -79,11 +87,13 @@ function EditEventForm({
           </select>
         </div>
         <div className="flex-1">
-          <label className="block text-sm font-medium mb-1">Border</label>
+          <label className="block text-sm font-medium mb-1 dark:text-slate-300">
+            Border
+          </label>
           <select
             name="border"
             defaultValue={event.border}
-            className="w-full text-sm border rounded-md border-slate-300"
+            className="w-full text-sm border rounded-md border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
           >
             <option value="">None</option>
             <option value="solid">solid</option>
@@ -92,11 +102,13 @@ function EditEventForm({
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Background</label>
+        <label className="block text-sm font-medium mb-1 dark:text-slate-300">
+          Background
+        </label>
         <select
           name="background"
           defaultValue={event.background}
-          className="w-full text-sm border rounded-md border-slate-300"
+          className="w-full text-sm border rounded-md border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
         >
           <option value="">None</option>
           <option value="architect">architect</option>
@@ -120,14 +132,14 @@ function EditEventForm({
       <div className="flex gap-2">
         <button
           type="submit"
-          className="px-3 py-1 text-sm bg-slate-900 text-white rounded-md"
+          className="px-3 py-1 text-sm bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 rounded-md hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors"
         >
           Save
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="px-3 py-1 text-sm border border-slate-300 rounded-md"
+          className="px-3 py-1 text-sm border border-slate-300 dark:border-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors"
         >
           Cancel
         </button>
@@ -162,7 +174,7 @@ function EventListItem({
   }
 
   return (
-    <li key={index} className="mb-4">
+    <li key={index} className="mb-4 dark:text-slate-300">
       <p>
         <strong>Label:</strong> {event.label || <em>Untitled</em>}
       </p>
