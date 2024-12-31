@@ -48,12 +48,6 @@ export const investments = [
   },
 
   {
-    name: 'Campsite',
-    description: 'an all-in-one team communication app',
-    href: 'https://campsite.co',
-  },
-
-  {
     name: 'Arcjet',
     description: 'a security layer for Node.js',
     href: 'https://arcjet.com',
@@ -87,6 +81,12 @@ export const investments = [
     name: 'Storytell.ai',
     description: 'an AI tool to extract signal from noise',
     href: 'https://storytell.ai',
+  },
+
+  {
+    name: 'Campsite (acq. by Notion)',
+    description: 'an all-in-one team communication app',
+    href: 'https://www.notion.com/blog/welcoming-campsites-founders-to-the-notion-team',
   },
 
   {
