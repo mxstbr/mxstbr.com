@@ -61,17 +61,11 @@ async function createEvent(formData: FormData): Promise<Boolean> {
 async function getEvents(password: string) {
   if (!isMax()) throw new Error('Invalid password.')
 
-  const data = await redis.json.get(`cal:${password}`)
+  const data: Event[] | null = await redis.json.get(`cal:${password}`)
 
-  // We can directly return the data as Event[] since it's already in the right format
-  // Just ensure all dates are in ISODateDayString format
-  return (data as any[]).map(
-    (event): Event => ({
-      ...event,
-      start: toDayString(event.start),
-      end: toDayString(event.end),
-    }),
-  )
+  if (!data) return []
+
+  return data
 }
 
 async function deleteEvent(event: Event) {
@@ -85,8 +79,8 @@ async function deleteEvent(event: Event) {
 
   const index = events.findIndex(
     (evt) =>
-      toDayString(evt.start) === event.start &&
-      toDayString(evt.end) === event.end &&
+      evt.start === event.start &&
+      evt.end === event.end &&
       evt.label === event.label &&
       evt.color === event.color &&
       evt.border === event.border &&
@@ -124,8 +118,8 @@ async function updateEvent(oldEvent: Event, formData: FormData) {
 
   const index = events.findIndex(
     (evt) =>
-      toDayString(evt.start) === oldEvent.start &&
-      toDayString(evt.end) === oldEvent.end &&
+      evt.start === oldEvent.start &&
+      evt.end === oldEvent.end &&
       evt.label === oldEvent.label &&
       evt.color === oldEvent.color &&
       evt.border === oldEvent.border &&
