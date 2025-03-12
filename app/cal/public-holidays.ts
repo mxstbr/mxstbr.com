@@ -33,9 +33,23 @@ export const PUBLIC_HOLIDAYS = [
   .filter((h) => h.type !== 'optional' && h.type !== 'observance')
   .reduce((holidays: ModifiedHoliday[], holiday) => {
     // Filter out substituted holidays
-    if (holiday.substitute)
+    if (holiday.substitute) {
+      const baseName = holiday.name.replace(' (substitute day)', '')
+      const holidayYear = holiday.start.getFullYear()
+
       return [
-        ...holidays.filter((h) => !holiday.name.includes(h.name)),
+        ...holidays.filter((h) => {
+          // Keep the holiday if it's not the original version from the same year
+          if (h.name !== baseName) return true
+
+          // Get the year from the holiday start date
+          const hYear =
+            h.start instanceof Date
+              ? h.start.getFullYear()
+              : new Date(h.start).getFullYear()
+
+          return hYear !== holidayYear
+        }),
         {
           ...holiday,
           name: holiday.name.replace(' (substitute day)', ' (sub)'),
@@ -52,6 +66,7 @@ export const PUBLIC_HOLIDAYS = [
           ),
         },
       ]
+    }
 
     // Merge Thanksgiving + "Day after Thanksgiving"
     // by ignoring the "Day after" and adding +1 day to thanksgiving.end
