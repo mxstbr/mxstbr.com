@@ -20,7 +20,7 @@ export const BIRTHDAYS: Birthday[] = [
   { name: 'Dal', month: 9, day: 24 },
   { name: 'Devina', month: 10, day: 29 },
   { name: 'Zen', month: 11, day: 13 },
-  { name: 'Apa', month: 12, day: 6 },
+  { name: 'Daniel', month: 12, day: 6 },
 
   { name: 'Mama', month: 11, day: 11 },
   { name: 'Papa', month: 6, day: 1 },
