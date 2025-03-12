@@ -39,20 +39,24 @@ async function createEvent(formData: FormData): Promise<Boolean> {
 
   if (!existingEvents) return false
 
+  // Always convert to ISODateDayString format before storing
+  const startDay = toDayString(start as ISODateString | ISODateDayString)
+  const endDay = toDayString(end as ISODateString | ISODateDayString)
+
   const newEvents: Array<Event> = [
     {
-      start: toDayString(start as ISODateString),
-      end: toDayString(end as ISODateString),
+      start: startDay,
+      end: endDay,
       label,
       color,
       border: border as 'solid' | undefined,
       background: background as BackgroundPattern | undefined,
-      labelSize: start === end ? 'small' : undefined,
+      labelSize: startDay === endDay ? 'small' : undefined,
     },
     ...existingEvents.map((event) => ({
       ...event,
-      start: toDayString(event.start as ISODateString),
-      end: toDayString(event.end as ISODateString),
+      start: toDayString(event.start),
+      end: toDayString(event.end),
     })),
   ]
 
@@ -138,17 +142,21 @@ async function updateEvent(oldEvent: Event, formData: FormData) {
 
   if (index === -1) return false
 
+  // Always convert to ISODateDayString format before storing
+  const startDay = toDayString(start as ISODateString | ISODateDayString)
+  const endDay = toDayString(end as ISODateString | ISODateDayString)
+
   const updatedEvent = {
-    start: toDayString(start as ISODateString),
-    end: toDayString(end as ISODateString),
+    start: startDay,
+    end: endDay,
     label,
     color,
     border: border as 'solid' | undefined,
     background: background as BackgroundPattern | undefined,
-    labelSize: start === end ? ('small' as const) : undefined,
+    labelSize: startDay === endDay ? ('small' as const) : undefined,
   }
 
-  // Convert to RedisEvent type before saving
+  // Store as RedisEvent but ensure we're using ISODateDayString format
   const redisEvent: RedisEvent = {
     ...updatedEvent,
     start: updatedEvent.start,

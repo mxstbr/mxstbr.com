@@ -17,6 +17,8 @@ function EditEventForm({
   updateEvent: (oldEvent: Event, formData: FormData) => Promise<boolean>
 }) {
   async function clientAction(formData: FormData) {
+    // Note: The server-side updateEvent function will handle
+    // the conversion to ISODateDayString format
     const success = await updateEvent(event, formData)
     if (success) {
       toast.success('Event updated')

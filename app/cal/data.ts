@@ -52,6 +52,19 @@ export type RedisEvent = Omit<Event, 'start' | 'end'> & {
   end: ISODateString | ISODateDayString
 }
 
-export function toDayString(date: ISODateString | ISODateDayString) {
+/**
+ * Converts any ISO date format to ISODateDayString format (YYYY-MM-DD)
+ * This function handles both ISODateString and ISODateDayString formats
+ * and always returns an ISODateDayString
+ */
+export function toDayString(
+  date: ISODateString | ISODateDayString,
+): ISODateDayString {
+  // If the date already doesn't have a time component (no 'T'), it's already a day string
+  if (!date.includes('T')) {
+    return date as ISODateDayString
+  }
+
+  // Otherwise, extract just the date part (before the 'T')
   return date.split('T')[0] as ISODateDayString
 }

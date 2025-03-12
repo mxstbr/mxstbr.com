@@ -95,6 +95,9 @@ export default function CreateEventForm({
     const colorValue = colors[selectedColor]
     formData.set('color', colorValue)
 
+    // Note: We don't need to convert dates here as the server-side createEventAction
+    // will handle the conversion to ISODateDayString format
+
     const success = await createEventAction(formData)
     if (success) {
       toast.success('Event created')

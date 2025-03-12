@@ -1,12 +1,14 @@
-import { ISODateDayString } from './data'
+import { ISODateDayString, ISODateString } from './data'
 
-// Helper to parse ISODateDayString into year, month, day components
-function parseISODateDay(date: ISODateDayString): {
+// Helper to parse ISODateDay or ISODateString into year, month, day components
+function parseISODateDay(date: ISODateDayString | ISODateString): {
   year: number
   month: number
   day: number
 } {
-  const [year, month, day] = date.split('-').map(Number)
+  // If the date has a time component, extract just the date part
+  const datePart = date.includes('T') ? date.split('T')[0] : date
+  const [year, month, day] = datePart.split('-').map(Number)
   return { year, month, day }
 }
 
