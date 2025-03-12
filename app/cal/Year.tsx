@@ -8,7 +8,6 @@ import {
   isPast,
   isWithinInterval,
   subDays,
-  Interval,
   eachDayOfInterval,
   isMonday,
   isToday,
@@ -25,22 +24,39 @@ import {
   getDay,
   endOfWeek,
   endOfMonth,
-} from 'date-fns'
+  Interval,
+  formatISODateDay,
+  today,
+  isEqualDay,
+  isAfterDay,
+  isBeforeDay,
+} from './date-utils'
 // @ts-ignore
 import * as patterns from 'hero-patterns'
-import { Event, colors } from './data'
+import { Event, colors, ISODateDayString } from './data'
 import { PUBLIC_HOLIDAYS, holidaysToEvents } from './public-holidays'
 
+// Get public holiday events
 const PUBLIC_HOLIDAY_EVENTS = holidaysToEvents(PUBLIC_HOLIDAYS)
 
 const VISIBLE_QUARTERS = 4
 const MONTHS_PER_QUARTER = 3
 const DAYS_PER_WEEK = 7
 // When does the first quarter start? MM/DD
-const FY_START_DAY = '02/01'
+const FY_START_MONTH = 2
+const FY_START_DAY = 1
 // Current FY
-let FY_START_DATE = new Date(`${getYear(Date.now())}/${FY_START_DAY}`)
+let FY_START_DATE = formatISODateDay(
+  getCurrentYear(),
+  FY_START_MONTH,
+  FY_START_DAY,
+)
 if (isFuture(FY_START_DATE)) FY_START_DATE = subYears(FY_START_DATE, 1)
+
+// Helper function to get current year
+function getCurrentYear(): number {
+  return new Date().getFullYear()
+}
 
 export default function Year({ events }: { events: Array<Event> }) {
   const firstVisibleQuarterStartDate = getFirstVisibleQuarterStartDate()
@@ -70,7 +86,7 @@ export default function Year({ events }: { events: Array<Event> }) {
 }
 
 function Quarter(props: {
-  startDate: Date
+  startDate: ISODateDayString
   weeks: number
   events: Array<Event>
 }) {
@@ -92,9 +108,7 @@ function Quarter(props: {
           const weekStartDate =
             idx === 0
               ? addDays(startDate, idx * DAYS_PER_WEEK)
-              : startOfWeek(addDays(startDate, idx * DAYS_PER_WEEK), {
-                  weekStartsOn: 1,
-                })
+              : startOfWeek(addDays(startDate, idx * DAYS_PER_WEEK))
 
           return (
             <Week
@@ -114,23 +128,52 @@ function Quarter(props: {
   )
 }
 
-function Week(props: { startDate: Date; endDate: Date; events: Array<Event> }) {
-  const prefixDays = Math.max(0, getDay(props.startDate) - 1)
+function Week(props: {
+  startDate: ISODateDayString
+  endDate: ISODateDayString
+  events: Array<Event>
+}) {
+  // For a standard week, we want to show 7 days (Monday through Sunday)
+  // If we're at the start of a quarter, we might need to add empty cells for days before the quarter starts
+  // If we're at the end of a quarter, we might need to add empty cells for days after the quarter ends
+
+  // Get the day of week for the start date (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+  const startDayOfWeek = getDay(props.startDate)
+
+  // Calculate prefix days - how many empty cells we need before the first day
+  // If startDayOfWeek is 1 (Monday), we need 0 prefix days
+  // If startDayOfWeek is 2 (Tuesday), we need 1 prefix day, etc.
+  const prefixDays = startDayOfWeek === 0 ? 6 : startDayOfWeek - 1
   const isStartOfQuarter = prefixDays > 0
-  let suffixDays = 6 - getDay(props.endDate)
+
+  // Get the day of week for the end date
+  const endDayOfWeek = getDay(props.endDate)
+
+  // Calculate suffix days - how many empty cells we need after the last day
+  // If endDayOfWeek is 0 (Sunday), we need 0 suffix days
+  // If endDayOfWeek is 6 (Saturday), we need 1 suffix day, etc.
+  let suffixDays = endDayOfWeek === 0 ? 0 : 7 - endDayOfWeek
   const isEndOfQuarter = suffixDays > 0
-  // TODO: I don't know why this is necessary.
-  if (isEndOfQuarter) suffixDays = suffixDays + 1
-  const days = DAYS_PER_WEEK - prefixDays - suffixDays
+
+  // Calculate how many actual days we need to display
+  // Start with the difference between end and start dates, plus 1 to include both start and end
+  const daysBetween =
+    differenceInCalendarDays(props.endDate, props.startDate) + 1
+
+  // Ensure we don't exceed 7 days total in a week
+  const daysToShow = Math.min(daysBetween, DAYS_PER_WEEK - prefixDays)
 
   return (
     <div className="flex flex-row">
-      {arr(prefixDays).map((_, idx) => (
-        <DayWrapper key={idx} />
+      {/* Render empty cells for days before the start date */}
+      {Array.from({ length: prefixDays }).map((_, idx) => (
+        <DayWrapper key={`prefix-${idx}`} />
       ))}
-      {arr(days).map((_, idx) => (
+
+      {/* Render actual days */}
+      {Array.from({ length: daysToShow }).map((_, idx) => (
         <Day
-          key={idx}
+          key={`day-${idx}`}
           index={idx}
           events={props.events}
           day={addDays(props.startDate, idx)}
@@ -138,13 +181,19 @@ function Week(props: { startDate: Date; endDate: Date; events: Array<Event> }) {
           isStartOfQuarter={isStartOfQuarter}
         />
       ))}
+
+      {/* Render empty cells for days after the end date if needed */}
+      {isEndOfQuarter &&
+        Array.from({ length: suffixDays }).map((_, idx) => (
+          <DayWrapper key={`suffix-${idx}`} />
+        ))}
     </div>
   )
 }
 
 function Day(props: {
   index: number
-  day: Date
+  day: ISODateDayString
   events: Array<Event>
   isEndOfQuarter: boolean
   isStartOfQuarter: boolean
@@ -275,7 +324,7 @@ function Day(props: {
               evt.label && isMiddleDayOfLongestWeekInInterval(evt, props.day),
           )
           .map((evt) => {
-            const eventId = `${evt.start.toISOString()}-${evt.end.toISOString()}-${evt.label || 'untitled'}`
+            const eventId = `${evt.start}-${evt.end}-${evt.label || 'untitled'}`
 
             // Special case: single day events render at the bottom.
             if (evt.labelSize === 'small') {
@@ -474,17 +523,29 @@ function Borders(props: BorderProps) {
 }
 
 function getFirstVisibleQuarterStartDate() {
+  // Define the start dates for each quarter based on the fiscal year start date
   const QUARTER_START_DAYS = [
     FY_START_DATE,
     addMonths(FY_START_DATE, MONTHS_PER_QUARTER),
     addMonths(FY_START_DATE, MONTHS_PER_QUARTER * 2),
     addMonths(FY_START_DATE, MONTHS_PER_QUARTER * 3),
-  ].filter((date) => isPast(date))
+  ]
 
-  // NOTE: The "as Date" is necessary because closestTo can return undefined
-  // if an empty array is passed as the second arg. Since this array is never
-  // empty, we can safely cast to always be Date.
-  return closestTo(new Date(), QUARTER_START_DAYS) as Date
+  // Get today's date
+  const currentDate = today()
+
+  // Find the most recent quarter start date (the one that's in the past or today)
+  const pastQuarters = QUARTER_START_DAYS.filter(
+    (date) => !isAfterDay(date, currentDate),
+  )
+
+  // If no quarters are in the past, use the first quarter
+  if (pastQuarters.length === 0) {
+    return QUARTER_START_DAYS[0]
+  }
+
+  // Otherwise, use the most recent quarter
+  return pastQuarters[pastQuarters.length - 1]
 }
 
 function getWeeksWithinInterval(interval: Interval) {
@@ -497,20 +558,22 @@ function getWeeksWithinInterval(interval: Interval) {
         return [...weeks, [day]]
       }
 
-      return [...weeks.slice(0, -1), [...(weeks[weeks.length - 1] || []), day]]
+      // If there are no weeks yet or the current week is empty, start a new week
+      if (weeks.length === 0 || weeks[weeks.length - 1].length === 0) {
+        return [[day]]
+      }
+
+      // Otherwise, add the day to the current week
+      return [...weeks.slice(0, -1), [...weeks[weeks.length - 1], day]]
     },
-    [] as Array<Array<Date>>,
+    [] as Array<Array<ISODateDayString>>,
   )
 }
 
-function isWeekEventDaysEven(event: Event, day: Date) {
+function isWeekEventDaysEven(event: Event, day: ISODateDayString) {
   const weeks = getWeeksWithinInterval(event)
 
-  const week = weeks.find((week) =>
-    week
-      .map((dayOfTheWeek) => format(dayOfTheWeek, 'dd MM yyyy'))
-      .includes(format(day, 'dd MM yyyy')),
-  )
+  const week = weeks.find((week) => week.includes(day))
 
   if (!week)
     throw new Error(
@@ -525,7 +588,10 @@ function isWeekEventDaysEven(event: Event, day: Date) {
 /**
  * Check whether a day is the middle day of the longest continuous sequence of days in a visual row for a specific event
  */
-function isMiddleDayOfLongestWeekInInterval(event: Interval, day: Date) {
+function isMiddleDayOfLongestWeekInInterval(
+  event: Interval,
+  day: ISODateDayString,
+) {
   const weeks = getWeeksWithinInterval(event)
 
   const longestWeek = weeks.sort((a, b) => b.length - a.length)[0]
@@ -540,12 +606,7 @@ function isMiddleDayOfLongestWeekInInterval(event: Interval, day: Date) {
   const isMiddleDay =
     // Even length: [1,2,3,4].indexOf(2) = 1 + 1; length / 2 = 2
     // Uneven length: [1,2,3,4,5].indexOf(3) = 2 + 1; length / 2 = 2.5; Math.ceil(2.5) = 3
-    longestWeek
-      // Format days to days to avoid false negatives with differing time
-      .map((dayOfTheWeek) => format(dayOfTheWeek, 'dd MM yyyy'))
-      .indexOf(format(day, 'dd MM yyyy')) +
-      1 ===
-    Math.ceil(longestWeek.length / 2)
+    longestWeek.indexOf(day) + 1 === Math.ceil(longestWeek.length / 2)
 
   return isMiddleDay
 }
@@ -553,41 +614,8 @@ function isMiddleDayOfLongestWeekInInterval(event: Interval, day: Date) {
 /**
  * Returns an Array with the length of num
  */
-const arr = (length: number) => new Array(length).fill(undefined)
-
-/**
- * Reimplement isEqual from date-fns to ignore time
- */
-function isEqualDay(date1: Date, date2: Date) {
-  return (
-    date1.getDate() === date2.getDate() &&
-    date1.getMonth() === date2.getMonth() &&
-    date1.getFullYear() === date2.getFullYear()
-  )
-}
-
-/**
- * Returns true if date1 is after date2 while ignoring time
- */
-function isAfterDay(date1: Date, date2: Date) {
-  return (
-    date1.getFullYear() > date2.getFullYear() ||
-    (date1.getFullYear() === date2.getFullYear() &&
-      (date1.getMonth() > date2.getMonth() ||
-        (date1.getMonth() === date2.getMonth() &&
-          date1.getDate() > date2.getDate())))
-  )
-}
-
-/**
- * Returns true if date1 is before date2 while ignoring time
- */
-function isBeforeDay(date1: Date, date2: Date) {
-  return (
-    date1.getFullYear() < date2.getFullYear() ||
-    (date1.getFullYear() === date2.getFullYear() &&
-      (date1.getMonth() < date2.getMonth() ||
-        (date1.getMonth() === date2.getMonth() &&
-          date1.getDate() < date2.getDate())))
-  )
+const arr = (length: number) => {
+  // Ensure length is a positive integer
+  const safeLength = Math.max(0, Math.floor(length))
+  return new Array(safeLength).fill(undefined)
 }

@@ -12,7 +12,6 @@ import { toDayString } from './data'
 import { PasswordForm } from './password-form'
 import { auth, isMax } from '../auth'
 import CreateEventForm from './create-event-form'
-import { addHours } from 'date-fns'
 import { revalidatePath } from 'next/cache'
 import { EventList } from './event-list'
 

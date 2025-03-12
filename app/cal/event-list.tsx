@@ -2,10 +2,10 @@
 
 import { useState } from 'react'
 import { toast } from 'react-hot-toast'
-import { format } from 'date-fns'
-import { DeleteButton } from './delete-button'
 import { Event, colors } from './data'
 import type { BackgroundPattern } from './data'
+import { DeleteButton } from './delete-button'
+import { format } from './date-utils'
 
 function EditEventForm({
   event,
@@ -36,7 +36,7 @@ function EditEventForm({
           <input
             name="startDate"
             type="date"
-            defaultValue={format(event.start, 'yyyy-MM-dd')}
+            defaultValue={event.start}
             className="text-sm border rounded-md border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
             required
           />
@@ -48,7 +48,7 @@ function EditEventForm({
           <input
             name="endDate"
             type="date"
-            defaultValue={format(event.end, 'yyyy-MM-dd')}
+            defaultValue={event.end}
             className="text-sm border rounded-md border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
             required
           />
@@ -160,7 +160,7 @@ function EventListItem({
   updateEvent: (oldEvent: Event, formData: FormData) => Promise<boolean>
 }) {
   const [isEditing, setIsEditing] = useState(false)
-  const eventId = `${event.start.toISOString()}-${event.end.toISOString()}-${event.label || 'untitled'}`
+  const eventId = `${event.start}-${event.end}-${event.label || 'untitled'}`
 
   if (isEditing) {
     return (
@@ -180,10 +180,10 @@ function EventListItem({
         <strong>Label:</strong> {event.label || <em>Untitled</em>}
       </p>
       <p>
-        <strong>Start:</strong> {event.start.toLocaleDateString()}
+        <strong>Start:</strong> {event.start}
       </p>
       <p>
-        <strong>End:</strong> {event.end.toLocaleDateString()}
+        <strong>End:</strong> {event.end}
       </p>
       <p>
         <strong>Color:</strong> {event.color}
@@ -220,7 +220,10 @@ export function EventList({
   return (
     <ol className="list-decimal pl-5">
       {events
-        .sort((a, b) => b.end.getTime() - a.end.getTime())
+        .sort((a, b) => {
+          // Compare end dates as strings (YYYY-MM-DD format sorts correctly)
+          return a.end > b.end ? -1 : a.end < b.end ? 1 : 0
+        })
         .map((event, index) => (
           <EventListItem
             key={index}
