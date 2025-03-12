@@ -31,39 +31,41 @@ export const PUBLIC_HOLIDAYS = [
   ...getFederalHolidays(getCurrentYear() + 1),
 ]
   .filter((h) => h.type !== 'optional' && h.type !== 'observance')
+  .map((holiday) => {
+    // Convert Date objects to ISODateDayString first
+    return {
+      ...holiday,
+      start: formatISODateDay(
+        holiday.start.getFullYear(),
+        holiday.start.getMonth() + 1,
+        holiday.start.getDate(),
+      ),
+      end: formatISODateDay(
+        holiday.end.getFullYear(),
+        holiday.end.getMonth() + 1,
+        holiday.end.getDate(),
+      ),
+    }
+  })
   .reduce((holidays: ModifiedHoliday[], holiday) => {
     // Filter out substituted holidays
     if (holiday.substitute) {
       const baseName = holiday.name.replace(' (substitute day)', '')
-      const holidayYear = holiday.start.getFullYear()
+      const holidayYear = new Date(holiday.start).getFullYear()
 
       return [
         ...holidays.filter((h) => {
           // Keep the holiday if it's not the original version from the same year
           if (h.name !== baseName) return true
 
-          // Get the year from the holiday start date
-          const hYear =
-            h.start instanceof Date
-              ? h.start.getFullYear()
-              : new Date(h.start).getFullYear()
+          // Get the year from the holiday start date (now always an ISODateDayString)
+          const hYear = new Date(h.start).getFullYear()
 
           return hYear !== holidayYear
         }),
         {
           ...holiday,
           name: holiday.name.replace(' (substitute day)', ' (sub)'),
-          // Convert Date objects to ISODateDayString
-          start: formatISODateDay(
-            holiday.start.getFullYear(),
-            holiday.start.getMonth() + 1,
-            holiday.start.getDate(),
-          ),
-          end: formatISODateDay(
-            holiday.end.getFullYear(),
-            holiday.end.getMonth() + 1,
-            holiday.end.getDate(),
-          ),
         },
       ]
     }
@@ -74,7 +76,7 @@ export const PUBLIC_HOLIDAYS = [
       return holidays.map((h) => {
         if (!h.name.includes('Thanksgiving')) return h
 
-        // Convert Date to ISODateDayString
+        // Already have ISODateDayString
         const holidayDate = new Date(h.date)
         const endDate = addDays(
           formatISODateDay(
@@ -87,28 +89,15 @@ export const PUBLIC_HOLIDAYS = [
 
         return {
           ...h,
-          // NOTE: We add 2 days here because we always -1 the holiday.end
-          // because date-holidays reports the end as Date+1 at midnight
-          // instead of Date at 23:59:59 🤦‍♂️
           end: endDate,
         }
       })
 
-    // Convert Date objects to ISODateDayString for regular holidays
+    // Regular holidays (already converted to ISODateDayString)
     return [
       ...holidays,
       {
         ...holiday,
-        start: formatISODateDay(
-          holiday.start.getFullYear(),
-          holiday.start.getMonth() + 1,
-          holiday.start.getDate(),
-        ),
-        end: formatISODateDay(
-          holiday.end.getFullYear(),
-          holiday.end.getMonth() + 1,
-          holiday.end.getDate(),
-        ),
       },
     ]
   }, [])
