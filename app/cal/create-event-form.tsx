@@ -174,12 +174,6 @@ export default function CreateEventForm({
                 </button>
               ))}
             </div>
-            {activePreset && (
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                Using {activePreset} preset. You can still override settings
-                below.
-              </p>
-            )}
           </div>
 
           <div className="flex flex-row items-stretch justify-between gap-2">
