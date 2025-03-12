@@ -31,9 +31,11 @@ export type BackgroundPattern =
 
 export type Border = 'solid'
 
+export type ISODateDayString = `${number}-${number}-${number}`
+
 export type Event = {
-  start: Date
-  end: Date
+  start: ISODateDayString
+  end: ISODateDayString
   color: string
   background?: BackgroundPattern
   border?: Border
@@ -42,7 +44,14 @@ export type Event = {
 }
 
 // Add this new type for Redis storage
+export type ISODateString =
+  `${number}-${number}-${number}T${number}:${number}:${number}.${number}Z`
+
 export type RedisEvent = Omit<Event, 'start' | 'end'> & {
-  start: string
-  end: string
+  start: ISODateString | ISODateDayString
+  end: ISODateString | ISODateDayString
+}
+
+export function toDayString(date: ISODateString | ISODateDayString) {
+  return date.split('T')[0] as ISODateDayString
 }

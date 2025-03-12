@@ -1,8 +1,14 @@
 import React from 'react'
-import { cookies } from 'next/headers'
 import { Redis } from '@upstash/redis'
 import Year from './Year'
-import type { BackgroundPattern, Event, RedisEvent } from './data'
+import type {
+  BackgroundPattern,
+  Event,
+  ISODateDayString,
+  ISODateString,
+  RedisEvent,
+} from './data'
+import { toDayString } from './data'
 import { PasswordForm } from './password-form'
 import { auth, isMax } from '../auth'
 import CreateEventForm from './create-event-form'
@@ -28,7 +34,7 @@ async function createEvent(formData: FormData): Promise<Boolean> {
 
   if (!start || !end || !color) return false
 
-  const existingEvents: Array<Event> | null = await redis.json.get(
+  const existingEvents: Array<RedisEvent> | null = await redis.json.get(
     `cal:${process.env.CAL_PASSWORD}`,
   )
 
@@ -36,15 +42,19 @@ async function createEvent(formData: FormData): Promise<Boolean> {
 
   const newEvents: Array<Event> = [
     {
-      start: addHours(new Date(start), 5),
-      end: addHours(new Date(end), 5),
+      start: toDayString(start as ISODateString),
+      end: toDayString(end as ISODateString),
       label,
       color,
       border: border as 'solid' | undefined,
       background: background as BackgroundPattern | undefined,
       labelSize: start === end ? 'small' : undefined,
     },
-    ...existingEvents,
+    ...existingEvents.map((event) => ({
+      ...event,
+      start: toDayString(event.start as ISODateString),
+      end: toDayString(event.end as ISODateString),
+    })),
   ]
 
   await redis.json.set(`cal:${process.env.CAL_PASSWORD}`, '$', newEvents)
@@ -62,8 +72,8 @@ async function getEvents(password: string) {
   return (data as RedisEvent[]).map(
     (event): Event => ({
       ...event,
-      start: new Date(event.start),
-      end: new Date(event.end),
+      start: toDayString(event.start),
+      end: toDayString(event.end),
     }),
   )
 }
@@ -71,7 +81,7 @@ async function getEvents(password: string) {
 async function deleteEvent(event: Event) {
   'use server'
 
-  const events: Array<Event> | null = await redis.json.get(
+  const events: Array<RedisEvent> | null = await redis.json.get(
     `cal:${process.env.CAL_PASSWORD}`,
   )
 
@@ -79,10 +89,8 @@ async function deleteEvent(event: Event) {
 
   const index = events.findIndex(
     (evt) =>
-      // @ts-ignore
-      evt.start === event.start.toISOString() &&
-      // @ts-ignore
-      evt.end === event.end.toISOString() &&
+      toDayString(evt.start) === event.start &&
+      toDayString(evt.end) === event.end &&
       evt.label === event.label &&
       evt.color === event.color &&
       evt.border === event.border &&
@@ -120,8 +128,8 @@ async function updateEvent(oldEvent: Event, formData: FormData) {
 
   const index = events.findIndex(
     (evt) =>
-      evt.start === oldEvent.start.toISOString() &&
-      evt.end === oldEvent.end.toISOString() &&
+      toDayString(evt.start) === oldEvent.start &&
+      toDayString(evt.end) === oldEvent.end &&
       evt.label === oldEvent.label &&
       evt.color === oldEvent.color &&
       evt.border === oldEvent.border &&
@@ -132,8 +140,8 @@ async function updateEvent(oldEvent: Event, formData: FormData) {
   if (index === -1) return false
 
   const updatedEvent = {
-    start: addHours(new Date(start), 5),
-    end: addHours(new Date(end), 5),
+    start: toDayString(start as ISODateString),
+    end: toDayString(end as ISODateString),
     label,
     color,
     border: border as 'solid' | undefined,
@@ -144,8 +152,8 @@ async function updateEvent(oldEvent: Event, formData: FormData) {
   // Convert to RedisEvent type before saving
   const redisEvent: RedisEvent = {
     ...updatedEvent,
-    start: updatedEvent.start.toISOString(),
-    end: updatedEvent.end.toISOString(),
+    start: updatedEvent.start,
+    end: updatedEvent.end,
   }
 
   events[index] = redisEvent
