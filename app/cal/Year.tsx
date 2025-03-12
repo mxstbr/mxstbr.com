@@ -35,9 +35,13 @@ import {
 import * as patterns from 'hero-patterns'
 import { Event, colors, ISODateDayString } from './data'
 import { PUBLIC_HOLIDAYS, holidaysToEvents } from './public-holidays'
+import { BIRTHDAYS, birthdaysToEvents } from './birthdays'
 
 // Get public holiday events
 const PUBLIC_HOLIDAY_EVENTS = holidaysToEvents(PUBLIC_HOLIDAYS)
+
+// Get birthday events
+const BIRTHDAY_EVENTS = birthdaysToEvents()
 
 const VISIBLE_QUARTERS = 4
 const MONTHS_PER_QUARTER = 3
@@ -74,7 +78,7 @@ export default function Year({ events }: { events: Array<Event> }) {
           return (
             <Quarter
               key={idx}
-              events={[...events, ...PUBLIC_HOLIDAY_EVENTS]}
+              events={[...events, ...PUBLIC_HOLIDAY_EVENTS, ...BIRTHDAY_EVENTS]}
               startDate={startDate}
               weeks={weeks}
             />
