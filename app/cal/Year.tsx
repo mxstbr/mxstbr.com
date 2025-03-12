@@ -47,7 +47,7 @@ const VISIBLE_QUARTERS = 4
 const MONTHS_PER_QUARTER = 3
 const DAYS_PER_WEEK = 7
 // When does the first quarter start? MM/DD
-const FY_START_MONTH = 2
+const FY_START_MONTH = 1
 const FY_START_DAY = 1
 // Current FY
 let FY_START_DATE = formatISODateDay(
