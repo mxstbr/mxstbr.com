@@ -26,19 +26,19 @@ const PRESETS: Preset[] = [
     border: 'solid',
   },
   {
-    name: 'Personal',
+    name: 'Minmax',
     color: 'yellow',
     background: 'diagonalLines',
     border: 'solid',
   },
   {
-    name: 'Work',
+    name: 'Max',
     color: 'pink',
     background: 'diagonalLines',
     border: 'solid',
   },
   {
-    name: 'Sue',
+    name: 'Minnie',
     color: 'blue',
     background: 'texture',
     border: 'solid',
