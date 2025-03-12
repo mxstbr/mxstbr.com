@@ -33,7 +33,7 @@ import {
 } from './date-utils'
 // @ts-ignore
 import * as patterns from 'hero-patterns'
-import { Event, colors, ISODateDayString } from './data'
+import { Event, colors, ISODateDayString, createEventId } from './data'
 import { PUBLIC_HOLIDAYS, holidaysToEvents } from './public-holidays'
 import { BIRTHDAYS, birthdaysToEvents } from './birthdays'
 
@@ -328,7 +328,7 @@ function Day(props: {
               evt.label && isMiddleDayOfLongestWeekInInterval(evt, props.day),
           )
           .map((evt) => {
-            const eventId = `${evt.start}-${evt.end}-${evt.label || 'untitled'}`
+            const eventId = createEventId(evt)
 
             // Special case: single day events render at the bottom.
             if (evt.labelSize === 'small') {

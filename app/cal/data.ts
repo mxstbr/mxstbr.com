@@ -9,6 +9,18 @@ export const colors = {
   black: '#6b7280',
 }
 
+/**
+ * Creates a URL-safe ID for an event that works with emojis
+ * by encoding the label part of the ID
+ */
+export function createEventId(event: Event): string {
+  const baseId = `${event.start}-${event.end}-`
+  const labelPart = event.label || 'untitled'
+
+  // Use encodeURIComponent to handle emojis and special characters
+  return baseId + encodeURIComponent(labelPart)
+}
+
 type Color = keyof typeof colors
 
 // Allowlist of patterns that work well at small size from heropatterns.com

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { toast } from 'react-hot-toast'
-import { Event, colors } from './data'
+import { Event, colors, createEventId } from './data'
 import type { BackgroundPattern } from './data'
 import { DeleteButton } from './delete-button'
 import { format } from './date-utils'
@@ -162,7 +162,7 @@ function EventListItem({
   updateEvent: (oldEvent: Event, formData: FormData) => Promise<boolean>
 }) {
   const [isEditing, setIsEditing] = useState(false)
-  const eventId = `${event.start}-${event.end}-${event.label || 'untitled'}`
+  const eventId = createEventId(event)
 
   if (isEditing) {
     return (
