@@ -1,7 +1,7 @@
-import { ISODateDayString, ISODateString } from './data'
+import { ISODateDayString } from './data'
 
-// Helper to parse ISODateDay or ISODateString into year, month, day components
-function parseISODateDay(date: ISODateDayString | ISODateString): {
+// Helper to parse ISODateDay into year, month, day components
+function parseISODateDay(date: string): {
   year: number
   month: number
   day: number

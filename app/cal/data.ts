@@ -43,23 +43,12 @@ export type Event = {
   labelSize?: 'small'
 }
 
-// Add this new type for Redis storage
-export type ISODateString =
-  `${number}-${number}-${number}T${number}:${number}:${number}.${number}Z`
-
-export type RedisEvent = Omit<Event, 'start' | 'end'> & {
-  start: ISODateString | ISODateDayString
-  end: ISODateString | ISODateDayString
-}
-
 /**
  * Converts any ISO date format to ISODateDayString format (YYYY-MM-DD)
- * This function handles both ISODateString and ISODateDayString formats
+ * This function handles both ISO date strings with time and ISODateDayString formats
  * and always returns an ISODateDayString
  */
-export function toDayString(
-  date: ISODateString | ISODateDayString,
-): ISODateDayString {
+export function toDayString(date: string): ISODateDayString {
   // If the date already doesn't have a time component (no 'T'), it's already a day string
   if (!date.includes('T')) {
     return date as ISODateDayString

@@ -1,13 +1,7 @@
 import React from 'react'
 import { Redis } from '@upstash/redis'
 import Year from './Year'
-import type {
-  BackgroundPattern,
-  Event,
-  ISODateDayString,
-  ISODateString,
-  RedisEvent,
-} from './data'
+import type { BackgroundPattern, Event, ISODateDayString } from './data'
 import { toDayString } from './data'
 import { PasswordForm } from './password-form'
 import { auth, isMax } from '../auth'
@@ -33,15 +27,15 @@ async function createEvent(formData: FormData): Promise<Boolean> {
 
   if (!start || !end || !color) return false
 
-  const existingEvents: Array<RedisEvent> | null = await redis.json.get(
+  const existingEvents: Array<Event> | null = await redis.json.get(
     `cal:${process.env.CAL_PASSWORD}`,
   )
 
   if (!existingEvents) return false
 
-  // Always convert to ISODateDayString format before storing
-  const startDay = toDayString(start as ISODateString | ISODateDayString)
-  const endDay = toDayString(end as ISODateString | ISODateDayString)
+  // Convert any date format to ISODateDayString
+  const startDay = toDayString(start)
+  const endDay = toDayString(end)
 
   const newEvents: Array<Event> = [
     {
@@ -53,11 +47,8 @@ async function createEvent(formData: FormData): Promise<Boolean> {
       background: background as BackgroundPattern | undefined,
       labelSize: startDay === endDay ? 'small' : undefined,
     },
-    ...existingEvents.map((event) => ({
-      ...event,
-      start: toDayString(event.start),
-      end: toDayString(event.end),
-    })),
+    // No need to convert existing events as they're already Events with ISODateDayString
+    ...existingEvents,
   ]
 
   await redis.json.set(`cal:${process.env.CAL_PASSWORD}`, '$', newEvents)
@@ -72,7 +63,9 @@ async function getEvents(password: string) {
 
   const data = await redis.json.get(`cal:${password}`)
 
-  return (data as RedisEvent[]).map(
+  // We can directly return the data as Event[] since it's already in the right format
+  // Just ensure all dates are in ISODateDayString format
+  return (data as any[]).map(
     (event): Event => ({
       ...event,
       start: toDayString(event.start),
@@ -84,7 +77,7 @@ async function getEvents(password: string) {
 async function deleteEvent(event: Event) {
   'use server'
 
-  const events: Array<RedisEvent> | null = await redis.json.get(
+  const events: Array<Event> | null = await redis.json.get(
     `cal:${process.env.CAL_PASSWORD}`,
   )
 
@@ -123,7 +116,7 @@ async function updateEvent(oldEvent: Event, formData: FormData) {
 
   if (!start || !end || !color) return false
 
-  const events: Array<RedisEvent> | null = await redis.json.get(
+  const events: Array<Event> | null = await redis.json.get(
     `cal:${process.env.CAL_PASSWORD}`,
   )
 
@@ -142,11 +135,11 @@ async function updateEvent(oldEvent: Event, formData: FormData) {
 
   if (index === -1) return false
 
-  // Always convert to ISODateDayString format before storing
-  const startDay = toDayString(start as ISODateString | ISODateDayString)
-  const endDay = toDayString(end as ISODateString | ISODateDayString)
+  // Convert any date format to ISODateDayString
+  const startDay = toDayString(start)
+  const endDay = toDayString(end)
 
-  const updatedEvent = {
+  const updatedEvent: Event = {
     start: startDay,
     end: endDay,
     label,
@@ -156,14 +149,7 @@ async function updateEvent(oldEvent: Event, formData: FormData) {
     labelSize: startDay === endDay ? ('small' as const) : undefined,
   }
 
-  // Store as RedisEvent but ensure we're using ISODateDayString format
-  const redisEvent: RedisEvent = {
-    ...updatedEvent,
-    start: updatedEvent.start,
-    end: updatedEvent.end,
-  }
-
-  events[index] = redisEvent
+  events[index] = updatedEvent
 
   await redis.json.set(`cal:${process.env.CAL_PASSWORD}`, '$', events)
 
