@@ -6,6 +6,8 @@ import { Toaster, toast } from 'react-hot-toast'
 // import { submitFeedback } from './send-feedback-action'
 import { ChevronDown, Edit2 } from 'react-feather'
 import { colors, BackgroundPattern, Border } from './data'
+// @ts-ignore
+import * as patterns from 'hero-patterns'
 
 // Define preset types
 type Preset = {
@@ -155,22 +157,13 @@ export default function CreateEventForm({
                     borderLeftColor: colors[preset.color],
                     position: 'relative',
                     overflow: 'hidden',
+                    background: patterns[preset.background](
+                      colors[preset.color],
+                      0.5,
+                    ),
                   }}
                 >
                   <span className="relative z-10">{preset.name}</span>
-                  {/* Background pattern indicator */}
-                  {preset.background && (
-                    <div
-                      className="absolute inset-0 opacity-20"
-                      style={{
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='1' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 5v1H0V0h5z'/%3E%3C/g%3E%3C/svg%3E")`,
-                        backgroundSize:
-                          preset.background === 'diagonalLines'
-                            ? '6px 6px'
-                            : '20px 20px',
-                      }}
-                    />
-                  )}
                 </button>
               ))}
             </div>
