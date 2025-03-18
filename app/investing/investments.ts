@@ -3,7 +3,7 @@ export const investments = [
     name: 'Fly.io',
     description: 'a developer-focused cloud for deploying apps close to users',
     href: 'https://fly.io',
-    subtext: 'Invested in ???, last raised a $70M Series C from EQT Ventures',
+    // subtext: 'Invested in ???, last raised a $70M Series C from EQT Ventures',
   },
 
   {
