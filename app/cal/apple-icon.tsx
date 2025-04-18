@@ -2,13 +2,17 @@ import { ImageResponse } from 'next/og'
 
 // Image metadata
 export const size = {
-  width: 32,
-  height: 32,
+  width: 256,
+  height: 256,
 }
 export const contentType = 'image/png'
 
 // Image generation
-export default function Icon() {
+export default function Icon({
+  borderRadius = '0',
+}: {
+  borderRadius?: string
+}) {
   // Get current day of the month
   const currentDay = new Date().getDate()
 
@@ -25,7 +29,7 @@ export default function Icon() {
           alignItems: 'center',
           justifyContent: 'center',
           color: 'white',
-          borderRadius: '27%',
+          borderRadius,
           letterSpacing: '-1px',
         }}
       >
