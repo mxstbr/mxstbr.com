@@ -8,10 +8,16 @@ import { auth, isMax } from '../auth'
 import CreateEventForm from './create-event-form'
 import { revalidatePath } from 'next/cache'
 import { EventList } from './event-list'
+import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 export const fetchCache = 'force-no-store'
+
+export const metadata: Metadata = {
+  title: 'Minmax calendar',
+  description: '',
+}
 
 const redis = Redis.fromEnv()
 
