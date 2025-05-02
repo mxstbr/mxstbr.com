@@ -18,7 +18,7 @@ export function Icon({ borderRadius = '0' }: { borderRadius?: string }) {
         // ImageResponse JSX element
         <div
           style={{
-            fontSize: 20,
+            fontSize: 200,
             background: '#e76f6f',
             width: '100%',
             height: '100%',
