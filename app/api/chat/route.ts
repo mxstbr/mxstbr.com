@@ -3,12 +3,13 @@ import { streamText, tool } from 'ai'
 import z from 'zod'
 import { Redis } from '@upstash/redis'
 import { isMax } from 'app/auth'
-import { toDayString } from 'app/cal/data'
+import { colors, toDayString } from 'app/cal/data'
 import type { Event } from 'app/cal/data'
+import { PRESETS } from '../../cal/presets'
 
 const redis = Redis.fromEnv()
 
-const openai = createOpenAI({})
+const openai = createOpenAI()
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30
@@ -31,6 +32,7 @@ export async function POST(req: Request) {
   const result = streamText({
     model: openai('gpt-4o'),
     messages,
+    system: `You are a helpful assistant that can help me manage my quarterly calendar. These are the presets for event colors, backgrounds, and borders depending on who the event is for: <presets>${JSON.stringify(PRESETS.map((preset) => ({ ...preset, color: colors[preset.color] })))}</presets> DO NOT USE DIFFERENT COLOR & BACKGROUDN COMBINATIONS.\n\nDefault events to be for minmax unless told otherwise. Today is ${new Date().toISOString().split('T')[0]}.`,
     tools: {
       // ---------------------------------------------------------------------
       // CREATE --------------------------------------------------------------
