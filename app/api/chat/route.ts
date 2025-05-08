@@ -6,6 +6,7 @@ import { isMax } from 'app/auth'
 import { colors, toDayString } from 'app/cal/data'
 import type { Event } from 'app/cal/data'
 import { PRESETS } from '../../cal/presets'
+import { revalidatePath } from 'next/cache'
 
 const redis = Redis.fromEnv()
 
@@ -24,7 +25,7 @@ Respond in a concise, helpful, and unambiguous way.
 A. When the user is manipulating events, return a single JSON object  
    inside one fenced code block \`\`\`json … \`\`\` so the calling code can parse it.  
    Required keys per event:  title · date (YYYY-MM-DD) · startTime (HH:MM 24h) · endTime · owner · preset  
-B. When the user only asks for information (e.g. “What’s on my calendar?”)  
+B. When the user only asks for information (e.g. "What's on my calendar?")  
    you may answer in natural language.
 
 ======================= COLOR / STYLE POLICY ==================
@@ -39,7 +40,7 @@ If the user omits the owner, assume "minmax" and use its preset.
 ======================= DEFAULT TITLE =========================
 If the user omits an event title but specifies a preset, don't include one.
 
-======================= TODAY’S DATE ==========================
+======================= TODAY'S DATE ==========================
 ${new Date().toISOString().split('T')[0]}
 
 ======================= PRESET DEFINITIONS ====================
@@ -105,6 +106,7 @@ export async function POST(req: Request) {
             newEvent,
             ...(existing || []),
           ])
+          revalidatePath('/cal')
 
           return {
             message: `✅ Event "${label || 'untitled'}" created`,
@@ -176,6 +178,7 @@ export async function POST(req: Request) {
           events[idx] = updatedEvent
 
           await redis.json.set(`cal:${process.env.CAL_PASSWORD}`, '$', events)
+          revalidatePath('/cal')
 
           return { message: '✏️ Event updated', event: updatedEvent }
         },
@@ -212,6 +215,7 @@ export async function POST(req: Request) {
           events.splice(idx, 1)
 
           await redis.json.set(`cal:${process.env.CAL_PASSWORD}`, '$', events)
+          revalidatePath('/cal')
 
           return { message: '🗑️ Event deleted' }
         },
