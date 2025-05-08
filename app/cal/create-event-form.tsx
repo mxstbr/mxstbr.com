@@ -85,9 +85,33 @@ export default function CreateEventForm({
       className={`fixed bottom-0 right-0 z-10 ${isExpanded ? 'w-full sm:w-96' : ''}`}
     >
       {isExpanded ? (
-        <div className="sm:mb-4 sm:mr-4 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-lg shadow-lg p-6 pb-8 flex flex-col gap-4">
-          <div className="flex justify-between items-center">
-            <h2 className="font-semibold mt-0 dark:text-white">Create event</h2>
+        <div className="sm:mb-4 sm:mr-4 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-lg shadow-lg flex flex-col gap-4">
+          <div className="flex justify-between items-center p-3">
+            {/* Tab selector */}
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setActiveTab('chat')}
+                className={`text-xs px-3 py-1 rounded-md ${
+                  activeTab === 'chat'
+                    ? 'bg-slate-200 dark:bg-slate-600 text-slate-900 dark:text-white'
+                    : 'bg-white dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-600'
+                }`}
+              >
+                AI
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('manual')}
+                className={`text-xs px-3 py-1 rounded-md ${
+                  activeTab === 'manual'
+                    ? 'bg-slate-200 dark:bg-slate-600 text-slate-900 dark:text-white'
+                    : 'bg-white dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-600'
+                }`}
+              >
+                Manual
+              </button>
+            </div>
             <button
               type="button"
               onClick={() => {
@@ -99,36 +123,10 @@ export default function CreateEventForm({
             </button>
           </div>
 
-          {/* Tab selector */}
-          <div className="flex gap-2 mb-4">
-            <button
-              type="button"
-              onClick={() => setActiveTab('chat')}
-              className={`text-xs px-3 py-1 rounded-md ${
-                activeTab === 'chat'
-                  ? 'bg-slate-200 dark:bg-slate-600 text-slate-900 dark:text-white'
-                  : 'bg-white dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-600'
-              }`}
-            >
-              AI
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab('manual')}
-              className={`text-xs px-3 py-1 rounded-md ${
-                activeTab === 'manual'
-                  ? 'bg-slate-200 dark:bg-slate-600 text-slate-900 dark:text-white'
-                  : 'bg-white dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-600'
-              }`}
-            >
-              Manual
-            </button>
-          </div>
-
           {activeTab === 'chat' ? (
             <Chat />
           ) : (
-            <form action={clientAction} className="flex flex-col gap-4">
+            <form action={clientAction} className="flex flex-col gap-4 px-3 pb-3">
               <div className="flex flex-row items-stretch justify-between gap-2">
                 <div>
                   <label

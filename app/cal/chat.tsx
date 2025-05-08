@@ -31,9 +31,10 @@ export default function Chat() {
           ))}
       </div>
 
-      <form onSubmit={handleSubmit} className="pt-2">
+      <form onSubmit={handleSubmit} className="border-t border-slate-200 dark:border-slate-700">
         <input
-          className="dark:bg-zinc-900 w-full p-2 border border-zinc-300 dark:border-zinc-800 rounded shadow-xl"
+          className="w-full p-3 bg-transparent dark:bg-transparent text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:outline-none border-none shadow-none rounded-none"
+          style={{ boxShadow: 'none', border: 'none' }}
           value={input}
           placeholder="Say something..."
           onChange={handleInputChange}
