@@ -1,11 +1,30 @@
 'use client'
 
 import { useChat } from '@ai-sdk/react'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react';
 
 export default function Chat() {
-  const { messages, input, handleInputChange, handleSubmit } = useChat({
+  const router = useRouter();
+  const { messages, input, handleInputChange, handleSubmit, status } = useChat({
     maxSteps: 5,
   })
+
+  // Refresh the page when an event is edited
+  useEffect(() => {
+    if (status !== 'ready') return;
+
+    const aiMessage = messages.reverse().find((message) => message.role === 'assistant');
+    if (!aiMessage) return;
+
+    const toolResult = aiMessage.parts.find(parts => parts.type === "tool-invocation")
+    if (!toolResult) return;
+
+    if (toolResult.toolInvocation.toolName === "create_event" || toolResult.toolInvocation.toolName === "update_event" || toolResult.toolInvocation.toolName === "delete_event") {
+      router.refresh();
+    }
+  }, [status, messages])
+
   return (
     <div className="flex flex-col w-full max-w-md h-64 mx-auto">
       <div className="flex-1 overflow-y-auto flex flex-col-reverse space-y-2 space-y-reverse p-3">
