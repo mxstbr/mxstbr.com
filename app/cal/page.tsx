@@ -179,8 +179,6 @@ export default async function Plan() {
         </div>
       </div>
       <CreateEventForm createEventAction={createEvent} />
-      <h2 className="text-lg font-bold mt-24">Chat</h2>
-      <Chat />
       <h2 className="text-lg font-bold mt-24">Raw events list (↓ end date)</h2>
       <EventList
         events={events}
