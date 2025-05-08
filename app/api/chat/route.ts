@@ -36,6 +36,9 @@ B. When the user only asks for information (e.g. “What’s on my calendar?”)
 ======================= DEFAULT OWNER =========================
 If the user omits the owner, assume "minmax" and use its preset.
 
+======================= DEFAULT TITLE =========================
+If the user omits an event title but specifies a preset, don't include one.
+
 ======================= TODAY’S DATE ==========================
 ${new Date().toISOString().split('T')[0]}
 
