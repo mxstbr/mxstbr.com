@@ -9,6 +9,7 @@ import CreateEventForm from './create-event-form'
 import { revalidatePath } from 'next/cache'
 import { EventList } from './event-list'
 import type { Metadata } from 'next'
+import Chat from './chat'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -178,6 +179,8 @@ export default async function Plan() {
         </div>
       </div>
       <CreateEventForm createEventAction={createEvent} />
+      <h2 className="text-lg font-bold mt-24">Chat</h2>
+      <Chat />
       <h2 className="text-lg font-bold mt-24">Raw events list (↓ end date)</h2>
       <EventList
         events={events}

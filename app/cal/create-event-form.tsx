@@ -8,42 +8,7 @@ import { ChevronDown, Edit2 } from 'react-feather'
 import { colors, BackgroundPattern, Border } from './data'
 // @ts-ignore
 import * as patterns from 'hero-patterns'
-
-// Define preset types
-type Preset = {
-  name: string
-  color: keyof typeof colors
-  background: BackgroundPattern
-  border: Border | ''
-}
-
-// Define presets
-const PRESETS: Preset[] = [
-  {
-    name: 'Kids',
-    color: 'green',
-    background: 'texture',
-    border: 'solid',
-  },
-  {
-    name: 'Minmax',
-    color: 'yellow',
-    background: 'diagonalLines',
-    border: 'solid',
-  },
-  {
-    name: 'Max',
-    color: 'pink',
-    background: 'diagonalLines',
-    border: 'solid',
-  },
-  {
-    name: 'Minnie',
-    color: 'blue',
-    background: 'texture',
-    border: 'solid',
-  },
-]
+import { PRESETS, Preset } from './presets'
 
 function SubmitButton() {
   const { pending } = useFormStatus()
