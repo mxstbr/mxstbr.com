@@ -1,4 +1,4 @@
-import { createOpenAI } from '@ai-sdk/openai'
+import { openai } from '@ai-sdk/openai'
 import { streamText, tool } from 'ai'
 import z from 'zod'
 import { Redis } from '@upstash/redis'
@@ -8,8 +8,6 @@ import type { Event } from 'app/cal/data'
 import { PRESETS } from '../../cal/presets'
 
 const redis = Redis.fromEnv()
-
-const openai = createOpenAI()
 
 const SYSTEM_PROMPT = String.raw`
 You are Calendar Assistant, an AI that helps a single end-user create, edit, and review events on a quarterly calendar.  
