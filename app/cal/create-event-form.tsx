@@ -82,10 +82,10 @@ export default function CreateEventForm({
 
   return (
     <div
-      className={`fixed bottom-0 right-0 z-10 ${isExpanded ? 'w-full sm:w-96' : ''}`}
+      className={`fixed bottom-0 right-0 z-10 ${isExpanded ? 'w-full sm:w-[32rem]' : ''}`}
     >
       {isExpanded ? (
-        <div className="sm:mb-4 sm:mr-4 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-lg shadow-lg flex flex-col gap-4">
+        <div className="sm:mb-4 sm:mr-4 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-lg shadow-lg flex flex-col gap-4 max-h-[80vh] sm:max-h-[95vh]">
           <div className="flex justify-between items-center p-3">
             {/* Tab selector */}
             <div className="flex gap-2">

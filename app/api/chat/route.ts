@@ -10,7 +10,7 @@ import { revalidatePath } from 'next/cache'
 
 const redis = Redis.fromEnv()
 
-const SYSTEM_PROMPT = String.raw`
+const SYSTEM_PROMPT = (today: Date) => String.raw`
 You are Calendar Assistant, an AI that helps a single end-user create, edit, and review all day events on a quarterly calendar.  
 Respond in a concise, helpful, and unambiguous way.
 
@@ -24,6 +24,7 @@ Respond in a concise, helpful, and unambiguous way.
 • Event data is all full-day. Never ask for times. You only need to know the date.
 • If events go for consecutive days, create one event for the whole period with start and end dates. NOT multiple events.
 • If there is a one-day event that doesn't go the whole day (e.g., dinner or a concert), don't add a border or background.
+• If the user specifies a week day, assume it's the next occurence of that week day.
 
 ======================= COLOR / STYLE POLICY ==================
 • Each event must follow EXACTLY one preset defined in <PRESETS>.  
@@ -36,7 +37,7 @@ If the user omits the owner, assume "minmax" and use its preset.
 If the user omits an event title but specifies a preset, don't include a title.
 
 ======================= TODAY'S DATE ==========================
-${new Date().toISOString().split('T')[0]}
+${today.toISOString().split('T')[0]}
 
 ======================= PRESET DEFINITIONS ====================
 <PRESETS>
@@ -68,7 +69,7 @@ export async function POST(req: Request) {
   const result = streamText({
     model: openai('gpt-4o'),
     messages,
-    system: SYSTEM_PROMPT,
+    system: SYSTEM_PROMPT(new Date()),
     tools: {
       // ---------------------------------------------------------------------
       // CREATE --------------------------------------------------------------
