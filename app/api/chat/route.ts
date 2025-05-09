@@ -114,16 +114,32 @@ export async function POST(req: Request) {
       // READ ----------------------------------------------------------------
       // ---------------------------------------------------------------------
       read_events: tool({
-        description: 'Return all calendar events',
-        parameters: z.object({}),
-        execute: async () => {
+        description: 'Return all calendar events, optionally filtered by date range',
+        parameters: z.object({
+          start_date: z.string().optional().default('2024-01-01'),
+          end_date: z.string().optional().default('9999-12-31'),
+        }),
+        execute: async ({ start_date, end_date }) => {
           if (!isMax()) throw new Error('Unauthorized')
 
           const events: Array<Event> | null = await redis.json.get(
             `cal:${process.env.CAL_PASSWORD}`,
           )
 
-          return { events: events ?? [] }
+          if (!events) return { events: [] }
+
+          // Filter events that start OR end within the date range
+          const filteredEvents = events.filter(event => {
+            const eventStart = event.start
+            const eventEnd = event.end
+            return (
+              (eventStart >= start_date && eventStart <= end_date) || // Event starts in range
+              (eventEnd >= start_date && eventEnd <= end_date) || // Event ends in range
+              (eventStart <= start_date && eventEnd >= end_date) // Event spans the entire range
+            )
+          })
+
+          return { events: filteredEvents }
         },
       }),
 
