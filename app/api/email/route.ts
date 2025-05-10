@@ -19,6 +19,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
             Before you do, make sure the event doesn't already exist.
             Our kids go to Fiesta Gardens International School.  If the email is about a school event, use the kids preset.
 
+            <subject>${body.headers.subject}</subject>
             <content>
             ${body.plain}
             </content>`)
