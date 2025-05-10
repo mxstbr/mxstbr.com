@@ -1,5 +1,5 @@
 import { openai } from '@ai-sdk/openai'
-import { streamText, tool } from 'ai'
+import { streamText, tool, generateText } from 'ai'
 import z from 'zod'
 import { Redis } from '@upstash/redis'
 import { isMax, isAuthorizedForEmailRoute } from 'app/auth'
@@ -247,7 +247,7 @@ export async function callCalendarAssistantWithEmail(plaintext: string) {
   // Use the email-specific authorization function
   if (!isAuthorizedForEmailRoute()) throw new Error('Unauthorized')
 
-  return streamText({
+  return generateText({
     model: openai('gpt-4o'),
     messages: [{ role: 'user', content: plaintext }],
     system: SYSTEM_PROMPT(new Date()),

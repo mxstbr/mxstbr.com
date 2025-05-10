@@ -25,7 +25,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
             </content>`)
         // We don't need to send a response back to the email sender,
         // the agent will take care of creating/updating/deleting events
-        return new NextResponse('OK', { status: 200 })
+        return new NextResponse(JSON.stringify(result, null, 2), { status: 200 })
     } catch (error) {
         console.error('Error processing email with calendar assistant:', error)
         return new NextResponse('Error processing email', { status: 500 })
