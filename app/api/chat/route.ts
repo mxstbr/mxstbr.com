@@ -8,7 +8,11 @@ export async function POST(req: Request) {
   if (!isMax()) throw new Error('Unauthorized')
   const { messages } = await req.json()
 
-  const result = await callCalendarAssistant(messages)
+  const sessionId = req.headers.get('x-session-id')
+
+  if (!sessionId) throw new Error('Missing session id.')
+
+  const result = await callCalendarAssistant(messages, sessionId)
   
   return result.toDataStreamResponse()
 }

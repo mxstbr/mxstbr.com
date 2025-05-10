@@ -2,13 +2,21 @@
 
 import { useChat } from '@ai-sdk/react'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function Chat() {
+  const [sessionId, setSessionId] = useState<string>('')
   const router = useRouter();
   const { messages, input, handleInputChange, handleSubmit, status } = useChat({
     maxSteps: 5,
+    headers: {
+      'x-session-id': sessionId
+    }
   })
+
+  useEffect(() => {
+    setSessionId(Date.now().toString())
+  }, [])
 
   // Refresh the page when an event is edited
   useEffect(() => {

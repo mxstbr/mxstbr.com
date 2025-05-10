@@ -230,7 +230,7 @@ export const calendarTools = {
 }
 
 // Function to call the calendar assistant with chat messages
-export async function callCalendarAssistant(messages: any[]) {
+export async function callCalendarAssistant(messages: any[], sessionId: string) {
   // Check authorization using web auth only (not email auth)
   if (!isMax()) throw new Error('Unauthorized')
 
@@ -239,6 +239,9 @@ export async function callCalendarAssistant(messages: any[]) {
     messages,
     system: SYSTEM_PROMPT(new Date()),
     tools: calendarTools,
+    onStepFinish: async (result) => {
+      await redis.lpush(`logs:${sessionId}`, result)
+    },
   })
 }
 
@@ -247,10 +250,14 @@ export async function callCalendarAssistantWithEmail(plaintext: string) {
   // Use the email-specific authorization function
   if (!isAuthorizedForEmailRoute()) throw new Error('Unauthorized')
 
+  const id = Date.now();
   return generateText({
     model: openai('gpt-4o'),
     messages: [{ role: 'user', content: plaintext }],
     system: SYSTEM_PROMPT(new Date()),
     tools: calendarTools,
+    onStepFinish: async (result) => {
+      await redis.lpush(`logs:${id}`, result)
+    }
   })
 } 
