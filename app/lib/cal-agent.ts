@@ -239,6 +239,7 @@ export async function callCalendarAssistant(messages: any[], sessionId: string) 
     messages,
     system: SYSTEM_PROMPT(new Date()),
     tools: calendarTools,
+    maxSteps: 10,
     onStepFinish: async (result) => {
       await redis.lpush(`logs:${sessionId}`, result)
     },
@@ -256,6 +257,7 @@ export async function callCalendarAssistantWithEmail(plaintext: string) {
     messages: [{ role: 'user', content: plaintext }],
     system: SYSTEM_PROMPT(new Date()),
     tools: calendarTools,
+    maxSteps: 10,
     onStepFinish: async (result) => {
       await redis.lpush(`logs:${id}`, result)
     }
