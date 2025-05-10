@@ -2,14 +2,13 @@ import { verifyBasicAuth } from "app/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { callCalendarAssistantWithEmail } from "../../lib/cal-agent";
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {
     const authed = verifyBasicAuth(req)
     if (!authed){
         return new NextResponse('Unauthorized', { status: 401 })
     }
 
     const body: NormalisedJsonHashEmailMessage = await req.json()
-    console.log(body)
 
     // Call the calendar assistant with the email plaintext
     try {
