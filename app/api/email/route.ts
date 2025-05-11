@@ -13,13 +13,14 @@ export async function POST(req: NextRequest) {
     // Call the calendar assistant with the email plaintext
     try {
         const result = await callCalendarAssistantWithEmail(`
-            You just received an email from ${body.headers.from}. Below is the email content.
+            You just received an automatically forwarded email.
             Analyze the email content and determine if you should add an event to the calendar.
             Before you do, make sure the event doesn't already exist.
-            Our kids go to Fiesta Gardens International School.
+            Our kids go to Fiesta Gardens International School. Only add required events to the calendar, but nothing volunteering or similar. Definitely add anything related to spirit weeks or teacher appreciation weeks.
             Every event you create must have a title.
             Every event you create must have ✉️ in front of the title.
 
+            <from>${body.headers.from}</from>
             <subject>${body.headers.subject}</subject>
             <content>
             ${body.plain}
