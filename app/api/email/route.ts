@@ -16,7 +16,9 @@ export async function POST(req: NextRequest) {
             You just received an email from ${body.headers.from}. Below is the email content.
             Analyze the email content and determine if you should add an event to the calendar.
             Before you do, make sure the event doesn't already exist.
-            Our kids go to Fiesta Gardens International School.  If the email is about a school event, use the kids preset.
+            Our kids go to Fiesta Gardens International School.
+            Every event you create must have a title.
+            Every event you create must have ✉️ in front of the title.
 
             <subject>${body.headers.subject}</subject>
             <content>
