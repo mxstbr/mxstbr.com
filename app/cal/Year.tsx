@@ -322,39 +322,21 @@ function Day(props: {
         </span>
 
         {/* Modified Labels section */}
+        {/* Single day events render at the bottom */}
         {dayEvents
           .filter(
             (evt) =>
-              evt.label && isMiddleDayOfLongestWeekInInterval(evt, props.day),
+              evt.label && 
+              isMiddleDayOfLongestWeekInInterval(evt, props.day) && 
+              evt.labelSize === 'small'
           )
           .map((evt) => {
             const eventId = createEventId(evt)
-
-            // Special case: single day events render at the bottom.
-            if (evt.labelSize === 'small') {
-              return (
-                <a
-                  key={evt.label}
-                  href={`#${eventId}`}
-                  className="text-xs font-semibold no-underline"
-                  style={{
-                    color: evt.color,
-                  }}
-                >
-                  {evt.label}
-                </a>
-              )
-            }
-
             return (
               <a
                 key={evt.label}
                 href={`#${eventId}`}
-                className={`absolute top-8 z-10 no-underline ${
-                  isWeekEventDaysEven(evt, props.day)
-                    ? 'right-0 translate-x-1/2'
-                    : 'left-1/2 -translate-x-1/2'
-                } w-max text-center font-medium`}
+                className="text-xs font-semibold no-underline"
                 style={{
                   color: evt.color,
                 }}
@@ -363,6 +345,36 @@ function Day(props: {
               </a>
             )
           })}
+          
+        {/* Multi-day events in one container */}
+        <div className="absolute top-8 z-10 w-full flex flex-col items-center">
+          {dayEvents
+            .filter(
+              (evt) =>
+                evt.label && 
+                isMiddleDayOfLongestWeekInInterval(evt, props.day) && 
+                evt.labelSize !== 'small'
+            )
+            .map((evt) => {
+              const eventId = createEventId(evt)
+              return (
+                <a
+                  key={evt.label}
+                  href={`#${eventId}`}
+                  className={`no-underline w-max text-center font-medium ${
+                    isWeekEventDaysEven(evt, props.day)
+                      ? 'self-end mr-[-8px]'
+                      : 'self-center'
+                  }`}
+                  style={{
+                    color: evt.color,
+                  }}
+                >
+                  {evt.label}
+                </a>
+              )
+            })}
+        </div>
       </div>
     </DayWrapper>
   )
