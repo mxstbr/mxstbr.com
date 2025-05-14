@@ -7,10 +7,11 @@ import { colors, toDayString } from 'app/cal/data'
 import type { Event } from 'app/cal/data'
 import { PRESETS } from '../cal/presets'
 import { revalidatePath } from 'next/cache'
+import { dedent } from './dedent'
 
 const redis = Redis.fromEnv()
 
-export const SYSTEM_PROMPT = (today: Date) => String.raw`
+export const SYSTEM_PROMPT = (today: Date) => dedent`
 You are Calendar Assistant, an AI that helps a single end-user create, edit, and review all day events on a quarterly calendar.  
 Respond in a concise, helpful, and unambiguous way.
 

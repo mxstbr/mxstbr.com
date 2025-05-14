@@ -1,6 +1,7 @@
 import { verifyBasicAuth } from "app/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { callCalendarAssistantWithEmail } from "../../lib/cal-agent";
+import { dedent } from "../../lib/dedent";
 
 export async function POST(req: NextRequest) {
     const authed = verifyBasicAuth(req)
@@ -12,20 +13,21 @@ export async function POST(req: NextRequest) {
 
     // Call the calendar assistant with the email plaintext
     try {
-        const result = await callCalendarAssistantWithEmail(`
+        const result = await callCalendarAssistantWithEmail(dedent`
             You just received an automatically forwarded email.
 
             === EMAIL EVENT ANALYSIS BEHAVIOR ===
             Analyze the email content and determine if you should add an event to the calendar.
-            Before you do, make sure the event doesn't already exist.
+            You must make sure the event doesn't already exist (read_events) before creating a new event.
             Every event you create must have a title.
-            Every event you create must have ✉️ in front of the title.
+            Every event you create must have ✉️ at the beginning of the title.
 
             === SCHOOL EVENT BEHAVIOR ===
             Our kids go to Fiesta Gardens International School.
             We are not a part of the Parent Teacher Association (PTA), nor do we volunteer.
             When emails arrive from school that contain dates, add them to the calendar only if they are required. (e.g., teacher appreciation weeks, spirit weeks, fall breaks,…)
 
+            === EMAIL ===
             <from>${body.headers.from}</from>
             <subject>${body.headers.subject}</subject>
             <content>
