@@ -5,10 +5,13 @@ import { ItemList, ItemListItem } from './components/item-list'
 import { StellateIcon } from './components/stellate-icon'
 import { Section } from './components/section'
 import { ShopifyIcon } from './components/shopify-icon'
+import { Quotes } from './components/quotes'
 
 export default async function Home() {
   return (
     <div className="space-y-20">
+      <Quotes />
+      
       <Section title="TL;DR">
         <ItemList>
           <ItemListItem
