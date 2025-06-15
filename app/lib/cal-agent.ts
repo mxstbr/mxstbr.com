@@ -1,8 +1,8 @@
 import { openai } from '@ai-sdk/openai'
-import { streamText, tool, generateText } from 'ai'
+import { streamText as ai_streamText, tool, generateText as ai_generateText } from 'ai'
 import z from 'zod'
 import { Redis } from '@upstash/redis'
-import { isMax, isAuthorizedForEmailRoute } from 'app/auth'
+import { isMax } from 'app/auth'
 import { colors, toDayString } from 'app/cal/data'
 import type { Event } from 'app/cal/data'
 import { PRESETS } from '../cal/presets'
@@ -24,13 +24,13 @@ Respond in a concise, helpful, and unambiguous way.
 
 ======================= EVENT BEHAVIOR ======================
 • Event data is all full-day. Never ask for times. You only need to know the date.
-• If there is a one-day event that doesn't go the whole day (e.g., dinner or a concert or a meetup), add it as a full-day event, but don't add a border or background, even if the preset has one.
+• If there is a one-day event that doesn't go the whole day (e.g., dinner or a concert or a meetup or a meeting), add it as a full-day event, but don't add a border or background, even if the preset has one.
 • If events go for consecutive days, create one event for the whole period with start and end dates. NOT multiple events.
 • If the user specifies a week day, assume it's the next occurence of that week day.
 
 ======================= COLOR / STYLE POLICY ==================
 • Each event must follow EXACTLY one preset defined in <PRESETS>.  
-• Never invent, merge, or modify presets.  
+• Never invent, merge, or modify presets. The only exception is non-whole-day events as specified above.
 
 ======================= DEFAULT OWNER =========================
 If the user omits the owner, assume "minmax" and use its preset.
@@ -70,9 +70,6 @@ export const calendarTools = {
     description: 'Create a new calendar event',
     parameters: eventSchema,
     execute: async ({ start, end, color, label, border, background }) => {
-      // Check authorization using either web or email auth
-      if (!isMax() && !isAuthorizedForEmailRoute()) throw new Error('Unauthorized')
-
       // Normalise to YYYY-MM-DD format
       const startDay = toDayString(start)
       const endDay = toDayString(end)
@@ -114,9 +111,6 @@ export const calendarTools = {
       end_date: z.string().optional().default('9999-12-31'),
     }),
     execute: async ({ start_date, end_date }) => {
-      // Check authorization using either web or email auth
-      if (!isMax() && !isAuthorizedForEmailRoute()) throw new Error('Unauthorized')
-
       const events: Array<Event> | null = await redis.json.get(
         `cal:${process.env.CAL_PASSWORD}`,
       )
@@ -149,9 +143,6 @@ export const calendarTools = {
       newEvent: eventSchema,
     }),
     execute: async ({ oldEvent, newEvent }) => {
-      // Check authorization using either web or email auth
-      if (!isMax() && !isAuthorizedForEmailRoute()) throw new Error('Unauthorized')
-
       const events: Array<Event> | null = await redis.json.get(
         `cal:${process.env.CAL_PASSWORD}`,
       )
@@ -198,9 +189,6 @@ export const calendarTools = {
     description: 'Delete a calendar event',
     parameters: z.object({ event: eventSchema }),
     execute: async ({ event }) => {
-      // Check authorization using either web or email auth
-      if (!isMax() && !isAuthorizedForEmailRoute()) throw new Error('Unauthorized')
-
       const events: Array<Event> | null = await redis.json.get(
         `cal:${process.env.CAL_PASSWORD}`,
       )
@@ -230,37 +218,29 @@ export const calendarTools = {
   }),
 }
 
-// Function to call the calendar assistant with chat messages
-export async function callCalendarAssistant(messages: any[], sessionId: string) {
-  // Check authorization using web auth only (not email auth)
-  if (!isMax()) throw new Error('Unauthorized')
-
-  return streamText({
+export async function streamText(sessionId: string, params: Partial<Parameters<typeof ai_streamText>[0]>) {
+  return ai_streamText({
     model: openai('gpt-4o'),
-    messages,
     system: SYSTEM_PROMPT(new Date()),
     tools: calendarTools,
     maxSteps: 10,
     onStepFinish: async (result) => {
       await redis.lpush(`logs:${sessionId}`, result)
     },
+    ...params,
   })
 }
 
-// Function to call the calendar assistant with email plaintext
-export async function callCalendarAssistantWithEmail(plaintext: string) {
-  // Use the email-specific authorization function
-  if (!isAuthorizedForEmailRoute()) throw new Error('Unauthorized')
-
+export async function generateText(params: Partial<Parameters<typeof ai_generateText>[0]>) {
   const id = Date.now();
-  return generateText({
+  return ai_generateText({
     model: openai('gpt-4o'),
-    messages: [{ role: 'user', content: plaintext }],
     system: SYSTEM_PROMPT(new Date()),
     tools: calendarTools,
     maxSteps: 10,
     onStepFinish: async (result) => {
       await redis.lpush(`logs:${id}`, result)
-    }
+    },
+    ...params,
   })
-} 
+}

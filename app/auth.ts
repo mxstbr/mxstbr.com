@@ -21,8 +21,3 @@ export function verifyBasicAuth(request: Request): boolean {
 
   return Buffer.from(password, 'base64').toString('utf-8') === process.env.CAL_PASSWORD && username === 'max'
 }
-
-// This function should be used by email-related agent calls
-export function isAuthorizedForEmailRoute(): boolean {
-  return true // Email routes are pre-authorized by Basic Auth
-}

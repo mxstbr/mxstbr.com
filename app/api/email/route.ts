@@ -1,6 +1,6 @@
 import { verifyBasicAuth } from 'app/auth'
 import { NextRequest, NextResponse } from 'next/server'
-import { callCalendarAssistantWithEmail } from '../../lib/cal-agent'
+import { generateText } from '../../lib/cal-agent'
 import { dedent } from '../../lib/dedent'
 
 export async function POST(req: NextRequest) {
@@ -13,7 +13,11 @@ export async function POST(req: NextRequest) {
 
   // Call the calendar assistant with the email plaintext
   try {
-    const result = await callCalendarAssistantWithEmail(dedent`
+    const result = await generateText({
+      messages: [
+        {
+          role: 'user',
+          content: dedent`
             You just received an automatically forwarded email.
 
             === EMAIL EVENT ANALYSIS BEHAVIOR ===
@@ -25,7 +29,7 @@ export async function POST(req: NextRequest) {
 
             === SCHOOL EVENT BEHAVIOR ===
             Our kids go to Fiesta Gardens International School.
-            We are not a part of the Parent Teacher Association (PTA), nor do we volunteer.
+            We are not a part of the Parent Teacher Association (PTA), nor do we volunteer, nor are we a part of the school board.
             When emails arrive from school that contain dates, add them to the calendar only if they are required. (e.g., teacher appreciation weeks, spirit weeks, fall breaks,…)
 
             === EMAIL ===
@@ -33,7 +37,11 @@ export async function POST(req: NextRequest) {
             <subject>${body.headers.subject}</subject>
             <content>
             ${body.plain}
-            </content>`)
+            </content>
+            `,
+        },
+      ],
+    })
     // We don't need to send a response back to the email sender,
     // the agent will take care of creating/updating/deleting events
     return new NextResponse(JSON.stringify(result, null, 2), { status: 200 })

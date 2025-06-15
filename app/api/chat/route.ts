@@ -1,4 +1,4 @@
-import { callCalendarAssistant } from '../../lib/cal-agent'
+import { streamText } from '../../lib/cal-agent'
 import { isMax } from 'app/auth'
 
 // Allow streaming responses up to 30 seconds
@@ -12,7 +12,7 @@ export async function POST(req: Request) {
 
   if (!sessionId) throw new Error('Missing session id.')
 
-  const result = await callCalendarAssistant(messages, sessionId)
+  const result = await streamText(sessionId, { messages })
   
   return result.toDataStreamResponse()
 }
