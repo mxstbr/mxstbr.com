@@ -44,6 +44,7 @@
     "remark-smartypants": "^3.0.2",
     "resend": "^4.0.0",
     "shiki": "^1.14.1",
+    "telegraf": "^4.16.3",
     "tsm": "^2.3.0",
     "typescript": "5.5.4",
     "zod": "^3.24.4"
