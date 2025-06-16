@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
           role: 'user',
           content: dedent`
             The following message was sent in a Telegram group chat between Maxie and Minnie.
-            Determine whether it is meant for you and, if so, take action on it:
+            Determine whether it is meant for you and, if so, respond to it. If not, do nothing.
             <message>${JSON.stringify(message)}</message>`,
         },
       ],
