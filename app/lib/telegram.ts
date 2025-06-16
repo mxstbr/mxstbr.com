@@ -3,7 +3,7 @@ import { Telegraf } from 'telegraf'
 import z from 'zod'
 
 export const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN as string)
-bot.telegram.setWebhook(process.env.NODE_ENV === 'development' ? "https://2d95-99-209-202-130.ngrok-free.app/api/telegram" : "https://mxstbr.com/api/telegram", {
+bot.telegram.setWebhook("https://mxstbr.com/api/telegram", {
   secret_token: process.env.TELEGRAM_SECRET_TOKEN,
 })
 
