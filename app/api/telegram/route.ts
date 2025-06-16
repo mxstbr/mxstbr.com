@@ -2,7 +2,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { type Update } from 'telegraf/types'
 import { bot } from 'app/lib/telegram'
-import { generateText } from 'app/lib/cal-agent'
+import { generateText } from 'app/lib/routing-agent'
+import { dedent } from 'app/lib/dedent'
 
 export async function POST(request: NextRequest) {
     if (request.headers.get('X-Telegram-Bot-Api-Secret-Token') !== process.env.TELEGRAM_SECRET_TOKEN) {
@@ -16,7 +17,10 @@ export async function POST(request: NextRequest) {
       messages: [
         {
           role: 'user',
-          content: `You just received the below message via Telegram, reply to it: ${JSON.stringify(message)}`,
+          content: dedent`
+            The following message was sent in a Telegram group chat between Maxie and Minnie.
+            Determine whether it is meant for you and, if so, take action on it:
+            <message>${JSON.stringify(message)}</message>`,
         },
       ],
     })
