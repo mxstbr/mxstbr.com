@@ -1,4 +1,4 @@
-import { streamText } from '../../lib/cal-agent'
+import { streamText } from '../../lib/routing-agent'
 import { isMax } from 'app/auth'
 
 // Allow streaming responses up to 30 seconds
