@@ -11,27 +11,17 @@ export default function Chat() {
     maxSteps: 5,
     headers: {
       'x-session-id': sessionId
+    },
+    onFinish: (message) => {
+      if (message.parts?.some(part => part.type === "tool-invocation" && part.toolInvocation.toolName === "calendar_agent")) {
+        router.refresh();
+      }
     }
   })
 
   useEffect(() => {
     setSessionId(Date.now().toString())
   }, [])
-
-  // Refresh the page when an event is edited
-  useEffect(() => {
-    if (status !== 'ready') return;
-
-    const aiMessage = [...messages].reverse().find((message) => message.role === 'assistant');
-    if (!aiMessage) return;
-
-    const toolResult = aiMessage.parts.find(parts => parts.type === "tool-invocation")
-    if (!toolResult) return;
-
-    if (toolResult.toolInvocation.toolName === "create_event" || toolResult.toolInvocation.toolName === "update_event" || toolResult.toolInvocation.toolName === "delete_event") {
-      router.refresh();
-    }
-  }, [status, messages])
 
   return (
     <div className="flex flex-col w-full h-64 mx-auto">
