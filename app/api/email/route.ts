@@ -20,24 +20,27 @@ export async function POST(req: NextRequest) {
           content: dedent`
             You just received an automatically forwarded email.
 
-            === EMAIL EVENT ANALYSIS BEHAVIOR ===
+            <analysis>
             Analyze the email content and determine if you should add an event to the calendar.
             You must make sure the event doesn't already exist (read_events) before creating a new event.
             Never create events for standard public holidays, these are already in the calendar.
             Every event you create must have a title.
             Every event you create must have ✉️ at the beginning of the title.
+            </analysis>
 
-            === SCHOOL EVENT BEHAVIOR ===
+            <school>
             Our kids go to Fiesta Gardens International School.
             We are not a part of the Parent Teacher Association (PTA), nor do we volunteer, nor are we a part of the school board.
             When emails arrive from school that contain dates, add them to the calendar only if they are required. (e.g., teacher appreciation weeks, spirit weeks, fall breaks,…)
+            </school>
 
-            === EMAIL ===
+            <email>
             <from>${body.headers.from}</from>
             <subject>${body.headers.subject}</subject>
             <content>
             ${body.plain}
             </content>
+            </email>
             `,
         },
       ],
