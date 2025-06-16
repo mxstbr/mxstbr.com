@@ -3,9 +3,9 @@ import { Telegraf } from 'telegraf'
 import z from 'zod'
 
 export const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN as string)
-bot.telegram.setWebhook("https://mxstbr.com/api/telegram", {
-  secret_token: process.env.TELEGRAM_SECRET_TOKEN,
-})
+// bot.telegram.setWebhook("https://mxstbr.com/api/telegram", {
+//   secret_token: process.env.TELEGRAM_SECRET_TOKEN,
+// })
 
 export const telegramTools = {
   send_message: tool({
