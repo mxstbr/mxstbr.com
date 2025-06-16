@@ -25,8 +25,6 @@ export async function POST(request: NextRequest) {
       ],
     })
 
-    await bot.telegram.sendMessage(message.chat.id, result.text)
-
     return NextResponse.json({ message: result.text })
   }
 

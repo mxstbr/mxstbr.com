@@ -3,7 +3,9 @@ import { streamText as ai_streamText, generateText as ai_generateText, tool } fr
 import { Redis } from '@upstash/redis'
 import { dedent } from './dedent'
 import { generateText as calGenerateText } from './cal-agent'
+import { generateText as emailGenerateText } from './email-agent'
 import z from 'zod'
+import { telegramTools } from './telegram'
 
 const redis = Redis.fromEnv()
 
@@ -15,8 +17,7 @@ You are Routing Assistant, an AI that helps direct messages to the appropriate s
 </context>
 
 <behavior>
-• Analyze incoming messages to determine which specialized agent(s) should handle them
-• It can be multiple agents, but it's usually just one
+• Analyze incoming messages to determine which specialized agent should handle them
 • Route messages to the appropriate agent(s) without modifying the content
 • If unsure about routing, don't route it
 • Be concise and clear in your responses
@@ -49,6 +50,16 @@ export const routingTools = {
       const result = await calGenerateText({ messages: [{ role: 'user', content: message }] })
       return { response: result.text }
     }
+  }),
+  email_agent: tool({
+    description: 'Routes the message to the Email Agent, which analyzes emails and determines whether they are urgent or important and, if so, pings Maxie and Minnie via Telegram direct message.',
+    parameters: z.object({
+      message: z.string().describe('The original message to forward to the Email Agent')
+    }),
+    execute: async ({ message }) => {
+      const result = await emailGenerateText({ messages: [{ role: 'user', content: message }] })
+      return { response: result.text }
+    }
   })
 }
 
@@ -56,7 +67,7 @@ export async function streamText(sessionId: string, params: Partial<Parameters<t
   return ai_streamText({
     model: openai('gpt-4o'),
     system: SYSTEM_PROMPT,
-    tools: routingTools,
+    tools: { ...routingTools, ...telegramTools },
     maxSteps: 5,
     onStepFinish: async (result) => {
       await redis.lpush(`logs:${sessionId}`, result)
@@ -70,7 +81,7 @@ export async function generateText(params: Partial<Parameters<typeof ai_generate
   return ai_generateText({
     model: openai('gpt-4o'),
     system: SYSTEM_PROMPT,
-    tools: routingTools,
+    tools: { ...routingTools, ...telegramTools },
     maxSteps: 5,
     onStepFinish: async (result) => {
       await redis.lpush(`logs:${id}`, result)
