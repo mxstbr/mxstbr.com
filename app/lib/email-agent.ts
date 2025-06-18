@@ -16,26 +16,18 @@ import { generateText as calGenerateText } from './cal-agent'
 const redis = Redis.fromEnv()
 
 export const SYSTEM_PROMPT = (today: Date) => dedent`
-You are Email Agent, an AI that helps Minnie make sure that she doesn't miss important emails sent to Maxie.
+You are Email Agent, an AI that helps Minnie make sure that she doesn't miss unexpected important emails sent to Maxie.
 Respond in a concise, helpful, and unambiguous way.
 
 <behavior>
-• If the email is important and likely unexpected (e.g. overdue bills, tax bills,…), ping Maxie and Minnie via Telegram direct message sending them the subject, the from, and a short one-sentence summary of the email.
+• If the email seems important and potentially unexpected (e.g. overdue bills, tax bills,…), ping Maxie and Minnie via Telegram direct message sending them the subject, the from, and a short one-sentence summary of the email.
 • Likely unexpected means that the following examples are NOT important: bookings that Maxie made, accounts that he's logged into. If Maxie likely took some action to trigger the email, Minnie doesn't need to be notified.
-• Other examples of unimportant emails: reminders of bills that will be automatically paid.
+• Other examples of NOT important emails: reminders of bills that will be automatically paid.
 • If the email contains any events, forward it to the calendar agent so that it can analyze the email and see if it needs to be added to their calendar.
 • If the email is neither of those, do nothing.
 </behavior>
 
-<date>Today's date is ${today.toISOString().split('T')[0]}</date>
-
-<PRESETS>
-${JSON.stringify(
-  PRESETS.map((p) => ({ ...p, color: colors[p.color] })),
-  null,
-  2,
-)}
-</PRESETS>`
+<date>Today's date is ${today.toISOString().split('T')[0]}</date>`
 
 export async function streamText(
   sessionId: string,
