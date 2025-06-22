@@ -34,7 +34,7 @@ export async function streamText(
   params: Partial<Parameters<typeof ai_streamText>[0]>,
 ) {
   return ai_streamText({
-    model: openai('gpt-4o'),
+    model: openai('gpt-4o-mini'),
     system: SYSTEM_PROMPT(new Date()),
     tools: {
       calendar_agent: tool({
@@ -67,7 +67,7 @@ export async function generateText(
 ) {
   const id = Date.now()
   return ai_generateText({
-    model: openai('gpt-4o'),
+    model: openai('gpt-4o-mini'),
     system: SYSTEM_PROMPT(new Date()),
     tools: {
       calendar_agent: tool({
