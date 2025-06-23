@@ -285,7 +285,7 @@ function Day(props: {
     <DayWrapper
       style={{
         background: dayEvents
-          .filter((evt) => !!evt.background)
+          .filter((evt) => !!evt.background && !!patterns[evt.background])
           .map((evt) => patterns[evt.background](evt.color, 0.5))
           .join(', '),
       }}
