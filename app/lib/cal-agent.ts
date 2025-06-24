@@ -60,7 +60,7 @@ ${JSON.stringify(
 
 export async function streamText(sessionId: string, params: Partial<Parameters<typeof ai_streamText>[0]>) {
   return ai_streamText({
-    model: openai('gpt-4o-mini'),
+    model: openai('gpt-4.1-mini'),
     system: SYSTEM_PROMPT(new Date()),
     tools: { ...calendarTools, ...telegramTools },
     maxSteps: 10,
@@ -74,7 +74,7 @@ export async function streamText(sessionId: string, params: Partial<Parameters<t
 export async function generateText(params: Partial<Parameters<typeof ai_generateText>[0]>) {
   const id = Date.now();
   return ai_generateText({
-    model: openai('gpt-4o-mini'),
+    model: openai('gpt-4.1-mini'),
     system: SYSTEM_PROMPT(new Date()),
     tools: { ...calendarTools, ...telegramTools },
     maxSteps: 10,
