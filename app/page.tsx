@@ -105,7 +105,7 @@ export default async function Home() {
 const work = [
   {
     name: 'Shopify',
-    role: 'Senior Staff Software Engineer',
+    role: 'Director of Engineering',
     timeframe: '2024–now',
     href: 'https://shopify.com',
   },
