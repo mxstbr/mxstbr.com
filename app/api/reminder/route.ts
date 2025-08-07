@@ -44,12 +44,14 @@ export const { POST } = serve(
       },
     )
 
-    await context.sleep('sleep-random-delay', delaySeconds)
+    if (process.env.NODE_ENV === 'production') {
+      await context.sleep('sleep-random-delay', delaySeconds)
+    }
 
     const voiceTwiml = await context.run('build-voice-response', () => {
-      const response = new twiml.VoiceResponse().say(
-        'Remember not to forget, as Simon would say.',
-      )
+      const response = new twiml.VoiceResponse()
+        .pause({ length: 2 })
+        .say('Remember not to forget, as Simon would say.')
       return response.toString()
     })
 
