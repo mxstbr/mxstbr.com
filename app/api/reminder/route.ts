@@ -1,49 +1,75 @@
-// This route gets posted by the Telegram Bot API when a message is sent to the bot.
-import { NextRequest } from 'next/server'
+import { serve } from '@upstash/workflow/nextjs'
+import { Receiver } from '@upstash/qstash'
 import twilio, { twiml } from 'twilio'
 
-const accountSid = process.env.TWILIO_ACCOUNT_SID
-const authToken = process.env.TWILIO_AUTH_TOKEN
-const client = twilio(accountSid, authToken)
+export const { POST } = serve(
+  async (context) => {
+    const shouldCall = await context.run('decide-to-call', async () => {
+      const timezone = 'America/Los_Angeles'
+      const now = new Date()
+      const nowInTimezone = new Date(
+        now.toLocaleString('en-US', { timeZone: timezone }),
+      )
+      const hour = nowInTimezone.getHours()
 
-export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get('authorization') || ''
-  if (!authHeader.includes(process.env.CRON_SECRET as string)) {
-    return new Response('Unauthorized', {
-      status: 401,
+      if (hour < 10 || hour > 17) return false
+
+      const diceRoll = Math.random()
+      return diceRoll <= 0.25
     })
-  }
 
-  // TODO: Make dynamic
-  const timezone = 'America/Los_Angeles'
-  const now = new Date()
-  const nowInTimezone = new Date(
-    now.toLocaleString('en-US', { timeZone: timezone }),
-  )
-  const hour = nowInTimezone.getHours()
+    if (!shouldCall) {
+      return
+    }
 
-  if (hour < 10 || hour > 17) {
-    return Response.json({ success: true })
-  }
+    const delaySeconds = await context.run(
+      'random-delay-within-hour',
+      async () => {
+        const timezone = 'America/Los_Angeles'
+        const now = new Date()
+        const nowInTimezone = new Date(
+          now.toLocaleString('en-US', { timeZone: timezone }),
+        )
 
-  // This cron job gets called at 25 minutes past the hour, every hour
-  // We filter out hours < 10 or > 17 to avoid calling outside of work hours
-  // We roll a dice to call on average twice a day
-  // With 8 work hours (10-17), we want ~2 calls per day, so ~25% chance per hour
-  const diceRoll = Math.random()
-  if (diceRoll > 0.25) {
-    return Response.json({ success: true })
-  }
+        const endOfHour = new Date(nowInTimezone)
+        endOfHour.setMinutes(59, 59, 999)
+        const remainingMs = Math.max(
+          0,
+          endOfHour.getTime() - nowInTimezone.getTime(),
+        )
+        const remainingSeconds = Math.floor(remainingMs / 1000)
 
-  const response = new twiml.VoiceResponse().say(
-    'Remember not to forget, as Simon would say.',
-  )
+        const randomSeconds = Math.floor(Math.random() * (remainingSeconds + 1))
+        return randomSeconds
+      },
+    )
 
-  await client.calls.create({
-    from: process.env.TWILIO_PHONE_NUMBER as string,
-    to: process.env.MAX_PHONE_NUMBER as string,
-    twiml: response.toString(),
-  })
+    await context.sleep('sleep-random-delay', delaySeconds)
 
-  return Response.json({ success: true })
-}
+    const voiceTwiml = await context.run('build-voice-response', () => {
+      const response = new twiml.VoiceResponse().say(
+        'Remember not to forget, as Simon would say.',
+      )
+      return response.toString()
+    })
+
+    await context.run('twilio-call', async () => {
+      const client = twilio(
+        process.env.TWILIO_ACCOUNT_SID as string,
+        process.env.TWILIO_AUTH_TOKEN as string,
+      )
+
+      await client.calls.create({
+        from: process.env.TWILIO_PHONE_NUMBER as string,
+        to: process.env.MAX_PHONE_NUMBER as string,
+        twiml: voiceTwiml,
+      })
+    })
+  },
+  {
+    receiver: new Receiver({
+      currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY as string,
+      nextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY as string,
+    }),
+  },
+)
