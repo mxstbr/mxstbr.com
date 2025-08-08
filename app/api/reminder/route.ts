@@ -1,11 +1,19 @@
 import { serve } from '@upstash/workflow/nextjs'
 import { Receiver } from '@upstash/qstash'
 import twilio, { twiml } from 'twilio'
+import { Redis } from '@upstash/redis'
+
+const redis = Redis.fromEnv()
 
 export const { POST } = serve(
   async (context) => {
+    const timezone = await context.run('load-timezone', async () => {
+      return (
+        (await redis.get<string>('reminder:timezone')) || 'America/Los_Angeles'
+      )
+    })
+
     const shouldCall = await context.run('decide-to-call', async () => {
-      const timezone = 'America/Los_Angeles'
       const now = new Date()
       const nowInTimezone = new Date(
         now.toLocaleString('en-US', { timeZone: timezone }),
@@ -25,7 +33,6 @@ export const { POST } = serve(
     const delaySeconds = await context.run(
       'random-delay-within-hour',
       async () => {
-        const timezone = 'America/Los_Angeles'
         const now = new Date()
         const nowInTimezone = new Date(
           now.toLocaleString('en-US', { timeZone: timezone }),
