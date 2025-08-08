@@ -57,8 +57,8 @@ export const { POST } = serve(
 
     const voiceTwiml = await context.run('build-voice-response', () => {
       const response = new twiml.VoiceResponse()
-        .pause({ length: 2 })
-        .say('Remember not to forget, as Simon would say.')
+      response.pause({ length: 2 })
+      response.say('Remember not to forget, as Simon would say.')
       return response.toString()
     })
 
