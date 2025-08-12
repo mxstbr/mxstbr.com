@@ -293,47 +293,42 @@ export default function TodosPage() {
   }
 
   return (
-    <div className="space-y-8">
-      <h2 className="font-bold text-lg">Todos</h2>
+    <div className="full-bleed">
+      <div className="md:px-16">
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
+          onDragCancel={handleDragCancel}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 sm:gap-6">
+            {STATUSES.map((status) => (
+              <KanbanColumn
+                key={status}
+                id={status}
+                title={STATUS_TITLES[status]}
+                itemIds={columnOrder[status]}
+                getTodoById={getTodoById}
+                onCardClick={(id) => setSelectedId(id)}
+              />
+            ))}
+          </div>
 
-      {/* Full-bleed board */}
-      <div className="full-bleed">
-        <div className="md:px-16">
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCorners}
-            onDragStart={handleDragStart}
-            onDragOver={handleDragOver}
-            onDragCancel={handleDragCancel}
-            onDragEnd={handleDragEnd}
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 sm:gap-6">
-              {STATUSES.map((status) => (
-                <KanbanColumn
-                  key={status}
-                  id={status}
-                  title={STATUS_TITLES[status]}
-                  itemIds={columnOrder[status]}
-                  getTodoById={getTodoById}
-                  onCardClick={(id) => setSelectedId(id)}
-                />
-              ))}
-            </div>
-
-            <DragOverlay>
-              {activeId ? (
-                <Card title={getTodoById(activeId)?.title ?? ''} dragging />
-              ) : null}
-            </DragOverlay>
-          </DndContext>
-          {selectedId ? (
-            <DetailsModal
-              title={getTodoById(selectedId)?.title ?? ''}
-              description={getTodoById(selectedId)?.description ?? ''}
-              onClose={() => setSelectedId(null)}
-            />
-          ) : null}
-        </div>
+          <DragOverlay>
+            {activeId ? (
+              <Card title={getTodoById(activeId)?.title ?? ''} dragging />
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+        {selectedId ? (
+          <DetailsModal
+            title={getTodoById(selectedId)?.title ?? ''}
+            description={getTodoById(selectedId)?.description ?? ''}
+            onClose={() => setSelectedId(null)}
+          />
+        ) : null}
       </div>
     </div>
   )
@@ -356,7 +351,7 @@ function KanbanColumn(props: {
       <div
         ref={setNodeRef}
         className={
-          'bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 sm:rounded-md p-3 h-screen transition-shadow' +
+          'bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 sm:rounded-md p-3 min-h-[calc(100vh-176px)] transition-shadow' +
           (isOver ? ' ring-2 ring-blue-400' : '')
         }
       >
