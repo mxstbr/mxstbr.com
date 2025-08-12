@@ -29,6 +29,7 @@ export type Status = 'inbox' | 'todo' | 'blocked' | 'watching' | 'done'
 type Todo = {
   id: string
   title: string
+  description: string
   status: Status
 }
 
@@ -42,18 +43,43 @@ const STATUS_TITLES: Record<Status, string> = {
   done: 'Done',
 }
 
-// Mock data: id, title, status only
+// Mock data: id, title, description, status
 const initialTodos: Todo[] = [
-  { id: 't1', title: 'Plan quarterly goals', status: 'inbox' },
-  { id: 't2', title: 'Email accountant', status: 'inbox' },
-  { id: 't3', title: 'Refactor nav component', status: 'todo' },
-  { id: 't4', title: 'Fix flaky test in CI', status: 'blocked' },
-  { id: 't5', title: 'Review PR #123', status: 'watching' },
-  { id: 't6', title: 'Ship blog post draft', status: 'todo' },
-  { id: 't7', title: 'Update dependencies', status: 'watching' },
-  { id: 't8', title: 'Book dentist appointment', status: 'inbox' },
-  { id: 't9', title: 'Migrate to new Redis plan', status: 'todo' },
-  { id: 't10', title: 'Celebrate shipping!', status: 'done' },
+  { id: 't1', title: 'Plan quarterly goals', description: '', status: 'inbox' },
+  { id: 't2', title: 'Email accountant', description: '', status: 'inbox' },
+  {
+    id: 't3',
+    title: 'Refactor nav component',
+    description: '',
+    status: 'todo',
+  },
+  {
+    id: 't4',
+    title: 'Fix flaky test in CI',
+    description: '',
+    status: 'blocked',
+  },
+  { id: 't5', title: 'Review PR #123', description: '', status: 'watching' },
+  { id: 't6', title: 'Ship blog post draft', description: '', status: 'todo' },
+  {
+    id: 't7',
+    title: 'Update dependencies',
+    description: '',
+    status: 'watching',
+  },
+  {
+    id: 't8',
+    title: 'Book dentist appointment',
+    description: '',
+    status: 'inbox',
+  },
+  {
+    id: 't9',
+    title: 'Migrate to new Redis plan',
+    description: '',
+    status: 'todo',
+  },
+  { id: 't10', title: 'Celebrate shipping!', description: '', status: 'done' },
 ]
 
 function isStatus(value: string): value is Status {
@@ -80,6 +106,7 @@ export default function TodosPage() {
     Record<Status, string[]>
   >(createInitialColumnOrder(initialTodos))
   const [activeId, setActiveId] = React.useState<string | null>(null)
+  const [selectedId, setSelectedId] = React.useState<string | null>(null)
   const dragStartStatusRef = React.useRef<Status | null>(null)
   const columnOrderBeforeDragRef = React.useRef<Record<
     Status,
@@ -288,6 +315,7 @@ export default function TodosPage() {
                   title={STATUS_TITLES[status]}
                   itemIds={columnOrder[status]}
                   getTodoById={getTodoById}
+                  onCardClick={(id) => setSelectedId(id)}
                 />
               ))}
             </div>
@@ -298,6 +326,13 @@ export default function TodosPage() {
               ) : null}
             </DragOverlay>
           </DndContext>
+          {selectedId ? (
+            <DetailsModal
+              title={getTodoById(selectedId)?.title ?? ''}
+              description={getTodoById(selectedId)?.description ?? ''}
+              onClose={() => setSelectedId(null)}
+            />
+          ) : null}
         </div>
       </div>
     </div>
@@ -309,6 +344,7 @@ function KanbanColumn(props: {
   title: string
   itemIds: string[]
   getTodoById: (id: string) => Todo | undefined
+  onCardClick: (id: string) => void
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: props.id })
 
@@ -320,7 +356,7 @@ function KanbanColumn(props: {
       <div
         ref={setNodeRef}
         className={
-          'bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 sm:rounded-md p-3 min-h-[240px] transition-shadow' +
+          'bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 sm:rounded-md p-3 h-screen transition-shadow' +
           (isOver ? ' ring-2 ring-blue-400' : '')
         }
       >
@@ -329,7 +365,14 @@ function KanbanColumn(props: {
             {props.itemIds.map((id) => {
               const todo = props.getTodoById(id)
               if (!todo) return null
-              return <SortableCard key={id} id={id} title={todo.title} />
+              return (
+                <SortableCard
+                  key={id}
+                  id={id}
+                  title={todo.title}
+                  onClick={() => props.onCardClick(id)}
+                />
+              )
             })}
           </div>
         </SortableContext>
@@ -338,7 +381,11 @@ function KanbanColumn(props: {
   )
 }
 
-function SortableCard(props: { id: string; title: string }) {
+function SortableCard(props: {
+  id: string
+  title: string
+  onClick?: () => void
+}) {
   const {
     attributes,
     listeners,
@@ -355,7 +402,13 @@ function SortableCard(props: { id: string; title: string }) {
   }
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      onClick={props.onClick}
+    >
       <Card title={props.title} dragging={isDragging} />
     </div>
   )
@@ -370,6 +423,40 @@ function Card(props: { title: string; dragging?: boolean }) {
       }
     >
       {props.title}
+    </div>
+  )
+}
+
+function DetailsModal(props: {
+  title: string
+  description: string
+  onClose: () => void
+}) {
+  return (
+    <div className="fixed inset-0 z-50">
+      <div className="absolute inset-0 bg-black/50" onClick={props.onClose} />
+      <div className="absolute inset-0 flex items-center justify-center p-4">
+        <div
+          className="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg shadow-lg max-w-lg w-full p-6"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex items-start justify-between gap-4">
+            <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+              {props.title}
+            </h3>
+            <button
+              onClick={props.onClose}
+              className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+              aria-label="Close"
+            >
+              ×
+            </button>
+          </div>
+          <div className="mt-3 text-sm text-slate-700 dark:text-slate-200 whitespace-pre-wrap">
+            {props.description}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
