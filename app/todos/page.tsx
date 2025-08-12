@@ -12,6 +12,7 @@ import {
   useSensors,
   closestCorners,
   useDroppable,
+  DragOverEvent,
 } from '@dnd-kit/core'
 import {
   SortableContext,
@@ -79,6 +80,11 @@ export default function TodosPage() {
     Record<Status, string[]>
   >(createInitialColumnOrder(initialTodos))
   const [activeId, setActiveId] = React.useState<string | null>(null)
+  const dragStartStatusRef = React.useRef<Status | null>(null)
+  const columnOrderBeforeDragRef = React.useRef<Record<
+    Status,
+    string[]
+  > | null>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -100,62 +106,163 @@ export default function TodosPage() {
   )
 
   function handleDragStart(event: DragStartEvent) {
-    setActiveId(String(event.active.id))
+    const id = String(event.active.id)
+    setActiveId(id)
+
+    dragStartStatusRef.current = getStatusOf(id) ?? null
+    columnOrderBeforeDragRef.current = {
+      inbox: [...columnOrder.inbox],
+      todo: [...columnOrder.todo],
+      blocked: [...columnOrder.blocked],
+      watching: [...columnOrder.watching],
+      done: [...columnOrder.done],
+    }
+  }
+
+  function handleDragOver(event: DragOverEvent) {
+    const { active, over } = event
+    if (!over) return
+
+    const activeId = String(active.id)
+    const overId = String(over.id)
+
+    setColumnOrder((prev) => {
+      const getStatusFrom = (
+        order: Record<Status, string[]>,
+        id: string,
+      ): Status | undefined => {
+        return STATUSES.find((s) => order[s].includes(id))
+      }
+
+      const sourceStatus = getStatusFrom(prev, activeId)
+      const targetStatus = isStatus(overId)
+        ? overId
+        : getStatusFrom(prev, overId)
+
+      if (!sourceStatus || !targetStatus) return prev
+
+      if (sourceStatus === targetStatus) {
+        const items = prev[sourceStatus]
+        const oldIndex = items.indexOf(activeId)
+        const newIndex = isStatus(overId)
+          ? items.length - 1
+          : items.indexOf(overId)
+
+        if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex)
+          return prev
+
+        const moved = arrayMove(items, oldIndex, newIndex)
+        if (moved === items) return prev
+        return { ...prev, [sourceStatus]: moved }
+      }
+
+      const sourceItems = [...prev[sourceStatus]]
+      const targetItems = [...prev[targetStatus]]
+
+      const sourceIndex = sourceItems.indexOf(activeId)
+      if (sourceIndex !== -1) sourceItems.splice(sourceIndex, 1)
+
+      // Avoid duplicates if the item somehow exists in the target already
+      const existingIndexInTarget = targetItems.indexOf(activeId)
+      if (existingIndexInTarget !== -1)
+        targetItems.splice(existingIndexInTarget, 1)
+
+      let targetIndex = isStatus(overId)
+        ? targetItems.length
+        : targetItems.indexOf(overId)
+      if (targetIndex === -1) targetIndex = targetItems.length
+
+      targetItems.splice(targetIndex, 0, activeId)
+
+      return {
+        ...prev,
+        [sourceStatus]: sourceItems,
+        [targetStatus]: targetItems,
+      }
+    })
   }
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
     setActiveId(null)
 
-    if (!over) return
+    if (!over) {
+      if (columnOrderBeforeDragRef.current) {
+        setColumnOrder(columnOrderBeforeDragRef.current)
+      }
+      dragStartStatusRef.current = null
+      columnOrderBeforeDragRef.current = null
+      return
+    }
 
     const activeId = String(active.id)
     const overId = String(over.id)
 
-    const sourceStatus = getStatusOf(activeId)
-    const targetStatus = isStatus(overId) ? overId : getStatusOf(overId)
+    const startStatus = dragStartStatusRef.current
+    const currentStatus = getStatusOf(activeId)
+    const dropStatus = isStatus(overId) ? overId : getStatusOf(overId)
+    const finalStatus = dropStatus ?? currentStatus ?? startStatus ?? null
 
-    if (!sourceStatus || !targetStatus) return
-
-    if (sourceStatus === targetStatus) {
-      const items = columnOrder[sourceStatus]
+    // If we stayed within the original column throughout, finalize ordering
+    if (startStatus && finalStatus && startStatus === finalStatus) {
+      const items = columnOrder[finalStatus]
       const oldIndex = items.indexOf(activeId)
       const newIndex = isStatus(overId)
         ? items.length - 1
         : items.indexOf(overId)
 
-      if (oldIndex === newIndex || newIndex === -1) return
-
-      setColumnOrder({
-        ...columnOrder,
-        [sourceStatus]: arrayMove(items, oldIndex, newIndex),
-      })
-      return
+      if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
+        setColumnOrder((prev) => ({
+          ...prev,
+          [finalStatus]: arrayMove(prev[finalStatus], oldIndex, newIndex),
+        }))
+      }
     }
 
-    // Moving across columns
-    const sourceItems = [...columnOrder[sourceStatus]]
-    const targetItems = [...columnOrder[targetStatus]]
+    // If the item crossed columns at any point, update its status to match the final column
+    if (startStatus && finalStatus && startStatus !== finalStatus) {
+      setTodos((prev) =>
+        prev.map((t) =>
+          t.id === activeId ? { ...t, status: finalStatus } : t,
+        ),
+      )
 
-    const sourceIndex = sourceItems.indexOf(activeId)
-    if (sourceIndex !== -1) sourceItems.splice(sourceIndex, 1)
+      // Ensure state reflects final placement if for some reason we didn't optimistically move it
+      if (currentStatus !== finalStatus) {
+        setColumnOrder((prev) => {
+          const sourceItems = [...prev[startStatus]]
+          const targetItems = [...prev[finalStatus]]
 
-    const targetIndex = isStatus(overId)
-      ? targetItems.length
-      : targetItems.indexOf(overId)
+          const sourceIndex = sourceItems.indexOf(activeId)
+          if (sourceIndex !== -1) sourceItems.splice(sourceIndex, 1)
 
-    const insertAt = targetIndex === -1 ? targetItems.length : targetIndex
-    targetItems.splice(insertAt, 0, activeId)
+          let targetIndex = isStatus(overId)
+            ? targetItems.length
+            : targetItems.indexOf(overId)
+          if (targetIndex === -1) targetIndex = targetItems.length
 
-    setColumnOrder({
-      ...columnOrder,
-      [sourceStatus]: sourceItems,
-      [targetStatus]: targetItems,
-    })
+          targetItems.splice(targetIndex, 0, activeId)
 
-    setTodos((prev) =>
-      prev.map((t) => (t.id === activeId ? { ...t, status: targetStatus } : t)),
-    )
+          return {
+            ...prev,
+            [startStatus]: sourceItems,
+            [finalStatus]: targetItems,
+          }
+        })
+      }
+    }
+
+    dragStartStatusRef.current = null
+    columnOrderBeforeDragRef.current = null
+  }
+
+  function handleDragCancel() {
+    setActiveId(null)
+    if (columnOrderBeforeDragRef.current) {
+      setColumnOrder(columnOrderBeforeDragRef.current)
+    }
+    dragStartStatusRef.current = null
+    columnOrderBeforeDragRef.current = null
   }
 
   return (
@@ -169,6 +276,8 @@ export default function TodosPage() {
             sensors={sensors}
             collisionDetection={closestCorners}
             onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragCancel={handleDragCancel}
             onDragEnd={handleDragEnd}
           >
             <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 sm:gap-6">
@@ -242,7 +351,7 @@ function SortableCard(props: { id: string; title: string }) {
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.6 : 1,
+    opacity: isDragging ? 0 : 1,
   }
 
   return (
