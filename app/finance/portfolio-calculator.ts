@@ -1,5 +1,5 @@
 import { type StockHolding, getHoldingsData } from './holdings-data'
-import { getStockPrice, batchGetStockPrices } from './mock-stock-api'
+import { getStockPrice, batchGetStockPrices } from './tiingo-api'
 
 export interface PortfolioValue {
   date: string

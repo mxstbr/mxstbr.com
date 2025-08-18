@@ -46,8 +46,8 @@ export default async function FinancePage() {
       <Prose>
         <h1>Portfolio Finance Tracker</h1>
         <p>
-          Track your stock portfolio value over time based on historical holdings and stock prices. 
-          This demo uses mock data to show how portfolio value changes based on stock purchases, 
+          Track your stock portfolio value over time based on historical holdings and real stock prices. 
+          This tracker uses live data from Tiingo API to show how portfolio value changes based on stock purchases, 
           sales, and market movements.
         </p>
       </Prose>
