@@ -33,6 +33,61 @@ export async function getHoldingsData(): Promise<StockHolding[]> {
     return data.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
   }
   
-  // If no data exists in Redis, seed it with default data and return
-  throw new Error('No holdings data found in Redis, seeding with default data')
+  // If no data exists in Redis, return empty array
+  return []
+}
+
+// Add a new holding entry
+export async function addHolding(holding: StockHolding): Promise<void> {
+  try {
+    const currentHoldings = await getHoldingsData()
+    const newHoldings = [...currentHoldings, holding]
+    await storeHoldingsData(newHoldings)
+  } catch (error) {
+    console.error('Error adding holding:', error)
+    throw new Error('Failed to add holding')
+  }
+}
+
+// Update an existing holding entry
+export async function updateHolding(index: number, updatedHolding: StockHolding): Promise<void> {
+  try {
+    const currentHoldings = await getHoldingsData()
+    if (index < 0 || index >= currentHoldings.length) {
+      throw new Error('Invalid holding index')
+    }
+    
+    currentHoldings[index] = updatedHolding
+    await storeHoldingsData(currentHoldings)
+  } catch (error) {
+    console.error('Error updating holding:', error)
+    throw new Error('Failed to update holding')
+  }
+}
+
+// Delete a holding entry
+export async function deleteHolding(index: number): Promise<void> {
+  try {
+    const currentHoldings = await getHoldingsData()
+    if (index < 0 || index >= currentHoldings.length) {
+      throw new Error('Invalid holding index')
+    }
+    
+    currentHoldings.splice(index, 1)
+    await storeHoldingsData(currentHoldings)
+  } catch (error) {
+    console.error('Error deleting holding:', error)
+    throw new Error('Failed to delete holding')
+  }
+}
+
+// Get holding by index
+export async function getHoldingByIndex(index: number): Promise<StockHolding | null> {
+  try {
+    const holdings = await getHoldingsData()
+    return holdings[index] || null
+  } catch (error) {
+    console.error('Error getting holding by index:', error)
+    return null
+  }
 }

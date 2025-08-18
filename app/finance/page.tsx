@@ -5,10 +5,70 @@ import ReturnChart from './return-chart'
 import Prose from 'app/components/prose'
 import { size } from 'app/og/utils'
 import { prodUrl } from 'app/sitemap'
+import { addHolding, updateHolding, deleteHolding, getHoldingsData, type StockHolding } from './holdings-data'
+import { revalidatePath } from 'next/cache'
+import { HoldingEditForm, HoldingDeleteButton, AddHoldingForm, HoldingsListItem } from './holdings-crud'
 
 // Utility function to format dollar values rounded to nearest dollar
 function formatDollar(value: number): string {
   return Math.round(value).toLocaleString()
+}
+
+// Server actions for holdings CRUD operations
+async function createHolding(formData: FormData): Promise<void> {
+  'use server'
+  
+  const ticker = formData.get('ticker')?.toString()
+  const shares = parseFloat(formData.get('shares')?.toString() || '0')
+  const date = formData.get('date')?.toString()
+  
+  if (!ticker || !shares || !date) {
+    throw new Error('Missing required fields')
+  }
+  
+  const newHolding: StockHolding = {
+    ticker: ticker.toUpperCase(),
+    shares,
+    date,
+  }
+  
+  await addHolding(newHolding)
+  revalidatePath('/finance')
+}
+
+async function editHolding(formData: FormData): Promise<void> {
+  'use server'
+  
+  const index = parseInt(formData.get('index')?.toString() || '-1')
+  const ticker = formData.get('ticker')?.toString()
+  const shares = parseFloat(formData.get('shares')?.toString() || '0')
+  const date = formData.get('date')?.toString()
+  
+  if (index < 0 || !ticker || !shares || !date) {
+    throw new Error('Missing required fields or invalid index')
+  }
+  
+  const updatedHolding: StockHolding = {
+    ticker: ticker.toUpperCase(),
+    shares,
+    date,
+  }
+  
+  await updateHolding(index, updatedHolding)
+  revalidatePath('/finance')
+}
+
+async function removeHolding(formData: FormData): Promise<void> {
+  'use server'
+  
+  const index = parseInt(formData.get('index')?.toString() || '-1')
+  
+  if (index < 0) {
+    throw new Error('Invalid index')
+  }
+  
+  await deleteHolding(index)
+  revalidatePath('/finance')
 }
 
 export const metadata: Metadata = {
@@ -227,6 +287,34 @@ export default async function FinancePage() {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Holdings Management */}
+      <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+            Manage Holdings
+          </h2>
+          <AddHoldingForm createAction={createHolding} />
+        </div>
+        
+        <div className="space-y-4">
+          {holdingsData.length === 0 ? (
+            <p className="text-slate-600 dark:text-slate-400 text-center py-8">
+              No holdings found. Add your first holding to get started.
+            </p>
+          ) : (
+            holdingsData.map((holding, index) => (
+              <HoldingsListItem
+                key={`${holding.ticker}-${holding.date}-${index}`}
+                holding={holding}
+                index={index}
+                editAction={editHolding}
+                deleteAction={removeHolding}
+              />
+            ))
+          )}
         </div>
       </div>
     </div>
