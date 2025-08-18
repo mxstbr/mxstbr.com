@@ -229,10 +229,17 @@ function createPriceRequests(dates: string[], holdingsData: StockHolding[]): Arr
   const tickers = getAllTickers(holdingsData)
   const requests: Array<{ ticker: string; date: string }> = []
   
+  // Add requests for all analysis dates
   dates.forEach(date => {
     tickers.forEach(ticker => {
       requests.push({ ticker, date })
     })
+  })
+  
+  // Add requests for all purchase dates (for cost basis calculation)
+  const purchases = parseHoldingsPurchases(holdingsData)
+  purchases.forEach(purchase => {
+    requests.push({ ticker: purchase.ticker, date: purchase.date })
   })
   
   return requests
@@ -345,6 +352,141 @@ function calculateReturnsSync(priceCache: Record<string, Record<string, number>>
   }
 }
 
+// Interface for individual purchase transactions
+export interface PurchaseTransaction {
+  ticker: string
+  shares: number
+  date: string
+  purchasePrice: number
+  costBasis: number
+}
+
+// Interface for holdings gains/losses
+export interface HoldingGainsLoss {
+  ticker: string
+  totalShares: number
+  totalCostBasis: number
+  currentValue: number
+  currentPrice: number
+  totalGainLoss: number
+  totalGainLossPercent: number
+  purchases: PurchaseTransaction[]
+}
+
+// Parse holdings data to identify individual purchase transactions
+function parseHoldingsPurchases(holdingsData: StockHolding[]): PurchaseTransaction[] {
+  const purchases: PurchaseTransaction[] = []
+  
+  // Group holdings by ticker
+  const holdingsByTicker: Record<string, StockHolding[]> = {}
+  holdingsData.forEach(holding => {
+    if (!holdingsByTicker[holding.ticker]) {
+      holdingsByTicker[holding.ticker] = []
+    }
+    holdingsByTicker[holding.ticker].push(holding)
+  })
+  
+  // Process each ticker to find purchase transactions
+  Object.entries(holdingsByTicker).forEach(([ticker, holdings]) => {
+    // Sort by date
+    const sortedHoldings = holdings.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    
+    let previousShares = 0
+    sortedHoldings.forEach(holding => {
+      const sharesPurchased = holding.shares - previousShares
+      
+      if (sharesPurchased > 0) {
+        purchases.push({
+          ticker,
+          shares: sharesPurchased,
+          date: holding.date,
+          purchasePrice: 0, // Will be filled in later
+          costBasis: 0 // Will be calculated later
+        })
+      } else if (sharesPurchased < 0) {
+        // This would be a sale - for now we'll skip sales handling
+        // In a real system, you'd want to handle sales with FIFO/LIFO logic
+        console.warn(`Detected sale of ${Math.abs(sharesPurchased)} shares of ${ticker} on ${holding.date}`)
+      }
+      
+      previousShares = holding.shares
+    })
+  })
+  
+  return purchases
+}
+
+// Calculate gains/losses for all holdings
+function calculateHoldingsGainsLossSync(
+  priceCache: Record<string, Record<string, number>>, 
+  holdingsData: StockHolding[]
+): {
+  holdingsGainsLoss: HoldingGainsLoss[]
+  totalCostBasis: number
+  totalCurrentValue: number
+  totalGainLoss: number
+  totalGainLossPercent: number
+} {
+  const today = new Date().toISOString().split('T')[0]
+  
+  // Parse purchases from holdings data
+  const purchases = parseHoldingsPurchases(holdingsData)
+  
+  // Add purchase prices from price cache
+  const purchasesWithPrices = purchases.map(purchase => ({
+    ...purchase,
+    purchasePrice: priceCache[purchase.ticker]?.[purchase.date] || 0,
+    costBasis: (priceCache[purchase.ticker]?.[purchase.date] || 0) * purchase.shares
+  }))
+  
+  // Group purchases by ticker and calculate gains/losses
+  const holdingsByTicker: Record<string, PurchaseTransaction[]> = {}
+  purchasesWithPrices.forEach(purchase => {
+    if (!holdingsByTicker[purchase.ticker]) {
+      holdingsByTicker[purchase.ticker] = []
+    }
+    holdingsByTicker[purchase.ticker].push(purchase)
+  })
+  
+  const holdingsGainsLoss: HoldingGainsLoss[] = []
+  let totalCostBasis = 0
+  let totalCurrentValue = 0
+  
+  Object.entries(holdingsByTicker).forEach(([ticker, tickerPurchases]) => {
+    const totalShares = tickerPurchases.reduce((sum, p) => sum + p.shares, 0)
+    const totalTickerCostBasis = tickerPurchases.reduce((sum, p) => sum + p.costBasis, 0)
+    const currentPrice = priceCache[ticker]?.[today] || 0
+    const currentValue = totalShares * currentPrice
+    const totalGainLoss = currentValue - totalTickerCostBasis
+    const totalGainLossPercent = totalTickerCostBasis > 0 ? (totalGainLoss / totalTickerCostBasis) * 100 : 0
+    
+    holdingsGainsLoss.push({
+      ticker,
+      totalShares,
+      totalCostBasis: totalTickerCostBasis,
+      currentValue,
+      currentPrice,
+      totalGainLoss,
+      totalGainLossPercent,
+      purchases: tickerPurchases
+    })
+    
+    totalCostBasis += totalTickerCostBasis
+    totalCurrentValue += currentValue
+  })
+  
+  const totalGainLoss = totalCurrentValue - totalCostBasis
+  const totalGainLossPercent = totalCostBasis > 0 ? (totalGainLoss / totalCostBasis) * 100 : 0
+  
+  return {
+    holdingsGainsLoss: holdingsGainsLoss.sort((a, b) => b.currentValue - a.currentValue),
+    totalCostBasis,
+    totalCurrentValue,
+    totalGainLoss,
+    totalGainLossPercent
+  }
+}
+
 // Main efficient function that fetches all data once and calculates everything
 export async function getCompletePortfolioData(startDate: string, endDate: string): Promise<{
   portfolioHistory: PortfolioValue[]
@@ -359,6 +501,13 @@ export async function getCompletePortfolioData(startDate: string, endDate: strin
     sixMonths: number
     oneYear: number
     inception: number
+  }
+  gainsLoss: {
+    holdingsGainsLoss: HoldingGainsLoss[]
+    totalCostBasis: number
+    totalCurrentValue: number
+    totalGainLoss: number
+    totalGainLossPercent: number
   }
 }> {
   // 1. Fetch holdings data from database (async)
@@ -377,10 +526,12 @@ export async function getCompletePortfolioData(startDate: string, endDate: strin
   const portfolioHistory = generatePortfolioHistorySync(startDate, endDate, priceCache, holdingsData)
   const currentStats = getCurrentPortfolioStatsSync(priceCache, holdingsData)
   const returns = calculateReturnsSync(priceCache, holdingsData)
+  const gainsLoss = calculateHoldingsGainsLossSync(priceCache, holdingsData)
   
   return {
     portfolioHistory,
     currentStats,
-    returns
+    returns,
+    gainsLoss
   }
 }

@@ -35,11 +35,18 @@ export const metadata: Metadata = {
 
 export default async function FinancePage() {
   // Generate portfolio history from the first holding date to today
-  const startDate = '2023-01-01'
+  const { getHoldingsData } = await import('./holdings-data')
+  const holdingsData = await getHoldingsData()
+  
+  // Find the earliest holding date
+  const startDate = holdingsData
+    .map(h => h.date)
+    .sort()[0] || '2019-01-01'
+  
   const endDate = new Date().toISOString().split('T')[0]
   
   // Fetch all data efficiently in one batch call
-  const { portfolioHistory, currentStats, returns } = await getCompletePortfolioData(startDate, endDate)
+  const { portfolioHistory, currentStats, returns, gainsLoss } = await getCompletePortfolioData(startDate, endDate)
   
   return (
     <div className="space-y-8">
@@ -53,7 +60,7 @@ export default async function FinancePage() {
       </Prose>
       
       {/* Current Portfolio Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-lg">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
             Total Portfolio Value
@@ -62,13 +69,25 @@ export default async function FinancePage() {
             ${currentStats.totalValue.toLocaleString()}
           </p>
         </div>
+
+        <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-lg">
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+            Total Gain/Loss
+          </h3>
+          <p className={`text-2xl font-bold ${gainsLoss.totalGainLoss >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+            {gainsLoss.totalGainLoss >= 0 ? '+' : ''}${gainsLoss.totalGainLoss.toLocaleString()}
+          </p>
+          <p className={`text-sm ${gainsLoss.totalGainLossPercent >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+            {gainsLoss.totalGainLossPercent >= 0 ? '+' : ''}{gainsLoss.totalGainLossPercent.toFixed(1)}%
+          </p>
+        </div>
         
         <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-lg">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
-            1 Year Return
+            Total Cost Basis
           </h3>
-          <p className={`text-3xl font-bold ${returns.oneYear >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-            {returns.oneYear >= 0 ? '+' : ''}{returns.oneYear.toFixed(1)}%
+          <p className="text-2xl font-bold text-slate-600 dark:text-slate-400">
+            ${gainsLoss.totalCostBasis.toLocaleString()}
           </p>
         </div>
         
@@ -76,8 +95,8 @@ export default async function FinancePage() {
           <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
             Total Return
           </h3>
-          <p className={`text-3xl font-bold ${returns.inception >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-            {returns.inception >= 0 ? '+' : ''}{returns.inception.toFixed(1)}%
+          <p className={`text-2xl font-bold ${gainsLoss.totalGainLossPercent >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+            {gainsLoss.totalGainLossPercent >= 0 ? '+' : ''}{gainsLoss.totalGainLossPercent.toFixed(1)}%
           </p>
         </div>
       </div>
@@ -85,13 +104,13 @@ export default async function FinancePage() {
       {/* Portfolio Value Chart */}
       <PortfolioChart portfolioHistory={portfolioHistory} />
       
-      {/* Top Holdings */}
+      {/* Holdings with Gains/Losses */}
       <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700">
         <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-6">
-          Current Holdings
+          Current Holdings & Gains/Losses
         </h2>
         <div className="space-y-4">
-          {currentStats.topHoldings.map((holding) => (
+          {gainsLoss.holdingsGainsLoss.map((holding) => (
             <div key={holding.ticker} className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <div className="w-12 h-12 bg-slate-100 dark:bg-slate-700 rounded-lg flex items-center justify-center">
@@ -104,16 +123,22 @@ export default async function FinancePage() {
                     {holding.ticker}
                   </p>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
-                    {currentStats.totalShares[holding.ticker]} shares
+                    {holding.totalShares.toFixed(3)} shares @ ${holding.currentPrice.toFixed(2)}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-500">
+                    Cost basis: ${holding.totalCostBasis.toLocaleString()}
                   </p>
                 </div>
               </div>
               <div className="text-right">
                 <p className="font-semibold text-slate-900 dark:text-slate-100">
-                  ${holding.value.toLocaleString()}
+                  ${holding.currentValue.toLocaleString()}
                 </p>
-                <p className="text-sm text-slate-600 dark:text-slate-400">
-                  {holding.percentage.toFixed(1)}%
+                <p className={`text-sm font-medium ${holding.totalGainLoss >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                  {holding.totalGainLoss >= 0 ? '+' : ''}${holding.totalGainLoss.toLocaleString()}
+                </p>
+                <p className={`text-xs ${holding.totalGainLossPercent >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                  {holding.totalGainLossPercent >= 0 ? '+' : ''}{holding.totalGainLossPercent.toFixed(1)}%
                 </p>
               </div>
             </div>
@@ -124,39 +149,81 @@ export default async function FinancePage() {
       {/* Performance Summary */}
       <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700">
         <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-6">
-          Performance Summary
+          Holdings Performance Summary
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <div className="text-center">
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">1 Month</p>
-            <p className={`font-semibold ${returns.oneMonth >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-              {returns.oneMonth >= 0 ? '+' : ''}{returns.oneMonth.toFixed(1)}%
-            </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {gainsLoss.holdingsGainsLoss.map((holding) => (
+            <div key={holding.ticker} className="text-center p-4 bg-slate-50 dark:bg-slate-900 rounded-lg">
+              <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1">
+                {holding.ticker}
+              </p>
+              <p className={`text-xl font-bold ${holding.totalGainLossPercent >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                {holding.totalGainLossPercent >= 0 ? '+' : ''}{holding.totalGainLossPercent.toFixed(1)}%
+              </p>
+              <p className={`text-sm ${holding.totalGainLoss >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                {holding.totalGainLoss >= 0 ? '+' : ''}${holding.totalGainLoss.toLocaleString()}
+              </p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-6 p-4 bg-slate-100 dark:bg-slate-900 rounded-lg">
+          <div className="flex justify-between items-center">
+            <span className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+              Portfolio Total
+            </span>
+            <div className="text-right">
+              <p className={`text-xl font-bold ${gainsLoss.totalGainLossPercent >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                {gainsLoss.totalGainLossPercent >= 0 ? '+' : ''}{gainsLoss.totalGainLossPercent.toFixed(1)}%
+              </p>
+              <p className={`text-sm ${gainsLoss.totalGainLoss >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                {gainsLoss.totalGainLoss >= 0 ? '+' : ''}${gainsLoss.totalGainLoss.toLocaleString()}
+              </p>
+            </div>
           </div>
-          <div className="text-center">
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">3 Months</p>
-            <p className={`font-semibold ${returns.threeMonths >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-              {returns.threeMonths >= 0 ? '+' : ''}{returns.threeMonths.toFixed(1)}%
-            </p>
-          </div>
-          <div className="text-center">
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">6 Months</p>
-            <p className={`font-semibold ${returns.sixMonths >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-              {returns.sixMonths >= 0 ? '+' : ''}{returns.sixMonths.toFixed(1)}%
-            </p>
-          </div>
-          <div className="text-center">
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">1 Year</p>
-            <p className={`font-semibold ${returns.oneYear >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-              {returns.oneYear >= 0 ? '+' : ''}{returns.oneYear.toFixed(1)}%
-            </p>
-          </div>
-          <div className="text-center">
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Total</p>
-            <p className={`font-semibold ${returns.inception >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-              {returns.inception >= 0 ? '+' : ''}{returns.inception.toFixed(1)}%
-            </p>
-          </div>
+        </div>
+      </div>
+
+      {/* Detailed Purchase History */}
+      <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700">
+        <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-6">
+          Purchase History & Cost Basis
+        </h2>
+        <div className="space-y-6">
+          {gainsLoss.holdingsGainsLoss.map((holding) => (
+            <div key={holding.ticker} className="border-b border-slate-200 dark:border-slate-700 pb-6 last:border-b-0">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-3">
+                {holding.ticker}
+              </h3>
+              <div className="space-y-2">
+                {holding.purchases.map((purchase, index) => (
+                  <div key={index} className="flex justify-between items-center text-sm">
+                    <div className="flex space-x-4">
+                      <span className="text-slate-600 dark:text-slate-400">
+                        {purchase.date}
+                      </span>
+                      <span className="text-slate-900 dark:text-slate-100">
+                        {purchase.shares.toFixed(3)} shares
+                      </span>
+                      <span className="text-slate-600 dark:text-slate-400">
+                        @ ${purchase.purchasePrice.toFixed(2)}
+                      </span>
+                    </div>
+                    <span className="text-slate-900 dark:text-slate-100 font-medium">
+                      ${purchase.costBasis.toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+                <div className="flex justify-between items-center text-sm font-semibold pt-2 border-t border-slate-200 dark:border-slate-700">
+                  <span className="text-slate-900 dark:text-slate-100">
+                    Total: {holding.totalShares.toFixed(3)} shares
+                  </span>
+                  <span className="text-slate-900 dark:text-slate-100">
+                    Cost Basis: ${holding.totalCostBasis.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
