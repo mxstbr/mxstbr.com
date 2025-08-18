@@ -49,6 +49,11 @@ export default async function FinancePage() {
   // Fetch all data efficiently in one batch call
   const { portfolioHistory, returnHistory, currentStats, returns, gainsLoss } = await getCompletePortfolioData(startDate, endDate)
   
+  // Get the latest time-weighted return for display
+  const latestTimeWeightedReturn = returnHistory.length > 0 
+    ? returnHistory[returnHistory.length - 1].timeWeightedReturn || 0 
+    : 0
+  
   return (
     <div className="space-y-8">
       <Prose>
@@ -61,7 +66,7 @@ export default async function FinancePage() {
       </Prose>
       
       {/* Current Portfolio Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-lg">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
             Total Portfolio Value
@@ -78,27 +83,16 @@ export default async function FinancePage() {
           <p className={`text-2xl font-bold ${gainsLoss.totalGainLoss >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
             {gainsLoss.totalGainLoss >= 0 ? '+' : ''}${gainsLoss.totalGainLoss.toLocaleString()}
           </p>
-          <p className={`text-sm ${gainsLoss.totalGainLossPercent >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-            {gainsLoss.totalGainLossPercent >= 0 ? '+' : ''}{gainsLoss.totalGainLossPercent.toFixed(1)}%
-          </p>
-        </div>
-        
-        <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-lg">
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
-            Total Cost Basis
-          </h3>
-          <p className="text-2xl font-bold text-slate-600 dark:text-slate-400">
-            ${gainsLoss.totalCostBasis.toLocaleString()}
-          </p>
         </div>
         
         <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-lg">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
             Total Return
           </h3>
-          <p className={`text-2xl font-bold ${gainsLoss.totalGainLossPercent >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-            {gainsLoss.totalGainLossPercent >= 0 ? '+' : ''}{gainsLoss.totalGainLossPercent.toFixed(1)}%
+          <p className={`text-2xl font-bold ${latestTimeWeightedReturn >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+            {latestTimeWeightedReturn >= 0 ? '+' : ''}{latestTimeWeightedReturn.toFixed(1)}%
           </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">Time-weighted</p>
         </div>
       </div>
       
@@ -176,8 +170,8 @@ export default async function FinancePage() {
               Portfolio Total
             </span>
             <div className="text-right">
-              <p className={`text-xl font-bold ${gainsLoss.totalGainLossPercent >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                {gainsLoss.totalGainLossPercent >= 0 ? '+' : ''}{gainsLoss.totalGainLossPercent.toFixed(1)}%
+              <p className={`text-xl font-bold ${latestTimeWeightedReturn >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                {latestTimeWeightedReturn >= 0 ? '+' : ''}{latestTimeWeightedReturn.toFixed(1)}% (Time-weighted)
               </p>
               <p className={`text-sm ${gainsLoss.totalGainLoss >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                 {gainsLoss.totalGainLoss >= 0 ? '+' : ''}${gainsLoss.totalGainLoss.toLocaleString()}
