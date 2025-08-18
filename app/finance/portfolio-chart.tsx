@@ -3,6 +3,11 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { PortfolioValue } from './portfolio-calculator'
 
+// Utility function to format dollar values rounded to nearest dollar
+function formatDollar(value: number): string {
+  return Math.round(value).toLocaleString()
+}
+
 interface PortfolioChartProps {
   portfolioHistory: PortfolioValue[]
 }
@@ -32,7 +37,7 @@ export default function PortfolioChart({ portfolioHistory }: PortfolioChartProps
             })}
           </p>
           <p className="text-slate-900 dark:text-slate-100 font-semibold">
-            ${payload[0].value.toLocaleString()}
+            ${formatDollar(payload[0].value)}
           </p>
         </div>
       )

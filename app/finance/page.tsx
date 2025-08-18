@@ -6,6 +6,11 @@ import Prose from 'app/components/prose'
 import { size } from 'app/og/utils'
 import { prodUrl } from 'app/sitemap'
 
+// Utility function to format dollar values rounded to nearest dollar
+function formatDollar(value: number): string {
+  return Math.round(value).toLocaleString()
+}
+
 export const metadata: Metadata = {
   title: 'Portfolio Finance Tracker',
   description: 'Track portfolio value over time based on stock holdings and historical prices',
@@ -72,7 +77,7 @@ export default async function FinancePage() {
             Total Portfolio Value
           </h3>
           <p className="text-3xl font-bold text-green-600 dark:text-green-400">
-            ${currentStats.totalValue.toLocaleString()}
+            ${formatDollar(currentStats.totalValue)}
           </p>
         </div>
 
@@ -81,7 +86,7 @@ export default async function FinancePage() {
             Total Gain/Loss
           </h3>
           <p className={`text-2xl font-bold ${gainsLoss.totalGainLoss >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-            {gainsLoss.totalGainLoss >= 0 ? '+' : ''}${gainsLoss.totalGainLoss.toLocaleString()}
+            {gainsLoss.totalGainLoss >= 0 ? '+' : ''}${formatDollar(gainsLoss.totalGainLoss)}
           </p>
         </div>
         
@@ -121,19 +126,19 @@ export default async function FinancePage() {
                     {holding.ticker}
                   </p>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
-                    {holding.totalShares.toFixed(3)} shares @ ${holding.currentPrice.toFixed(2)}
+                    {holding.totalShares.toFixed(3)} shares @ ${formatDollar(holding.currentPrice)}
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-500">
-                    Cost basis: ${holding.totalCostBasis.toLocaleString()}
+                    Cost basis: ${formatDollar(holding.totalCostBasis)}
                   </p>
                 </div>
               </div>
               <div className="text-right">
                 <p className="font-semibold text-slate-900 dark:text-slate-100">
-                  ${holding.currentValue.toLocaleString()}
+                  ${formatDollar(holding.currentValue)}
                 </p>
                 <p className={`text-sm font-medium ${holding.totalGainLoss >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                  {holding.totalGainLoss >= 0 ? '+' : ''}${holding.totalGainLoss.toLocaleString()}
+                  {holding.totalGainLoss >= 0 ? '+' : ''}${formatDollar(holding.totalGainLoss)}
                 </p>
                 <p className={`text-xs ${holding.totalGainLossPercent >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                   {holding.totalGainLossPercent >= 0 ? '+' : ''}{holding.totalGainLossPercent.toFixed(1)}%
@@ -159,7 +164,7 @@ export default async function FinancePage() {
                 {holding.totalGainLossPercent >= 0 ? '+' : ''}{holding.totalGainLossPercent.toFixed(1)}%
               </p>
               <p className={`text-sm ${holding.totalGainLoss >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                {holding.totalGainLoss >= 0 ? '+' : ''}${holding.totalGainLoss.toLocaleString()}
+                {holding.totalGainLoss >= 0 ? '+' : ''}${formatDollar(holding.totalGainLoss)}
               </p>
             </div>
           ))}
@@ -174,7 +179,7 @@ export default async function FinancePage() {
                 {latestTimeWeightedReturn >= 0 ? '+' : ''}{latestTimeWeightedReturn.toFixed(1)}% (Time-weighted)
               </p>
               <p className={`text-sm ${gainsLoss.totalGainLoss >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                {gainsLoss.totalGainLoss >= 0 ? '+' : ''}${gainsLoss.totalGainLoss.toLocaleString()}
+                {gainsLoss.totalGainLoss >= 0 ? '+' : ''}${formatDollar(gainsLoss.totalGainLoss)}
               </p>
             </div>
           </div>
@@ -203,11 +208,11 @@ export default async function FinancePage() {
                         {purchase.shares.toFixed(3)} shares
                       </span>
                       <span className="text-slate-600 dark:text-slate-400">
-                        @ ${purchase.purchasePrice.toFixed(2)}
+                        @ ${formatDollar(purchase.purchasePrice)}
                       </span>
                     </div>
                     <span className="text-slate-900 dark:text-slate-100 font-medium">
-                      ${purchase.costBasis.toLocaleString()}
+                      ${formatDollar(purchase.costBasis)}
                     </span>
                   </div>
                 ))}
@@ -216,7 +221,7 @@ export default async function FinancePage() {
                     Total: {holding.totalShares.toFixed(3)} shares
                   </span>
                   <span className="text-slate-900 dark:text-slate-100">
-                    Cost Basis: ${holding.totalCostBasis.toLocaleString()}
+                    Cost Basis: ${formatDollar(holding.totalCostBasis)}
                   </span>
                 </div>
               </div>

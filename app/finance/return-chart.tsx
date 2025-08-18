@@ -3,6 +3,11 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { type PortfolioReturn } from './portfolio-calculator'
 
+// Utility function to format dollar values rounded to nearest dollar
+function formatDollar(value: number): string {
+  return Math.round(value).toLocaleString()
+}
+
 interface ReturnChartProps {
   returnHistory: PortfolioReturn[]
 }
@@ -26,12 +31,12 @@ function CustomTooltip({ active, payload, label }: any) {
           S&P 500: +{data.sp500Return.toFixed(2)}%
         </p>
         <div className="border-t border-slate-200 dark:border-slate-600 mt-2 pt-2">
-          <p className={`text-sm ${data.returnDollars >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-            Total Gain/Loss: {data.returnDollars >= 0 ? '+' : ''}${data.returnDollars.toLocaleString()}
-          </p>
-          <p className="text-sm text-slate-600 dark:text-slate-400">
-            Value: ${data.totalValue.toLocaleString()}
-          </p>
+                  <p className={`text-sm ${data.returnDollars >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+          Total Gain/Loss: {data.returnDollars >= 0 ? '+' : ''}${formatDollar(data.returnDollars)}
+        </p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+          Value: ${formatDollar(data.totalValue)}
+        </p>
         </div>
       </div>
     )
