@@ -135,7 +135,7 @@ export default function ReturnChart({ returnHistory }: ReturnChartProps) {
             <Line 
               type="monotone" 
               dataKey="moneyWeightedReturn" 
-              stroke="#6b7280" 
+              stroke="#72CAAD" 
               strokeWidth={1.5}
               strokeDasharray="6 3"
               dot={false}
