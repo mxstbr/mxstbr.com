@@ -7,6 +7,15 @@ export interface PortfolioValue {
   holdings: Record<string, { shares: number; value: number; price: number }>
 }
 
+export interface PortfolioReturn {
+  date: string
+  totalValue: number
+  totalCostBasis: number
+  returnPercent: number
+  returnDollars: number
+  timeWeightedReturn?: number
+}
+
 // Get holdings for a specific date (uses the most recent holding data up to that date)
 function getHoldingsForDate(date: string, holdingsData: StockHolding[]): Record<string, number> {
   const targetDate = new Date(date)
@@ -271,6 +280,116 @@ function calculatePortfolioValueForDateSync(date: string, priceCache: Record<str
   }
 }
 
+// Calculate cost basis for a specific date (only includes purchases up to that date)
+function calculateCostBasisForDateSync(date: string, priceCache: Record<string, Record<string, number>>, holdingsData: StockHolding[]): number {
+  const targetDate = new Date(date)
+  const purchases = parseHoldingsPurchases(holdingsData)
+  
+  // Only include purchases that happened on or before the target date
+  const purchasesUpToDate = purchases.filter(purchase => new Date(purchase.date) <= targetDate)
+  
+  let totalCostBasis = 0
+  purchasesUpToDate.forEach(purchase => {
+    const purchasePrice = priceCache[purchase.ticker]?.[purchase.date] || 0
+    totalCostBasis += purchase.shares * purchasePrice
+  })
+  
+  return totalCostBasis
+}
+
+// Calculate time-weighted return (eliminates impact of cash flows)
+function calculateTimeWeightedReturn(date: string, priceCache: Record<string, Record<string, number>>, holdingsData: StockHolding[]): number {
+  const targetDate = new Date(date)
+  const purchases = parseHoldingsPurchases(holdingsData)
+  
+  // Get all purchase dates up to the target date
+  const purchaseDates = Array.from(new Set(purchases
+    .filter(p => new Date(p.date) <= targetDate)
+    .map(p => p.date)))
+    .sort()
+  
+  if (purchaseDates.length === 0) return 0
+  
+  let cumulativeReturn = 1.0 // Start with 1.0 for multiplicative chaining
+  
+  // Create periods: start with the first purchase, then between consecutive purchases, then to target date
+  const periods: Array<{ start: string; end: string }> = []
+  
+  // Add periods between consecutive purchase dates
+  for (let i = 0; i < purchaseDates.length - 1; i++) {
+    periods.push({
+      start: purchaseDates[i],
+      end: purchaseDates[i + 1]
+    })
+  }
+  
+  // Add final period from last purchase to target date
+  if (purchaseDates.length > 0) {
+    const lastPurchaseDate = purchaseDates[purchaseDates.length - 1]
+    if (lastPurchaseDate !== date) {
+      periods.push({
+        start: lastPurchaseDate,
+        end: date
+      })
+    }
+  }
+  
+  // Calculate return for each period and chain them
+  periods.forEach(period => {
+    // Get holdings at the start of this period (before any purchases in this period)
+    const holdingsAtStart = getHoldingsForDate(period.start, holdingsData)
+    
+    // Calculate the value at start and end of period for these holdings
+    let valueAtStart = 0
+    let valueAtEnd = 0
+    
+    Object.entries(holdingsAtStart).forEach(([ticker, shares]) => {
+      const priceAtStart = priceCache[ticker]?.[period.start] || 0
+      const priceAtEnd = priceCache[ticker]?.[period.end] || 0
+      
+      valueAtStart += shares * priceAtStart
+      valueAtEnd += shares * priceAtEnd
+    })
+    
+    // Calculate period return and chain it
+    if (valueAtStart > 0) {
+      const periodReturn = valueAtEnd / valueAtStart
+      cumulativeReturn *= periodReturn
+    }
+  })
+  
+  // Convert to percentage
+  return (cumulativeReturn - 1) * 100
+}
+
+// Generate portfolio return history over time (cost-basis-based returns)
+function generatePortfolioReturnHistorySync(startDate: string, endDate: string, priceCache: Record<string, Record<string, number>>, holdingsData: StockHolding[]): PortfolioReturn[] {
+  const dates = generateAnalysisDates(startDate, endDate, holdingsData)
+  const history: PortfolioReturn[] = []
+  
+  dates.forEach(date => {
+    const portfolioValue = calculatePortfolioValueForDateSync(date, priceCache, holdingsData)
+    const costBasis = calculateCostBasisForDateSync(date, priceCache, holdingsData)
+    
+    if (portfolioValue.totalValue > 0 && costBasis > 0) {
+      const returnDollars = portfolioValue.totalValue - costBasis
+      const returnPercent = (returnDollars / costBasis) * 100
+      const timeWeightedReturn = calculateTimeWeightedReturn(date, priceCache, holdingsData)
+      
+      history.push({
+        date,
+        totalValue: portfolioValue.totalValue,
+        totalCostBasis: costBasis,
+        returnPercent,
+        returnDollars,
+        timeWeightedReturn
+      })
+    }
+  })
+  
+  return history
+}
+
 // Synchronous version of generatePortfolioHistory using cached prices
 function generatePortfolioHistorySync(startDate: string, endDate: string, priceCache: Record<string, Record<string, number>>, holdingsData: StockHolding[]): PortfolioValue[] {
   const dates = generateAnalysisDates(startDate, endDate, holdingsData)
@@ -490,6 +609,7 @@ function calculateHoldingsGainsLossSync(
 // Main efficient function that fetches all data once and calculates everything
 export async function getCompletePortfolioData(startDate: string, endDate: string): Promise<{
   portfolioHistory: PortfolioValue[]
+  returnHistory: PortfolioReturn[]
   currentStats: {
     totalValue: number
     totalShares: Record<string, number>
@@ -524,12 +644,14 @@ export async function getCompletePortfolioData(startDate: string, endDate: strin
   
   // 5. Calculate everything synchronously using cached data
   const portfolioHistory = generatePortfolioHistorySync(startDate, endDate, priceCache, holdingsData)
+  const returnHistory = generatePortfolioReturnHistorySync(startDate, endDate, priceCache, holdingsData)
   const currentStats = getCurrentPortfolioStatsSync(priceCache, holdingsData)
   const returns = calculateReturnsSync(priceCache, holdingsData)
   const gainsLoss = calculateHoldingsGainsLossSync(priceCache, holdingsData)
   
   return {
     portfolioHistory,
+    returnHistory,
     currentStats,
     returns,
     gainsLoss

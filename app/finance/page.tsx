@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import { getCompletePortfolioData } from './portfolio-calculator'
 import PortfolioChart from './portfolio-chart'
+import ReturnChart from './return-chart'
 import Prose from 'app/components/prose'
 import { size } from 'app/og/utils'
 import { prodUrl } from 'app/sitemap'
@@ -46,7 +47,7 @@ export default async function FinancePage() {
   const endDate = new Date().toISOString().split('T')[0]
   
   // Fetch all data efficiently in one batch call
-  const { portfolioHistory, currentStats, returns, gainsLoss } = await getCompletePortfolioData(startDate, endDate)
+  const { portfolioHistory, returnHistory, currentStats, returns, gainsLoss } = await getCompletePortfolioData(startDate, endDate)
   
   return (
     <div className="space-y-8">
@@ -103,6 +104,9 @@ export default async function FinancePage() {
       
       {/* Portfolio Value Chart */}
       <PortfolioChart portfolioHistory={portfolioHistory} />
+      
+      {/* Portfolio Return Chart */}
+      <ReturnChart returnHistory={returnHistory} />
       
       {/* Holdings with Gains/Losses */}
       <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700">
