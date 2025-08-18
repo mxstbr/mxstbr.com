@@ -122,17 +122,12 @@ export default async function FinancePage() {
   return (
     <div className="space-y-8">
       <Prose>
-        <h1>Portfolio Finance Tracker</h1>
-        <p>
-          Track your stock portfolio value over time based on historical holdings and real stock prices. 
-          This tracker uses live data from Tiingo API to show how portfolio value changes based on stock purchases, 
-          sales, and market movements.
-        </p>
+        <h1>Stock Portfolio Tracker</h1>
       </Prose>
       
       {/* Current Portfolio Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-lg">
+        <div className="bg-slate-50 dark:bg-slate-900">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
             Total Portfolio Value
           </h3>
@@ -141,7 +136,7 @@ export default async function FinancePage() {
           </p>
         </div>
 
-        <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-lg">
+        <div className="bg-slate-50 dark:bg-slate-900">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
             Total Gain/Loss
           </h3>
@@ -150,7 +145,7 @@ export default async function FinancePage() {
           </p>
         </div>
         
-        <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-lg">
+        <div className="bg-slate-50 dark:bg-slate-900">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
             Total Return
           </h3>
