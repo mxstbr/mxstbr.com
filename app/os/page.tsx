@@ -371,6 +371,7 @@ export default function OsPage() {
             alignItems: 'center', 
             gap: 4, 
             padding: 2, 
+            paddingBottom: `calc(2px + env(safe-area-inset-bottom, 20px))`,
             justifyContent: 'flex-start',
             backgroundColor: '#c0c0c0',
             border: 'none'
