@@ -22,6 +22,7 @@ export default function OsPage() {
   const [nextZIndex, setNextZIndex] = useState(1000)
   const [isSmallScreen, setIsSmallScreen] = useState(false)
   const [isTouchDevice, setIsTouchDevice] = useState(false)
+  const [safeAreaBottom, setSafeAreaBottom] = useState(0)
   const [dragState, setDragState] = useState<{
     isDragging: boolean
     windowId: string | null
@@ -35,7 +36,7 @@ export default function OsPage() {
   })
   const dragStartRef = useRef<{ x: number; y: number } | null>(null)
 
-  // Detect screen size and touch device
+  // Detect screen size, touch device, and safe area
   useEffect(() => {
     const checkScreenSize = () => {
       setIsSmallScreen(window.innerWidth < 768) // md breakpoint
@@ -45,15 +46,38 @@ export default function OsPage() {
       setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0)
     }
 
+    const checkSafeArea = () => {
+      // Create a temporary element to read the safe area CSS variable
+      const testElement = document.createElement('div')
+      testElement.style.position = 'fixed'
+      testElement.style.top = '0'
+      testElement.style.left = '0'
+      testElement.style.visibility = 'hidden'
+      testElement.style.height = 'env(safe-area-inset-bottom)'
+      document.body.appendChild(testElement)
+      
+      const computedHeight = window.getComputedStyle(testElement).height
+      const safeAreaValue = parseInt(computedHeight, 10) || 0
+      setSafeAreaBottom(safeAreaValue)
+      
+      document.body.removeChild(testElement)
+    }
+
     // Initial checks
     checkScreenSize()
     checkTouchDevice()
+    checkSafeArea()
 
-    // Listen for resize events
-    window.addEventListener('resize', checkScreenSize)
+    // Listen for resize and orientation change events
+    window.addEventListener('resize', () => {
+      checkScreenSize()
+      checkSafeArea()
+    })
+    window.addEventListener('orientationchange', checkSafeArea)
     
     return () => {
       window.removeEventListener('resize', checkScreenSize)
+      window.removeEventListener('orientationchange', checkSafeArea)
     }
   }, [])
 
@@ -66,10 +90,10 @@ export default function OsPage() {
         x: 0,
         y: 0,
         width: window.innerWidth,
-        height: window.innerHeight - 32 // Account for taskbar height only (safe area handled separately)
+        height: window.innerHeight - (32 + safeAreaBottom) // Dynamic: taskbar height + actual safe area
       })))
     }
-  }, [isSmallScreen])
+  }, [isSmallScreen, safeAreaBottom])
 
   const apps: { name: string; href: string; icon: string }[] = [
     { name: 'Calendar', href: '/cal', icon: '/static/images/windows_98_icons/calendar-0.png' },
@@ -95,7 +119,7 @@ export default function OsPage() {
         x: 0,
         y: 0,
         width: window.innerWidth,
-        height: window.innerHeight - 32 // Account for taskbar height only (safe area handled separately)
+        height: window.innerHeight - (32 + safeAreaBottom) // Dynamic: taskbar height + actual safe area
       }
     } else {
       // Windowed mode on larger screens
