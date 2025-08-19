@@ -1,0 +1,53 @@
+# mxstbr.com Cursor Rules
+
+## Tech Stack
+- Next.js v15 with App Router
+- TailwindCSS with custom configuration
+- TypeScript (relaxed mode: strict: false)
+- MDX for content
+- React Server Components (default) and Client Components
+
+## Code Conventions
+
+### Component Structure
+- Use named exports: `export function ComponentName()`
+- Functional components with hooks
+- Props typed with inline interfaces or type aliases
+- Default to Server Components; use Client Components when needed
+
+### TypeScript Patterns
+- Use `import type` for type-only imports
+- Define props interfaces inline or as separate types
+- Relaxed TypeScript settings (strict: false, strictNullChecks: true)
+
+### Styling with Tailwind
+- Use Tailwind classes with dark mode support patterns: `dark:text-slate-100`
+- Consistent spacing with `space-y-*` classes
+- Custom Tailwind colors: `slate-350`, `yellow-slate-100`
+- Typography plugin with custom "slate" theme
+
+### File Organization
+- App Router structure with `page.tsx` files
+- Components in `app/components/` directory
+- Feature-based directories (cal/, finance/, notes/, etc.)
+- kebab-case for file names and directories
+- PascalCase for component names
+- camelCase for variables and functions
+
+### Next.js Patterns
+- Export `metadata` objects for SEO
+- Use `revalidate` and `dynamic` exports for caching control
+- Dynamic routing with `[slug]` directories
+- Import Next.js components from `next/*` (Image, Link, etc.)
+
+### Import Style
+- Relative imports for local components: `'./component'` or `'../component'`
+- Feature imports: `'app/feature/utils'`
+- External libraries: standard npm imports
+
+### Common Patterns
+- Use `space-y-*` for vertical spacing between elements
+- Consistent color scheme: slate palette with dark mode
+- ItemList/ItemListItem pattern for structured content
+- Section component for page organization
+- Prose component for text content
