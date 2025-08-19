@@ -41,7 +41,7 @@ export default function Chat() {
                 `}
               >
                 <div className="font-semibold mb-1 opacity-70 text-xs">
-                  {isUser ? 'User' : 'AI'}
+                  {isUser ? 'User' : 'Clippy'}
                 </div>
                 {message.parts.map((part, i) => {
                   switch (part.type) {
