@@ -137,7 +137,7 @@ export default function OsPage() {
             </div>
             <div className="window-body" style={{ flex: 1, padding: 0 }}>
               <iframe
-                src={activeApp.href}
+                src={`${activeApp.href}?os=true`}
                 style={{
                   width: '100%',
                   height: '100%',

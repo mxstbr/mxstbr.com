@@ -127,7 +127,7 @@ export default async function FinancePage() {
       
       {/* Current Portfolio Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-slate-50 dark:bg-slate-900">
+        <div>
           <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
             Total Portfolio Value
           </h3>
@@ -136,7 +136,7 @@ export default async function FinancePage() {
           </p>
         </div>
 
-        <div className="bg-slate-50 dark:bg-slate-900">
+        <div>
           <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
             Total Gain/Loss
           </h3>
@@ -145,7 +145,7 @@ export default async function FinancePage() {
           </p>
         </div>
         
-        <div className="bg-slate-50 dark:bg-slate-900">
+        <div>
           <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
             Total Return
           </h3>
