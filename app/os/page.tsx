@@ -66,7 +66,7 @@ export default function OsPage() {
         x: 0,
         y: 0,
         width: window.innerWidth,
-        height: window.innerHeight - 70 // Account for taskbar + safe area
+        height: window.innerHeight - 32 // Account for taskbar height only (safe area handled separately)
       })))
     }
   }, [isSmallScreen])
@@ -95,7 +95,7 @@ export default function OsPage() {
         x: 0,
         y: 0,
         width: window.innerWidth,
-        height: window.innerHeight - 70 // Account for taskbar height + safe area
+        height: window.innerHeight - 32 // Account for taskbar height only (safe area handled separately)
       }
     } else {
       // Windowed mode on larger screens
@@ -259,7 +259,7 @@ export default function OsPage() {
         className="p-4 sm:p-6 pl-6 sm:pl-8" 
         onClick={(e) => e.stopPropagation()}
         style={{ 
-          paddingBottom: `calc(6rem + env(safe-area-inset-bottom))` 
+          paddingBottom: '4rem' // Fixed padding since safe area is now handled by taskbar
         }}
       >
         <ul className="flex gap-6 content-start flex-col w-24">
@@ -379,15 +379,15 @@ export default function OsPage() {
         </div>
       ))}
 
-      {/* Taskbar: single 98.css status bar for full grey background */}
+      {/* Taskbar with proper safe area handling */}
       <div 
         className="fixed left-0 right-0 bottom-0" 
         onClick={(e) => e.stopPropagation()}
         style={{ 
           backgroundColor: '#c0c0c0',
-          paddingBottom: 'env(safe-area-inset-bottom)'
         }}
       >
+        {/* Actual taskbar - stays at consistent height */}
         <div
           className="status-bar"
           style={{ 
@@ -395,10 +395,10 @@ export default function OsPage() {
             alignItems: 'center', 
             gap: 4, 
             padding: 2, 
-            paddingBottom: `calc(2px + env(safe-area-inset-bottom, 20px))`,
             justifyContent: 'flex-start',
             backgroundColor: '#c0c0c0',
-            border: 'none'
+            border: 'none',
+            minHeight: '28px' // Ensure consistent taskbar height
           }}
         >
           <button className="default" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -465,6 +465,15 @@ export default function OsPage() {
             {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </p>
         </div>
+        
+        {/* Grey safe area padding for mobile - only appears when safe area exists */}
+        <div 
+          style={{ 
+            backgroundColor: '#c0c0c0',
+            height: 'env(safe-area-inset-bottom)',
+            minHeight: '0px' // Collapse to nothing when no safe area
+          }}
+        />
       </div>
     </div>
   )
