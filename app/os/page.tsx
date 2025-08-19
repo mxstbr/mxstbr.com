@@ -430,7 +430,7 @@ export default function OsPage() {
           <div style={{ flex: 1 }} />
           <p
             className="status-bar-field"
-            style={{ padding: '1px 6px', fontSize: 12, lineHeight: 1.2 }}
+            style={{ padding: '1px 6px', fontSize: 12, lineHeight: 1.2, flexGrow: 0 }}
           >
             {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </p>
