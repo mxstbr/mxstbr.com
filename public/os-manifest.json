@@ -1,0 +1,34 @@
+{
+  "name": "MaxOS",
+  "short_name": "MaxOS",
+  "description": "A Windows 98-inspired operating system interface",
+  "start_url": "/os",
+  "display": "fullscreen",
+  "background_color": "#008080",
+  "theme_color": "#008080",
+  "orientation": "any",
+  "scope": "/os",
+  "icons": [
+    {
+      "src": "/static/images/windows_98_icons/windows-0.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/images/windows_98_icons/windows-1.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/images/windows_98_icons/windows-2.png",
+      "sizes": "24x24",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/images/windows_98_icons/windows-3.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    }
+  ]
+}

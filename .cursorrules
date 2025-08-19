@@ -40,6 +40,12 @@
 - Dynamic routing with `[slug]` directories
 - Import Next.js components from `next/*` (Image, Link, etc.)
 
+### Static Assets
+- Files in `/public` are automatically served and accessible via URL paths
+- Reference public assets with leading slash: `/static/images/file.png`
+- No need to copy files already in public directory - use existing paths
+- For icons and images, use existing assets from `/public/static/images/`
+
 ### Import Style
 - Relative imports for local components: `'./component'` or `'../component'`
 - Feature imports: `'app/feature/utils'`
