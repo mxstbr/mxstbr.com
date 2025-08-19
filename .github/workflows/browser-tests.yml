@@ -1,0 +1,41 @@
+name: Browser Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+      
+      - name: Install dependencies
+        run: pnpm install
+      
+      - name: Install Playwright Chrome
+        run: pnpm exec playwright install chromium --with-deps
+      
+      - name: Build Next.js app
+        run: pnpm build
+        env:
+          # Required build-time env vars
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+          
+      - name: Run Playwright tests
+        run: pnpm exec playwright test
+        env:
+          BASE_URL: http://localhost:3000
