@@ -63,9 +63,8 @@ export default function OsPage() {
               key={app.name} 
               className="flex flex-col items-center gap-2 select-none"
               style={{
-                border: selectedApp === app.name ? '1px dashed #ffffff' : '1px dashed transparent',
+                border: selectedApp === app.name ? '1px dashed #000000' : '1px dashed transparent',
                 padding: '4px',
-                background: selectedApp === app.name ? 'rgba(255,255,255,0.1)' : 'transparent'
               }}
             >
               <div
