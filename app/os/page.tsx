@@ -239,11 +239,7 @@ export default function OsPage() {
           paddingBottom: `calc(6rem + env(safe-area-inset-bottom))` 
         }}
       >
-        <ul className={`flex gap-6 content-start ${
-          isSmallScreen 
-            ? 'flex-row flex-wrap justify-start w-full' 
-            : 'flex-col w-24'
-        }`}>
+        <ul className="flex gap-6 content-start flex-col w-24">
           {apps.map((app) => (
             <li 
               key={app.name} 
