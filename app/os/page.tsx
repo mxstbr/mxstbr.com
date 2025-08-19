@@ -163,7 +163,55 @@ export default function OsPage() {
     setSelectedApp(null)
   }
 
-  // Drag functionality
+  // Drag functionality with document-level event listeners
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!dragState.isDragging || !dragState.windowId || isSmallScreen) return
+
+    const newX = e.clientX - dragState.offsetX
+    const newY = e.clientY - dragState.offsetY
+
+    // Allow windows to be dragged outside on all sides while keeping some minimum visible area
+    // Ensure at least 100px of the window remains visible from any edge
+    const minVisibleSize = 100
+    const constrainedX = Math.max(-window.innerWidth + minVisibleSize, Math.min(newX, window.innerWidth - minVisibleSize))
+    const constrainedY = Math.max(-window.innerHeight + minVisibleSize, Math.min(newY, window.innerHeight - minVisibleSize))
+
+    setWindows(prev => prev.map(w => 
+      w.id === dragState.windowId 
+        ? { ...w, x: constrainedX, y: constrainedY }
+        : w
+    ))
+  }
+
+  const handleMouseUp = () => {
+    setDragState({
+      isDragging: false,
+      windowId: null,
+      offsetX: 0,
+      offsetY: 0
+    })
+    dragStartRef.current = null
+  }
+
+  // Attach document-level event listeners during drag
+  useEffect(() => {
+    if (dragState.isDragging) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      
+      // Prevent text selection during drag
+      document.body.style.userSelect = 'none'
+      document.body.style.webkitUserSelect = 'none'
+      
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove)
+        document.removeEventListener('mouseup', handleMouseUp)
+        document.body.style.userSelect = ''
+        document.body.style.webkitUserSelect = ''
+      }
+    }
+  }, [dragState.isDragging, dragState.windowId, dragState.offsetX, dragState.offsetY, isSmallScreen])
+
   const handleMouseDown = (e: React.MouseEvent, windowId: string) => {
     // Disable dragging on small screens
     if (isSmallScreen) {
@@ -187,41 +235,15 @@ export default function OsPage() {
 
     dragStartRef.current = { x: e.clientX, y: e.clientY }
     bringWindowToFront(windowId)
-  }
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!dragState.isDragging || !dragState.windowId || isSmallScreen) return
-
-    const newX = e.clientX - dragState.offsetX
-    const newY = e.clientY - dragState.offsetY
-
-    // Constrain to viewport
-    const constrainedX = Math.max(0, Math.min(newX, window.innerWidth - 200))
-    const constrainedY = Math.max(0, Math.min(newY, window.innerHeight - 100))
-
-    setWindows(prev => prev.map(w => 
-      w.id === dragState.windowId 
-        ? { ...w, x: constrainedX, y: constrainedY }
-        : w
-    ))
-  }
-
-  const handleMouseUp = () => {
-    setDragState({
-      isDragging: false,
-      windowId: null,
-      offsetX: 0,
-      offsetY: 0
-    })
-    dragStartRef.current = null
+    
+    // Prevent default to avoid any browser drag behavior
+    e.preventDefault()
   }
 
   return (
     <div
       className="fixed inset-0 z-[9999] mt-0"
       onClick={handleDesktopClick}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
       style={{
         backgroundColor: '#008080',
         backgroundImage:
@@ -347,7 +369,8 @@ export default function OsPage() {
                   width: '100%',
                   height: '100%',
                   border: 'none',
-                  background: 'white'
+                  background: 'white',
+                  pointerEvents: dragState.isDragging ? 'none' : 'auto'
                 }}
                 title={windowState.app.name}
               />
