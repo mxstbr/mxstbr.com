@@ -232,6 +232,7 @@ export default function OsPage() {
       }}
     >
       <link rel="stylesheet" href="https://unpkg.com/98.css" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
       <div 
         className="p-4 sm:p-6 pl-6 sm:pl-8" 
         onClick={(e) => e.stopPropagation()}
