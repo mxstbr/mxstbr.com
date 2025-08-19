@@ -66,7 +66,7 @@ export default function OsPage() {
         x: 0,
         y: 0,
         width: window.innerWidth,
-        height: window.innerHeight - 32 // Account for taskbar
+        height: window.innerHeight - 70 // Account for taskbar + safe area
       })))
     }
   }, [isSmallScreen])
@@ -95,7 +95,7 @@ export default function OsPage() {
         x: 0,
         y: 0,
         width: window.innerWidth,
-        height: window.innerHeight - 32 // Account for taskbar height
+        height: window.innerHeight - 70 // Account for taskbar height + safe area
       }
     } else {
       // Windowed mode on larger screens
@@ -232,7 +232,13 @@ export default function OsPage() {
       }}
     >
       <link rel="stylesheet" href="https://unpkg.com/98.css" />
-      <div className="p-4 sm:p-6 pb-24 pl-6 sm:pl-8" onClick={(e) => e.stopPropagation()}>
+      <div 
+        className="p-4 sm:p-6 pl-6 sm:pl-8" 
+        onClick={(e) => e.stopPropagation()}
+        style={{ 
+          paddingBottom: `calc(6rem + env(safe-area-inset-bottom))` 
+        }}
+      >
         <ul className={`flex gap-6 content-start ${
           isSmallScreen 
             ? 'flex-row flex-wrap justify-start w-full' 
@@ -357,7 +363,10 @@ export default function OsPage() {
       <div 
         className="fixed left-0 right-0 bottom-0" 
         onClick={(e) => e.stopPropagation()}
-        style={{ backgroundColor: '#c0c0c0' }}
+        style={{ 
+          backgroundColor: '#c0c0c0',
+          paddingBottom: 'env(safe-area-inset-bottom)'
+        }}
       >
         <div
           className="status-bar"
