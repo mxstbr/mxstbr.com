@@ -287,7 +287,7 @@ export default function OsPage() {
           paddingBottom: '4rem' // Fixed padding since safe area is now handled by taskbar
         }}
       >
-        <ul className="flex gap-6 content-start flex-col w-24">
+        <ul className="flex gap-3 content-start flex-col w-32">
           {apps.map((app) => (
             <li 
               key={app.name} 
@@ -295,8 +295,8 @@ export default function OsPage() {
               style={{
                 border: selectedApp === app.name ? '1px dashed #000000' : '1px dashed transparent',
                 padding: isTouchDevice ? '8px' : '4px', // Larger touch target on touch devices
-                minHeight: isTouchDevice ? '80px' : 'auto',
-                minWidth: isTouchDevice ? '80px' : 'auto',
+                minHeight: isTouchDevice ? '96px' : 'auto',
+                minWidth: isTouchDevice ? '96px' : 'auto',
                 justifyContent: 'center'
               }}
             >
@@ -314,8 +314,8 @@ export default function OsPage() {
               >
                 <div
                   style={{ 
-                    width: 48, 
-                    height: 48, 
+                    width: 64, 
+                    height: 64, 
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -325,8 +325,8 @@ export default function OsPage() {
                   <Image
                     src={app.icon}
                     alt={app.name}
-                    width={32}
-                    height={32}
+                    width={48}
+                    height={48}
                     style={{ imageRendering: 'pixelated' }}
                   />
                 </div>
