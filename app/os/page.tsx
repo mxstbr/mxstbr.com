@@ -107,8 +107,12 @@ export default function OsPage() {
     // Check if window is already open
     const existingWindow = windows.find(w => w.app.name === app.name)
     if (existingWindow) {
-      // Bring existing window to front
-      bringWindowToFront(existingWindow.id)
+      // If window is minimized, restore it, otherwise bring to front
+      if (existingWindow.isMinimized) {
+        restoreWindow(existingWindow.id)
+      } else {
+        bringWindowToFront(existingWindow.id)
+      }
       return
     }
 
@@ -153,6 +157,23 @@ export default function OsPage() {
     setWindows(prev => prev.map(w => 
       w.id === windowId 
         ? { ...w, zIndex: nextZIndex }
+        : w
+    ))
+    setNextZIndex(prev => prev + 1)
+  }
+
+  const minimizeWindow = (windowId: string) => {
+    setWindows(prev => prev.map(w => 
+      w.id === windowId 
+        ? { ...w, isMinimized: true }
+        : w
+    ))
+  }
+
+  const restoreWindow = (windowId: string) => {
+    setWindows(prev => prev.map(w => 
+      w.id === windowId 
+        ? { ...w, isMinimized: false, zIndex: nextZIndex }
         : w
     ))
     setNextZIndex(prev => prev + 1)
@@ -376,7 +397,13 @@ export default function OsPage() {
             >
               <div className="title-bar-text">{windowState.app.name}</div>
               <div className="title-bar-controls">
-                <button aria-label="Minimize"></button>
+                <button 
+                  aria-label="Minimize"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    minimizeWindow(windowState.id)
+                  }}
+                ></button>
                 <button aria-label="Maximize"></button>
                 <button 
                   aria-label="Close" 
@@ -443,7 +470,7 @@ export default function OsPage() {
             const focusedWindow = windows.reduce((prev, current) => 
               (current.zIndex > prev.zIndex) ? current : prev
             )
-            const isFocused = windowState.id === focusedWindow.id
+            const isFocused = windowState.id === focusedWindow.id && !windowState.isMinimized
             
             return (
               <button
@@ -457,8 +484,15 @@ export default function OsPage() {
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
-                  // Apply pressed/selected style for focused window
-                  ...(isFocused ? {
+                  // Apply different styles based on window state
+                  ...(windowState.isMinimized ? {
+                    // Minimized window style - grayed out
+                    backgroundColor: '#e0e0e0',
+                    color: '#808080',
+                    border: '1px solid #808080',
+                    borderStyle: 'outset'
+                  } : isFocused ? {
+                    // Focused window style - pressed/selected
                     border: '1px solid #808080',
                     borderStyle: 'inset',
                     backgroundColor: '#c0c0c0',
@@ -467,7 +501,11 @@ export default function OsPage() {
                 }}
                 onClick={(e) => {
                   e.stopPropagation()
-                  bringWindowToFront(windowState.id)
+                  if (windowState.isMinimized) {
+                    restoreWindow(windowState.id)
+                  } else {
+                    bringWindowToFront(windowState.id)
+                  }
                 }}
               >
                 <Image
@@ -475,7 +513,10 @@ export default function OsPage() {
                   alt={windowState.app.name}
                   width={16}
                   height={16}
-                  style={{ imageRendering: 'pixelated' }}
+                  style={{ 
+                    imageRendering: 'pixelated',
+                    opacity: windowState.isMinimized ? 0.6 : 1
+                  }}
                 />
                 {windowState.app.name}
               </button>
