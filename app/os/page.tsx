@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useTransition } from 'react'
 import Image from 'next/image'
+import { setPasswordCookie, clearPasswordCookie } from './auth-actions'
 
 export const dynamic = 'force-static'
 
@@ -23,6 +24,12 @@ export default function OsPage() {
   const [isSmallScreen, setIsSmallScreen] = useState(false)
   const [isTouchDevice, setIsTouchDevice] = useState(false)
   const [safeAreaBottom, setSafeAreaBottom] = useState(0)
+  const [isStartMenuOpen, setIsStartMenuOpen] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [showLoginWindow, setShowLoginWindow] = useState(false)
+  const [loginPassword, setLoginPassword] = useState('')
+  const [loginError, setLoginError] = useState('')
+  const [isPending, startTransition] = useTransition()
   const [dragState, setDragState] = useState<{
     isDragging: boolean
     windowId: string | null
@@ -35,6 +42,15 @@ export default function OsPage() {
     offsetY: 0
   })
   const dragStartRef = useRef<{ x: number; y: number } | null>(null)
+
+  // Check authentication status on mount
+  useEffect(() => {
+    fetch('/api/auth')
+      .then((res) => res.text())
+      .then((res) => {
+        setIsAuthenticated(res === 'true')
+      })
+  }, [])
 
   // Detect screen size, touch device, and safe area
   useEffect(() => {
@@ -207,6 +223,48 @@ export default function OsPage() {
 
   const handleDesktopClick = () => {
     setSelectedApp(null)
+    setIsStartMenuOpen(false)
+  }
+
+  const handleLogin = () => {
+    startTransition(async () => {
+      try {
+        // Set the password cookie using server action
+        await setPasswordCookie(loginPassword)
+        
+        // Check if authentication was successful
+        const authCheck = await fetch('/api/auth')
+        const isAuth = await authCheck.text()
+        
+        if (isAuth === 'true') {
+          setIsAuthenticated(true)
+          setShowLoginWindow(false)
+          setLoginPassword('')
+          setLoginError('')
+        } else {
+          setLoginError('Invalid password')
+        }
+      } catch (error) {
+        setLoginError('Error logging in')
+      }
+    })
+  }
+
+  const handleLogout = () => {
+    startTransition(async () => {
+      try {
+        // Clear the password cookie using server action
+        await clearPasswordCookie()
+        setIsAuthenticated(false)
+        setIsStartMenuOpen(false)
+      } catch (error) {
+        console.error('Error logging out:', error)
+      }
+    })
+  }
+
+  const handleShutdown = () => {
+    window.close()
   }
 
   // Drag functionality with document-level event listeners
@@ -353,7 +411,13 @@ export default function OsPage() {
                 </div>
                 <span
                   className="text-center text-sm leading-tight"
-                  style={{ color: '#ffffff' }}
+                  style={{ 
+                    color: '#ffffff',
+                    fontFamily: '"MS Sans Serif", "Tahoma", sans-serif',
+                    fontSize: '11px',
+                    textShadow: '1px 1px 1px rgba(0,0,0,0.8)',
+                    letterSpacing: '0px'
+                  }}
                 >
                   {app.name}
                 </span>
@@ -362,6 +426,226 @@ export default function OsPage() {
           ))}
         </ul>
       </div>
+
+      {/* Login Window */}
+      {showLoginWindow && (
+        <div
+          className="window-container fixed"
+          style={{
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 400,
+            maxWidth: '90vw',
+            zIndex: 10000
+          }}
+        >
+          <div className="window">
+            <div className="title-bar">
+              <div className="title-bar-text">Log On to Windows</div>
+              <div className="title-bar-controls">
+                <button 
+                  aria-label="Close" 
+                  onClick={() => {
+                    setShowLoginWindow(false)
+                    setLoginPassword('')
+                    setLoginError('')
+                  }}
+                ></button>
+              </div>
+            </div>
+            <div className="window-body" style={{ padding: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
+                <Image
+                  src="/static/images/windows_98_icons/keys-0.png"
+                  alt="Key"
+                  width={32}
+                  height={32}
+                  style={{ imageRendering: 'pixelated', marginTop: 8 }}
+                />
+                <div style={{ flex: 1 }}>
+                  <p style={{ marginBottom: 16 }}>Type a password to log on to Windows.</p>
+                  <div className="field-row" style={{ marginBottom: 8 }}>
+                    <label htmlFor="password" style={{ minWidth: 80 }}>Password:</label>
+                    <input
+                      id="password"
+                      type="password"
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !isPending) {
+                          handleLogin()
+                        }
+                      }}
+                      style={{ flex: 1 }}
+                      autoFocus
+                      disabled={isPending}
+                    />
+                  </div>
+                  {loginError && (
+                    <p style={{ color: 'red', fontSize: 12, marginBottom: 8 }}>{loginError}</p>
+                  )}
+                </div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 16 }}>
+                <button onClick={handleLogin} disabled={isPending}>
+                  {isPending ? 'Logging in...' : 'OK'}
+                </button>
+                <button onClick={() => {
+                  setShowLoginWindow(false)
+                  setLoginPassword('')
+                  setLoginError('')
+                }} disabled={isPending}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Start Menu */}
+      {isStartMenuOpen && (
+        <div
+          className="window"
+          style={{
+            position: 'fixed',
+            left: 0,
+            bottom: 32 + safeAreaBottom,
+            width: 220,
+            zIndex: 9998,
+            padding: 0,
+            borderWidth: 2
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'row',
+            backgroundColor: '#c0c0c0',
+            height: '100%'
+          }}>
+            <div style={{
+              background: 'linear-gradient(180deg, #000080 0%, #1084d0 100%)',
+              padding: '8px 4px',
+              color: 'white',
+              fontWeight: 'bold',
+              fontSize: 14,
+              display: 'flex',
+              alignItems: 'flex-end',
+              writingMode: 'vertical-rl',
+              transform: 'rotate(180deg)',
+              width: 24
+            }}>
+              <div style={{ letterSpacing: 1 }}>
+                <span style={{ fontWeight: 'bold' }}>MaxOS</span> <span style={{ fontWeight: 'normal' }}>98</span>
+              </div>
+            </div>
+            <div style={{ flex: 1, backgroundColor: '#c0c0c0' }}>
+              {!isAuthenticated ? (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    padding: '2px 16px 2px 20px',
+                    cursor: 'pointer',
+                    fontSize: 11,
+                    backgroundColor: 'transparent',
+                    color: 'black',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#000080'
+                    e.currentTarget.style.color = 'white'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                    e.currentTarget.style.color = 'black'
+                  }}
+                  onClick={() => {
+                    setShowLoginWindow(true)
+                    setIsStartMenuOpen(false)
+                  }}
+                >
+                  <Image
+                    src="/static/images/windows_98_icons/keys-0.png"
+                    alt="Log On"
+                    width={16}
+                    height={16}
+                    style={{ imageRendering: 'pixelated' }}
+                  />
+                  <span>Log On...</span>
+                </div>
+              ) : (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    padding: '2px 16px 2px 20px',
+                    cursor: 'pointer',
+                    fontSize: 11,
+                    backgroundColor: 'transparent',
+                    color: 'black',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#000080'
+                    e.currentTarget.style.color = 'white'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                    e.currentTarget.style.color = 'black'
+                  }}
+                  onClick={handleLogout}
+                >
+                  <Image
+                    src="/static/images/windows_98_icons/keys-0.png"
+                    alt="Log Off"
+                    width={16}
+                    height={16}
+                    style={{ imageRendering: 'pixelated' }}
+                  />
+                  <span>Log Off Max...</span>
+                </div>
+              )}
+              <div style={{ 
+                margin: '2px 4px',
+                height: 2,
+                borderTop: '1px solid #ffffff',
+                borderBottom: '1px solid #808080',
+              }} />
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '2px 16px 2px 20px',
+                  cursor: 'pointer',
+                  fontSize: 11,
+                  backgroundColor: 'transparent',
+                  color: 'black',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#000080'
+                  e.currentTarget.style.color = 'white'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent'
+                  e.currentTarget.style.color = 'black'
+                }}
+                onClick={handleShutdown}
+              >
+                <Image
+                  src="/static/images/windows_98_icons/shut_down_cool-0.png"
+                  alt="Shut Down"
+                  width={16}
+                  height={16}
+                  style={{ imageRendering: 'pixelated' }}
+                />
+                <span>Shut Down...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Windows */}
       {windows.map((windowState) => (
@@ -453,7 +737,24 @@ export default function OsPage() {
             minHeight: '28px' // Ensure consistent taskbar height
           }}
         >
-          <button className="default" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <button 
+            className={isStartMenuOpen ? "" : "default"} 
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 4,
+              ...(isStartMenuOpen ? {
+                border: '1px solid #808080',
+                borderStyle: 'inset',
+                backgroundColor: '#c0c0c0',
+                boxShadow: 'inset 1px 1px 0px 0px #808080, inset -1px -1px 0px 0px #dfdfdf'
+              } : {})
+            }}
+            onClick={(e) => {
+              e.stopPropagation()
+              setIsStartMenuOpen(!isStartMenuOpen)
+            }}
+          >
             <Image
               src="/static/images/windows_98_icons/windows_slanted-1.png"
               alt="Windows"
