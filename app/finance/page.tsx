@@ -8,6 +8,8 @@ import { prodUrl } from 'app/sitemap'
 import { addHolding, updateHolding, deleteHolding, getHoldingsData, type StockHolding } from './holdings-data'
 import { revalidatePath } from 'next/cache'
 import { HoldingEditForm, HoldingDeleteButton, AddHoldingForm, HoldingsListItem } from './holdings-crud'
+import { notFound } from 'next/navigation'
+import { isMax } from 'app/auth'
 
 // Utility function to format dollar values rounded to nearest dollar
 function formatDollar(value: number): string {
@@ -100,6 +102,8 @@ export const metadata: Metadata = {
 }
 
 export default async function FinancePage() {
+  if (!isMax()) return notFound();
+  
   // Generate portfolio history from the first holding date to today
   const { getHoldingsData } = await import('./holdings-data')
   const holdingsData = await getHoldingsData()
