@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   const proto =
     forwardedProto || (req.url.startsWith('https:') ? 'https' : 'http')
   const urlObject = new URL(req.url)
-  const absoluteUrl = `${proto}://${host}${urlObject.pathname}`
+  const absoluteUrl = `${proto}://${host}${urlObject.pathname}${urlObject.search}`
 
   const authToken = process.env.TWILIO_AUTH_TOKEN || ''
   if (!authToken)
