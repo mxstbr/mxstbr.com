@@ -2,8 +2,6 @@ import twilio from 'twilio'
 import { NextResponse } from 'next/server'
 import { generateText } from 'app/lib/routing-agent'
 
-// We only need the helper functions + TwiML from twilio
-const { validateRequestWithBody } = twilio
 const { MessagingResponse } = twilio.twiml
 
 export const dynamic = 'force-dynamic'
@@ -29,11 +27,15 @@ export async function POST(req: Request) {
       { status: 500 },
     )
 
-  const isValid = validateRequestWithBody(
+  // Parse the form data for validation
+  const formData = Object.fromEntries(new URLSearchParams(rawBody))
+
+  // Use the standard validateRequest with parsed parameters
+  const isValid = twilio.validateRequest(
     authToken,
     twilioSignature,
     absoluteUrl,
-    rawBody,
+    formData,
   )
   if (!isValid)
     return NextResponse.json(
