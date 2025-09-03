@@ -49,8 +49,7 @@ export async function POST(req: Request) {
   const aiResult = await generateText({
     messages: [
       {
-        // @ts-ignore
-        role: 'developer',
+        role: 'system',
         content:
           'This message was sent via SMS and you will respond via SMS. Keep your response below 1600 characters (extended SMS messaging limit).',
       },
