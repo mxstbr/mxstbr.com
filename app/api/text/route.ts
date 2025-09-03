@@ -16,10 +16,11 @@ export async function POST(req: Request) {
   const forwardedProto = req.headers.get('x-forwarded-proto')
   const forwardedHost = req.headers.get('x-forwarded-host')
   const host = forwardedHost || req.headers.get('host') || ''
-  const proto =
-    forwardedProto || (req.url.startsWith('https:') ? 'https' : 'http')
-  const urlObject = new URL(req.url)
-  const absoluteUrl = `${proto}://${host}${urlObject.pathname}${urlObject.search}`
+  const proto = forwardedProto || 'https'
+
+  // Get the path and query string from the request
+  const url = new URL(req.url, `${proto}://${host}`)
+  const absoluteUrl = url.toString()
 
   const authToken = process.env.TWILIO_AUTH_TOKEN || ''
   if (!authToken)
