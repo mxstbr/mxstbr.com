@@ -1,6 +1,6 @@
 import { verifyBasicAuth } from 'app/auth'
 import { NextRequest, NextResponse } from 'next/server'
-import { generateText } from '../../lib/routing-agent'
+import { generateText } from '../../lib/clippy-agent'
 import { dedent } from '../../lib/dedent'
 
 export async function POST(req: NextRequest) {

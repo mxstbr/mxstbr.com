@@ -2,13 +2,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { type Update } from 'telegraf/types'
 import { bot } from 'app/lib/telegram'
-import { generateText } from 'app/lib/routing-agent'
+import { generateText } from 'app/lib/clippy-agent'
 import { dedent } from 'app/lib/dedent'
 
 export async function POST(request: NextRequest) {
-    if (request.headers.get('X-Telegram-Bot-Api-Secret-Token') !== process.env.TELEGRAM_SECRET_TOKEN) {
-        return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
-    }
+  if (
+    request.headers.get('X-Telegram-Bot-Api-Secret-Token') !==
+    process.env.TELEGRAM_SECRET_TOKEN
+  ) {
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+  }
 
   const update: Update = await request.json()
   if ('message' in update) {

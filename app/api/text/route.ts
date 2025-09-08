@@ -1,6 +1,6 @@
 import twilio from 'twilio'
 import { NextResponse } from 'next/server'
-import { generateText } from 'app/lib/routing-agent'
+import { generateText } from 'app/lib/clippy-agent'
 
 const { MessagingResponse } = twilio.twiml
 

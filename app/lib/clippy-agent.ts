@@ -13,7 +13,7 @@ import { telegramTools } from './telegram'
 const redis = Redis.fromEnv()
 
 export const SYSTEM_PROMPT = (today: Date) => dedent`
-You are the unified AI assistant that helps Maxie and Minnie with both email analysis and calendar management.
+You are the unified AI assistant named Clippy that helps Maxie and Minnie with both email analysis and calendar management.
 Respond in a concise, helpful, and unambiguous way.
 
 <context>

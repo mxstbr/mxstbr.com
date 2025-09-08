@@ -1,4 +1,4 @@
-import { streamText } from '../../lib/routing-agent'
+import { streamText } from '../../lib/clippy-agent'
 import { isMax } from 'app/auth'
 
 // Allow streaming responses up to 30 seconds
@@ -13,6 +13,6 @@ export async function POST(req: Request) {
   if (!sessionId) throw new Error('Missing session id.')
 
   const result = await streamText(sessionId, { messages })
-  
+
   return result.toDataStreamResponse()
 }
