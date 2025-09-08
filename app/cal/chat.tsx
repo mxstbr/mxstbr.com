@@ -29,8 +29,8 @@ export default function Chat() {
 
   return (
     <div className="flex flex-col w-full h-64 mx-auto">
-      <div className="flex-1 overflow-y-auto flex flex-col-reverse space-y-2 space-y-reverse p-3">
-        {[...messages].reverse().map((message) => {
+      <div className="flex-1 overflow-y-auto flex flex-col space-y-2 space-y-reverse p-3">
+        {[...messages].map((message) => {
           const isUser = message.role === 'user'
           return (
             <div
