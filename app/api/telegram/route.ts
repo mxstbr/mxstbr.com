@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { type Update } from 'telegraf/types'
 import { bot } from 'app/lib/telegram'
-import { generateText } from 'app/lib/clippy-agent'
+import { clippyGenerateText } from 'app/lib/clippy-agent'
 import { dedent } from 'app/lib/dedent'
 
 export async function POST(request: NextRequest) {
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
   const update: Update = await request.json()
   if ('message' in update) {
     const message = update.message
-    const result = await generateText({
+    const result = await clippyGenerateText({
       messages: [
         {
           role: 'user',

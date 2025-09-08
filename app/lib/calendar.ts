@@ -25,7 +25,7 @@ export const calendarTools = {
   // ---------------------------------------------------------------------
   create_event: tool({
     description: 'Create a new calendar event',
-    parameters: eventSchema,
+    inputSchema: eventSchema,
     execute: async ({ start, end, color, label, border, background }) => {
       // Normalise to YYYY-MM-DD format
       const startDay = toDayString(start)
@@ -62,8 +62,9 @@ export const calendarTools = {
   // READ ----------------------------------------------------------------
   // ---------------------------------------------------------------------
   read_events: tool({
-    description: 'Return all calendar events, optionally filtered by date range',
-    parameters: z.object({
+    description:
+      'Return all calendar events, optionally filtered by date range',
+    inputSchema: z.object({
       start_date: z.string().optional().default('2024-01-01'),
       end_date: z.string().optional().default('9999-12-31'),
     }),
@@ -75,7 +76,7 @@ export const calendarTools = {
       if (!events) return { events: [] }
 
       // Filter events that start OR end within the date range
-      const filteredEvents = events.filter(event => {
+      const filteredEvents = events.filter((event) => {
         const eventStart = event.start
         const eventEnd = event.end
         return (
@@ -95,7 +96,7 @@ export const calendarTools = {
   update_event: tool({
     description:
       'Update an existing calendar event (provide oldEvent and newEvent)',
-    parameters: z.object({
+    inputSchema: z.object({
       oldEvent: eventSchema,
       newEvent: eventSchema,
     }),
@@ -144,7 +145,7 @@ export const calendarTools = {
   // ---------------------------------------------------------------------
   delete_event: tool({
     description: 'Delete a calendar event',
-    parameters: z.object({ event: eventSchema }),
+    inputSchema: z.object({ event: eventSchema }),
     execute: async ({ event }) => {
       const events: Array<Event> | null = await redis.json.get(
         `cal:${process.env.CAL_PASSWORD}`,
@@ -173,4 +174,4 @@ export const calendarTools = {
       return { message: '🗑️ Event deleted' }
     },
   }),
-} 
+}

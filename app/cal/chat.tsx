@@ -1,33 +1,31 @@
 'use client'
 
 import { useChat } from '@ai-sdk/react'
+import { DefaultChatTransport } from 'ai'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 export default function Chat() {
-  const [sessionId, setSessionId] = useState<string>('')
+  const [sessionId] = useState<string>(() => Date.now().toString())
+  const [input, setInput] = useState<string>('')
   const router = useRouter()
-  const { messages, input, handleInputChange, handleSubmit, status } = useChat({
-    maxSteps: 5,
-    headers: {
-      'x-session-id': sessionId,
-    },
-    onFinish: (message) => {
-      if (
-        message.parts?.some(
-          (part) =>
-            part.type === 'tool-invocation' &&
-            part.toolInvocation.toolName.includes('event'),
-        )
-      ) {
-        router.refresh()
-      }
-    },
+
+  const { messages, sendMessage, status } = useChat({
+    transport: new DefaultChatTransport({
+      api: '/api/chat',
+      headers: {
+        'x-session-id': sessionId,
+      },
+    }),
   })
 
-  useEffect(() => {
-    setSessionId(Date.now().toString())
-  }, [])
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (input.trim()) {
+      sendMessage({ text: input })
+      setInput('')
+    }
+  }
 
   return (
     <div className="flex flex-col w-full h-64 mx-auto">
@@ -48,90 +46,54 @@ export default function Chat() {
                   }
                 `}
               >
-                <div className="font-semibold mb-1 opacity-70 text-xs">
-                  {isUser ? 'User' : 'Clippy'}
-                </div>
                 {message.parts.map((part, i) => {
                   switch (part.type) {
                     case 'text':
                       return <div key={`${message.id}-${i}`}>{part.text}</div>
-                    case 'tool-invocation':
-                      const { toolName, toolCallId, args, state } =
-                        part.toolInvocation
-                      return (
-                        <div
-                          key={`${message.id}-${i}`}
-                          className="my-2 p-2 rounded bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 text-yellow-900 dark:text-yellow-100"
-                        >
-                          <div className="flex items-start gap-2">
-                            <div className="flex-1">
-                              <div className="text-sm text-yellow-700 dark:text-yellow-200">
-                                <span className="font-medium">{toolName}</span>
-                                {state === 'result' ? (
-                                  <span className="ml-1">
-                                    completed successfully
-                                  </span>
-                                ) : (
-                                  <span className="ml-1">in progress...</span>
-                                )}
-                              </div>
-                              {args && Object.keys(args).length > 0 && (
-                                <div className="mt-1 text-xs text-yellow-800 dark:text-yellow-300">
-                                  with parameters:{' '}
-                                  {Object.entries(args).map(([key, value]) => (
-                                    <span
-                                      key={key}
-                                      className="inline-block mr-2"
-                                    >
-                                      <span className="font-medium">{key}</span>
-                                      : {JSON.stringify(value)}
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
+                    default:
+                      // Handle dynamic tool calls (they start with 'tool-')
+                      if (part.type.startsWith('tool-')) {
+                        return (
+                          <div
+                            key={`${message.id}-${i}`}
+                            className="my-2 p-2 rounded bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 text-yellow-900 dark:text-yellow-100"
+                          >
+                            <div className="text-xs font-medium mb-1">
+                              🔧 Tool Call: {part.type.replace('tool-', '')}
                             </div>
                           </div>
-                          <details className="mt-1">
-                            <summary className="text-xs text-yellow-700 dark:text-yellow-200 cursor-pointer hover:text-yellow-900 dark:hover:text-yellow-100">
-                              View technical details
-                            </summary>
-                            <div className="mt-2 p-2 bg-yellow-100 dark:bg-yellow-800 rounded text-xs overflow-x-auto">
-                              <div className="font-mono">
-                                <div>ID: {toolCallId}</div>
-                                <div>Tool: {toolName}</div>
-                                <div>State: {state}</div>
-                                {args && (
-                                  <div>
-                                    Args:{' '}
-                                    <pre className="mt-1">
-                                      {JSON.stringify(args, null, 2)}
-                                    </pre>
-                                  </div>
-                                )}
-                                {state === 'result' &&
-                                  'result' in part.toolInvocation && (
-                                    <div>
-                                      Result:{' '}
-                                      <pre className="mt-1">
-                                        {JSON.stringify(
-                                          part.toolInvocation.result,
-                                          null,
-                                          2,
-                                        )}
-                                      </pre>
-                                    </div>
-                                  )}
-                              </div>
-                            </div>
-                          </details>
-                        </div>
-                      )
+                        )
+                      }
+                      return null
                   }
                 })}
               </div>
             </div>
           )
         })}
+
+        {status === 'streaming' && (
+          <div className="flex justify-start">
+            <div className="max-w-xs md:max-w-md px-4 py-2 rounded-lg shadow-sm border text-sm bg-slate-100 text-slate-900 border-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700">
+              <div className="flex items-center space-x-1">
+                <div className="flex space-x-1">
+                  <div className="w-2 h-2 bg-slate-600 rounded-full animate-bounce"></div>
+                  <div
+                    className="w-2 h-2 bg-slate-600 rounded-full animate-bounce"
+                    style={{ animationDelay: '0.1s' }}
+                  ></div>
+                  <div
+                    className="w-2 h-2 bg-slate-600 rounded-full animate-bounce"
+                    style={{ animationDelay: '0.2s' }}
+                  ></div>
+                </div>
+                <span className="text-xs text-slate-500">
+                  AI is thinking...
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <form
@@ -143,7 +105,8 @@ export default function Chat() {
           style={{ boxShadow: 'none', border: 'none' }}
           value={input}
           placeholder="Say something..."
-          onChange={handleInputChange}
+          onChange={(e) => setInput(e.target.value)}
+          disabled={status !== 'ready'}
         />
       </form>
     </div>

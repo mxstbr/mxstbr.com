@@ -1,8 +1,5 @@
 import { openai } from '@ai-sdk/openai'
-import {
-  streamText as ai_streamText,
-  generateText as ai_generateText,
-} from 'ai'
+import { generateText, streamText } from 'ai'
 import { Redis } from '@upstash/redis'
 import { colors } from 'app/cal/data'
 import { PRESETS } from '../cal/presets'
@@ -72,34 +69,43 @@ ${JSON.stringify(
 )}
 </PRESETS>`
 
-export async function streamText(
+// Agent configuration - using modern AI SDK patterns
+const clippyAgentConfig = {
+  model: openai('gpt-4o-mini'),
+  system: SYSTEM_PROMPT(new Date()),
+  tools: {
+    ...calendarTools,
+    ...telegramTools,
+  },
+  maxSteps: 10,
+} as const
+
+export async function clippyStreamText(
   sessionId: string,
-  params: Partial<Parameters<typeof ai_streamText>[0]>,
+  params: {
+    messages: any[]
+  },
 ) {
-  return ai_streamText({
-    model: openai('gpt-5-mini'),
-    system: SYSTEM_PROMPT(new Date()),
-    tools: { ...calendarTools, ...telegramTools },
-    maxSteps: 10,
+  return streamText({
+    ...clippyAgentConfig,
+    messages: params.messages,
     onStepFinish: async (result) => {
       await redis.lpush(`logs:${sessionId}`, result)
     },
-    ...params,
   })
 }
 
-export async function generateText(
-  params: Partial<Parameters<typeof ai_generateText>[0]>,
+export async function clippyGenerateText(
+  params:
+    | { messages: any[]; prompt?: never }
+    | { prompt: string; messages?: never },
 ) {
   const id = Date.now()
-  return ai_generateText({
-    model: openai('gpt-5-mini'),
-    system: SYSTEM_PROMPT(new Date()),
-    tools: { ...calendarTools, ...telegramTools },
-    maxSteps: 10,
+  return generateText({
+    ...clippyAgentConfig,
+    ...params,
     onStepFinish: async (result) => {
       await redis.lpush(`logs:${id}`, result)
     },
-    ...params,
   })
 }
