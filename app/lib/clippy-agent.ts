@@ -77,7 +77,7 @@ export async function streamText(
   params: Partial<Parameters<typeof ai_streamText>[0]>,
 ) {
   return ai_streamText({
-    model: openai('gpt-4.1-mini'),
+    model: openai('gpt-5-mini'),
     system: SYSTEM_PROMPT(new Date()),
     tools: { ...calendarTools, ...telegramTools },
     maxSteps: 10,
@@ -93,7 +93,7 @@ export async function generateText(
 ) {
   const id = Date.now()
   return ai_generateText({
-    model: openai('gpt-4.1-mini'),
+    model: openai('gpt-5-mini'),
     system: SYSTEM_PROMPT(new Date()),
     tools: { ...calendarTools, ...telegramTools },
     maxSteps: 10,
