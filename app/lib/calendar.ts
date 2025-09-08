@@ -1,6 +1,6 @@
 import { tool } from 'ai'
 import { Redis } from '@upstash/redis'
-import z from 'zod'
+import z from 'zod/v3'
 import { colors, toDayString } from 'app/cal/data'
 import type { Event } from 'app/cal/data'
 import { revalidatePath } from 'next/cache'

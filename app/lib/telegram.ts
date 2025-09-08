@@ -1,6 +1,6 @@
 import { tool } from 'ai'
 import { Telegraf } from 'telegraf'
-import z from 'zod'
+import z from 'zod/v3'
 
 export const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN as string)
 // bot.telegram.setWebhook("https://mxstbr.com/api/telegram", {
