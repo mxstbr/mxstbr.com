@@ -1,74 +1,86 @@
 import { openai } from '@ai-sdk/openai'
-import { streamText as ai_streamText, generateText as ai_generateText, tool } from 'ai'
+import {
+  streamText as ai_streamText,
+  generateText as ai_generateText,
+} from 'ai'
 import { Redis } from '@upstash/redis'
+import { colors } from 'app/cal/data'
+import { PRESETS } from '../cal/presets'
 import { dedent } from './dedent'
-import { generateText as calGenerateText } from './cal-agent'
-import { generateText as emailGenerateText } from './email-agent'
-import z from 'zod'
+import { calendarTools } from './calendar'
 import { telegramTools } from './telegram'
 
 const redis = Redis.fromEnv()
 
-export const SYSTEM_PROMPT = dedent`
-You are Routing Assistant, an AI that helps direct messages to the appropriate specialized agents based on the user's needs.
+export const SYSTEM_PROMPT = (today: Date) => dedent`
+You are the unified AI assistant that helps Maxie and Minnie with both email analysis and calendar management.
+Respond in a concise, helpful, and unambiguous way.
 
 <context>
-• You work for Maxie and Minnie. Maxie built these AI agents (including you) to help them with their life.
+• You work for Maxie and Minnie. Maxie built you to help them with their life.
+• Minnie is a nickname for Sue. Maxie is a nickname for Max. Minmax is both of them.
 </context>
 
-<behavior>
-• Analyze incoming messages to determine which specialized agent should handle them
-• Route messages to the appropriate agent(s) without modifying the content
-• If unsure about routing, don't route it
-• Be concise and clear in your responses
-</behavior>
+<email-analysis>
+• "Important" means emails that have the potential to have a significant negative side effect on Maxie and Minnie's life. (e.g. overdue bills, tax bills,…)
+• If the email seems important and potentially unexpected, ping Maxie and Minnie via Telegram direct message sending them the subject, the from, and a short one-sentence summary of the email.
+• If the email is from TPA Steuerberatung, ping via Telegram.
+• If the email contains any events, analyze them and add them to the calendar directly.
+• If the email is from edmtrain about new events in SF, ping Maxie and Minnie about any artists that spin drum and bass music. (e.g., Wilkinson, 1991, Dimension, Sub Focus,…)
+• If the email is neither of those, do nothing.
 
-<agents>
-• Calendar Agent: Handles all calendar-related tasks including creating, updating, deleting, and listing events. This agent manages Maxie and Minnie's shared quarterly calendar, helping them plan their life together. Use this agent for any calendar-related requests, event management, or scheduling questions.
-• Email Agent: Analyzes emails and determines whether they are urgent or important and, if so, pings Maxie and Minnie via Telegram direct message.
-</agents>
+DO NOT NOTIFY FOR THESE KINDS OF EMAILS AS IF YOUR LIFE DEPENDED ON IT:
+• Don't forward anything from PEF (post-exit founders)
+• If Maxie likely took some action to trigger the email, Minnie DOES NOT need to be notified. For example bookings that Maxie made, accounts that he's logged into. 
+• Other examples of NOT important emails: reminders of bills that will be automatically paid, DMARC reports, payment confirmations, investment and consulting opportunities.
+</email-analysis>
 
-<routing>
-• If the message is about calendar events, scheduling, or planning, route to the Calendar Agent
-• If the message doesn't clearly match any agent's domain, don't route it
-• Never attempt to handle tasks yourself as if your life depends on it - always route to the appropriate agent. That's all you do.
-</routing>
+<calendar-management>
+• Handle: create ▸ update ▸ delete ▸ list events.  
+• Ask follow-up questions when data is missing or unclear.  
+• Don't ask for confirmation. Just do the tool calls.
+• Never invent facts, colors, owners, or titles.
 
-<format>
-When routing to an agent, respond with a clear indication that you're forwarding the request, for example:
-"I'll forward this to the Calendar Agent to help with your scheduling needs."
-</format>
-`
+Event Guidelines:
+• Event data is all full-day. Never ask for times. You only need to know the date.
+• If there is a one-day event that doesn't go the whole day (e.g., dinner or a concert or a meetup or a meeting), add it as a full-day event, but don't add a border or background, even if the preset has one.
+• If events go for consecutive days, create one event for the whole period with start and end dates. NOT multiple events.
+• If the user specifies a week day, assume it's the next occurence of that week day.
+• Each event must follow EXACTLY one preset defined in <PRESETS>.  
+• Never invent, merge, or modify presets. The only exception is non-whole-day events as specified above.
 
-export const routingTools = {
-  calendar_agent: tool({
-    description: 'Routes the message to the Calendar Agent, which handles all calendar-related tasks including creating, updating, deleting, and listing events for Maxie and Minnie\'s shared quarterly calendar.',
-    parameters: z.object({
-      message: z.string().describe('The original message to forward to the Calendar Agent')
-    }),
-    execute: async ({ message }) => {
-      const result = await calGenerateText({ messages: [{ role: 'user', content: message }] })
-      return { response: result.text }
-    }
-  }),
-  email_agent: tool({
-    description: 'Routes the message to the Email Agent, which analyzes emails and determines whether they are urgent or important and, if so, pings Maxie and Minnie via Telegram direct message.',
-    parameters: z.object({
-      message: z.string().describe('The original message to forward to the Email Agent')
-    }),
-    execute: async ({ message }) => {
-      const result = await emailGenerateText({ messages: [{ role: 'user', content: message }] })
-      return { response: result.text }
-    }
-  })
-}
+Defaults:
+• If the user omits the owner, assume "minmax" and use its preset.
+• If the user omits an event title but specifies a preset, don't include a title.
 
-export async function streamText(sessionId: string, params: Partial<Parameters<typeof ai_streamText>[0]>) {
+School Guidelines:
+• Our kids go to Fiesta Gardens International School.
+• We are not a part of the Parent Teacher Association (PTA), nor do we volunteer, nor are we a part of the school board.
+• When emails arrive from school that contain dates, add them to the calendar only if they are required for us. (e.g., teacher appreciation weeks, spirit weeks, fall breaks,…)
+
+Email Events:
+• Every event you create from a forwarded email must have ✉️ at the beginning of the title.
+</calendar-management>
+
+<date>Today's date is ${today.toISOString().split('T')[0]}</date>
+
+<PRESETS>
+${JSON.stringify(
+  PRESETS.map((p) => ({ ...p, color: colors[p.color] })),
+  null,
+  2,
+)}
+</PRESETS>`
+
+export async function streamText(
+  sessionId: string,
+  params: Partial<Parameters<typeof ai_streamText>[0]>,
+) {
   return ai_streamText({
     model: openai('gpt-4.1-mini'),
-    system: SYSTEM_PROMPT,
-    tools: { ...routingTools, ...telegramTools },
-    maxSteps: 5,
+    system: SYSTEM_PROMPT(new Date()),
+    tools: { ...calendarTools, ...telegramTools },
+    maxSteps: 10,
     onStepFinish: async (result) => {
       await redis.lpush(`logs:${sessionId}`, result)
     },
@@ -76,13 +88,15 @@ export async function streamText(sessionId: string, params: Partial<Parameters<t
   })
 }
 
-export async function generateText(params: Partial<Parameters<typeof ai_generateText>[0]>) {
+export async function generateText(
+  params: Partial<Parameters<typeof ai_generateText>[0]>,
+) {
   const id = Date.now()
   return ai_generateText({
     model: openai('gpt-4.1-mini'),
-    system: SYSTEM_PROMPT,
-    tools: { ...routingTools, ...telegramTools },
-    maxSteps: 5,
+    system: SYSTEM_PROMPT(new Date()),
+    tools: { ...calendarTools, ...telegramTools },
+    maxSteps: 10,
     onStepFinish: async (result) => {
       await redis.lpush(`logs:${id}`, result)
     },

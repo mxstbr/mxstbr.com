@@ -2,21 +2,27 @@
 
 import { useChat } from '@ai-sdk/react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'
 
 export default function Chat() {
   const [sessionId, setSessionId] = useState<string>('')
-  const router = useRouter();
+  const router = useRouter()
   const { messages, input, handleInputChange, handleSubmit, status } = useChat({
     maxSteps: 5,
     headers: {
-      'x-session-id': sessionId
+      'x-session-id': sessionId,
     },
     onFinish: (message) => {
-      if (message.parts?.some(part => part.type === "tool-invocation" && part.toolInvocation.toolName === "calendar_agent")) {
-        router.refresh();
+      if (
+        message.parts?.some(
+          (part) =>
+            part.type === 'tool-invocation' &&
+            part.toolInvocation.toolName.includes('event'),
+        )
+      ) {
+        router.refresh()
       }
-    }
+    },
   })
 
   useEffect(() => {
@@ -27,7 +33,7 @@ export default function Chat() {
     <div className="flex flex-col w-full h-64 mx-auto">
       <div className="flex-1 overflow-y-auto flex flex-col-reverse space-y-2 space-y-reverse p-3">
         {[...messages].reverse().map((message) => {
-          const isUser = message.role === 'user';
+          const isUser = message.role === 'user'
           return (
             <div
               key={message.id}
@@ -35,9 +41,11 @@ export default function Chat() {
             >
               <div
                 className={`max-w-xs md:max-w-md px-4 py-2 rounded-lg shadow-sm border text-sm
-                  ${isUser
-                    ? 'bg-blue-100 text-blue-900 border-blue-200 dark:bg-blue-900 dark:text-blue-100 dark:border-blue-700'
-                    : 'bg-slate-100 text-slate-900 border-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700'}
+                  ${
+                    isUser
+                      ? 'bg-blue-100 text-blue-900 border-blue-200 dark:bg-blue-900 dark:text-blue-100 dark:border-blue-700'
+                      : 'bg-slate-100 text-slate-900 border-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700'
+                  }
                 `}
               >
                 <div className="font-semibold mb-1 opacity-70 text-xs">
@@ -48,7 +56,8 @@ export default function Chat() {
                     case 'text':
                       return <div key={`${message.id}-${i}`}>{part.text}</div>
                     case 'tool-invocation':
-                      const { toolName, toolCallId, args, state } = part.toolInvocation;
+                      const { toolName, toolCallId, args, state } =
+                        part.toolInvocation
                       return (
                         <div
                           key={`${message.id}-${i}`}
@@ -59,16 +68,23 @@ export default function Chat() {
                               <div className="text-sm text-yellow-700 dark:text-yellow-200">
                                 <span className="font-medium">{toolName}</span>
                                 {state === 'result' ? (
-                                  <span className="ml-1">completed successfully</span>
+                                  <span className="ml-1">
+                                    completed successfully
+                                  </span>
                                 ) : (
                                   <span className="ml-1">in progress...</span>
                                 )}
                               </div>
                               {args && Object.keys(args).length > 0 && (
                                 <div className="mt-1 text-xs text-yellow-800 dark:text-yellow-300">
-                                  with parameters: {Object.entries(args).map(([key, value]) => (
-                                    <span key={key} className="inline-block mr-2">
-                                      <span className="font-medium">{key}</span>: {JSON.stringify(value)}
+                                  with parameters:{' '}
+                                  {Object.entries(args).map(([key, value]) => (
+                                    <span
+                                      key={key}
+                                      className="inline-block mr-2"
+                                    >
+                                      <span className="font-medium">{key}</span>
+                                      : {JSON.stringify(value)}
                                     </span>
                                   ))}
                                 </div>
@@ -86,14 +102,25 @@ export default function Chat() {
                                 <div>State: {state}</div>
                                 {args && (
                                   <div>
-                                    Args: <pre className="mt-1">{JSON.stringify(args, null, 2)}</pre>
+                                    Args:{' '}
+                                    <pre className="mt-1">
+                                      {JSON.stringify(args, null, 2)}
+                                    </pre>
                                   </div>
                                 )}
-                                {state === 'result' && 'result' in part.toolInvocation && (
-                                  <div>
-                                    Result: <pre className="mt-1">{JSON.stringify(part.toolInvocation.result, null, 2)}</pre>
-                                  </div>
-                                )}
+                                {state === 'result' &&
+                                  'result' in part.toolInvocation && (
+                                    <div>
+                                      Result:{' '}
+                                      <pre className="mt-1">
+                                        {JSON.stringify(
+                                          part.toolInvocation.result,
+                                          null,
+                                          2,
+                                        )}
+                                      </pre>
+                                    </div>
+                                  )}
                               </div>
                             </div>
                           </details>
@@ -103,11 +130,14 @@ export default function Chat() {
                 })}
               </div>
             </div>
-          );
+          )
         })}
       </div>
 
-      <form onSubmit={handleSubmit} className="border-t border-slate-200 dark:border-slate-700 w-full">
+      <form
+        onSubmit={handleSubmit}
+        className="border-t border-slate-200 dark:border-slate-700 w-full"
+      >
         <input
           className="w-full p-3 bg-transparent dark:bg-transparent text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:outline-none border-none shadow-none rounded-none"
           style={{ boxShadow: 'none', border: 'none' }}
