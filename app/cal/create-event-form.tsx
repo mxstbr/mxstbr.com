@@ -98,7 +98,7 @@ export default function CreateEventForm({
                     : 'bg-white dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-600'
                 }`}
               >
-                AI
+                Clippy
               </button>
               <button
                 type="button"
@@ -126,7 +126,10 @@ export default function CreateEventForm({
           {activeTab === 'chat' ? (
             <Chat />
           ) : (
-            <form action={clientAction} className="flex flex-col gap-4 px-3 pb-3">
+            <form
+              action={clientAction}
+              className="flex flex-col gap-4 px-3 pb-3"
+            >
               <div className="flex flex-row items-stretch justify-between gap-2">
                 <div>
                   <label

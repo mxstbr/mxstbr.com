@@ -18,11 +18,7 @@ export default function Chat() {
       },
     }),
     onFinish: ({ message }) => {
-      console.log('Finish')
-      console.log(message)
-      console.log(message.parts.some((part) => part.type.includes('event')))
       if (message.parts.some((part) => part.type.includes('event'))) {
-        console.log('REFRESH')
         router.refresh()
       }
     },
@@ -39,7 +35,7 @@ export default function Chat() {
   return (
     <div className="flex flex-col w-full h-64 mx-auto">
       <div className="flex-1 overflow-y-auto flex flex-col-reverse space-y-2 space-y-reverse p-3">
-        {[...messages].reverse().map((message) => {
+        {[...messages].reverse().map((message, index) => {
           const isUser = message.role === 'user'
           return (
             <div
@@ -55,6 +51,7 @@ export default function Chat() {
                   }
                 `}
               >
+                {!isUser && <strong>Clippy</strong>}
                 {message.parts.map((part, i) => {
                   switch (part.type) {
                     case 'text':
@@ -82,33 +79,23 @@ export default function Chat() {
                       return null
                   }
                 })}
+                {index === 0 && !isUser && status === 'streaming' && (
+                  <div className="flex space-x-1 mt-2">
+                    <div className="w-2 h-2 bg-slate-600 rounded-full animate-bounce"></div>
+                    <div
+                      className="w-2 h-2 bg-slate-600 rounded-full animate-bounce"
+                      style={{ animationDelay: '0.1s' }}
+                    ></div>
+                    <div
+                      className="w-2 h-2 bg-slate-600 rounded-full animate-bounce"
+                      style={{ animationDelay: '0.2s' }}
+                    ></div>
+                  </div>
+                )}
               </div>
             </div>
           )
         })}
-
-        {status === 'streaming' && (
-          <div className="flex justify-start">
-            <div className="max-w-xs md:max-w-md px-4 py-2 rounded-lg shadow-sm border text-sm bg-slate-100 text-slate-900 border-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700">
-              <div className="flex items-center space-x-1">
-                <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-slate-600 rounded-full animate-bounce"></div>
-                  <div
-                    className="w-2 h-2 bg-slate-600 rounded-full animate-bounce"
-                    style={{ animationDelay: '0.1s' }}
-                  ></div>
-                  <div
-                    className="w-2 h-2 bg-slate-600 rounded-full animate-bounce"
-                    style={{ animationDelay: '0.2s' }}
-                  ></div>
-                </div>
-                <span className="text-xs text-slate-500">
-                  AI is thinking...
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       <form
