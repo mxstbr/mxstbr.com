@@ -1,5 +1,5 @@
 import { openai } from '@ai-sdk/openai'
-import { generateText, streamText } from 'ai'
+import { generateText, stepCountIs, streamText } from 'ai'
 import { Redis } from '@upstash/redis'
 import { colors } from 'app/cal/data'
 import { PRESETS } from '../cal/presets'
@@ -36,6 +36,7 @@ DO NOT NOTIFY FOR THESE KINDS OF EMAILS AS IF YOUR LIFE DEPENDED ON IT:
 • Handle: create ▸ update ▸ delete ▸ list events.  
 • Ask follow-up questions when data is missing or unclear.  
 • Don't ask for confirmation. Just do the tool calls.
+• Always finish your message with a single-sentence summary of the result.
 • Never invent facts, colors, owners, or titles.
 
 Event Guidelines:
@@ -45,6 +46,7 @@ Event Guidelines:
 • If the user specifies a week day, assume it's the next occurence of that week day.
 • Each event must follow EXACTLY one preset defined in <PRESETS>.  
 • Never invent, merge, or modify presets. The only exception is non-whole-day events as specified above.
+• To delete events, you have to first read the events for that time and then pass the full data of the event to delete.
 
 Defaults:
 • If the user omits the owner, assume "minmax" and use its preset.
@@ -77,7 +79,7 @@ const clippyAgentConfig = {
     ...calendarTools,
     ...telegramTools,
   },
-  maxSteps: 10,
+  stopWhen: stepCountIs(10),
 } as const
 
 export async function clippyStreamText(
@@ -89,6 +91,7 @@ export async function clippyStreamText(
   return streamText({
     ...clippyAgentConfig,
     messages: params.messages,
+
     onStepFinish: async (result) => {
       await redis.lpush(`logs:${sessionId}`, result)
     },

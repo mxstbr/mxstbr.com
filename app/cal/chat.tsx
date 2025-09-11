@@ -17,6 +17,15 @@ export default function Chat() {
         'x-session-id': sessionId,
       },
     }),
+    onFinish: ({ message }) => {
+      console.log('Finish')
+      console.log(message)
+      console.log(message.parts.some((part) => part.type.includes('event')))
+      if (message.parts.some((part) => part.type.includes('event'))) {
+        console.log('REFRESH')
+        router.refresh()
+      }
+    },
   })
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -29,8 +38,8 @@ export default function Chat() {
 
   return (
     <div className="flex flex-col w-full h-64 mx-auto">
-      <div className="flex-1 overflow-y-auto flex flex-col space-y-2 space-y-reverse p-3">
-        {[...messages].map((message) => {
+      <div className="flex-1 overflow-y-auto flex flex-col-reverse space-y-2 space-y-reverse p-3">
+        {[...messages].reverse().map((message) => {
           const isUser = message.role === 'user'
           return (
             <div
@@ -61,6 +70,12 @@ export default function Chat() {
                             <div className="text-xs font-medium mb-1">
                               🔧 Tool Call: {part.type.replace('tool-', '')}
                             </div>
+                            <details>
+                              <summary>View details</summary>
+                              <pre>
+                                <code>{JSON.stringify(part, null, 2)}</code>
+                              </pre>
+                            </details>
                           </div>
                         )
                       }
