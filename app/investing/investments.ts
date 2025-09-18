@@ -96,10 +96,10 @@ export const investments = [
   },
 
   {
-    name: 'DX (acq. by Atlassian for $1B)',
+    name: 'DX (acq. by Atlassian)',
     description: 'the developer experience platform',
     href: 'https://techcrunch.com/2025/09/18/atlassian-acquires-dx-a-developer-productivity-platform-for-1b/',
-    subtext: 'Seed',
+    subtext: 'Seed → $1B acquisition',
   },
 
   {
