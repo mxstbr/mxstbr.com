@@ -23,13 +23,6 @@ export const investments = [
   },
 
   {
-    name: 'DX',
-    description: 'the developer experience platform',
-    href: 'https://getdx.com',
-    subtext: 'Seed',
-  },
-
-  {
     name: 'Clerk',
     description: 'a complete suite to authenticate and manage users',
     href: 'https://clerk.com',
@@ -100,6 +93,13 @@ export const investments = [
     description: 'an AI tool to extract signal from noise',
     href: 'https://storytell.ai',
     subtext: 'Seed'
+  },
+
+  {
+    name: 'DX (acq. by Atlassian for $1B)',
+    description: 'the developer experience platform',
+    href: 'https://techcrunch.com/2025/09/18/atlassian-acquires-dx-a-developer-productivity-platform-for-1b/',
+    subtext: 'Seed',
   },
 
   {
