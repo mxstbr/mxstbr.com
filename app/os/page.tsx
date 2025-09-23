@@ -117,6 +117,7 @@ export default function OsPage() {
     { name: 'Reminders', href: '/reminder', icon: '/static/images/windows_98_icons/address_book-0.png' },
     { name: 'Todos', href: '/todos', icon: '/static/images/windows_98_icons/cardfile-0.png' },
     { name: 'Clippy', href: '/clippy', icon: '/static/images/windows_98_icons/clippy.webp' },
+    { name: 'Blip', href: 'https://blip.mxstbr.com', icon: '/static/images/windows_98_icons/computer_taskmgr-0.png' },
   ]
 
   const openWindow = (app: { name: string; href: string; icon: string }) => {
