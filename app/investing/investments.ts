@@ -47,6 +47,13 @@ export const investments = [
   },
 
   {
+    name: 'Flox',
+    description: 'a development environment toolchain based on Nix',
+    href: 'https://flox.dev',
+    subtext: 'Series B',
+  },
+  
+  {
     name: 'Liveblocks',
     description: 'a toolchain to build real-time collaborative products',
     href: 'https://liveblocks.io',
