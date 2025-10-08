@@ -8,15 +8,30 @@ import { revalidatePath } from 'next/cache'
 const redis = Redis.fromEnv()
 
 // Shared schema describing a calendar event
-const eventSchema = z.object({
-  start: z.string(),
-  end: z.string(),
-  color: z.string(),
-  label: z.string().optional().nullable(),
-  border: z.string().optional().nullable(),
-  background: z.string().optional().nullable(),
-  labelSize: z.literal('small').optional(),
-})
+const eventSchema = z
+  .object({
+    start: z.string(),
+    end: z.string(),
+    color: z.string(),
+    label: z.string().optional().nullable(),
+    border: z.string().optional().nullable(),
+    background: z.string().optional().nullable(),
+    labelSize: z.literal('small').optional(),
+  })
+  .superRefine((val, ctx) => {
+    const hasLabel = val.label != null
+    const hasBorder = val.border != null
+    const hasBackground = val.background != null
+    if (!hasLabel && !hasBorder && !hasBackground) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'At least one (or more) of `label`, `border`, or `background` is required',
+        path: [
+          !hasLabel ? 'label' : !hasBorder ? 'border' : 'background',
+        ],
+      })
+    }
+  })
 
 // Define the calendar tools
 export const calendarTools = {
