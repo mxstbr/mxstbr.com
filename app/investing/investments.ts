@@ -23,8 +23,16 @@ export const investments = [
   },
 
   {
+    name: 'Zed',
+    description: 'a high-performance, AI native code editor',
+    href: 'https://zed.dev',
+    // https://x.com/zeddotdev/status/1958174635779903909
+    subtext: 'Seed -> $32M Series B led by Sequoia',
+  },
+
+  {
     name: 'Clerk',
-    description: 'a complete suite to authenticate and manage users',
+    description: 'an authentication platform and user management platform',
     href: 'https://clerk.com',
     //https://clerk.com/blog/series-b
     subtext: 'Seed -> $30M Series B led by CRV'
@@ -39,11 +47,10 @@ export const investments = [
   },
 
   {
-    name: 'Zed',
-    description: 'a high-performance, multiplayer code editor',
-    href: 'https://zed.dev',
-    // https://x.com/zeddotdev/status/1958174635779903909
-    subtext: 'Seed -> $32M Series B led by Sequoia',
+    name: 'Arcjet',
+    description: 'a security layer for Node.js',
+    href: 'https://arcjet.com',
+    subtext: 'Seed → $8.3M Series A led by Plural'
   },
 
   {
@@ -58,13 +65,6 @@ export const investments = [
     description: 'a toolchain to build real-time collaborative products',
     href: 'https://liveblocks.io',
     subtext: 'Seed',
-  },
-
-  {
-    name: 'Arcjet',
-    description: 'a security layer for Node.js',
-    href: 'https://arcjet.com',
-    subtext: 'Seed'
   },
 
   {
