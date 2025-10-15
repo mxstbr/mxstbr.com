@@ -16,7 +16,7 @@ export const investments = [
 
   {
     name: 'Clerk',
-    description: 'an authentication platform and user management platform',
+    description: 'an authentication and user management platform',
     href: 'https://clerk.com',
     // https://x.com/ClerkDev/status/1978499565406843393
     subtext: 'Seed -> $50M Series C led by Menlo & Anthropic'
