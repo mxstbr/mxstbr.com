@@ -15,6 +15,14 @@ export const investments = [
   },
 
   {
+    name: 'Clerk',
+    description: 'an authentication platform and user management platform',
+    href: 'https://clerk.com',
+    // https://x.com/ClerkDev/status/1978499565406843393
+    subtext: 'Seed -> $50M Series C led by Menlo & Anthropic'
+  },
+
+  {
     name: 'Raycast',
     description: 'an extensible MacOS launcher',
     href: 'https://raycast.com',
@@ -28,14 +36,6 @@ export const investments = [
     href: 'https://zed.dev',
     // https://x.com/zeddotdev/status/1958174635779903909
     subtext: 'Seed -> $32M Series B led by Sequoia',
-  },
-
-  {
-    name: 'Clerk',
-    description: 'an authentication platform and user management platform',
-    href: 'https://clerk.com',
-    //https://clerk.com/blog/series-b
-    subtext: 'Seed -> $30M Series B led by CRV'
   },
 
   {
