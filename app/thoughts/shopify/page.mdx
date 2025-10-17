@@ -1,0 +1,145 @@
+import BlogPost from '../blogpost'
+
+export const meta = {
+  state: 'draft',
+  publishedAt: '2025-10-27',
+  title: 'Reflections on Shopify',
+  summary:
+    "When I joined Shopify, I thought I'd hate working there. But it turns out, I loved it. Here is why.",
+  views: 0,
+}
+
+import { generateMeta } from '../blogpost'
+export const generateMetadata = generateMeta(meta)
+
+<BlogPost meta={meta}>
+
+When Shopify acquired Stellate, I was afraid I would hate working there. I had been a founder for most of my career and was worried about losing autonomy at a big company.
+
+Turns out, **I absolutely loved it.**
+
+Shopify defies almost everything you expect from a "big company." Let me explain why.
+
+_I'm writing this as I'm leaving Shopify. Not because I wanted to leave, but because I got the opportunity to join OpenAI to work on ChatGPT, and I couldn't say no._
+
+## Surprisingly small company
+
+Shopify had 8,100 employees (last reported) and powered $250 billion in <abbr title="Gross Merchandise Volume">GMV</abbr> last year. That is **$30.8 million GMV per employee**.
+
+For comparison, estimates suggest Amazon has around 70,000 employees working on e-commerce (_excluding_ fulfillment, AWS, physical stores, support, devices... to make it somewhat comparable to Shopify) powering an estimated $800 billion in GMV last year. That comes out to $11.5 million GMV per employee — **less than half of Shopify's ratio**.
+
+Shopify is also consistently growing 25-30% year over year. That's ridiculous pace for a $200B market cap company.
+
+What this means in practice: **there is way more to do than Shopify has people for.**
+
+Everybody is stretched thin. Nobody has time for politics or ego. People only care about making the best product decision because there is too much work to waste time on anything else. It's very startup-like in that way.
+
+## Founder mode
+
+Tobi runs Shopify in what Paul Graham calls ["founder mode"](http://www.paulgraham.com/foundermode.html).
+
+Every six weeks he reviews every single project in the company with his exec team and gives feedback on each one, making sure we don't get stuck in local maximas and are making the right decisions.
+
+It's intense. For everybody. But it's a big part of the reason why the quality of Shopify's products and decision-making is so high.
+
+## Big changes? Fuck it, ship it
+
+When Shopify decides to make a big change, they just do it and deal with the consequences. When they decided to move to a monorepo, they did not spend months planning it out. They just did it.
+
+Another example: in April 2025, Tobi issued an internal memo declaring that AI usage is now a baseline expectation. Before requesting additional headcount, teams must first demonstrate why AI cannot achieve their objectives. AI proficiency became part of performance reviews. The entire company shifted to becoming AI-native practically overnight.
+
+That is how **Shopify moves much faster than most big companies**: make the changes, then deal with the consequences, instead of planning for the consequences before making the changes.
+
+Of course, this also means more pain for employees. Moving to a monorepo was not a smooth process. Becoming AI-native required everyone to change how they work. But the alternative, endless planning and coordination,,,,,,,, would have taken years… and probably never happened.
+
+## Get shit done > process
+
+As I was onboarding I reached out to Kaz and asked him how to be successful at Shopify as a former founder. He told me the following:
+
+> Your #1 Job is get shit done.
+> Your #2 Job is update the system so you can do more of #1.
+> Don't do #2 before you've done #1.
+
+That mindset permeates the company. Process exists to serve shipping, not the other way around. If a process gets in the way, you change it or ignore it. Getting shit done is more important than all else.
+
+## Building the best product > making more money
+
+One of the first slides you see during onboarding says:
+
+> 1. Build the best product
+> 2. Make more money, so we can do more of 1.  
+>    **Never reverse the order.**
+
+This is not just a nice slide. This is how decisions get made. In some ways, this is a painful decision to make, because I'm sure Shopify could squeeze out a lot more revenue in the short-term if they prioritized 2 above 1.
+
+But Tobi isn't playing to win the short-term game. He's playing to build a generational company that will be around for decades to come.
+
+It sounds simple, but most companies do not operate this way once they reach a certain size because more money is so tempting. But Shopify does.
+
+## The ~Mastery system
+
+Shopify's performance review system is called "[~Mastery](https://www.shopify.com/news/mastery)" and it is one of the most well-designed systems I have seen.
+
+It is remarkably fair and data-driven. The system uses peer-based calibration to validate manager ratings, which means your rating is ultimately determined by what your peers think of your impact, not just one manager's (likely biased) opinion.
+
+This makes it nearly impossible to game. You cannot be good at managing up and coast. Your peers know who actually did the work. They are much harder to fool than a manager.
+
+## Extremely long employee tenure is the reason Shopify can build the best platform
+
+The median tenure of my engineering team was **over four years**. 🤯
+
+At most tech companies, people leave after 18 months, so you can't have them spend a year learning about all the nooks and crannies of a massive platform. That's how you end up with microservices: onboarding onto one isolated area is much faster so you can make that short tenure work.
+
+At Shopify, people stick around. This means engineers having to spend a year learning the system before becoming fully productive, which is a requirement if you're building one big monolithic platform (which is the best user experience, by the way), is fine.
+
+## Hiring spiky objects
+
+Shopify intentionally hires "spiky objects": people who are exceptional at one thing, even if they are not so great at others.
+
+This philosophy starts at the top. Tobi is a spiky object and hires people around him to complement his weaknesses. Harley, for example, brings skills Tobi does not have. The entire leadership team is built this way.
+
+Most companies try to hire "well-rounded" people. Shopify optimizes for exceptional ability in one dimension, then builds teams that cover each other's gaps. It works remarkably well.
+
+## Reliability above all else
+
+Reliability is Shopify's #1 priority. Shopify powers millions of online stores. When Shopify goes down, those merchants cannot make sales. Literally their business goes down when Shopify goes down.
+
+Shopify spends a lot of effort on making their systems more reliable all the time. When Mikhail, the CTO, joined he took this to a whole new level with intense rigor, and Shopify's merchants have greatly benefited from it.
+
+## Launching Horizon
+
+The best way to describe what working at Shopify feels like is to tell you about launching Horizon.
+
+Six months ago, Ben Sehl and I set a ridiculously audacious goal: ship Horizon, a new flagship theme, and all the new platform features needed to make it possible, by the Summer Edition in May. 😱
+
+This was a complete rework of how merchants build their online stores. Not a small thing.
+
+When we first met the Liquid team, we immediately realized how deeply everybody cares about making Liquid Storefronts better. We knew we had a shot at making the deadline — but it was going to be close.
+
+We got to work. Got visibility into who is working on what. Simplified every process. Refactored the team structure. Iterated on roadmaps and project scopes. Put the right people in the right seats. Wrote tons of code.
+
+And we turned up the heat. Brought pressure. Brought intensity. To every. single. day.
+
+How did the team respond? **They showed the fuck up for it.** 🔥
+
+We went from shipping 2,500 pull requests in all of last year to shipping **2,500 pull requests in just three months**. We went from finishing three projects in Q3 to finishing **fifteen projects each in Q4 and Q1**. 🤯
+
+We did not just ship Horizon on time. We shipped Horizon, all the necessary theme platform improvements to make it possible, dozens of other improvements throughout the editor (copy & paste anybody?!), and even squeezed in major bonus features including a new skeleton theme for developers and AI block generation.
+
+And yet, Horizon is barely the beginning.
+
+This is what happens when you combine incredible people with clear focus and intense pressure. It was exhausting and exhilarating in equal measure.
+
+## Final thoughts
+
+Looking back, I am grateful I took the leap to join Shopify. I learned what it looks like when a large company still operates like a startup in the ways that matter.
+
+Most importantly, I got to work with exceptional people who care deeply about building the best product. That is worth more than anything else.
+
+If you are a founder and feeling stuck, you should consider joining one of the handful of companies that still operate this way. You will learn things you cannot learn anywhere else.
+
+---
+
+_Thanks to Ben, Kaz, and the entire Liquid team for an incredible year. Working with you was the privilege of a lifetime._
+
+</BlogPost>
