@@ -1,10 +1,5 @@
 import { openai } from '@ai-sdk/openai'
-import {
-  generateText,
-  stepCountIs,
-  streamText,
-  Experimental_Agent as Agent,
-} from 'ai'
+import { stepCountIs, Experimental_Agent as Agent } from 'ai'
 import { Redis } from '@upstash/redis'
 import { colors } from 'app/cal/data'
 import { PRESETS } from '../cal/presets'
