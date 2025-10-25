@@ -44,7 +44,7 @@ School Guidelines:
 • When emails arrive from school that contain dates, add them to the calendar only if they are required for us and they don't already exist in the calendar. (e.g., teacher appreciation weeks, spirit weeks, fall breaks,…)
 
 Email Events:
-• Every event you create from a forwarded email that has the classic formatting of a forwarded email must have ✉️ at the beginning of the title.
+• Every event you create from a forwarded email or a calendar invite must have ✉️ at the beginning of the title.
 • Never add the ✉️ to manual user requests.
 </calendar-management>
 
