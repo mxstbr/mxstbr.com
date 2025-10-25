@@ -1,4 +1,4 @@
-import { clippyStreamText } from '../../lib/clippy-agent'
+import { clippy } from '../../lib/clippy-agent'
 import { isMax } from 'app/auth'
 import { convertToModelMessages } from 'ai'
 
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
   // Convert UIMessages from frontend to ModelMessages for AI SDK
   const modelMessages = convertToModelMessages(messages)
 
-  const result = await clippyStreamText(sessionId, { messages: modelMessages })
+  const result = await clippy.stream({ messages: modelMessages })
 
   return result.toUIMessageStreamResponse({
     originalMessages: messages, // Pass original messages to prevent duplicates

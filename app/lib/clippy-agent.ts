@@ -1,5 +1,10 @@
 import { openai } from '@ai-sdk/openai'
-import { generateText, stepCountIs, streamText } from 'ai'
+import {
+  generateText,
+  stepCountIs,
+  streamText,
+  Experimental_Agent as Agent,
+} from 'ai'
 import { Redis } from '@upstash/redis'
 import { colors } from 'app/cal/data'
 import { PRESETS } from '../cal/presets'
@@ -58,44 +63,15 @@ ${JSON.stringify(
 )}
 </PRESETS>`
 
-// Agent configuration - using modern AI SDK patterns
-const clippyAgentConfig = {
+export const clippy = new Agent({
   model: openai('gpt-4o-mini'),
   system: SYSTEM_PROMPT(new Date()),
   tools: {
     ...calendarTools,
     ...telegramTools,
   },
-  stopWhen: stepCountIs(10),
-} as const
-
-export async function clippyStreamText(
-  sessionId: string,
-  params: {
-    messages: any[]
+  onStepFinish: async (result) => {
+    await redis.lpush(`logs:${result.response.id}`, result)
   },
-) {
-  return streamText({
-    ...clippyAgentConfig,
-    messages: params.messages,
-
-    onStepFinish: async (result) => {
-      await redis.lpush(`logs:${sessionId}`, result)
-    },
-  })
-}
-
-export async function clippyGenerateText(
-  params:
-    | { messages: any[]; prompt?: never }
-    | { prompt: string; messages?: never },
-) {
-  const id = Date.now()
-  return generateText({
-    ...clippyAgentConfig,
-    ...params,
-    onStepFinish: async (result) => {
-      await redis.lpush(`logs:${id}`, result)
-    },
-  })
-}
+  stopWhen: stepCountIs(10),
+})

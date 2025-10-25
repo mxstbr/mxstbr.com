@@ -1,6 +1,6 @@
 import twilio from 'twilio'
 import { NextResponse } from 'next/server'
-import { clippyGenerateText } from 'app/lib/clippy-agent'
+import { clippy } from 'app/lib/clippy-agent'
 
 const { MessagingResponse } = twilio.twiml
 
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
   const params = new URLSearchParams(rawBody)
   const messageBody = params.get('Body') || ''
 
-  const aiResult = await clippyGenerateText({
+  const aiResult = await clippy.generate({
     messages: [
       {
         role: 'system',
