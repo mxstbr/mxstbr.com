@@ -132,6 +132,16 @@ function Quarter(props: {
   )
 }
 
+// Event segment represents a portion of an event within a single week
+type EventSegment = {
+  event: Event
+  startDayIndex: number // 0-6 (Monday-Sunday) within the week
+  endDayIndex: number // 0-6 (Monday-Sunday) within the week
+  track: number // Vertical position (0 = top, 1 = below, etc.)
+  isStart: boolean // Is this the actual start of the event?
+  isEnd: boolean // Is this the actual end of the event?
+}
+
 function Week(props: {
   startDate: ISODateDayString
   endDate: ISODateDayString
@@ -167,8 +177,17 @@ function Week(props: {
   // Ensure we don't exceed 7 days total in a week
   const daysToShow = Math.min(daysBetween, DAYS_PER_WEEK - prefixDays)
 
+  // Calculate event segments for this week
+  const eventSegments = calculateEventSegments(
+    props.events,
+    props.startDate,
+    props.endDate,
+    prefixDays,
+    daysToShow,
+  )
+
   return (
-    <div className="flex flex-row">
+    <div className="relative flex flex-row">
       {/* Render empty cells for days before the start date */}
       {Array.from({ length: prefixDays }).map((_, idx) => (
         <DayWrapper key={`prefix-${idx}`} />
@@ -191,6 +210,9 @@ function Week(props: {
         Array.from({ length: suffixDays }).map((_, idx) => (
           <DayWrapper key={`suffix-${idx}`} />
         ))}
+
+      {/* Render event overlays on top of the week */}
+      <EventOverlays segments={eventSegments} prefixDays={prefixDays} />
     </div>
   )
 }
@@ -212,80 +234,31 @@ function Day(props: {
       (isAfterDay(props.day, event.start) && isBeforeDay(props.day, event.end)),
   )
 
-  let borders = dayEvents
-    .filter((event) => !!event.border)
-    .reduce(
-      (borders, event) => {
-        let { top, bottom, left, right } = borders
+  // Month divider borders - still needed for structure
+  let borders = { top: [], bottom: [], left: [], right: [] } as BorderProps
 
-        // TOP border: If 7 days ago isn't in the same event
-        if (
-          !isWithinInterval(subDays(props.day, 7), {
-            start: event.start,
-            end: event.end,
-          })
-        ) {
-          top.push(event.color)
-        }
-
-        // LEFT border: is first in event
-        // TODO: Only render first in row if event doesn't "connect" visually to previous week
-        if (isEqualDay(props.day, event.start)) {
-          left.push(event.color)
-        }
-
-        // BOTTOM border: if in 7 days  isn't in the same event
-        if (
-          !isWithinInterval(addDays(props.day, 7), {
-            start: event.start,
-            end: event.end,
-          })
-        ) {
-          bottom.push(event.color)
-        }
-
-        // RIGHT border: is last in event
-        // TODO: Only render lsat in row if event doesn't "connect" visually to next week
-        if (isEqualDay(props.day, event.end)) {
-          right.push(event.color)
-        }
-
-        return {
-          top,
-          bottom,
-          left,
-          right,
-        }
-      },
-      { top: [], bottom: [], left: [], right: [] } as BorderProps,
-    )
-
-  // Month divider borders
   if (
-    borders.right.length === 0 &&
     isLastDayOfMonth(props.day) &&
     props.index !== 6 &&
     !props.isEndOfQuarter
   ) {
-    borders.right = [...borders.right, 'black']
+    borders.right = ['black']
   }
-  if (
-    borders.left.length === 0 &&
-    props.isStartOfQuarter &&
-    isFirstDayOfMonth(props.day)
-  ) {
-    borders.left = [...borders.left, 'black']
+  if (props.isStartOfQuarter && isFirstDayOfMonth(props.day)) {
+    borders.left = ['black']
   }
-  if (borders.top.length === 0 && dayOfTheMonth <= 7) {
-    // TODO: End of month border needs to be border-bottom
-    borders.top = [...borders.top, 'black']
+  if (dayOfTheMonth <= 7) {
+    borders.top = ['black']
   }
 
   return (
     <DayWrapper
       style={{
         background: dayEvents
-          .filter((evt) => !!evt.background && !!patterns[evt.background])
+          .filter(
+            (evt) =>
+              !evt.label && !!evt.background && !!patterns[evt.background],
+          )
           .map((evt) => patterns[evt.background](evt.color, 0.5))
           .join(', '),
       }}
@@ -293,7 +266,7 @@ function Day(props: {
       <div
         className={`absolute bottom-0 left-0 right-0 top-0 flex flex-col justify-between p-2 box-border ${isPast(props.day) && !isToday(props.day) ? 'opacity-20' : ''}`}
       >
-        {/* Borders */}
+        {/* Month divider borders only */}
         <Borders {...borders} />
 
         {/* Day number */}
@@ -320,61 +293,6 @@ function Day(props: {
             )}
           </span>
         </span>
-
-        {/* Modified Labels section */}
-        {/* Single day events render at the bottom */}
-        {dayEvents
-          .filter(
-            (evt) =>
-              evt.label && 
-              isMiddleDayOfLongestWeekInInterval(evt, props.day) && 
-              evt.labelSize === 'small'
-          )
-          .map((evt) => {
-            const eventId = createEventId(evt)
-            return (
-              <a
-                key={evt.label}
-                href={`#${eventId}`}
-                className="text-xs font-semibold no-underline"
-                style={{
-                  color: evt.color,
-                }}
-              >
-                {evt.label}
-              </a>
-            )
-          })}
-          
-        {/* Multi-day events in one container */}
-        <div className="absolute top-8 z-10 w-full flex flex-col items-center">
-          {dayEvents
-            .filter(
-              (evt) =>
-                evt.label && 
-                isMiddleDayOfLongestWeekInInterval(evt, props.day) && 
-                evt.labelSize !== 'small'
-            )
-            .map((evt) => {
-              const eventId = createEventId(evt)
-              return (
-                <a
-                  key={evt.label}
-                  href={`#${eventId}`}
-                  className={`no-underline w-max text-center font-medium ${
-                    isWeekEventDaysEven(evt, props.day)
-                      ? 'self-end mr-[-8px]'
-                      : 'self-center'
-                  }`}
-                  style={{
-                    color: evt.color,
-                  }}
-                >
-                  {evt.label}
-                </a>
-              )
-            })}
-        </div>
       </div>
     </DayWrapper>
   )
@@ -634,4 +552,181 @@ const arr = (length: number) => {
   // Ensure length is a positive integer
   const safeLength = Math.max(0, Math.floor(length))
   return new Array(safeLength).fill(undefined)
+}
+
+/**
+ * Calculate event segments for a given week
+ * An event might span multiple weeks, so we only calculate the portion visible in this week
+ */
+function calculateEventSegments(
+  events: Array<Event>,
+  weekStartDate: ISODateDayString,
+  weekEndDate: ISODateDayString,
+  prefixDays: number,
+  daysToShow: number,
+): Array<EventSegment> {
+  // Filter events that overlap with this week and have labels (only show bars for labeled events)
+  const weekEvents = events.filter(
+    (event) =>
+      event.label &&
+      !(
+        isAfterDay(event.start, weekEndDate) ||
+        isBeforeDay(event.end, weekStartDate)
+      ),
+  )
+
+  // Create segments for each event
+  const segments: Array<Omit<EventSegment, 'track'>> = weekEvents.map(
+    (event) => {
+      // Calculate which day indices this event spans within the week
+      // Start day: either the event start or the week start, whichever is later
+      const segmentStart = isBeforeDay(event.start, weekStartDate)
+        ? weekStartDate
+        : event.start
+
+      // End day: either the event end or the week end, whichever is earlier
+      const segmentEnd = isAfterDay(event.end, weekEndDate)
+        ? weekEndDate
+        : event.end
+
+      // Calculate day indices (0-based from the first actual day shown)
+      const startDayIndex = differenceInCalendarDays(
+        segmentStart,
+        weekStartDate,
+      )
+      const endDayIndex = differenceInCalendarDays(segmentEnd, weekStartDate)
+
+      return {
+        event,
+        startDayIndex,
+        endDayIndex,
+        isStart: isEqualDay(segmentStart, event.start),
+        isEnd: isEqualDay(segmentEnd, event.end),
+      }
+    },
+  )
+
+  // Assign tracks (vertical positions) to segments
+  // Sort by start day, then by length (longer events first)
+  const sortedSegments = [...segments].sort((a, b) => {
+    if (a.startDayIndex !== b.startDayIndex) {
+      return a.startDayIndex - b.startDayIndex
+    }
+    return b.endDayIndex - b.startDayIndex - (a.endDayIndex - a.startDayIndex)
+  })
+
+  // Track assignment: ensure overlapping events get different tracks
+  const segmentsWithTracks: Array<EventSegment> = []
+
+  for (const segment of sortedSegments) {
+    // Find the lowest available track for this segment
+    let track = 0
+    let trackAvailable = false
+
+    while (!trackAvailable) {
+      // Check if this track is available for the entire duration of the segment
+      const overlaps = segmentsWithTracks.some(
+        (s) =>
+          s.track === track &&
+          !(
+            s.endDayIndex < segment.startDayIndex ||
+            s.startDayIndex > segment.endDayIndex
+          ),
+      )
+
+      if (!overlaps) {
+        trackAvailable = true
+      } else {
+        track++
+      }
+    }
+
+    segmentsWithTracks.push({ ...segment, track })
+  }
+
+  return segmentsWithTracks
+}
+
+/**
+ * Render event overlays on top of a week
+ */
+function EventOverlays(props: {
+  segments: Array<EventSegment>
+  prefixDays: number
+}) {
+  if (props.segments.length === 0) return null
+
+  // Group segments by event to find the longest segment for label placement
+  const segmentsByEvent = new Map<string, Array<EventSegment>>()
+  props.segments.forEach((segment) => {
+    const eventId = createEventId(segment.event)
+    if (!segmentsByEvent.has(eventId)) {
+      segmentsByEvent.set(eventId, [])
+    }
+    segmentsByEvent.get(eventId)!.push(segment)
+  })
+
+  return (
+    <>
+      {props.segments.map((segment, idx) => {
+        const eventId = createEventId(segment.event)
+        const dayWidth = 100 / 7 // Each day is 1/7th of the week width
+
+        // Calculate position and width as percentages
+        const leftPercent =
+          (props.prefixDays + segment.startDayIndex) * dayWidth
+        const segmentDays = segment.endDayIndex - segment.startDayIndex + 1
+        const widthPercent = segmentDays * dayWidth
+
+        // Check if this is a single-day event
+        const isSingleDay = segmentDays === 1
+        const isSmallEvent = segment.event.labelSize === 'small'
+
+        // Calculate top position based on track
+        // Single-day events positioned lower, multi-day events start higher
+        const topPx =
+          isSingleDay || isSmallEvent
+            ? 64 + segment.track * 22
+            : 32 + segment.track * 26
+
+        // Determine if this segment should show the label
+        // Show label on the longest segment of this event
+        const allSegmentsForEvent = segmentsByEvent.get(eventId)!
+        const longestSegment = allSegmentsForEvent.reduce((longest, seg) => {
+          const segDays = seg.endDayIndex - seg.startDayIndex + 1
+          const longestDays = longest.endDayIndex - longest.startDayIndex + 1
+          return segDays > longestDays ? seg : longest
+        }, allSegmentsForEvent[0])
+
+        const shouldShowLabel =
+          segment === longestSegment && segment.event.label && segmentDays >= 1 // Show label if at least 1 day
+
+        // Adjust styling for single-day events
+        const heightClass = isSingleDay || isSmallEvent ? 'h-5' : 'h-6'
+        const textClass =
+          isSingleDay || isSmallEvent ? 'text-[10px]' : 'text-xs'
+
+        return (
+          <a
+            key={`${eventId}-${idx}`}
+            href={`#${eventId}`}
+            className={`absolute ${heightClass} rounded flex items-center ${textClass} font-semibold no-underline transition-opacity hover:opacity-90 px-2 shadow-sm`}
+            style={{
+              left: `${leftPercent}%`,
+              width: `${widthPercent}%`,
+              top: `${topPx}px`,
+              backgroundColor: segment.event.color,
+              color: 'white',
+              opacity: 0.9,
+              minWidth: '8px',
+            }}
+          >
+            {shouldShowLabel && (
+              <span className="truncate">{segment.event.label}</span>
+            )}
+          </a>
+        )
+      })}
+    </>
+  )
 }
