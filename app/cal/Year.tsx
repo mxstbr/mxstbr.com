@@ -678,16 +678,13 @@ function EventOverlays(props: {
         const segmentDays = segment.endDayIndex - segment.startDayIndex + 1
         const widthPercent = segmentDays * dayWidth
 
-        // Check if this is a single-day event
-        const isSingleDay = segmentDays === 1
-        const isSmallEvent = segment.event.labelSize === 'small'
+        // Add small gaps at start and end of events (0.3% of day width on each side)
+        const gapPercent = 0.3
+        const adjustedLeft = leftPercent + gapPercent
+        const adjustedWidth = widthPercent - gapPercent * 2
 
-        // Calculate top position based on track
-        // Single-day events positioned lower, multi-day events start higher
-        const topPx =
-          isSingleDay || isSmallEvent
-            ? 64 + segment.track * 22
-            : 32 + segment.track * 26
+        // Calculate top position based on track - all events use the same positioning
+        const topPx = 32 + segment.track * 24
 
         // Determine if this segment should show the label
         // Show label on the longest segment of this event
@@ -701,23 +698,23 @@ function EventOverlays(props: {
         const shouldShowLabel =
           segment === longestSegment && segment.event.label && segmentDays >= 1 // Show label if at least 1 day
 
-        // Adjust styling for single-day events
-        const heightClass = isSingleDay || isSmallEvent ? 'h-5' : 'h-6'
-        const textClass =
-          isSingleDay || isSmallEvent ? 'text-[10px]' : 'text-xs'
+        // Check if the event is in the past (event end date is before today and not today)
+        const eventIsPast =
+          isPast(segment.event.end) && !isToday(segment.event.end)
+        const eventOpacity = eventIsPast ? 0.2 : 0.9
 
         return (
           <a
             key={`${eventId}-${idx}`}
             href={`#${eventId}`}
-            className={`absolute ${heightClass} rounded flex items-center ${textClass} font-semibold no-underline transition-opacity hover:opacity-90 px-2 shadow-sm`}
+            className="absolute h-5 rounded flex items-center text-[10px] font-semibold no-underline transition-opacity hover:opacity-90 px-1.5 shadow-sm"
             style={{
-              left: `${leftPercent}%`,
-              width: `${widthPercent}%`,
+              left: `${adjustedLeft}%`,
+              width: `${adjustedWidth}%`,
               top: `${topPx}px`,
               backgroundColor: segment.event.color,
               color: 'white',
-              opacity: 0.9,
+              opacity: eventOpacity,
               minWidth: '8px',
             }}
           >
