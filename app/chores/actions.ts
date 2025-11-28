@@ -60,7 +60,7 @@ export async function addChore(formData: FormData): Promise<void> {
     .filter(Boolean)
   const type = (formData.get('type')?.toString() as ChoreType | undefined) ?? 'one-off'
   const cadence = (formData.get('cadence')?.toString() as 'daily' | 'weekly' | undefined) ?? 'daily'
-  const timeOfDay = parseTimeOfDay(formData.get('timeOfDay')) ?? 'morning'
+  const timeOfDay = parseTimeOfDay(formData.get('timeOfDay')) ?? undefined
   const rawDays = formData
     .getAll('daysOfWeek')
     .map((value) => parseNumber(value))
@@ -145,6 +145,57 @@ export async function completeChore(formData: FormData): Promise<{ awarded: numb
   return { awarded }
 }
 
+export async function undoChore(formData: FormData): Promise<{ delta: number }> {
+  const choreId = formData.get('choreId')?.toString()
+  const kidId = formData.get('kidId')?.toString()
+  const completionId = formData.get('completionId')?.toString()
+  if (!choreId || !kidId) return { delta: 0 }
+
+  let delta = 0
+  const today = todayIsoDate()
+
+  await withUpdatedState((state) => {
+    const chore = state.chores.find((c) => c.id === choreId)
+    if (!chore) return
+
+    let index = -1
+    if (completionId) {
+      index = state.completions.findIndex(
+        (entry) =>
+          entry.id === completionId &&
+          entry.choreId === choreId &&
+          entry.kidId === kidId &&
+          entry.timestamp.slice(0, 10) === today,
+      )
+    }
+
+    if (index === -1) {
+      index = state.completions.findIndex(
+        (entry) =>
+          entry.choreId === choreId &&
+          entry.kidId === kidId &&
+          entry.timestamp.slice(0, 10) === today,
+      )
+    }
+
+    if (index === -1) return
+
+    const [removed] = state.completions.splice(index, 1)
+    delta = -removed.starsAwarded
+
+    if (chore.type === 'one-off') {
+      const allDone = chore.kidIds.every((id) =>
+        state.completions.some((entry) => entry.choreId === chore.id && entry.kidId === id),
+      )
+      if (!allDone) {
+        chore.completedAt = null
+      }
+    }
+  })
+
+  return { delta }
+}
+
 export async function setPause(formData: FormData): Promise<void> {
   const choreId = formData.get('choreId')?.toString()
   const pausedUntil = formData.get('pausedUntil')?.toString()
@@ -198,12 +249,12 @@ export async function archiveChore(formData: FormData): Promise<void> {
 export async function setTimeOfDay(formData: FormData): Promise<void> {
   const choreId = formData.get('choreId')?.toString()
   const timeOfDay = parseTimeOfDay(formData.get('timeOfDay'))
-  if (!choreId || !timeOfDay) return
+  if (!choreId) return
 
   await withUpdatedState((state) => {
     const chore = state.chores.find((c) => c.id === choreId)
     if (!chore) return
-    chore.timeOfDay = timeOfDay
+    chore.timeOfDay = timeOfDay ?? undefined
   })
 }
 
@@ -232,6 +283,8 @@ export async function adjustKidStars(formData: FormData): Promise<void> {
 
 export async function setChoreKids(formData: FormData): Promise<void> {
   const choreId = formData.get('choreId')?.toString()
+  const timeValue = formData.get('timeOfDay')
+  const timeOfDay = parseTimeOfDay(timeValue)
   const kidIds = formData
     .getAll('kidIds')
     .map((value) => value.toString())
@@ -246,6 +299,9 @@ export async function setChoreKids(formData: FormData): Promise<void> {
     if (!validKidIds.length) return
 
     chore.kidIds = validKidIds
+    if (timeValue !== null) {
+      chore.timeOfDay = timeOfDay ?? undefined
+    }
   })
 }
 

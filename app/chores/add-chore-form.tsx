@@ -16,7 +16,7 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
   const [type, setType] = useState<'one-off' | 'repeated' | 'perpetual'>('one-off')
   const [cadence, setCadence] = useState<'daily' | 'weekly'>('daily')
   const [selectedDays, setSelectedDays] = useState<number[]>([now.getDay()])
-  const [timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening'>('morning')
+  const [timeOfDay, setTimeOfDay] = useState<'' | 'morning' | 'afternoon' | 'evening'>('morning')
   const [selectedKids, setSelectedKids] = useState<string[]>(kids.map((kid) => kid.id))
 
   const toggleDay = (day: number) => {
@@ -127,10 +127,11 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
             name="timeOfDay"
             value={timeOfDay}
             onChange={(event) =>
-              setTimeOfDay(event.target.value as 'morning' | 'afternoon' | 'evening')
+              setTimeOfDay(event.target.value as '' | 'morning' | 'afternoon' | 'evening')
             }
             className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
           >
+            <option value="">Any time</option>
             <option value="morning">Morning</option>
             <option value="afternoon">Afternoon</option>
             <option value="evening">Evening</option>

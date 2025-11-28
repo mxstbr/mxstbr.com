@@ -164,8 +164,8 @@ export function sortByTimeOfDay<T extends { timeOfDay?: 'morning' | 'afternoon' 
   chores: T[],
 ): T[] {
   return [...chores].sort((a, b) => {
-    const orderA = TIME_ORDER[a.timeOfDay ?? 'morning']
-    const orderB = TIME_ORDER[b.timeOfDay ?? 'morning']
+    const orderA = a.timeOfDay ? TIME_ORDER[a.timeOfDay] : Number.POSITIVE_INFINITY
+    const orderB = b.timeOfDay ? TIME_ORDER[b.timeOfDay] : Number.POSITIVE_INFINITY
     if (orderA !== orderB) return orderA - orderB
     const createdA = a.createdAt ?? ''
     const createdB = b.createdAt ?? ''

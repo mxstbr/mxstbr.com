@@ -3,12 +3,13 @@
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Chore, Completion, Kid } from './data'
-import { completeChore, setKidColor } from './actions'
+import { completeChore, setKidColor, undoChore } from './actions'
 import { sortByTimeOfDay, starsForKid, withAlpha } from './utils'
 
 type Column = {
   kid: Kid
   chores: Chore[]
+  done: { chore: Chore; completionId: string }[]
 }
 
 type KidBoardProps = {
@@ -56,6 +57,27 @@ export function KidBoard({ columns, completions }: KidBoardProps) {
     }
   }
 
+  const handleUndo = async (
+    chore: Chore,
+    completionId: string,
+    kidId: string,
+  ) => {
+    const formData = new FormData()
+    formData.append('choreId', chore.id)
+    formData.append('kidId', kidId)
+    formData.append('completionId', completionId)
+    const result = await undoChore(formData)
+
+    if (typeof result?.delta === 'number' && result.delta !== 0) {
+      setTotals((prev) => ({
+        ...prev,
+        [kidId]: (prev[kidId] ?? 0) + result.delta,
+      }))
+    }
+
+    router.refresh()
+  }
+
   return (
     <div className="full-bleed">
       <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 md:px-4">
@@ -64,8 +86,10 @@ export function KidBoard({ columns, completions }: KidBoardProps) {
             key={column.kid.id}
             kid={column.kid}
             chores={sortByTimeOfDay(column.chores)}
+            doneChores={column.done}
             starTotal={totals[column.kid.id] ?? 0}
             onComplete={handleComplete}
+            onUndo={handleUndo}
           />
         ))}
       </div>
@@ -76,13 +100,17 @@ export function KidBoard({ columns, completions }: KidBoardProps) {
 function KidColumn({
   kid,
   chores,
+  doneChores,
   starTotal,
   onComplete,
+  onUndo,
 }: {
   kid: Kid
   chores: Chore[]
+  doneChores: { chore: Chore; completionId: string }[]
   starTotal: number
   onComplete: (chore: Chore, kidId: string, accent: string) => void
+  onUndo: (chore: Chore, completionId: string, kidId: string) => void
 }) {
   const accent = kid.color ?? '#0ea5e9'
   const accentSoft = withAlpha(accent, 0.12)
@@ -138,6 +166,26 @@ function KidColumn({
           ))
         )}
       </div>
+
+      {doneChores.length ? (
+        <div className="space-y-2">
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
+            Done today
+          </div>
+          <div className="space-y-2">
+            {doneChores.map((entry) => (
+              <CompletedChoreButton
+                key={`${entry.chore.id}-${entry.completionId}`}
+                chore={entry.chore}
+                completionId={entry.completionId}
+                accent={accent}
+                kidId={kid.id}
+                onUndo={onUndo}
+              />
+            ))}
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }
@@ -190,7 +238,10 @@ function AnimatedCount({ value, accent }: { value: number; accent: string }) {
     <div className="flex flex-col items-start leading-tight">
       <span className="tabular-nums text-base">{displayValue}</span>
       {range ? (
-        <span className="text-[10px] font-medium uppercase tracking-wide text-slate-600" style={{ color: accent }}>
+        <span
+          className="text-[10px] font-medium uppercase tracking-wide text-slate-600"
+          style={{ color: accent }}
+        >
           {range[0]} → {range[1]}
         </span>
       ) : null}
@@ -210,12 +261,6 @@ function ChoreButton({
   onComplete: (chore: Chore, kidId: string, accent: string) => Promise<void>
 }) {
   const [isPending, startTransition] = useTransition()
-  const timeLabel =
-    chore.timeOfDay === 'afternoon'
-      ? 'Afternoon'
-      : chore.timeOfDay === 'evening'
-        ? 'Evening'
-        : 'Morning'
 
   return (
     <button
@@ -234,15 +279,72 @@ function ChoreButton({
       <div className="flex min-w-0 flex-1 items-center gap-3">
         <span className="text-3xl leading-none">{chore.emoji}</span>
         <div className="min-w-0">
-          <div className="text-lg font-semibold leading-tight">{chore.title}</div>
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">
-            {timeLabel}
+          <div className="text-lg font-semibold leading-tight">
+            {chore.title}
           </div>
         </div>
       </div>
       <div className="flex flex-col items-end justify-center text-sm font-semibold text-amber-700 dark:text-amber-200">
-        <span className="leading-tight">+{chore.stars}</span>
-        <span className="text-xs font-medium text-slate-500 dark:text-slate-300">stars</span>
+        <span className="leading-tight text-xl">+{chore.stars}</span>
+        <span className="text-xs font-medium text-slate-500 dark:text-slate-300">
+          stars
+        </span>
+      </div>
+    </button>
+  )
+}
+
+function CompletedChoreButton({
+  chore,
+  completionId,
+  accent,
+  kidId,
+  onUndo,
+}: {
+  chore: Chore
+  completionId: string
+  accent: string
+  kidId: string
+  onUndo: (chore: Chore, completionId: string, kidId: string) => Promise<void> | void
+}) {
+  const [isPending, startTransition] = useTransition()
+  const accentSoft = withAlpha(accent, 0.18)
+
+  return (
+    <button
+      type="button"
+      onClick={() =>
+        startTransition(() => {
+          void onUndo(chore, completionId, kidId)
+        })
+      }
+      className="group flex w-full items-center gap-4 rounded-xl border-2 border-emerald-400 bg-white px-4 py-3 text-left text-slate-900 shadow transition hover:-translate-y-0.5 hover:border-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:translate-y-0 disabled:opacity-60 dark:border-emerald-500/60 dark:bg-slate-800 dark:text-slate-50"
+      disabled={isPending}
+    >
+      <span
+        className="flex h-10 w-10 items-center justify-center rounded-lg border-2 text-lg font-semibold text-emerald-700 transition group-hover:-translate-y-0.5 dark:text-emerald-200"
+        style={{ borderColor: accent, backgroundColor: accentSoft, color: accent }}
+      >
+        ✓
+      </span>
+      <div className="flex min-w-0 flex-1 items-center gap-3">
+        <span className="text-2xl leading-none">{chore.emoji}</span>
+        <div className="min-w-0">
+          <div className="text-base font-semibold leading-tight line-through">
+            {chore.title}
+          </div>
+          <div className="text-xs font-medium text-emerald-700 dark:text-emerald-200">
+            Marked done
+          </div>
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="rounded-full bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700 shadow-sm dark:bg-emerald-900/40 dark:text-emerald-100">
+          +{chore.stars} ⭐️
+        </div>
+        <div className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
+          Undo
+        </div>
       </div>
     </button>
   )

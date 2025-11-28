@@ -10,7 +10,6 @@ import {
   completeChore,
   renameKid,
   setPause,
-  setTimeOfDay,
   adjustKidStars,
   setChoreKids,
   setRewardKids,
@@ -302,7 +301,9 @@ function ChoreCard({
       ? 'Afternoon'
       : chore.timeOfDay === 'evening'
         ? 'Evening'
-        : 'Morning'
+        : chore.timeOfDay === 'morning'
+          ? 'Morning'
+          : 'Any time'
 
   return (
     <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 shadow-sm dark:border-slate-700 dark:bg-slate-800/70">
@@ -335,19 +336,6 @@ function ChoreCard({
             Mark done
           </button>
         </form>
-        <form action={setTimeOfDay} className="flex items-center gap-1">
-          <input type="hidden" name="choreId" value={chore.id} />
-          <select
-            name="timeOfDay"
-            defaultValue={chore.timeOfDay ?? 'morning'}
-            className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-700 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-            aria-label="Time of day"
-          >
-            <option value="morning">Morning</option>
-            <option value="afternoon">Afternoon</option>
-            <option value="evening">Evening</option>
-          </select>
-        </form>
         {chore.type === 'repeated' ? (
           <form action={setPause} className="flex items-center gap-2">
             <input type="hidden" name="choreId" value={chore.id} />
@@ -376,6 +364,17 @@ function ChoreCard({
         </form>
         <form action={setChoreKids} className="flex flex-wrap items-center gap-2">
           <input type="hidden" name="choreId" value={chore.id} />
+          <select
+            name="timeOfDay"
+            defaultValue={chore.timeOfDay ?? ''}
+            className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-700 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+            aria-label="Time of day"
+          >
+            <option value="">Any time</option>
+            <option value="morning">Morning</option>
+            <option value="afternoon">Afternoon</option>
+            <option value="evening">Evening</option>
+          </select>
           <div className="flex flex-wrap gap-1">
             {allKids.map((k) => {
               const active = chore.kidIds.includes(k.id)

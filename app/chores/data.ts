@@ -155,7 +155,7 @@ function ensureChores(chores: Chore[] | undefined, kids: Kid[]): Chore[] {
     return {
       ...chore,
       kidIds: kidIds.length ? kidIds : [kids[0]?.id ?? 'kid-1'],
-      timeOfDay: chore.timeOfDay ?? 'morning',
+      timeOfDay: chore.timeOfDay ?? undefined,
     }
   })
 }
