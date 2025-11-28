@@ -1,4 +1,4 @@
-import type { Chore, Completion } from './data'
+import type { Chore, Completion, Reward, RewardRedemption } from './data'
 
 export const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 export const DAY_ABBRS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -160,4 +160,17 @@ export function sortByTimeOfDay<T extends { timeOfDay?: 'morning' | 'afternoon' 
     const createdB = b.createdAt ?? ''
     return createdB.localeCompare(createdA)
   })
+}
+
+export function rewardAvailableForKid(
+  reward: Reward,
+  kidId: string,
+  redemptions: RewardRedemption[],
+): boolean {
+  if (!reward.kidIds.includes(kidId) || reward.archived) return false
+  if (reward.type === 'perpetual') return true
+
+  return !redemptions.some(
+    (entry) => entry.rewardId === reward.id && entry.kidId === kidId,
+  )
 }

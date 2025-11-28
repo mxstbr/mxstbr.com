@@ -7,7 +7,10 @@ import {
   ChoreType,
   getChoreState,
   saveChoreState,
+  type RewardType,
 } from './data'
+import { starsForKid } from './utils'
+import { bot } from 'app/lib/telegram'
 
 function todayIsoDate(): string {
   return new Date().toISOString().slice(0, 10)
@@ -27,6 +30,7 @@ async function withUpdatedState(
   await saveChoreState(state)
   revalidatePath('/chores')
   revalidatePath('/chores/admin')
+  revalidatePath('/chores/rewards')
 }
 
 function parseNumber(value: FormDataEntryValue | null): number | null {
@@ -231,6 +235,117 @@ export async function setChoreKids(formData: FormData): Promise<void> {
 
     chore.kidIds = validKidIds
   })
+}
+
+export async function addReward(formData: FormData): Promise<void> {
+  const title = formData.get('title')?.toString().trim()
+  const emoji = formData.get('emoji')?.toString().trim() || '🎁'
+  const cost = parseNumber(formData.get('cost')) ?? 1
+  const type = (formData.get('rewardType')?.toString() as RewardType | undefined) ?? 'perpetual'
+  const kidIds = formData
+    .getAll('kidIds')
+    .map((value) => value.toString())
+    .filter(Boolean)
+
+  if (!title || kidIds.length === 0) return
+
+  await withUpdatedState((state) => {
+    const validKidIds = kidIds.filter((id) => state.kids.some((kid) => kid.id === id))
+    if (!validKidIds.length) return
+
+    state.rewards.unshift({
+      id: crypto.randomUUID(),
+      kidIds: validKidIds,
+      title,
+      emoji,
+      cost: Math.max(0, Math.round(cost)),
+      type,
+      createdAt: new Date().toISOString(),
+    })
+  })
+}
+
+export async function archiveReward(formData: FormData): Promise<void> {
+  const rewardId = formData.get('rewardId')?.toString()
+  if (!rewardId) return
+
+  await withUpdatedState((state) => {
+    state.rewards = state.rewards.filter((reward) => reward.id !== rewardId)
+    state.rewardRedemptions = state.rewardRedemptions.filter((entry) => entry.rewardId !== rewardId)
+  })
+}
+
+export async function setRewardKids(formData: FormData): Promise<void> {
+  const rewardId = formData.get('rewardId')?.toString()
+  const kidIds = formData
+    .getAll('kidIds')
+    .map((value) => value.toString())
+    .filter(Boolean)
+  if (!rewardId || kidIds.length === 0) return
+
+  await withUpdatedState((state) => {
+    const reward = state.rewards.find((r) => r.id === rewardId)
+    if (!reward) return
+
+    const validKidIds = kidIds.filter((id) => state.kids.some((kid) => kid.id === id))
+    if (!validKidIds.length) return
+
+    reward.kidIds = validKidIds
+  })
+}
+
+export async function redeemReward(formData: FormData): Promise<{ success: boolean }> {
+  const rewardId = formData.get('rewardId')?.toString()
+  const kidId = formData.get('kidId')?.toString()
+  if (!rewardId || !kidId) return { success: false }
+
+  let success = false
+
+  await withUpdatedState((state) => {
+    const reward = state.rewards.find((r) => r.id === rewardId)
+    if (!reward) return
+    if (!reward.kidIds.includes(kidId) || reward.archived) return
+
+    if (reward.type === 'one-off') {
+      const alreadyRedeemed = state.rewardRedemptions.some(
+        (entry) => entry.rewardId === rewardId && entry.kidId === kidId,
+      )
+      if (alreadyRedeemed) return
+    }
+
+    const starBalance = starsForKid(state.completions, kidId)
+    if (starBalance < reward.cost) return
+
+    const timestamp = new Date().toISOString()
+
+    state.completions.unshift({
+      id: crypto.randomUUID(),
+      choreId: `reward:${reward.id}`,
+      kidId,
+      timestamp,
+      starsAwarded: -Math.max(0, Math.round(reward.cost)),
+    })
+
+    state.rewardRedemptions.unshift({
+      id: crypto.randomUUID(),
+      rewardId: reward.id,
+      kidId,
+      timestamp,
+      cost: reward.cost,
+    })
+
+    success = true
+
+    const kid = state.kids.find((k) => k.id === kidId)
+    if (kid && process.env.TELEGRAM_BOT_TOKEN) {
+      const message = `${kid.name} redeemed "${reward.title}" for ${reward.cost} ⭐️`
+      bot.telegram
+        .sendMessage('-4904434425', message)
+        .catch((err) => console.error('Failed to send Telegram reward message', err))
+    }
+  })
+
+  return { success }
 }
 function parseTimeOfDay(
   value: FormDataEntryValue | null,

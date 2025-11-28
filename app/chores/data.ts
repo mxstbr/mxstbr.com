@@ -1,6 +1,7 @@
 import { Redis } from '@upstash/redis'
 
 export type ChoreType = 'one-off' | 'repeated' | 'perpetual'
+export type RewardType = 'one-off' | 'perpetual'
 
 export type Kid = {
   id: string
@@ -35,10 +36,31 @@ export type Completion = {
   starsAwarded: number
 }
 
+export type Reward = {
+  id: string
+  kidIds: string[]
+  title: string
+  emoji: string
+  cost: number
+  type: RewardType
+  createdAt: string
+  archived?: boolean
+}
+
+export type RewardRedemption = {
+  id: string
+  rewardId: string
+  kidId: string
+  timestamp: string
+  cost: number
+}
+
 export type ChoreState = {
   kids: Kid[]
   chores: Chore[]
   completions: Completion[]
+  rewards: Reward[]
+  rewardRedemptions: RewardRedemption[]
 }
 
 const redis = Redis.fromEnv()
@@ -138,6 +160,21 @@ function ensureChores(chores: Chore[] | undefined, kids: Kid[]): Chore[] {
   })
 }
 
+function ensureRewards(rewards: Reward[] | undefined, kids: Kid[]): Reward[] {
+  if (!Array.isArray(rewards)) return []
+  return rewards.map((reward) => {
+    const kidIds =
+      (reward as any).kidIds && Array.isArray((reward as any).kidIds)
+        ? (reward as any).kidIds.filter(Boolean)
+        : [kids[0]?.id ?? 'kid-1']
+
+    return {
+      ...reward,
+      kidIds: kidIds.length ? kidIds : [kids[0]?.id ?? 'kid-1'],
+    }
+  })
+}
+
 export function normalizeState(state: Partial<ChoreState> | null): ChoreState {
   const kids = ensureKids(state?.kids)
 
@@ -145,6 +182,8 @@ export function normalizeState(state: Partial<ChoreState> | null): ChoreState {
     kids,
     chores: ensureChores(state?.chores, kids),
     completions: state?.completions ?? [],
+    rewards: ensureRewards(state?.rewards, kids),
+    rewardRedemptions: state?.rewardRedemptions ?? [],
   }
 }
 
