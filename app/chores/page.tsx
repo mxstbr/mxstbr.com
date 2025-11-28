@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import { completeChore } from './actions'
 import { type Chore, type Completion, type Kid, getChoreState } from './data'
-import { DAY_NAMES, getToday, isOpenToday, starsForKid } from './utils'
+import { getToday, isOpenToday, starsForKid } from './utils'
+import { PasswordForm } from 'app/cal/password-form'
+import { auth, isMax } from 'app/auth'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -77,6 +79,12 @@ function ChoreButton({ chore }: { chore: Chore }) {
 }
 
 export default async function ChoresPage() {
+  const password = auth()
+
+  if (!isMax()) {
+    return <PasswordForm error={password ? 'Invalid password.' : undefined} />
+  }
+
   const state = await getChoreState()
   const ctx = getToday()
 

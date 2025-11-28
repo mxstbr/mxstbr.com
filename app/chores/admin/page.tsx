@@ -14,6 +14,8 @@ import {
   type Kid,
   getChoreState,
 } from '../data'
+import { PasswordForm } from 'app/cal/password-form'
+import { auth, isMax } from 'app/auth'
 import {
   DAY_NAMES,
   getToday,
@@ -261,6 +263,12 @@ function ChoreCard({
 }
 
 export default async function ChoreAdminPage() {
+  const password = auth()
+
+  if (!isMax()) {
+    return <PasswordForm error={password ? 'Invalid password.' : undefined} />
+  }
+
   const state = await getChoreState()
   const ctx = getToday()
 
