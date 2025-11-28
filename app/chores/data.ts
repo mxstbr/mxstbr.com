@@ -15,7 +15,7 @@ export type ChoreSchedule = {
 
 export type Chore = {
   id: string
-  kidId: string
+  kidIds: string[]
   title: string
   emoji: string
   stars: number
@@ -60,7 +60,7 @@ function createDefaultChores(kids: Kid[]): Chore[] {
   return [
     {
       id: crypto.randomUUID(),
-      kidId: kidA,
+      kidIds: [kidA, kidB, kidC],
       title: 'Pack for our next trip',
       emoji: '🎒',
       stars: 5,
@@ -70,7 +70,7 @@ function createDefaultChores(kids: Kid[]): Chore[] {
     },
     {
       id: crypto.randomUUID(),
-      kidId: kidB,
+      kidIds: [kidB],
       title: 'Brush, change, and pee',
       emoji: '🪥',
       stars: 3,
@@ -81,7 +81,7 @@ function createDefaultChores(kids: Kid[]): Chore[] {
     },
     {
       id: crypto.randomUUID(),
-      kidId: kidB,
+      kidIds: [kidB],
       title: 'Shower day',
       emoji: '🚿',
       stars: 2,
@@ -92,7 +92,7 @@ function createDefaultChores(kids: Kid[]): Chore[] {
     },
     {
       id: crypto.randomUUID(),
-      kidId: kidC,
+      kidIds: [kidC],
       title: 'Be kind',
       emoji: '💖',
       stars: 1,
@@ -122,10 +122,20 @@ function ensureKids(kids: Kid[] | undefined): Kid[] {
 
 function ensureChores(chores: Chore[] | undefined, kids: Kid[]): Chore[] {
   if (!Array.isArray(chores)) return createDefaultChores(kids)
-  return chores.map((chore) => ({
-    ...chore,
-    timeOfDay: chore.timeOfDay ?? 'morning',
-  }))
+  return chores.map((chore) => {
+    const kidIds =
+      (chore as any).kidIds && Array.isArray((chore as any).kidIds)
+        ? (chore as any).kidIds.filter(Boolean)
+        : (chore as any).kidId
+          ? [(chore as any).kidId]
+          : [kids[0]?.id ?? 'kid-1']
+
+    return {
+      ...chore,
+      kidIds: kidIds.length ? kidIds : [kids[0]?.id ?? 'kid-1'],
+      timeOfDay: chore.timeOfDay ?? 'morning',
+    }
+  })
 }
 
 export function normalizeState(state: Partial<ChoreState> | null): ChoreState {

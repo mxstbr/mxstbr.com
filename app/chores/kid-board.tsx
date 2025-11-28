@@ -34,16 +34,18 @@ export function KidBoard({ columns, completions }: KidBoardProps) {
 
   const handleComplete = async (
     chore: Chore,
+    kidId: string,
     accent: string,
   ) => {
     const formData = new FormData()
     formData.append('choreId', chore.id)
+    formData.append('kidId', kidId)
     const result = await completeChore(formData)
 
     if (result?.awarded && result.awarded > 0) {
       setTotals((prev) => ({
         ...prev,
-        [chore.kidId]: (prev[chore.kidId] ?? 0) + result.awarded,
+        [kidId]: (prev[kidId] ?? 0) + result.awarded,
       }))
       fireConfetti(accent)
     }
@@ -77,7 +79,7 @@ function KidColumn({
   kid: Kid
   chores: Chore[]
   starTotal: number
-  onComplete: (chore: Chore, accent: string) => void
+  onComplete: (chore: Chore, kidId: string, accent: string) => void
 }) {
   const accent = kid.color ?? '#0ea5e9'
   const accentSoft = withAlpha(accent, 0.12)
@@ -109,6 +111,7 @@ function KidColumn({
               key={chore.id}
               chore={chore}
               accent={accent}
+              kidId={kid.id}
               onComplete={onComplete}
             />
           ))
@@ -178,10 +181,12 @@ function ChoreButton({
   chore,
   accent,
   onComplete,
+  kidId,
 }: {
   chore: Chore
   accent: string
-  onComplete: (chore: Chore, accent: string) => Promise<void>
+  kidId: string
+  onComplete: (chore: Chore, kidId: string, accent: string) => Promise<void>
 }) {
   const [isPending, startTransition] = useTransition()
   const timeLabel =
@@ -196,7 +201,7 @@ function ChoreButton({
       type="button"
       onClick={() =>
         startTransition(() => {
-          void onComplete(chore, accent)
+          void onComplete(chore, kidId, accent)
         })
       }
       className="group flex w-full items-center gap-4 rounded-xl border-2 border-slate-200 bg-white px-4 py-4 text-left text-slate-900 shadow transition hover:-translate-y-0.5 hover:border-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"

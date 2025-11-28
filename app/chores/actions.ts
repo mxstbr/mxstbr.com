@@ -50,7 +50,10 @@ export async function addChore(formData: FormData): Promise<void> {
   const title = formData.get('title')?.toString().trim()
   const emoji = formData.get('emoji')?.toString().trim() || '⭐️'
   const stars = parseNumber(formData.get('stars')) ?? 1
-  const kidId = formData.get('kidId')?.toString()
+  const kidIds = formData
+    .getAll('kidIds')
+    .map((value) => value.toString())
+    .filter(Boolean)
   const type = (formData.get('type')?.toString() as ChoreType | undefined) ?? 'one-off'
   const cadence = (formData.get('cadence')?.toString() as 'daily' | 'weekly' | undefined) ?? 'daily'
   const timeOfDay = parseTimeOfDay(formData.get('timeOfDay')) ?? 'morning'
@@ -61,15 +64,16 @@ export async function addChore(formData: FormData): Promise<void> {
   const daysOfWeek =
     rawDays.length > 0 ? rawDays : [new Date().getUTCDay()]
 
-  if (!title || !kidId) return
+  if (!title || kidIds.length === 0) return
 
   await withUpdatedState((state) => {
-    if (!state.kids.find((kid) => kid.id === kidId)) return
+    const validKidIds = kidIds.filter((id) => state.kids.some((kid) => kid.id === id))
+    if (!validKidIds.length) return
 
     const createdAt = new Date().toISOString()
     const chore: Chore = {
       id: crypto.randomUUID(),
-      kidId,
+      kidIds: validKidIds,
       title,
       emoji,
       stars: Math.max(0, Math.round(stars)),
@@ -91,13 +95,15 @@ export async function addChore(formData: FormData): Promise<void> {
 
 export async function completeChore(formData: FormData): Promise<{ awarded: number }> {
   const choreId = formData.get('choreId')?.toString()
-  if (!choreId) return { awarded: 0 }
+  const kidId = formData.get('kidId')?.toString()
+  if (!choreId || !kidId) return { awarded: 0 }
 
   let awarded = 0
 
   await withUpdatedState((state) => {
     const chore = state.chores.find((c) => c.id === choreId)
     if (!chore) return
+    if (!chore.kidIds.includes(kidId)) return
 
     const today = todayIsoDate()
     const alreadyCompletedToday =
@@ -105,6 +111,7 @@ export async function completeChore(formData: FormData): Promise<{ awarded: numb
       state.completions.some(
         (completion) =>
           completion.choreId === chore.id &&
+          completion.kidId === kidId &&
           completion.timestamp.slice(0, 10) === today,
       )
 
@@ -116,13 +123,18 @@ export async function completeChore(formData: FormData): Promise<{ awarded: numb
     state.completions.unshift({
       id: crypto.randomUUID(),
       choreId: chore.id,
-      kidId: chore.kidId,
+      kidId,
       timestamp: new Date().toISOString(),
       starsAwarded: chore.stars,
     })
 
     if (chore.type === 'one-off') {
-      chore.completedAt = new Date().toISOString()
+      const allDone = chore.kidIds.every((id) =>
+        state.completions.some((completion) => completion.choreId === chore.id && completion.kidId === id),
+      )
+      if (allDone) {
+        chore.completedAt = new Date().toISOString()
+      }
     }
   })
 
@@ -176,6 +188,48 @@ export async function setTimeOfDay(formData: FormData): Promise<void> {
     const chore = state.chores.find((c) => c.id === choreId)
     if (!chore) return
     chore.timeOfDay = timeOfDay
+  })
+}
+
+export async function adjustKidStars(formData: FormData): Promise<void> {
+  const kidId = formData.get('kidId')?.toString()
+  const rawDelta = parseNumber(formData.get('delta'))
+  const mode = formData.get('mode')?.toString()
+  if (!kidId || rawDelta === null) return
+
+  const delta = Math.round(Math.abs(rawDelta)) * (mode === 'remove' ? -1 : 1)
+  if (delta === 0) return
+
+  await withUpdatedState((state) => {
+    const kid = state.kids.find((k) => k.id === kidId)
+    if (!kid) return
+
+    state.completions.unshift({
+      id: crypto.randomUUID(),
+      choreId: `manual-${Date.now()}`,
+      kidId,
+      timestamp: new Date().toISOString(),
+      starsAwarded: delta,
+    })
+  })
+}
+
+export async function setChoreKids(formData: FormData): Promise<void> {
+  const choreId = formData.get('choreId')?.toString()
+  const kidIds = formData
+    .getAll('kidIds')
+    .map((value) => value.toString())
+    .filter(Boolean)
+  if (!choreId || kidIds.length === 0) return
+
+  await withUpdatedState((state) => {
+    const chore = state.chores.find((c) => c.id === choreId)
+    if (!chore) return
+
+    const validKidIds = kidIds.filter((id) => state.kids.some((kid) => kid.id === id))
+    if (!validKidIds.length) return
+
+    chore.kidIds = validKidIds
   })
 }
 function parseTimeOfDay(

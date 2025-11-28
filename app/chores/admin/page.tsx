@@ -8,6 +8,8 @@ import {
   renameKid,
   setPause,
   setTimeOfDay,
+  adjustKidStars,
+  setChoreKids,
 } from '../actions'
 import {
   type Chore,
@@ -20,8 +22,8 @@ import { auth, isMax } from 'app/auth'
 import {
   DAY_NAMES,
   getToday,
-  hasCompletedToday,
-  isOpenToday,
+  hasCompletedTodayForKid,
+  isOpenForKid,
   isPaused,
   recurringStatus,
   scheduleLabel,
@@ -46,6 +48,7 @@ type ColumnProps = {
   recurringChores: Chore[]
   completions: Completion[]
   ctx: TodayContext
+  allKids: Kid[]
 }
 
 function KidColumn({
@@ -54,6 +57,7 @@ function KidColumn({
   recurringChores,
   completions,
   ctx,
+  allKids,
 }: ColumnProps) {
   const starTotal = starsForKid(completions, kid.id)
   const accent = kid.color ?? '#0ea5e9'
@@ -96,6 +100,32 @@ function KidColumn({
         >
           ⭐️ <span className="tabular-nums">{starTotal}</span>
         </div>
+        <form action={adjustKidStars} className="flex items-center gap-1">
+          <input type="hidden" name="kidId" value={kid.id} />
+          <input
+            type="number"
+            name="delta"
+            min={1}
+            defaultValue={1}
+            className="w-16 rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+          />
+          <button
+            type="submit"
+            name="mode"
+            value="add"
+            className="rounded-md border border-transparent bg-slate-900 px-2 py-1 text-xs font-semibold text-white transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+          >
+            Give
+          </button>
+          <button
+            type="submit"
+            name="mode"
+            value="remove"
+            className="rounded-md border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-700 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-200"
+          >
+            Remove
+          </button>
+        </form>
       </div>
 
       <div className="flex flex-1 flex-col gap-3">
@@ -119,6 +149,8 @@ function KidColumn({
               chore={chore}
               ctx={ctx}
               completions={completions}
+              kid={kid}
+              allKids={allKids}
             />
           ))
         )}
@@ -131,7 +163,7 @@ function KidColumn({
           </h4>
           <div className="space-y-2">
             {recurringChores.map((chore) => {
-              const status = recurringStatus(chore, completions, ctx)
+              const status = recurringStatus(chore, kid.id, completions, ctx)
               return (
                 <div
                   key={chore.id}
@@ -199,6 +231,37 @@ function KidColumn({
                         Archive
                       </button>
                     </form>
+                    <form action={setChoreKids} className="flex flex-wrap items-center gap-1">
+                      <input type="hidden" name="choreId" value={chore.id} />
+                      {allKids.map((k) => {
+                        const active = chore.kidIds.includes(k.id)
+                        return (
+                          <label
+                            key={k.id}
+                            className={`flex items-center gap-1 rounded-md border px-2 py-1 text-[10px] font-semibold uppercase tracking-wide ${
+                              active
+                                ? 'border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900'
+                                : 'border-slate-300 text-slate-700 hover:border-slate-500 dark:border-slate-700 dark:text-slate-200'
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              name="kidIds"
+                              value={k.id}
+                              defaultChecked={active}
+                              className="sr-only"
+                            />
+                            {k.name}
+                          </label>
+                        )
+                      })}
+                      <button
+                        type="submit"
+                        className="rounded-md border border-slate-300 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-700 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-200"
+                      >
+                        Save kids
+                      </button>
+                    </form>
                   </div>
                 </div>
               )
@@ -214,14 +277,18 @@ function ChoreCard({
   chore,
   ctx,
   completions,
+  kid,
+  allKids,
 }: {
   chore: Chore
   ctx: TodayContext
   completions: Completion[]
+  kid: Kid
+  allKids: Kid[]
 }) {
   const dueLabel = scheduleLabel(chore)
   const paused = isPaused(chore, ctx)
-  const doneToday = hasCompletedToday(chore.id, completions, ctx)
+  const doneToday = hasCompletedTodayForKid(chore.id, kid.id, completions, ctx)
   const timeLabel =
     chore.timeOfDay === 'afternoon'
       ? 'Afternoon'
@@ -251,6 +318,7 @@ function ChoreCard({
       <div className="mt-3 flex flex-wrap gap-2">
         <form action={completeChore}>
           <input type="hidden" name="choreId" value={chore.id} />
+          <input type="hidden" name="kidId" value={kid.id} />
           <button
             type="submit"
             className="rounded-md bg-slate-900 px-3 py-1 text-xs font-semibold text-white transition hover:bg-slate-800 disabled:opacity-50 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
@@ -298,6 +366,39 @@ function ChoreCard({
             Archive
           </button>
         </form>
+        <form action={setChoreKids} className="flex flex-wrap items-center gap-2">
+          <input type="hidden" name="choreId" value={chore.id} />
+          <div className="flex flex-wrap gap-1">
+            {allKids.map((k) => {
+              const active = chore.kidIds.includes(k.id)
+              return (
+                <label
+                  key={k.id}
+                  className={`flex items-center gap-1 rounded-md border px-2 py-1 text-[10px] font-semibold uppercase tracking-wide ${
+                    active
+                      ? 'border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900'
+                      : 'border-slate-300 text-slate-700 hover:border-slate-500 dark:border-slate-700 dark:text-slate-200'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    name="kidIds"
+                    value={k.id}
+                    defaultChecked={active}
+                    className="sr-only"
+                  />
+                  {k.name}
+                </label>
+              )
+            })}
+          </div>
+          <button
+            type="submit"
+            className="rounded-md border border-slate-300 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-700 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-200"
+          >
+            Save kids
+          </button>
+        </form>
       </div>
     </div>
   )
@@ -322,12 +423,14 @@ export default async function ChoreAdminPage() {
   }
 
   for (const chore of state.chores) {
-    if (isOpenToday(chore, state.completions, ctx)) {
-      openChoresByKid[chore.kidId]?.push(chore)
-    }
+    for (const kid of state.kids) {
+      if (isOpenForKid(chore, kid.id, state.completions, ctx)) {
+        openChoresByKid[kid.id]?.push(chore)
+      }
 
-    if (chore.type === 'repeated') {
-      recurringByKid[chore.kidId]?.push(chore)
+      if (chore.type === 'repeated' && chore.kidIds.includes(kid.id)) {
+        recurringByKid[kid.id]?.push(chore)
+      }
     }
   }
 
@@ -367,6 +470,7 @@ export default async function ChoreAdminPage() {
               recurringChores={sortByTimeOfDay(recurringByKid[kid.id] ?? [])}
               completions={state.completions}
               ctx={ctx}
+              allKids={state.kids}
             />
           ))}
         </div>

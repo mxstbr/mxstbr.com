@@ -21,14 +21,16 @@ export function getToday(): TodayContext {
   }
 }
 
-export function hasCompletedToday(
+export function hasCompletedTodayForKid(
   choreId: string,
+  kidId: string,
   completions: Completion[],
   ctx: TodayContext,
 ): boolean {
   return completions.some(
     (completion) =>
       completion.choreId === choreId &&
+      completion.kidId === kidId &&
       completion.timestamp.slice(0, 10) === ctx.todayIso,
   )
 }
@@ -41,13 +43,20 @@ export function isPaused(chore: Chore, ctx: TodayContext): boolean {
   )
 }
 
-export function isOpenToday(
+export function isOpenForKid(
   chore: Chore,
+  kidId: string,
   completions: Completion[],
   ctx: TodayContext,
 ): boolean {
+  if (!chore.kidIds.includes(kidId)) return false
+
   if (chore.type === 'one-off') {
-    return !chore.completedAt
+    return !completions.some(
+      (completion) =>
+        completion.choreId === chore.id &&
+        completion.kidId === kidId,
+    )
   }
 
   if (chore.type === 'perpetual') {
@@ -62,7 +71,7 @@ export function isOpenToday(
     if (!days.includes(ctx.weekday)) return false
   }
 
-  if (hasCompletedToday(chore.id, completions, ctx)) return false
+  if (hasCompletedTodayForKid(chore.id, kidId, completions, ctx)) return false
 
   return true
 }
@@ -80,6 +89,7 @@ export function scheduleLabel(chore: Chore): string {
 
 export function recurringStatus(
   chore: Chore,
+  kidId: string,
   completions: Completion[],
   ctx: TodayContext,
 ): { label: string; tone: 'neutral' | 'success' | 'muted' } {
@@ -90,11 +100,11 @@ export function recurringStatus(
     }
   }
 
-  if (isOpenToday(chore, completions, ctx)) {
+  if (isOpenForKid(chore, kidId, completions, ctx)) {
     return { label: 'Due today', tone: 'neutral' }
   }
 
-  if (hasCompletedToday(chore.id, completions, ctx)) {
+  if (hasCompletedTodayForKid(chore.id, kidId, completions, ctx)) {
     return { label: 'Done today', tone: 'success' }
   }
 
@@ -133,6 +143,10 @@ export function withAlpha(color: string, alpha: number): string {
   }
 
   return color
+}
+
+export function appliesToKid(chore: Chore, kidId: string): boolean {
+  return chore.kidIds.includes(kidId)
 }
 
 export function sortByTimeOfDay<T extends { timeOfDay?: 'morning' | 'afternoon' | 'evening'; createdAt?: string }>(

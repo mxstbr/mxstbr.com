@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { KidBoard } from './kid-board'
 import { type Chore, getChoreState } from './data'
-import { getToday, isOpenToday, sortByTimeOfDay } from './utils'
+import { getToday, isOpenForKid, sortByTimeOfDay } from './utils'
 import { PasswordForm } from 'app/cal/password-form'
 import { auth, isMax } from 'app/auth'
 
@@ -32,8 +32,10 @@ export default async function ChoresPage() {
   }
 
   for (const chore of state.chores) {
-    if (isOpenToday(chore, state.completions, ctx)) {
-      openChoresByKid[chore.kidId]?.push(chore)
+    for (const kid of state.kids) {
+      if (isOpenForKid(chore, kid.id, state.completions, ctx)) {
+        openChoresByKid[kid.id]?.push(chore)
+      }
     }
   }
 
