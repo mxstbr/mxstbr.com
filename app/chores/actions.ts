@@ -174,6 +174,18 @@ export async function renameKid(formData: FormData): Promise<void> {
   })
 }
 
+export async function setKidColor(formData: FormData): Promise<void> {
+  const kidId = formData.get('kidId')?.toString()
+  const color = parseColor(formData.get('color'))
+  if (!kidId || !color) return
+
+  await withUpdatedState((state) => {
+    const kid = state.kids.find((k) => k.id === kidId)
+    if (!kid) return
+    kid.color = color
+  })
+}
+
 export async function archiveChore(formData: FormData): Promise<void> {
   const choreId = formData.get('choreId')?.toString()
   if (!choreId) return

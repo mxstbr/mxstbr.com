@@ -95,13 +95,6 @@ function KidColumn({
             defaultValue={kid.name}
             className="w-28 rounded-md border border-slate-300 bg-white px-2 py-1 text-sm font-semibold text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
           />
-          <input
-            type="color"
-            name="color"
-            defaultValue={kid.color}
-            className="h-8 w-10 cursor-pointer rounded-md border border-slate-300 bg-white p-1 shadow-sm dark:border-slate-700 dark:bg-slate-800"
-            aria-label={`${kid.name} color`}
-          />
           <button
             type="submit"
             className="rounded-md border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-700 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-200"

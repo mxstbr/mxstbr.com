@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Chore, Completion, Kid } from './data'
-import { completeChore } from './actions'
+import { completeChore, setKidColor } from './actions'
 import { sortByTimeOfDay, starsForKid, withAlpha } from './utils'
 
 type Column = {
@@ -51,6 +51,9 @@ export function KidBoard({ columns, completions }: KidBoardProps) {
     }
 
     router.refresh()
+    if (chore.type === 'perpetual') {
+      setTimeout(() => router.refresh(), 5200)
+    }
   }
 
   return (
@@ -97,7 +100,25 @@ function KidColumn({
         <div className="text-lg font-semibold text-slate-900 dark:text-slate-50">
           {kid.name}
         </div>
-        <StarBadge value={starTotal} accent={accent} />
+        <div className="flex items-center gap-2">
+          <StarBadge value={starTotal} accent={accent} />
+          <form action={setKidColor} className="flex items-center gap-1">
+            <input type="hidden" name="kidId" value={kid.id} />
+            <input
+              type="color"
+              name="color"
+              defaultValue={kid.color}
+              className="h-9 w-9 cursor-pointer rounded-md border border-slate-300 bg-white p-1 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+              aria-label={`${kid.name} color`}
+            />
+            <button
+              type="submit"
+              className="rounded-md border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-700 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-200"
+            >
+              Set
+            </button>
+          </form>
+        </div>
       </div>
 
       <div className="space-y-3">

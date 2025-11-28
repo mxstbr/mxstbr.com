@@ -11,6 +11,7 @@ const TIME_ORDER: Record<'morning' | 'afternoon' | 'evening', number> = {
 export type TodayContext = {
   todayIso: string
   weekday: number
+  nowMs: number
 }
 
 export function getToday(): TodayContext {
@@ -18,6 +19,7 @@ export function getToday(): TodayContext {
   return {
     todayIso: now.toISOString().slice(0, 10),
     weekday: now.getUTCDay(),
+    nowMs: now.getTime(),
   }
 }
 
@@ -60,6 +62,15 @@ export function isOpenForKid(
   }
 
   if (chore.type === 'perpetual') {
+    const nowMs = ctx.nowMs ?? Date.now()
+    const last = completions.find(
+      (completion) =>
+        completion.choreId === chore.id && completion.kidId === kidId,
+    )
+    if (last) {
+      const elapsed = nowMs - new Date(last.timestamp).getTime()
+      if (elapsed < 5000) return false
+    }
     return true
   }
 
