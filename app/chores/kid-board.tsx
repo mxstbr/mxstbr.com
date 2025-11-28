@@ -195,8 +195,8 @@ function ChoreButton({
     <button
       type="button"
       onClick={() =>
-        startTransition(async () => {
-          await onComplete(chore, accent)
+        startTransition(() => {
+          void onComplete(chore, accent)
         })
       }
       className="group flex w-full items-center gap-4 rounded-xl border-2 border-slate-200 bg-white px-4 py-4 text-left text-slate-900 shadow transition hover:-translate-y-0.5 hover:border-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
@@ -246,12 +246,13 @@ function fireConfetti(accent: string) {
     piece.style.top = `-10%`
     piece.style.opacity = '0.9'
     piece.style.borderRadius = '2px'
-    piece.style.transform = `rotate(${Math.random() * 360}deg)`
     const fall = 900 + Math.random() * 700
     const drift = Math.random() * 40 - 20
     const delay = Math.random() * 150
-    piece.style.animation = `chores-confetti-fall ${fall}ms ease-out ${delay}ms forwards, chores-confetti-spin ${600 + Math.random() * 400}ms linear infinite`
+    const rotation = 540 + Math.random() * 540
+    piece.style.animation = `chores-confetti-fall ${fall}ms ease-out ${delay}ms forwards`
     piece.style.setProperty('--drift', `${drift}px`)
+    piece.style.setProperty('--rotation', `${rotation}deg`)
     container.appendChild(piece)
   }
 
@@ -268,14 +269,9 @@ function ensureConfettiStyles() {
   style.id = id
   style.textContent = `
     @keyframes chores-confetti-fall {
-      0% { transform: translate3d(0, 0, 0); opacity: 0.9; }
-      100% { transform: translate3d(var(--drift, 0px), 110vh, 0); opacity: 0; }
-    }
-    @keyframes chores-confetti-spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
+      0% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0.9; }
+      100% { transform: translate3d(var(--drift, 0px), 110vh, 0) rotate(var(--rotation, 720deg)); opacity: 0; }
     }
   `
   document.head.appendChild(style)
 }
-
