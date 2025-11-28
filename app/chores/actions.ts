@@ -26,6 +26,7 @@ async function withUpdatedState(
 
   await saveChoreState(state)
   revalidatePath('/chores')
+  revalidatePath('/chores/admin')
 }
 
 function parseNumber(value: FormDataEntryValue | null): number | null {

@@ -1,417 +1,107 @@
 import type { Metadata } from 'next'
-import { AddChoreForm } from './add-chore-form'
-import {
-  addChore,
-  archiveChore,
-  completeChore,
-  renameKid,
-  setPause,
-} from './actions'
-import {
-  type Chore,
-  type Completion,
-  type Kid,
-  getChoreState,
-} from './data'
+import { completeChore } from './actions'
+import { type Chore, type Completion, type Kid, getChoreState } from './data'
+import { DAY_NAMES, getToday, isOpenToday, starsForKid } from './utils'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 export const fetchCache = 'force-no-store'
 
-const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-const DAY_ABBRS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-
-type TodayContext = {
-  todayIso: string
-  weekday: number
-}
-
 export const metadata: Metadata = {
   title: 'Chores',
-  description: 'A three-column family chore board with stars and repeating tasks stored in Redis.',
-}
-
-function today(): TodayContext {
-  const now = new Date()
-  return {
-    todayIso: now.toISOString().slice(0, 10),
-    weekday: now.getUTCDay(),
-  }
-}
-
-function hasCompletedToday(
-  choreId: string,
-  completions: Completion[],
-  ctx: TodayContext,
-): boolean {
-  return completions.some(
-    (completion) =>
-      completion.choreId === choreId &&
-      completion.timestamp.slice(0, 10) === ctx.todayIso,
-  )
-}
-
-function isPaused(chore: Chore, ctx: TodayContext): boolean {
-  return (
-    chore.type === 'repeated' &&
-    !!chore.pausedUntil &&
-    chore.pausedUntil >= ctx.todayIso
-  )
-}
-
-function isOpenToday(
-  chore: Chore,
-  completions: Completion[],
-  ctx: TodayContext,
-): boolean {
-  if (chore.type === 'one-off') {
-    return !chore.completedAt
-  }
-
-  if (chore.type === 'perpetual') {
-    return true
-  }
-
-  if (isPaused(chore, ctx)) return false
-
-  const cadence = chore.schedule?.cadence ?? 'daily'
-  if (cadence === 'weekly') {
-    const days = chore.schedule?.daysOfWeek ?? []
-    if (!days.includes(ctx.weekday)) return false
-  }
-
-  if (hasCompletedToday(chore.id, completions, ctx)) return false
-
-  return true
-}
-
-function scheduleLabel(chore: Chore): string {
-  if (chore.type === 'one-off') return 'One-off'
-  if (chore.type === 'perpetual') return 'Perpetual'
-  if (chore.schedule?.cadence === 'weekly') {
-    const days = chore.schedule.daysOfWeek ?? []
-    if (!days.length) return 'Weekly'
-    return `Weekly · ${days.map((day) => DAY_ABBRS[day]).join(', ')}`
-  }
-  return 'Daily'
-}
-
-function recurringStatus(
-  chore: Chore,
-  completions: Completion[],
-  ctx: TodayContext,
-): { label: string; tone: 'neutral' | 'success' | 'muted' } {
-  if (isPaused(chore, ctx)) {
-    return {
-      label: `Paused until ${chore.pausedUntil}`,
-      tone: 'muted',
-    }
-  }
-
-  if (isOpenToday(chore, completions, ctx)) {
-    return { label: 'Due today', tone: 'neutral' }
-  }
-
-  if (hasCompletedToday(chore.id, completions, ctx)) {
-    return { label: 'Done today', tone: 'success' }
-  }
-
-  if (chore.schedule?.cadence === 'weekly' && chore.schedule.daysOfWeek?.length) {
-    return {
-      label: `Next: ${chore.schedule.daysOfWeek
-        .map((day) => DAY_ABBRS[day])
-        .join(', ')}`,
-      tone: 'muted',
-    }
-  }
-
-  return { label: 'Back tomorrow', tone: 'muted' }
-}
-
-function starsForKid(completions: Completion[], kidId: string): number {
-  return completions
-    .filter((completion) => completion.kidId === kidId)
-    .reduce((total, completion) => total + completion.starsAwarded, 0)
+  description:
+    'Kid-facing chore board with one column per kid and a single tap to claim stars.',
 }
 
 type ColumnProps = {
   kid: Kid
-  openChores: Chore[]
-  recurringChores: Chore[]
+  chores: Chore[]
   completions: Completion[]
-  ctx: TodayContext
 }
 
-function KidColumn({
-  kid,
-  openChores,
-  recurringChores,
-  completions,
-  ctx,
-}: ColumnProps) {
+function KidColumn({ kid, chores, completions }: ColumnProps) {
   const starTotal = starsForKid(completions, kid.id)
 
   return (
-    <div className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <div className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
       <div className="flex items-center justify-between gap-3">
-        <form action={renameKid} className="flex items-center gap-2">
-          <input type="hidden" name="kidId" value={kid.id} />
-          <input
-            name="name"
-            defaultValue={kid.name}
-            className="w-28 rounded-md border border-slate-300 bg-white px-2 py-1 text-sm font-semibold text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
-          />
-          <button
-            type="submit"
-            className="rounded-md border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-700 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-200"
-          >
-            Save
-          </button>
-        </form>
-        <div className="flex items-center gap-2 rounded-md bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-800 dark:bg-slate-800 dark:text-slate-100">
+        <div className="text-lg font-semibold text-slate-900 dark:text-slate-50">
+          {kid.name}
+        </div>
+        <div className="flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-800 shadow-sm dark:bg-amber-900/50 dark:text-amber-50">
           ⭐️ <span className="tabular-nums">{starTotal}</span>
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-            Open today
-          </h3>
-          <span className="text-xs text-slate-500 dark:text-slate-400">
-            {openChores.length} chore{openChores.length === 1 ? '' : 's'}
-          </span>
-        </div>
-
-        {openChores.length === 0 ? (
-          <div className="rounded-md border border-dashed border-slate-300 p-3 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
-            Nothing pending. Celebrate the wins or add something new.
+      <div className="space-y-3">
+        {chores.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-300">
+            All clear! Come back when something new pops up.
           </div>
         ) : (
-          openChores.map((chore) => (
-            <ChoreCard
-              key={chore.id}
-              chore={chore}
-              ctx={ctx}
-              completions={completions}
-            />
-          ))
+          chores.map((chore) => <ChoreButton key={chore.id} chore={chore} />)
         )}
       </div>
-
-      {recurringChores.length > 0 ? (
-        <div className="space-y-2 border-t border-slate-200 pt-3 dark:border-slate-800">
-          <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Recurring & pauses
-          </h4>
-          <div className="space-y-2">
-            {recurringChores.map((chore) => {
-              const status = recurringStatus(chore, completions, ctx)
-              return (
-                <div
-                  key={chore.id}
-                  className="rounded-md border border-slate-200 bg-slate-50 p-3 text-sm dark:border-slate-700 dark:bg-slate-800/60"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">{chore.emoji}</span>
-                      <div>
-                        <div className="font-semibold">{chore.title}</div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400">
-                          {scheduleLabel(chore)}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                          status.tone === 'success'
-                            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-100'
-                            : status.tone === 'muted'
-                              ? 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-200'
-                              : 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-100'
-                        }`}
-                      >
-                        {status.label}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    <form action={setPause} className="flex items-center gap-2">
-                      <input type="hidden" name="choreId" value={chore.id} />
-                      <input
-                        type="date"
-                        name="pausedUntil"
-                        defaultValue={chore.pausedUntil ?? ''}
-                        className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-50"
-                      />
-                      <button
-                        type="submit"
-                        className="rounded-md border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-700 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-200"
-                      >
-                        Pause
-                      </button>
-                    </form>
-                    {chore.pausedUntil ? (
-                      <form action={setPause}>
-                        <input type="hidden" name="choreId" value={chore.id} />
-                        <input type="hidden" name="pausedUntil" value="" />
-                        <button
-                          type="submit"
-                          className="rounded-md border border-transparent bg-slate-900 px-3 py-1 text-xs font-semibold text-white transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
-                        >
-                          Resume
-                        </button>
-                      </form>
-                    ) : null}
-                    <form action={archiveChore}>
-                      <input type="hidden" name="choreId" value={chore.id} />
-                      <button
-                        type="submit"
-                        className="rounded-md border border-transparent px-3 py-1 text-xs font-semibold text-slate-500 transition hover:bg-slate-100 dark:hover:bg-slate-800"
-                      >
-                        Archive
-                      </button>
-                    </form>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      ) : null}
     </div>
   )
 }
 
-function ChoreCard({
-  chore,
-  ctx,
-  completions,
-}: {
-  chore: Chore
-  ctx: TodayContext
-  completions: Completion[]
-}) {
-  const dueLabel = scheduleLabel(chore)
-  const paused = isPaused(chore, ctx)
-  const doneToday = hasCompletedToday(chore.id, completions, ctx)
-
+function ChoreButton({ chore }: { chore: Chore }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 shadow-sm dark:border-slate-700 dark:bg-slate-800/70">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-start gap-3">
-          <div className="text-2xl leading-none">{chore.emoji}</div>
-          <div className="space-y-1">
-            <div className="font-semibold leading-tight">{chore.title}</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400">
-              {dueLabel}
-              {paused ? ` • Paused until ${chore.pausedUntil}` : null}
-              {doneToday && !paused ? ' • Done for today' : null}
+    <form action={completeChore}>
+      <input type="hidden" name="choreId" value={chore.id} />
+      <button
+        type="submit"
+        className="group flex w-full items-center gap-4 rounded-xl border-2 border-slate-200 bg-white px-4 py-4 text-left text-slate-900 shadow transition hover:-translate-y-0.5 hover:border-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:translate-y-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+      >
+        <span className="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-slate-300 bg-slate-50 text-lg font-semibold text-slate-700 transition group-hover:-translate-y-0.5 group-hover:border-emerald-500 group-hover:bg-emerald-50 group-hover:text-emerald-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:group-hover:border-emerald-400 dark:group-hover:bg-emerald-900/40">
+          ✓
+        </span>
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <span className="text-3xl leading-none">{chore.emoji}</span>
+          <div className="min-w-0">
+            <div className="text-lg font-semibold leading-tight">
+              {chore.title}
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-1 rounded-md bg-white px-2 py-1 text-xs font-semibold text-slate-700 shadow dark:bg-slate-900 dark:text-slate-100">
-          ⭐️ {chore.stars}
+        <div className="flex flex-col items-end justify-center text-sm font-semibold text-amber-700 dark:text-amber-200">
+          <span className="leading-tight">+{chore.stars}</span>
+          <span className="text-xs font-medium text-slate-500 dark:text-slate-300">
+            stars
+          </span>
         </div>
-      </div>
-
-      <div className="mt-3 flex flex-wrap gap-2">
-        <form action={completeChore}>
-          <input type="hidden" name="choreId" value={chore.id} />
-          <button
-            type="submit"
-            className="rounded-md bg-slate-900 px-3 py-1 text-xs font-semibold text-white transition hover:bg-slate-800 disabled:opacity-50 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
-            disabled={doneToday && chore.type === 'repeated'}
-          >
-            Mark done
-          </button>
-        </form>
-        {chore.type === 'repeated' ? (
-          <form action={setPause} className="flex items-center gap-2">
-            <input type="hidden" name="choreId" value={chore.id} />
-            <input
-              type="date"
-              name="pausedUntil"
-              defaultValue={chore.pausedUntil ?? ''}
-              className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-50"
-            />
-            <button
-              type="submit"
-              className="rounded-md border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-700 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-200"
-            >
-              Pause
-            </button>
-          </form>
-        ) : null}
-        <form action={archiveChore}>
-          <input type="hidden" name="choreId" value={chore.id} />
-          <button
-            type="submit"
-            className="rounded-md border border-transparent px-3 py-1 text-xs font-semibold text-slate-500 transition hover:bg-slate-100 dark:hover:bg-slate-800"
-          >
-            Archive
-          </button>
-        </form>
-      </div>
-    </div>
+      </button>
+    </form>
   )
 }
 
 export default async function ChoresPage() {
   const state = await getChoreState()
-  const ctx = today()
+  const ctx = getToday()
 
   const openChoresByKid: Record<string, Chore[]> = {}
-  const recurringByKid: Record<string, Chore[]> = {}
 
   for (const kid of state.kids) {
     openChoresByKid[kid.id] = []
-    recurringByKid[kid.id] = []
   }
 
   for (const chore of state.chores) {
     if (isOpenToday(chore, state.completions, ctx)) {
       openChoresByKid[chore.kidId]?.push(chore)
     }
-
-    if (chore.type === 'repeated') {
-      recurringByKid[chore.kidId]?.push(chore)
-    }
   }
 
   return (
     <div className="space-y-6">
-      <div className="space-y-3">
-        <p className="text-sm uppercase tracking-wide text-slate-500 dark:text-slate-400">
-          Family chore stack
-        </p>
-        <div className="space-y-2">
-          <h1 className="text-2xl font-bold leading-tight">Chores & rewards</h1>
-          <p className="text-slate-600 dark:text-slate-300">
-            A three-column Kanban for today&apos;s chores, pulled from Redis and tailored for
-            one-off, repeating, and perpetual tasks. Mark things done to award stars,
-            pause routines during breaks, and keep each kid&apos;s tally visible.
-          </p>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Today is {DAY_NAMES[ctx.weekday]}, {ctx.todayIso}.
-          </p>
-        </div>
-      </div>
-
-      <AddChoreForm kids={state.kids} addChoreAction={addChore} />
-
       <div className="full-bleed">
         <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 md:px-4">
           {state.kids.map((kid) => (
             <KidColumn
               key={kid.id}
               kid={kid}
-              openChores={openChoresByKid[kid.id] ?? []}
-              recurringChores={recurringByKid[kid.id] ?? []}
+              chores={openChoresByKid[kid.id] ?? []}
               completions={state.completions}
-              ctx={ctx}
             />
           ))}
         </div>
