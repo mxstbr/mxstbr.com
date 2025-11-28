@@ -5,6 +5,7 @@ export type ChoreType = 'one-off' | 'repeated' | 'perpetual'
 export type Kid = {
   id: string
   name: string
+  color: string
 }
 
 export type ChoreSchedule = {
@@ -23,6 +24,7 @@ export type Chore = {
   pausedUntil?: string | null
   createdAt: string
   completedAt?: string | null
+  timeOfDay?: 'morning' | 'afternoon' | 'evening'
 }
 
 export type Completion = {
@@ -44,9 +46,9 @@ const redis = Redis.fromEnv()
 export const CHORES_KEY = 'chores:mxstbr:family-board'
 
 const DEFAULT_KIDS: Kid[] = [
-  { id: 'kid-1', name: 'Kid One' },
-  { id: 'kid-2', name: 'Kid Two' },
-  { id: 'kid-3', name: 'Kid Three' },
+  { id: 'kid-1', name: 'Kid One', color: '#0ea5e9' },
+  { id: 'kid-2', name: 'Kid Two', color: '#8b5cf6' },
+  { id: 'kid-3', name: 'Kid Three', color: '#f59e0b' },
 ]
 
 function createDefaultChores(kids: Kid[]): Chore[] {
@@ -64,6 +66,7 @@ function createDefaultChores(kids: Kid[]): Chore[] {
       stars: 5,
       type: 'one-off',
       createdAt,
+      timeOfDay: 'afternoon',
     },
     {
       id: crypto.randomUUID(),
@@ -74,6 +77,7 @@ function createDefaultChores(kids: Kid[]): Chore[] {
       type: 'repeated',
       schedule: { cadence: 'daily' },
       createdAt,
+      timeOfDay: 'evening',
     },
     {
       id: crypto.randomUUID(),
@@ -84,6 +88,7 @@ function createDefaultChores(kids: Kid[]): Chore[] {
       type: 'repeated',
       schedule: { cadence: 'weekly', daysOfWeek: [3] }, // Wednesday
       createdAt,
+      timeOfDay: 'evening',
     },
     {
       id: crypto.randomUUID(),
@@ -93,6 +98,7 @@ function createDefaultChores(kids: Kid[]): Chore[] {
       stars: 1,
       type: 'perpetual',
       createdAt,
+      timeOfDay: 'morning',
     },
   ]
 }
@@ -108,12 +114,18 @@ function ensureKids(kids: Kid[] | undefined): Kid[] {
     })
   }
 
-  return filled.slice(0, 3)
+  return filled.slice(0, 3).map((kid, index) => ({
+    ...kid,
+    color: kid.color || DEFAULT_KIDS[index]?.color || '#0ea5e9',
+  }))
 }
 
 function ensureChores(chores: Chore[] | undefined, kids: Kid[]): Chore[] {
-  if (Array.isArray(chores)) return chores
-  return createDefaultChores(kids)
+  if (!Array.isArray(chores)) return createDefaultChores(kids)
+  return chores.map((chore) => ({
+    ...chore,
+    timeOfDay: chore.timeOfDay ?? 'morning',
+  }))
 }
 
 export function normalizeState(state: Partial<ChoreState> | null): ChoreState {

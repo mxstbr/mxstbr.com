@@ -2,6 +2,11 @@ import type { Chore, Completion } from './data'
 
 export const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 export const DAY_ABBRS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const TIME_ORDER: Record<'morning' | 'afternoon' | 'evening', number> = {
+  morning: 0,
+  afternoon: 1,
+  evening: 2,
+}
 
 export type TodayContext = {
   todayIso: string
@@ -109,4 +114,36 @@ export function starsForKid(completions: Completion[], kidId: string): number {
   return completions
     .filter((completion) => completion.kidId === kidId)
     .reduce((total, completion) => total + completion.starsAwarded, 0)
+}
+
+export function withAlpha(color: string, alpha: number): string {
+  if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(color)) {
+    const hex = color.slice(1)
+    const fullHex =
+      hex.length === 3
+        ? hex
+            .split('')
+            .map((c) => c + c)
+            .join('')
+        : hex
+    const r = parseInt(fullHex.slice(0, 2), 16)
+    const g = parseInt(fullHex.slice(2, 4), 16)
+    const b = parseInt(fullHex.slice(4, 6), 16)
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`
+  }
+
+  return color
+}
+
+export function sortByTimeOfDay<T extends { timeOfDay?: 'morning' | 'afternoon' | 'evening'; createdAt?: string }>(
+  chores: T[],
+): T[] {
+  return [...chores].sort((a, b) => {
+    const orderA = TIME_ORDER[a.timeOfDay ?? 'morning']
+    const orderB = TIME_ORDER[b.timeOfDay ?? 'morning']
+    if (orderA !== orderB) return orderA - orderB
+    const createdA = a.createdAt ?? ''
+    const createdB = b.createdAt ?? ''
+    return createdB.localeCompare(createdA)
+  })
 }

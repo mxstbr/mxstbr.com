@@ -16,6 +16,7 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
   const [type, setType] = useState<'one-off' | 'repeated' | 'perpetual'>('one-off')
   const [cadence, setCadence] = useState<'daily' | 'weekly'>('daily')
   const [selectedDays, setSelectedDays] = useState<number[]>([now.getDay()])
+  const [timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening'>('morning')
 
   const toggleDay = (day: number) => {
     setSelectedDays((prev) =>
@@ -43,7 +44,7 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
         </button>
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-200">
           Title
           <input
@@ -86,6 +87,22 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
                 {kid.name}
               </option>
             ))}
+          </select>
+        </label>
+
+        <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-200">
+          Time of day
+          <select
+            name="timeOfDay"
+            value={timeOfDay}
+            onChange={(event) =>
+              setTimeOfDay(event.target.value as 'morning' | 'afternoon' | 'evening')
+            }
+            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+          >
+            <option value="morning">Morning</option>
+            <option value="afternoon">Afternoon</option>
+            <option value="evening">Evening</option>
           </select>
         </label>
       </div>

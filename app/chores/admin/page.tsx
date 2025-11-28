@@ -7,6 +7,7 @@ import {
   completeChore,
   renameKid,
   setPause,
+  setTimeOfDay,
 } from '../actions'
 import {
   type Chore,
@@ -26,6 +27,8 @@ import {
   scheduleLabel,
   starsForKid,
   type TodayContext,
+  sortByTimeOfDay,
+  withAlpha,
 } from '../utils'
 
 export const dynamic = 'force-dynamic'
@@ -53,9 +56,18 @@ function KidColumn({
   ctx,
 }: ColumnProps) {
   const starTotal = starsForKid(completions, kid.id)
+  const accent = kid.color ?? '#0ea5e9'
+  const accentSoft = withAlpha(accent, 0.1)
 
   return (
-    <div className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <div
+      className="flex flex-col gap-4 rounded-xl border bg-white p-4 shadow-sm dark:bg-slate-900"
+      style={{
+        borderColor: accent,
+        backgroundColor: accentSoft,
+        boxShadow: `0 12px 40px -20px ${accentSoft}, inset 0 1px 0 ${accentSoft}`,
+      }}
+    >
       <div className="flex items-center justify-between gap-3">
         <form action={renameKid} className="flex items-center gap-2">
           <input type="hidden" name="kidId" value={kid.id} />
@@ -64,6 +76,13 @@ function KidColumn({
             defaultValue={kid.name}
             className="w-28 rounded-md border border-slate-300 bg-white px-2 py-1 text-sm font-semibold text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
           />
+          <input
+            type="color"
+            name="color"
+            defaultValue={kid.color}
+            className="h-8 w-10 cursor-pointer rounded-md border border-slate-300 bg-white p-1 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+            aria-label={`${kid.name} color`}
+          />
           <button
             type="submit"
             className="rounded-md border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-700 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-200"
@@ -71,7 +90,10 @@ function KidColumn({
             Save
           </button>
         </form>
-        <div className="flex items-center gap-2 rounded-md bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-800 dark:bg-slate-800 dark:text-slate-100">
+        <div
+          className="flex items-center gap-2 rounded-md px-3 py-1 text-sm font-semibold text-slate-800"
+          style={{ backgroundColor: accentSoft, color: accent }}
+        >
           ⭐️ <span className="tabular-nums">{starTotal}</span>
         </div>
       </div>
@@ -200,6 +222,12 @@ function ChoreCard({
   const dueLabel = scheduleLabel(chore)
   const paused = isPaused(chore, ctx)
   const doneToday = hasCompletedToday(chore.id, completions, ctx)
+  const timeLabel =
+    chore.timeOfDay === 'afternoon'
+      ? 'Afternoon'
+      : chore.timeOfDay === 'evening'
+        ? 'Evening'
+        : 'Morning'
 
   return (
     <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 shadow-sm dark:border-slate-700 dark:bg-slate-800/70">
@@ -209,7 +237,7 @@ function ChoreCard({
           <div className="space-y-1">
             <div className="font-semibold leading-tight">{chore.title}</div>
             <div className="text-xs text-slate-500 dark:text-slate-400">
-              {dueLabel}
+              {timeLabel} • {dueLabel}
               {paused ? ` • Paused until ${chore.pausedUntil}` : null}
               {doneToday && !paused ? ' • Done for today' : null}
             </div>
@@ -230,6 +258,19 @@ function ChoreCard({
           >
             Mark done
           </button>
+        </form>
+        <form action={setTimeOfDay} className="flex items-center gap-1">
+          <input type="hidden" name="choreId" value={chore.id} />
+          <select
+            name="timeOfDay"
+            defaultValue={chore.timeOfDay ?? 'morning'}
+            className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-700 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+            aria-label="Time of day"
+          >
+            <option value="morning">Morning</option>
+            <option value="afternoon">Afternoon</option>
+            <option value="evening">Evening</option>
+          </select>
         </form>
         {chore.type === 'repeated' ? (
           <form action={setPause} className="flex items-center gap-2">
@@ -322,8 +363,8 @@ export default async function ChoreAdminPage() {
             <KidColumn
               key={kid.id}
               kid={kid}
-              openChores={openChoresByKid[kid.id] ?? []}
-              recurringChores={recurringByKid[kid.id] ?? []}
+              openChores={sortByTimeOfDay(openChoresByKid[kid.id] ?? [])}
+              recurringChores={sortByTimeOfDay(recurringByKid[kid.id] ?? [])}
               completions={state.completions}
               ctx={ctx}
             />
