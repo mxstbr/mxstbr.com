@@ -40,6 +40,8 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
   const todayCtx = getToday()
   const ctx = getToday(searchParams?.day)
   const viewingToday = ctx.todayIso === todayCtx.todayIso
+  const viewingPast = ctx.todayIso < todayCtx.todayIso
+  const viewingFuture = ctx.todayIso > todayCtx.todayIso
   const prevDay = shiftIsoDay(ctx.todayIso, -1)
   const nextDay = shiftIsoDay(ctx.todayIso, 1)
   const dayDate = new Date(`${ctx.todayIso}T12:00:00Z`)
@@ -154,7 +156,13 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
           </Link>
         </div>
       </div>
-      <KidBoard columns={columns} completions={state.completions} />
+      <KidBoard
+        columns={columns}
+        completions={state.completions}
+        mode={viewingToday ? 'today' : viewingFuture ? 'future' : 'past'}
+        dayLabel={readableDay}
+        todayHref={choresHref()}
+      />
     </div>
   )
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { type CSSProperties, useEffect, useMemo, useRef, useState, useTransition } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { Chore, Completion, Kid } from './data'
 import { completeChore, setKidColor, undoChore } from './actions'
@@ -15,9 +16,18 @@ type Column = {
 type KidBoardProps = {
   columns: Column[]
   completions: Completion[]
+  mode: 'today' | 'past' | 'future'
+  dayLabel: string
+  todayHref: string
 }
 
-export function KidBoard({ columns, completions }: KidBoardProps) {
+type PendingCompletion = {
+  chore: Chore
+  kidId: string
+  accent: string
+}
+
+export function KidBoard({ columns, completions, mode, dayLabel, todayHref }: KidBoardProps) {
   const router = useRouter()
   const initialTotals = useMemo(() => {
     const totals: Record<string, number> = {}
@@ -28,6 +38,7 @@ export function KidBoard({ columns, completions }: KidBoardProps) {
   }, [columns, completions])
 
   const [totals, setTotals] = useState(initialTotals)
+  const [pending, setPending] = useState<PendingCompletion | null>(null)
 
   useEffect(() => {
     setTotals(initialTotals)
@@ -55,6 +66,15 @@ export function KidBoard({ columns, completions }: KidBoardProps) {
     if (chore.type === 'perpetual') {
       setTimeout(() => router.refresh(), 5200)
     }
+  }
+
+  const handleCompleteRequest = (chore: Chore, kidId: string, accent: string) => {
+    if (mode === 'future') return
+    if (mode === 'past') {
+      setPending({ chore, kidId, accent })
+      return
+    }
+    void handleComplete(chore, kidId, accent)
   }
 
   const handleUndo = async (
@@ -88,11 +108,61 @@ export function KidBoard({ columns, completions }: KidBoardProps) {
             chores={sortByTimeOfDay(column.chores)}
             doneChores={column.done}
             starTotal={totals[column.kid.id] ?? 0}
-            onComplete={handleComplete}
+            onComplete={handleCompleteRequest}
             onUndo={handleUndo}
+            disableCompletion={mode === 'future'}
           />
         ))}
       </div>
+      {pending ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl dark:bg-slate-900">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">
+                  Editing a past day
+                </h2>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                  You&apos;re viewing {dayLabel}. Go to today to record chores, or complete this task for {dayLabel}.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPending(null)}
+                className="rounded-md p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800"
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+            <div className="mt-4 flex flex-wrap justify-end gap-2">
+              <Link
+                href={todayHref}
+                className="inline-flex items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+              >
+                Go to today
+              </Link>
+              <button
+                type="button"
+                onClick={() => {
+                  void handleComplete(pending.chore, pending.kidId, pending.accent)
+                  setPending(null)
+                }}
+                className="inline-flex items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-100"
+              >
+                Complete for {dayLabel}
+              </button>
+              <button
+                type="button"
+                onClick={() => setPending(null)}
+                className="inline-flex items-center justify-center rounded-md border border-transparent px-3 py-2 text-sm font-semibold text-slate-600 transition hover:text-slate-900 dark:text-slate-300"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }
@@ -104,6 +174,7 @@ function KidColumn({
   starTotal,
   onComplete,
   onUndo,
+  disableCompletion,
 }: {
   kid: Kid
   chores: Chore[]
@@ -111,6 +182,7 @@ function KidColumn({
   starTotal: number
   onComplete: (chore: Chore, kidId: string, accent: string) => Promise<void> | void
   onUndo: (chore: Chore, completionId: string, kidId: string) => Promise<void> | void
+  disableCompletion: boolean
 }) {
   const accent = kid.color ?? '#0ea5e9'
   const accentSoft = withAlpha(accent, 0.12)
@@ -162,6 +234,7 @@ function KidColumn({
               accent={accent}
               kidId={kid.id}
               onComplete={onComplete}
+              disabled={disableCompletion}
             />
           ))
         )}
@@ -254,11 +327,13 @@ function ChoreButton({
   accent,
   onComplete,
   kidId,
+  disabled = false,
 }: {
   chore: Chore
   accent: string
   kidId: string
-  onComplete: (chore: Chore, kidId: string, accent: string) => Promise<void>
+  onComplete: (chore: Chore, kidId: string, accent: string) => Promise<void> | void
+  disabled?: boolean
 }) {
   const [isPending, startTransition] = useTransition()
   const accentSoft = withAlpha(accent, 0.12)
@@ -278,7 +353,7 @@ function ChoreButton({
           '--accent-soft': accentSoft,
         } as CSSProperties
       }
-      disabled={isPending}
+      disabled={isPending || disabled}
     >
       <span className="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-slate-300 bg-slate-50 text-lg font-semibold text-slate-700 transition group-hover:border-[var(--accent)] group-hover:bg-[var(--accent-soft)] group-hover:text-[var(--accent)] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:group-hover:border-[var(--accent)] dark:group-hover:bg-[var(--accent-soft)] dark:group-hover:text-[var(--accent)]">
         {isPending ? '…' : ''}
