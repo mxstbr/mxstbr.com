@@ -57,7 +57,7 @@ export default async function RewardsPage({ searchParams }: RewardsPageProps) {
   }))
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6 min-h-screen bg-slate-50">
       <div className="flex items-center justify-between gap-3">
         <div className="space-y-1">
           <p className="text-sm uppercase tracking-wide text-slate-500 dark:text-slate-400">
