@@ -363,6 +363,8 @@ function ChoreButton({
   disabled?: boolean
 }) {
   const [isPending, startTransition] = useTransition()
+  const [isSpeaking, setIsSpeaking] = useState(false)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
   const accentSoft = withAlpha(accent, 0.12)
   const accentVars = {
     '--accent': accent,
@@ -370,21 +372,49 @@ function ChoreButton({
   } as CSSProperties
   const completionDisabled = isPending || disabled
 
+  const handleSpeak = async () => {
+    if (isSpeaking) return
+    try {
+      setIsSpeaking(true)
+      audioRef.current?.pause()
+      const response = await fetch('/api/chores/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: chore.title }),
+      })
+      if (!response.ok) throw new Error(`TTS failed: ${response.status}`)
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+      const audio = new Audio(url)
+      audioRef.current = audio
+      audio.onended = () => {
+        URL.revokeObjectURL(url)
+        setIsSpeaking(false)
+      }
+      audio.onerror = () => {
+        URL.revokeObjectURL(url)
+        setIsSpeaking(false)
+      }
+      await audio.play()
+    } catch (error) {
+      console.error('Failed to play chore audio', error)
+      setIsSpeaking(false)
+    }
+  }
+
   return (
-    <div className="relative" style={accentVars}>
+    <div className="flex items-stretch gap-2" style={accentVars}>
       <button
         type="button"
-        onClick={() =>
-          startTransition(() => {
-            if (completionDisabled) return
-            void onComplete(chore, kidId, accent)
-          })
-        }
-        className="group flex min-h-[80px] flex-1 items-center gap-4 rounded-xl border-2 border-slate-200 bg-white px-4 py-4 pr-14 text-left text-slate-900 shadow transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:hover:border-[var(--accent)] dark:hover:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)]"
+        onClick={() => {
+          if (completionDisabled) return
+          void handleSpeak()
+        }}
+        className="group flex min-h-[80px] flex-1 items-center gap-4 rounded-xl border-2 border-slate-200 bg-white px-4 py-4 text-left text-slate-900 shadow transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:hover:border-[var(--accent)] dark:hover:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)]"
         disabled={completionDisabled}
       >
         <span className="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-slate-300 bg-slate-50 text-lg font-semibold text-slate-700 transition group-hover:border-[var(--accent)] group-hover:bg-[var(--accent-soft)] group-hover:text-[var(--accent)] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:group-hover:border-[var(--accent)] dark:group-hover:bg-[var(--accent-soft)] dark:group-hover:text-[var(--accent)]">
-          {isPending ? '…' : ''}
+          {isSpeaking ? '🔊' : ''}
         </span>
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <span className="text-3xl leading-none">{chore.emoji}</span>
@@ -401,7 +431,20 @@ function ChoreButton({
           </span>
         </div>
       </button>
-      <SpeakButton text={chore.title} accent={accent} />
+      <button
+        type="button"
+        onClick={() =>
+          startTransition(() => {
+            if (completionDisabled) return
+            void onComplete(chore, kidId, accent)
+          })
+        }
+        className="flex h-full min-w-[52px] items-center justify-center rounded-xl border-2 border-emerald-400 bg-white px-3 text-lg font-semibold text-emerald-700 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-500 hover:bg-emerald-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:translate-y-0 disabled:opacity-60 dark:border-emerald-500/60 dark:bg-slate-800 dark:text-emerald-100 dark:hover:border-emerald-400 dark:hover:bg-emerald-900/30 dark:focus-visible:outline-emerald-400"
+        disabled={completionDisabled}
+        aria-label={`Mark "${chore.title}" as done`}
+      >
+        ✓
+      </button>
     </div>
   )
 }
@@ -468,62 +511,7 @@ function CompletedChoreButton({
           </div>
         </div>
       </button>
-      <SpeakButton text={chore.title} accent={accent} />
     </div>
-  )
-}
-
-function SpeakButton({ text, accent }: { text: string; accent: string }) {
-  const [isSpeaking, setIsSpeaking] = useState(false)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
-  const accentSoft = withAlpha(accent, 0.16)
-
-  return (
-    <button
-      type="button"
-      onClick={async (event) => {
-        event.stopPropagation()
-        if (isSpeaking) return
-
-        try {
-          setIsSpeaking(true)
-          audioRef.current?.pause()
-          const response = await fetch('/api/chores/tts', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text }),
-          })
-          if (!response.ok) throw new Error(`TTS failed with status ${response.status}`)
-          const blob = await response.blob()
-          const url = URL.createObjectURL(blob)
-          const audio = new Audio(url)
-          audioRef.current = audio
-          audio.onended = () => {
-            URL.revokeObjectURL(url)
-            setIsSpeaking(false)
-          }
-          audio.onerror = () => {
-            URL.revokeObjectURL(url)
-            setIsSpeaking(false)
-          }
-          await audio.play()
-        } catch (error) {
-          console.error('Failed to play chore audio', error)
-          setIsSpeaking(false)
-        }
-      }}
-      className="absolute right-2 top-2 flex h-10 w-10 items-center justify-center rounded-lg border-2 border-slate-200 bg-white text-lg shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:hover:border-[var(--accent)] dark:hover:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)]"
-      style={
-        {
-          '--accent': accent,
-          '--accent-soft': accentSoft,
-        } as CSSProperties
-      }
-      aria-label={`Play "${text}"`}
-      disabled={isSpeaking}
-    >
-      {isSpeaking ? '…' : '🔊'}
-    </button>
   )
 }
 
