@@ -191,10 +191,20 @@ export function appliesToKid(chore: Chore, kidId: string): boolean {
   return chore.kidIds.includes(kidId)
 }
 
-export function sortByTimeOfDay<T extends { timeOfDay?: 'morning' | 'afternoon' | 'evening'; createdAt?: string }>(
+export function sortByTimeOfDay<
+  T extends {
+    timeOfDay?: 'morning' | 'afternoon' | 'evening'
+    createdAt?: string
+    type?: 'one-off' | 'repeated' | 'perpetual'
+  },
+>(
   chores: T[],
 ): T[] {
   return [...chores].sort((a, b) => {
+    const isPerpetualA = a.type === 'perpetual'
+    const isPerpetualB = b.type === 'perpetual'
+    if (isPerpetualA !== isPerpetualB) return isPerpetualA ? 1 : -1
+
     const orderA = a.timeOfDay ? TIME_ORDER[a.timeOfDay] : Number.POSITIVE_INFINITY
     const orderB = b.timeOfDay ? TIME_ORDER[b.timeOfDay] : Number.POSITIVE_INFINITY
     if (orderA !== orderB) return orderA - orderB
