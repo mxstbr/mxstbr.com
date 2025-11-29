@@ -403,7 +403,21 @@ function ChoreButton({
   }
 
   return (
-    <div className="flex items-stretch gap-2" style={accentVars}>
+    <div className="flex items-stretch gap-3" style={accentVars}>
+      <button
+        type="button"
+        onClick={() =>
+          startTransition(() => {
+            if (completionDisabled) return
+            void onComplete(chore, kidId, accent)
+          })
+        }
+        className="flex h-full min-w-[52px] items-center justify-center rounded-xl border-2 border-emerald-400 bg-white px-3 text-lg font-semibold text-emerald-700 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-500 hover:bg-emerald-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:translate-y-0 disabled:opacity-60 dark:border-emerald-500/60 dark:bg-slate-800 dark:text-emerald-100 dark:hover:border-emerald-400 dark:hover:bg-emerald-900/30 dark:focus-visible:outline-emerald-400"
+        disabled={completionDisabled}
+        aria-label={`Mark "${chore.title}" as done`}
+      >
+        {isPending ? '…' : '✓'}
+      </button>
       <button
         type="button"
         onClick={() => {
