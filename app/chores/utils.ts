@@ -28,6 +28,7 @@ export type TodayContext = {
 }
 
 const ISO_DAY_REGEX = /^\d{4}-\d{2}-\d{2}$/
+const ALL_WEEKDAYS = [0, 1, 2, 3, 4, 5, 6]
 
 function dateFromIsoDay(day: string): Date | null {
   if (!ISO_DAY_REGEX.test(day)) return null
@@ -88,6 +89,24 @@ export function hasCompletedTodayForKid(
   )
 }
 
+function hasCompletionInWindow(
+  choreId: string,
+  kidId: string,
+  startIso: string,
+  endIso: string | null,
+  completions: Completion[],
+  ctx: TodayContext,
+): boolean {
+  return completions.some((completion) => {
+    if (completion.choreId !== choreId || completion.kidId !== kidId) return false
+    const day = pacificDateFromTimestamp(completion.timestamp)
+    if (day < startIso) return false
+    if (day > ctx.todayIso) return false
+    if (endIso && day >= endIso) return false
+    return true
+  })
+}
+
 export function isPaused(chore: Chore, ctx: TodayContext): boolean {
   return (
     chore.type === 'repeated' &&
@@ -103,13 +122,16 @@ export function isOpenForKid(
   ctx: TodayContext,
 ): boolean {
   if (!chore.kidIds.includes(kidId)) return false
+  const createdDay = pacificDateFromTimestamp(chore.createdAt)
+  if (createdDay > ctx.todayIso) return false
 
   if (chore.type === 'one-off') {
-    return !completions.some(
-      (completion) =>
-        completion.choreId === chore.id &&
-        completion.kidId === kidId,
-    )
+    const done = completions.some((completion) => {
+      if (completion.choreId !== chore.id || completion.kidId !== kidId) return false
+      const day = pacificDateFromTimestamp(completion.timestamp)
+      return day <= ctx.todayIso
+    })
+    return !done
   }
 
   if (chore.type === 'perpetual') {
@@ -128,14 +150,34 @@ export function isOpenForKid(
   if (isPaused(chore, ctx)) return false
 
   const cadence = chore.schedule?.cadence ?? 'daily'
+
   if (cadence === 'weekly') {
     const days = chore.schedule?.daysOfWeek ?? []
-    if (!days.includes(ctx.weekday)) return false
+    const windowStart = nearestScheduledOnOrBefore(ctx.todayIso, days)
+    if (!windowStart) return false
+    const windowEnd = nextScheduledAfter(windowStart, days)
+    const doneInWindow = hasCompletionInWindow(
+      chore.id,
+      kidId,
+      windowStart,
+      windowEnd,
+      completions,
+      ctx,
+    )
+    return !doneInWindow
   }
 
-  if (hasCompletedTodayForKid(chore.id, kidId, completions, ctx)) return false
-
-  return true
+  // daily cadence
+  const windowEnd = shiftIsoDay(ctx.todayIso, 1)
+  const doneToday = hasCompletionInWindow(
+    chore.id,
+    kidId,
+    ctx.todayIso,
+    windowEnd,
+    completions,
+    ctx,
+  )
+  return !doneToday
 }
 
 export function scheduleLabel(chore: Chore): string {
@@ -215,6 +257,40 @@ export function shiftIsoDay(dayIso: string, delta: number): string {
   const base = dateFromIsoDay(dayIso) ?? new Date()
   base.setUTCDate(base.getUTCDate() + delta)
   return formatPacificDate(base)
+}
+
+function nearestScheduledOnOrBefore(dayIso: string, daysOfWeek: number[]): string | null {
+  const day = dateFromIsoDay(dayIso)
+  if (!day) return null
+  const allowed = daysOfWeek.length ? daysOfWeek : ALL_WEEKDAYS
+
+  for (let offset = 0; offset < 7; offset++) {
+    const candidate = new Date(day)
+    candidate.setUTCDate(candidate.getUTCDate() - offset)
+    if (allowed.includes(candidate.getUTCDay())) {
+      return formatPacificDate(candidate)
+    }
+  }
+
+  return formatPacificDate(day)
+}
+
+function nextScheduledAfter(dayIso: string, daysOfWeek: number[]): string | null {
+  const day = dateFromIsoDay(dayIso)
+  if (!day) return null
+  const allowed = daysOfWeek.length ? daysOfWeek : ALL_WEEKDAYS
+
+  for (let offset = 1; offset <= 7; offset++) {
+    const candidate = new Date(day)
+    candidate.setUTCDate(candidate.getUTCDate() + offset)
+    if (allowed.includes(candidate.getUTCDay())) {
+      return formatPacificDate(candidate)
+    }
+  }
+
+  const fallback = new Date(day)
+  fallback.setUTCDate(fallback.getUTCDate() + 7)
+  return formatPacificDate(fallback)
 }
 
 export function sortByTimeOfDay<
