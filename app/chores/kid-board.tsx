@@ -371,7 +371,7 @@ function ChoreButton({
   const completionDisabled = isPending || disabled
 
   return (
-    <div className="flex items-stretch gap-2" style={accentVars}>
+    <div className="relative" style={accentVars}>
       <button
         type="button"
         onClick={() =>
@@ -380,7 +380,7 @@ function ChoreButton({
             void onComplete(chore, kidId, accent)
           })
         }
-        className="group flex min-h-[80px] flex-1 items-center gap-4 rounded-xl border-2 border-slate-200 bg-white px-4 py-4 text-left text-slate-900 shadow transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:hover:border-[var(--accent)] dark:hover:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)]"
+        className="group flex min-h-[80px] flex-1 items-center gap-4 rounded-xl border-2 border-slate-200 bg-white px-4 py-4 pr-14 text-left text-slate-900 shadow transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:hover:border-[var(--accent)] dark:hover:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)]"
         disabled={completionDisabled}
       >
         <span className="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-slate-300 bg-slate-50 text-lg font-semibold text-slate-700 transition group-hover:border-[var(--accent)] group-hover:bg-[var(--accent-soft)] group-hover:text-[var(--accent)] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:group-hover:border-[var(--accent)] dark:group-hover:bg-[var(--accent-soft)] dark:group-hover:text-[var(--accent)]">
@@ -427,7 +427,7 @@ function CompletedChoreButton({
   const accentSoft = withAlpha(accent, 0.18)
 
   return (
-    <div className="flex items-stretch gap-2">
+    <div className="relative">
       <button
         type="button"
         onClick={() =>
@@ -435,7 +435,7 @@ function CompletedChoreButton({
             void onUndo(chore, completionId, kidId)
           })
         }
-        className="group flex w-full items-center gap-4 rounded-xl border-2 border-emerald-400 bg-white px-4 py-3 text-left text-slate-900 shadow transition hover:-translate-y-0.5 hover:border-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:translate-y-0 disabled:opacity-60 dark:border-emerald-500/60 dark:bg-slate-800 dark:text-slate-50"
+        className="group flex w-full items-center gap-4 rounded-xl border-2 border-emerald-400 bg-white px-4 py-3 pr-14 text-left text-slate-900 shadow transition hover:-translate-y-0.5 hover:border-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:translate-y-0 disabled:opacity-60 dark:border-emerald-500/60 dark:bg-slate-800 dark:text-slate-50"
         disabled={isPending}
       >
         <span
@@ -512,7 +512,7 @@ function SpeakButton({ text, accent }: { text: string; accent: string }) {
           setIsSpeaking(false)
         }
       }}
-      className="flex h-full min-w-[48px] items-center justify-center rounded-xl border-2 border-slate-200 bg-white px-3 text-lg transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:hover:border-[var(--accent)] dark:hover:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)]"
+      className="absolute right-2 top-2 flex h-10 w-10 items-center justify-center rounded-lg border-2 border-slate-200 bg-white text-lg shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:hover:border-[var(--accent)] dark:hover:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)]"
       style={
         {
           '--accent': accent,

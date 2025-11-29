@@ -4,6 +4,7 @@ import { openai } from '@ai-sdk/openai'
 import { isMax } from 'app/auth'
 
 export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
 
 export async function POST(request: Request): Promise<Response> {
   if (!isMax()) {
@@ -28,7 +29,9 @@ export async function POST(request: Request): Promise<Response> {
     const result = await generateSpeech({
       model: openai.speech('gpt-4o-mini-tts'),
       text: truncated,
+      voice: 'alloy',
       outputFormat: 'mp3',
+      language: 'en',
     })
 
     return new Response(Buffer.from(result.audio.uint8Array), {
@@ -39,7 +42,8 @@ export async function POST(request: Request): Promise<Response> {
       },
     })
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
     console.error('Failed to generate chore TTS', error)
-    return NextResponse.json({ error: 'Failed to generate audio' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to generate audio', message }, { status: 500 })
   }
 }
