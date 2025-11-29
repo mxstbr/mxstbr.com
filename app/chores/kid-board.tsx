@@ -432,6 +432,37 @@ function KidColumn({
 }) {
   const accent = kid.color ?? '#0ea5e9'
   const accentSoft = withAlpha(accent, 0.12)
+  const timeGroups: {
+    key: 'morning' | 'afternoon' | 'evening' | 'any'
+    label: string
+    emoji?: string
+  }[] = [
+    { key: 'morning', label: 'Morning', emoji: '🌅' },
+    { key: 'afternoon', label: 'Afternoon', emoji: '☀️' },
+    { key: 'evening', label: 'Evening', emoji: '🌙' },
+    { key: 'any', label: 'Any time' },
+  ]
+  const choresByTime: Record<
+    'morning' | 'afternoon' | 'evening' | 'any',
+    Chore[]
+  > = {
+    morning: [],
+    afternoon: [],
+    evening: [],
+    any: [],
+  }
+
+  for (const chore of chores) {
+    if (chore.timeOfDay === 'morning') {
+      choresByTime.morning.push(chore)
+    } else if (chore.timeOfDay === 'afternoon') {
+      choresByTime.afternoon.push(chore)
+    } else if (chore.timeOfDay === 'evening') {
+      choresByTime.evening.push(chore)
+    } else {
+      choresByTime.any.push(chore)
+    }
+  }
 
   return (
     <div
@@ -470,29 +501,46 @@ function KidColumn({
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {chores.length === 0 ? (
           <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-center text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200">
             All clear! Come back when something new pops up.
           </div>
         ) : (
-          chores.map((chore) => (
-            <ChoreButton
-              key={chore.id}
-              chore={chore}
-              accent={accent}
-              kidId={kid.id}
-              onComplete={onComplete}
-              disabled={disableCompletion}
-            />
-          ))
+          timeGroups
+            .map((group) => ({
+              ...group,
+              items: choresByTime[group.key],
+            }))
+            .filter((group) => group.items.length > 0)
+            .map((group) => (
+              <div key={group.key} className="space-y-2">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
+                  {group.emoji ? <span aria-hidden="true">{group.emoji}</span> : null}
+                  <span>{group.label}</span>
+                </div>
+                <div className="space-y-3">
+                  {group.items.map((chore) => (
+                    <ChoreButton
+                      key={chore.id}
+                      chore={chore}
+                      accent={accent}
+                      kidId={kid.id}
+                      onComplete={onComplete}
+                      disabled={disableCompletion}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))
         )}
       </div>
 
       {doneChores.length ? (
         <div className="space-y-2">
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-            Done today
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
+            <span>Done today</span>
+            <span className="h-px flex-1 rounded-full bg-slate-200 dark:bg-slate-700" />
           </div>
           <div className="space-y-2">
             {doneChores.map((entry) => (
