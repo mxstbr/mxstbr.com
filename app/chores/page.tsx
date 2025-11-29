@@ -2,7 +2,13 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { KidBoard } from './kid-board'
 import { type Chore, getChoreState } from './data'
-import { getToday, isOpenForKid, pacificDateFromTimestamp, shiftIsoDay, sortByTimeOfDay } from './utils'
+import {
+  getToday,
+  isOpenForKid,
+  pacificDateFromTimestamp,
+  shiftIsoDay,
+  sortByTimeOfDay,
+} from './utils'
 import { PasswordForm } from 'app/cal/password-form'
 import { auth, isMax } from 'app/auth'
 
@@ -43,7 +49,10 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
   }).format(dayDate)
 
   const openChoresByKid: Record<string, Chore[]> = {}
-  const doneChoresByKid: Record<string, { chore: Chore; completionId: string; timestamp: string }[]> = {}
+  const doneChoresByKid: Record<
+    string,
+    { chore: Chore; completionId: string; timestamp: string }[]
+  > = {}
 
   for (const kid of state.kids) {
     openChoresByKid[kid.id] = []
@@ -59,7 +68,8 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
   }
 
   for (const completion of state.completions) {
-    if (pacificDateFromTimestamp(completion.timestamp) !== ctx.todayIso) continue
+    if (pacificDateFromTimestamp(completion.timestamp) !== ctx.todayIso)
+      continue
     const chore = state.chores.find((c) => c.id === completion.choreId)
     if (!chore) continue
     if (!chore.kidIds.includes(completion.kidId)) continue
@@ -84,7 +94,7 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
   }))
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6 bg-slate-50 min-h-screen">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
           Chores
@@ -99,7 +109,9 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
               ‹
             </Link>
             <Link
-              href={viewingToday ? '/chores' : `/chores?day=${todayCtx.todayIso}`}
+              href={
+                viewingToday ? '/chores' : `/chores?day=${todayCtx.todayIso}`
+              }
               className={`rounded px-3 py-1 transition ${
                 viewingToday
                   ? 'bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200'
