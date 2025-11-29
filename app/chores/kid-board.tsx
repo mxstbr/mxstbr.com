@@ -20,6 +20,7 @@ type KidBoardProps = {
   mode: 'today' | 'past' | 'future'
   dayLabel: string
   todayHref: string
+  selectedKidId?: string
 }
 
 type PendingCompletion = {
@@ -28,8 +29,10 @@ type PendingCompletion = {
   accent: string
 }
 
-export function KidBoard({ columns, completions, mode, dayLabel, todayHref }: KidBoardProps) {
+export function KidBoard({ columns, completions, mode, dayLabel, todayHref, selectedKidId }: KidBoardProps) {
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const initialTotals = useMemo(() => {
     const totals: Record<string, number> = {}
     for (const column of columns) {
@@ -40,10 +43,22 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref }: Ki
 
   const [totals, setTotals] = useState(initialTotals)
   const [pending, setPending] = useState<PendingCompletion | null>(null)
+  const [activeKidId, setActiveKidId] = useState<string>(
+    selectedKidId && columns.some((c) => c.kid.id === selectedKidId)
+      ? selectedKidId
+      : columns[0]?.kid.id ?? '',
+  )
 
   useEffect(() => {
     setTotals(initialTotals)
   }, [initialTotals])
+
+  useEffect(() => {
+    if (!selectedKidId) return
+    if (columns.some((c) => c.kid.id === selectedKidId)) {
+      setActiveKidId(selectedKidId)
+    }
+  }, [selectedKidId, columns])
 
   useEffect(() => {
     const refresh = () => router.refresh()
@@ -132,9 +147,46 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref }: Ki
     router.refresh()
   }
 
+  const handleKidChange = (kidId: string) => {
+    setActiveKidId(kidId)
+    const params = new URLSearchParams(searchParams?.toString() ?? '')
+    params.set('kid', kidId)
+    const query = params.toString()
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
+  }
+
+  const mobileColumn = columns.find((col) => col.kid.id === activeKidId) ?? columns[0]
+
   return (
     <div className="full-bleed">
-      <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 md:px-4">
+      <div className="md:hidden">
+        <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">
+          Select kid
+        </label>
+        <select
+          value={mobileColumn?.kid.id}
+          onChange={(event) => handleKidChange(event.target.value)}
+          className="mb-4 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+        >
+          {columns.map((col) => (
+            <option key={col.kid.id} value={col.kid.id}>
+              {col.kid.name}
+            </option>
+          ))}
+        </select>
+        {mobileColumn ? (
+          <KidColumn
+            kid={mobileColumn.kid}
+            chores={sortByTimeOfDay(mobileColumn.chores)}
+            doneChores={mobileColumn.done}
+            starTotal={totals[mobileColumn.kid.id] ?? 0}
+            onComplete={handleCompleteRequest}
+            onUndo={handleUndo}
+            disableCompletion={mode === 'future'}
+          />
+        ) : null}
+      </div>
+      <div className="hidden grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 md:px-4 md:grid">
         {columns.map((column) => (
           <KidColumn
             key={column.kid.id}

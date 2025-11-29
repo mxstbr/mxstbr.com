@@ -26,6 +26,7 @@ type ChoresPageProps = {
   searchParams?: {
     day?: string
     os?: string
+    kid?: string
   }
 }
 
@@ -51,6 +52,7 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
     day: 'numeric',
   }).format(dayDate)
   const osParam = searchParams?.os
+  const kidParam = searchParams?.kid
 
   const choresHref = (day?: string) => {
     const params = new URLSearchParams()
@@ -162,6 +164,7 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
         mode={viewingToday ? 'today' : viewingFuture ? 'future' : 'past'}
         dayLabel={readableDay}
         todayHref={choresHref()}
+        selectedKidId={kidParam}
       />
     </div>
   )
