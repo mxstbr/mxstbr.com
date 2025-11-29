@@ -427,14 +427,14 @@ function ChoreButton({
         className="group flex min-h-[80px] flex-1 items-center gap-4 rounded-xl border-2 border-slate-200 bg-white px-4 py-4 text-left text-slate-900 shadow transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:hover:border-[var(--accent)] dark:hover:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)]"
         disabled={completionDisabled}
       >
-        <span className="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-slate-300 bg-slate-50 text-lg font-semibold text-slate-700 transition group-hover:border-[var(--accent)] group-hover:bg-[var(--accent-soft)] group-hover:text-[var(--accent)] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:group-hover:border-[var(--accent)] dark:group-hover:bg-[var(--accent-soft)] dark:group-hover:text-[var(--accent)]">
-          {isSpeaking ? '🔊' : ''}
-        </span>
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <span className="text-3xl leading-none">{chore.emoji}</span>
           <div className="min-w-0">
-            <div className="text-lg font-semibold leading-tight">
-              {chore.title}
+            <div className="flex items-center gap-2">
+              <div className="text-lg font-semibold leading-tight">{chore.title}</div>
+              <span className="text-sm text-slate-500 dark:text-slate-300">
+                {isSpeaking ? '…' : '🔊'}
+              </span>
             </div>
           </div>
         </div>
@@ -444,20 +444,6 @@ function ChoreButton({
             stars
           </span>
         </div>
-      </button>
-      <button
-        type="button"
-        onClick={() =>
-          startTransition(() => {
-            if (completionDisabled) return
-            void onComplete(chore, kidId, accent)
-          })
-        }
-        className="flex h-full min-w-[52px] items-center justify-center rounded-xl border-2 border-emerald-400 bg-white px-3 text-lg font-semibold text-emerald-700 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-500 hover:bg-emerald-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:translate-y-0 disabled:opacity-60 dark:border-emerald-500/60 dark:bg-slate-800 dark:text-emerald-100 dark:hover:border-emerald-400 dark:hover:bg-emerald-900/30 dark:focus-visible:outline-emerald-400"
-        disabled={completionDisabled}
-        aria-label={`Mark "${chore.title}" as done`}
-      >
-        ✓
       </button>
     </div>
   )
