@@ -27,6 +27,7 @@ type ChoresPageProps = {
     day?: string
     os?: string
     kid?: string
+    pwd?: string
   }
 }
 
@@ -34,7 +35,12 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
   const password = auth()
 
   if (!isMax()) {
-    return <PasswordForm error={password ? 'Invalid password.' : undefined} />
+    return (
+      <PasswordForm
+        error={password ? 'Invalid password.' : undefined}
+        defaultPassword={searchParams?.pwd}
+      />
+    )
   }
 
   const state = await getChoreState()

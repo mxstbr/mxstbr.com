@@ -66,6 +66,10 @@ type RewardColumnProps = {
   allKids: Kid[]
 }
 
+type AdminPageProps = {
+  searchParams?: { pwd?: string }
+}
+
 function KidColumn({
   kid,
   openChores,
@@ -519,11 +523,16 @@ function RewardCard({
   )
 }
 
-export default async function ChoreAdminPage() {
+export default async function ChoreAdminPage({ searchParams }: AdminPageProps) {
   const password = auth()
 
   if (!isMax()) {
-    return <PasswordForm error={password ? 'Invalid password.' : undefined} />
+    return (
+      <PasswordForm
+        error={password ? 'Invalid password.' : undefined}
+        defaultPassword={searchParams?.pwd}
+      />
+    )
   }
 
   const state = await getChoreState()

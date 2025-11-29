@@ -603,7 +603,13 @@ function ChoreButton({
     chore.emoji ? 'emoji' : 'confetti',
     {
       emoji: chore.emoji ? [chore.emoji, '🎉'] : undefined,
-      spread: 140,
+      fps: 60,
+      lifetime: 420,
+      angle: 90,
+      decay: 0.92,
+      spread: 170,
+      startVelocity: 60,
+      elementCount: 120,
     },
   )
   const accentSoft = withAlpha(accent, 0.12)

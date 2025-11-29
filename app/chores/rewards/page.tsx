@@ -17,6 +17,7 @@ export const metadata: Metadata = {
 type RewardsPageProps = {
   searchParams?: {
     os?: string
+    pwd?: string
   }
 }
 
@@ -24,7 +25,12 @@ export default async function RewardsPage({ searchParams }: RewardsPageProps) {
   const password = auth()
 
   if (!isMax()) {
-    return <PasswordForm error={password ? 'Invalid password.' : undefined} />
+    return (
+      <PasswordForm
+        error={password ? 'Invalid password.' : undefined}
+        defaultPassword={searchParams?.pwd}
+      />
+    )
   }
 
   const state = await getChoreState()

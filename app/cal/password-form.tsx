@@ -1,25 +1,30 @@
 import { cookies } from 'next/headers'
-import { PasswordField } from './password-field'
 
-export function PasswordForm({ error }: { error?: string }) {
-  async function setPassword(formData: FormData) {
-    'use server'
-    const cookieStore = cookies()
-
-    const password = formData.get('password')
-    if (typeof password !== 'string') return
-
-    cookieStore.set('password', password, {
-      // One year
-      expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
-    })
-  }
-
+export function PasswordForm({
+  error,
+  defaultPassword,
+}: {
+  error?: string
+  defaultPassword?: string
+}) {
   return (
-    <form action={setPassword}>
+    <form
+      action={async (formData) => {
+        'use server'
+        const cookieStore = cookies()
+
+        const password = formData.get('password')
+        if (typeof password !== 'string') return
+
+        cookieStore.set('password', password, {
+          // One year
+          expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+        })
+      }}
+    >
       <label>
         Password
-        <PasswordField name="password" />
+        <input type="password" name="password" defaultValue={defaultPassword} />
       </label>
       <button type="submit">Submit</button>
       {error && <p>{error}</p>}
