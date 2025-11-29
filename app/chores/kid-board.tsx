@@ -46,6 +46,8 @@ type ApprovalRequest = {
   onReward?: () => void
 }
 
+const REWARD_TARGET_ID = 'chores-reward-target'
+
 export function KidBoard({
   columns,
   completions,
@@ -226,6 +228,11 @@ export function KidBoard({
 
   return (
     <div className="full-bleed md:h-full md:min-h-0">
+      <span
+        id={REWARD_TARGET_ID}
+        className="pointer-events-none fixed bottom-4 left-1/2 z-40 -translate-x-1/2 text-2xl md:bottom-6"
+        aria-hidden="true"
+      />
       <div className="md:hidden">
         <label className="mb-2 block text-xs font-semibold text-slate-700 dark:text-slate-200">
           Select kid
@@ -543,13 +550,12 @@ function ChoreButton({
   const [isSkipping, setIsSkipping] = useState(false)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
-  const rewardId = useMemo(() => `chore-reward-${chore.id}`, [chore.id])
   const { reward, isAnimating } = useReward(
-    rewardId,
+    REWARD_TARGET_ID,
     chore.emoji ? 'emoji' : 'confetti',
     {
-      emoji: chore.emoji ? [chore.emoji] : undefined,
-      spread: 80,
+      emoji: chore.emoji ? [chore.emoji, '🎉'] : undefined,
+      spread: 140,
     },
   )
   const accentSoft = withAlpha(accent, 0.12)
@@ -635,10 +641,7 @@ function ChoreButton({
         aria-label={`Mark "${chore.title}" as done`}
       >
         <div className="flex flex-col items-center gap-2">
-          <span
-            id={rewardId}
-            className="text-xl leading-none transition group-active:text-[var(--accent)] group-focus-visible:text-[var(--accent)] xl:text-3xl"
-          >
+          <span className="text-xl leading-none transition group-active:text-[var(--accent)] group-focus-visible:text-[var(--accent)] xl:text-3xl">
             {isPending ? '…' : chore.emoji}
           </span>
         </div>
