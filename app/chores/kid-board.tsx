@@ -2,8 +2,8 @@
 
 import { type CSSProperties, useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import Reward from 'react-rewards'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useReward } from 'react-rewards'
 import type { Chore, Completion, Kid } from './data'
 import { completeChore, setKidColor, skipChore, undoChore } from './actions'
 import { sortByTimeOfDay, starsForKid, withAlpha } from './utils'
@@ -109,6 +109,10 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref, sele
     router.refresh()
     if (chore.type === 'perpetual') {
       setTimeout(() => router.refresh(), 5200)
+    }
+
+    if (onReward) {
+      onReward()
     }
   }
 
@@ -427,7 +431,11 @@ function ChoreButton({
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [isSkipping, setIsSkipping] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
-  const rewardRef = useRef<{ rewardMe: () => void } | null>(null)
+  const rewardId = useMemo(() => `chore-reward-${chore.id}`, [chore.id])
+  const { reward, isAnimating } = useReward(rewardId, chore.emoji ? 'emoji' : 'confetti', {
+    emoji: chore.emoji ? [chore.emoji] : undefined,
+    spread: 80,
+  })
   const accentSoft = withAlpha(accent, 0.12)
   const accentVars = {
     '--accent': accent,
@@ -467,40 +475,37 @@ function ChoreButton({
 
   return (
     <div className="flex items-stretch gap-2" style={accentVars}>
-      <Reward
-        ref={rewardRef}
-        type={chore.emoji ? 'emoji' : 'confetti'}
-        config={chore.emoji ? { emoji: [chore.emoji], spread: 80 } : { spread: 80 }}
+      <button
+        type="button"
+        onClick={() =>
+          startTransition(() => {
+            if (completionDisabled || isAnimating) return
+            void onComplete(chore, kidId, accent, reward)
+          })
+        }
+        className="group flex w-full items-center gap-4 rounded-xl border-2 border-slate-200 bg-white px-4 py-4 text-left text-slate-900 shadow transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:hover:border-[var(--accent)] dark:hover:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)]"
+        disabled={completionDisabled || isAnimating}
+        aria-label={`Mark "${chore.title}" as done`}
       >
-        <button
-          type="button"
-          onClick={() =>
-            startTransition(() => {
-              if (completionDisabled) return
-              void onComplete(chore, kidId, accent, () => rewardRef.current?.rewardMe())
-            })
-          }
-          className="group flex w-full items-center gap-4 rounded-xl border-2 border-slate-200 bg-white px-4 py-4 text-left text-slate-900 shadow transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:hover:border-[var(--accent)] dark:hover:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)]"
-          disabled={completionDisabled}
-          aria-label={`Mark "${chore.title}" as done`}
+        <span
+          id={rewardId}
+          className="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-slate-300 bg-slate-50 text-lg font-semibold text-slate-700 transition group-hover:border-[var(--accent)] group-hover:bg-[var(--accent-soft)] group-hover:text-[var(--accent)] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:group-hover:border-[var(--accent)] dark:group-hover:bg-[var(--accent-soft)] dark:group-hover:text-[var(--accent)]"
         >
-          <span className="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-slate-300 bg-slate-50 text-lg font-semibold text-slate-700 transition group-hover:border-[var(--accent)] group-hover:bg-[var(--accent-soft)] group-hover:text-[var(--accent)] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:group-hover:border-[var(--accent)] dark:group-hover:bg-[var(--accent-soft)] dark:group-hover:text-[var(--accent)]">
-            {isPending ? '…' : ''}
+          {isPending ? '…' : ''}
+        </span>
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <span className="text-3xl leading-none">{chore.emoji}</span>
+          <div className="min-w-0">
+            <div className="text-lg font-semibold leading-tight">{chore.title}</div>
+          </div>
+        </div>
+        <div className="flex flex-col items-end justify-center text-sm font-semibold text-amber-700 dark:text-amber-200">
+          <span className="leading-tight text-xl">+{chore.stars}</span>
+          <span className="text-xs font-medium text-slate-500 dark:text-slate-300">
+            stars
           </span>
-          <div className="flex min-w-0 flex-1 items-center gap-3">
-            <span className="text-3xl leading-none">{chore.emoji}</span>
-            <div className="min-w-0">
-              <div className="text-lg font-semibold leading-tight">{chore.title}</div>
-            </div>
-          </div>
-          <div className="flex flex-col items-end justify-center text-sm font-semibold text-amber-700 dark:text-amber-200">
-            <span className="leading-tight text-xl">+{chore.stars}</span>
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-300">
-              stars
-            </span>
-          </div>
-        </button>
-      </Reward>
+        </div>
+      </button>
       <div className="relative">
         <button
           type="button"
