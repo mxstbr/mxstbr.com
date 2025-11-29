@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, useTransition, type CSSProperties
 import { useRouter } from 'next/navigation'
 import type { Completion, Kid, Reward, RewardRedemption } from './data'
 import { redeemReward } from './actions'
-import { rewardAvailableForKid, starsForKid, withAlpha } from './utils'
+import { msUntilNextPacificMidnight, rewardAvailableForKid, starsForKid, withAlpha } from './utils'
 
 type Column = {
   kid: Kid
@@ -32,6 +32,19 @@ export function RewardBoard({ columns, completions, redemptions }: RewardBoardPr
   useEffect(() => {
     setTotals(initialTotals)
   }, [initialTotals])
+
+  useEffect(() => {
+    let timeoutId: number
+    const setNextRefresh = () => {
+      const delay = msUntilNextPacificMidnight()
+      timeoutId = window.setTimeout(() => {
+        router.refresh()
+        setNextRefresh()
+      }, delay)
+    }
+    setNextRefresh()
+    return () => window.clearTimeout(timeoutId)
+  }, [router])
 
   const handleRedeem = async (reward: Reward, kidId: string, accent: string) => {
     const formData = new FormData()

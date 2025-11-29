@@ -21,6 +21,17 @@ const pacificWeekdayFormatter = new Intl.DateTimeFormat('en-US', {
   weekday: 'short',
 })
 
+const pacificDateTimeFormatter = new Intl.DateTimeFormat('en-US', {
+  timeZone: PACIFIC_TIMEZONE,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hour12: false,
+})
+
 export type TodayContext = {
   todayIso: string
   weekday: number
@@ -331,4 +342,24 @@ export function rewardAvailableForKid(
   return !redemptions.some(
     (entry) => entry.rewardId === reward.id && entry.kidId === kidId,
   )
+}
+
+export function msUntilNextPacificMidnight(): number {
+  const now = new Date()
+  const parts = pacificDateTimeFormatter.formatToParts(now)
+  const get = (type: Intl.DateTimeFormatPartTypes): number =>
+    Number(parts.find((part) => part.type === type)?.value ?? '0')
+
+  const year = get('year')
+  const month = get('month')
+  const day = get('day')
+  const hour = get('hour')
+  const minute = get('minute')
+  const second = get('second')
+
+  const pacificNow = Date.UTC(year, month - 1, day, hour, minute, second)
+  const pacificMidnight = Date.UTC(year, month - 1, day + 1, 0, 0, 0)
+  const diff = pacificMidnight - pacificNow
+
+  return Number.isFinite(diff) && diff > 0 ? diff : 1_000 * 60 * 60
 }

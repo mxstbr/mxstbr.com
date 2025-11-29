@@ -14,7 +14,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useReward } from 'react-rewards'
 import type { Chore, Completion, Kid } from './data'
 import { completeChore, skipChore, undoChore } from './actions'
-import { sortByTimeOfDay, starsForKid, withAlpha } from './utils'
+import { msUntilNextPacificMidnight, sortByTimeOfDay, starsForKid, withAlpha } from './utils'
 import { PARENTAL_PIN } from './parental-pin'
 
 type Column = {
@@ -82,6 +82,19 @@ export function KidBoard({
   useEffect(() => {
     setTotals(initialTotals)
   }, [initialTotals])
+
+  useEffect(() => {
+    let timeoutId: number
+    const setNextRefresh = () => {
+      const delay = msUntilNextPacificMidnight()
+      timeoutId = window.setTimeout(() => {
+        router.refresh()
+        setNextRefresh()
+      }, delay)
+    }
+    setNextRefresh()
+    return () => window.clearTimeout(timeoutId)
+  }, [router])
 
   useEffect(() => {
     if (!selectedKidId) return
