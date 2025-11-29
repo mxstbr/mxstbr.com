@@ -9,7 +9,9 @@ type AddRewardFormProps = {
 }
 
 export function AddRewardForm({ kids, addRewardAction }: AddRewardFormProps) {
-  const [selectedKids, setSelectedKids] = useState<string[]>(kids.map((kid) => kid.id))
+  const [selectedKids, setSelectedKids] = useState<string[]>(
+    kids.map((kid) => kid.id),
+  )
   const [type, setType] = useState<'one-off' | 'perpetual'>('perpetual')
 
   const toggleKid = (id: string) => {
@@ -40,7 +42,7 @@ export function AddRewardForm({ kids, addRewardAction }: AddRewardFormProps) {
         </button>
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-200">
           Title
           <input
@@ -77,7 +79,9 @@ export function AddRewardForm({ kids, addRewardAction }: AddRewardFormProps) {
           <select
             name="rewardType"
             value={type}
-            onChange={(event) => setType(event.target.value as 'one-off' | 'perpetual')}
+            onChange={(event) =>
+              setType(event.target.value as 'one-off' | 'perpetual')
+            }
             className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
           >
             <option value="one-off">One-off</option>

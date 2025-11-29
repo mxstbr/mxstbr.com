@@ -5,7 +5,15 @@ import type { Kid } from './data'
 import { pacificWeekdayIndex } from './utils'
 
 const DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
-const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+const DAY_NAMES = [
+  'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+]
 
 type AddChoreFormProps = {
   kids: Kid[]
@@ -14,11 +22,17 @@ type AddChoreFormProps = {
 
 export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
   const pacificWeekday = useMemo(() => pacificWeekdayIndex(new Date()), [])
-  const [type, setType] = useState<'one-off' | 'repeated' | 'perpetual'>('one-off')
+  const [type, setType] = useState<'one-off' | 'repeated' | 'perpetual'>(
+    'one-off',
+  )
   const [cadence, setCadence] = useState<'daily' | 'weekly'>('daily')
   const [selectedDays, setSelectedDays] = useState<number[]>([pacificWeekday])
-  const [timeOfDay, setTimeOfDay] = useState<'' | 'morning' | 'afternoon' | 'evening'>('morning')
-  const [selectedKids, setSelectedKids] = useState<string[]>(kids.map((kid) => kid.id))
+  const [timeOfDay, setTimeOfDay] = useState<
+    '' | 'morning' | 'afternoon' | 'evening'
+  >('morning')
+  const [selectedKids, setSelectedKids] = useState<string[]>(
+    kids.map((kid) => kid.id),
+  )
 
   const toggleDay = (day: number) => {
     setSelectedDays((prev) =>
@@ -43,7 +57,8 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
         <div>
           <h2 className="font-semibold text-lg">Add a chore</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Define the task, assign a kid, and choose how often it should show up.
+            Define the task, assign a kid, and choose how often it should show
+            up.
           </p>
         </div>
         <button
@@ -54,7 +69,7 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
         </button>
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-200">
           Title
           <input
@@ -128,7 +143,9 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
             name="timeOfDay"
             value={timeOfDay}
             onChange={(event) =>
-              setTimeOfDay(event.target.value as '' | 'morning' | 'afternoon' | 'evening')
+              setTimeOfDay(
+                event.target.value as '' | 'morning' | 'afternoon' | 'evening',
+              )
             }
             className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
           >
@@ -160,14 +177,16 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
         </label>
       </div>
 
-      <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-200">
           Type
           <select
             name="type"
             value={type}
             onChange={(event) =>
-              setType(event.target.value as 'one-off' | 'repeated' | 'perpetual')
+              setType(
+                event.target.value as 'one-off' | 'repeated' | 'perpetual',
+              )
             }
             className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
           >
@@ -187,14 +206,17 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
               <select
                 name="cadence"
                 value={cadence}
-                onChange={(event) => setCadence(event.target.value as 'daily' | 'weekly')}
+                onChange={(event) =>
+                  setCadence(event.target.value as 'daily' | 'weekly')
+                }
                 className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
               >
                 <option value="daily">Daily</option>
                 <option value="weekly">Weekly</option>
               </select>
               <span className="text-xs font-normal text-slate-500 dark:text-slate-400">
-                Daily chores re-open every day; weekly ones only on selected days.
+                Daily chores re-open every day; weekly ones only on selected
+                days.
               </span>
             </label>
 

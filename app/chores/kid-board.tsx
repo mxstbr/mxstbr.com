@@ -436,7 +436,7 @@ function KidColumn({
       }}
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="text-sm font-semibold text-slate-900 dark:text-slate-50 lg:text-base">
+        <div className="text-sm font-semibold text-slate-900 dark:text-slate-50 xl:text-base">
           {kid.name}
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -630,38 +630,38 @@ function ChoreButton({
             void onComplete(chore, kidId, accent, reward)
           })
         }
-        className="group flex w-full items-start gap-3 px-3 py-3 text-left text-slate-900 transition active:bg-[var(--accent-soft)] focus-visible:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:text-slate-50 dark:active:bg-[var(--accent-soft)] dark:focus-visible:bg-[var(--accent-soft)] lg:gap-4 lg:px-4 lg:py-4"
+        className="group flex w-full items-start gap-3 px-3 py-3 text-left text-slate-900 transition active:bg-[var(--accent-soft)] focus-visible:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:text-slate-50 dark:active:bg-[var(--accent-soft)] dark:focus-visible:bg-[var(--accent-soft)] xl:gap-4 xl:px-4 xl:py-4"
         disabled={completionDisabled || isAnimating}
         aria-label={`Mark "${chore.title}" as done`}
       >
         <div className="flex flex-col items-center gap-2">
           <span
             id={rewardId}
-            className="text-2xl leading-none transition group-active:text-[var(--accent)] group-focus-visible:text-[var(--accent)] lg:text-3xl"
+            className="text-xl leading-none transition group-active:text-[var(--accent)] group-focus-visible:text-[var(--accent)] xl:text-3xl"
           >
             {isPending ? '…' : chore.emoji}
           </span>
         </div>
         <div className="min-w-0 flex-1">
-          <div className="text-sm font-semibold leading-tight lg:text-base">
+          <div className="text-sm font-semibold leading-tight xl:text-base">
             {chore.title}
           </div>
-          {chore.requiresApproval ? (
-            <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800 dark:bg-amber-900/50 dark:text-amber-100">
-              🔐 Parent approval required
-            </div>
-          ) : null}
         </div>
       </button>
-      <div className="flex items-center justify-between border-t border-slate-200 px-3 py-1.5 text-xs font-semibold text-amber-700 dark:border-slate-700 dark:text-amber-200 lg:px-4">
-        <div className="text-sm font-semibold leading-none lg:text-base">
-          +{chore.stars} stars
+      <div className="flex items-center justify-between border-t border-slate-200 px-3 py-1.5 text-xs font-semibold text-amber-700 dark:border-slate-700 dark:text-amber-200 xl:px-4">
+        <div className="flex items-center gap-2 text-sm font-semibold leading-none xl:text-base">
+          <div>+{chore.stars} stars</div>
+          {chore.requiresApproval ? (
+            <div className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800 dark:bg-amber-900/50 dark:text-amber-100">
+              🔐 Parent OK
+            </div>
+          ) : null}
         </div>
         <div className="relative">
           <button
             type="button"
             onClick={() => setMenuOpen((open) => !open)}
-            className="flex h-9 w-9 items-center justify-center rounded-lg border-2 border-slate-200 bg-white text-xs transition active:border-[var(--accent)] active:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:active:border-[var(--accent)] dark:active:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)] lg:h-10 lg:w-10 lg:text-sm"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border-2 border-slate-200 bg-white text-xs transition active:border-[var(--accent)] active:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:active:border-[var(--accent)] dark:active:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)] xl:h-10 xl:w-10 xl:text-sm"
             aria-expanded={menuOpen}
             aria-label="More actions"
           >
@@ -744,11 +744,11 @@ function CompletedChoreButton({
             void onUndo(chore, completionId, kidId)
           })
         }
-        className="group flex w-full items-center gap-3 rounded-xl border-2 border-emerald-400 bg-white px-3 py-3 pr-12 text-left text-slate-900 shadow transition active:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 disabled:opacity-60 dark:border-emerald-500/60 dark:bg-slate-800 dark:text-slate-50 lg:gap-4 lg:px-4 lg:py-3 lg:pr-14"
+        className="group flex w-full items-center gap-3 rounded-xl border-2 border-emerald-400 bg-white px-3 py-3 pr-12 text-left text-slate-900 shadow transition active:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 disabled:opacity-60 dark:border-emerald-500/60 dark:bg-slate-800 dark:text-slate-50 xl:gap-4 xl:px-4 xl:py-3 xl:pr-14"
         disabled={isPending}
       >
         <span
-          className="flex h-10 w-10 items-center justify-center rounded-lg border-2 text-sm font-semibold text-emerald-700 transition group-active:-translate-y-0.5 dark:text-emerald-200 lg:text-base"
+          className="flex h-10 w-10 items-center justify-center rounded-lg border-2 text-sm font-semibold text-emerald-700 transition group-active:-translate-y-0.5 dark:text-emerald-200 xl:text-base"
           style={{
             borderColor: accent,
             backgroundColor: accentSoft,
@@ -758,9 +758,9 @@ function CompletedChoreButton({
           ✓
         </span>
         <div className="flex min-w-0 flex-1 items-center gap-3">
-          <span className="text-lg leading-none lg:text-xl">{chore.emoji}</span>
+          <span className="text-lg leading-none xl:text-xl">{chore.emoji}</span>
           <div className="min-w-0">
-            <div className="text-xs font-semibold leading-tight line-through lg:text-sm">
+            <div className="text-xs font-semibold leading-tight line-through xl:text-sm">
               {chore.title}
             </div>
             <div className="text-xs font-medium text-emerald-700 dark:text-emerald-200">
@@ -822,7 +822,7 @@ function SpeakIconButton({ text, accent }: { text: string; accent: string }) {
           setIsSpeaking(false)
         }
       }}
-      className="flex h-full min-w-[46px] items-center justify-center rounded-xl border-2 border-slate-200 bg-white px-2.5 text-sm transition active:-translate-y-0.5 active:border-[var(--accent)] active:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:active:border-[var(--accent)] dark:active:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)] lg:min-w-[52px] lg:px-3 lg:text-base"
+      className="flex h-full min-w-[46px] items-center justify-center rounded-xl border-2 border-slate-200 bg-white px-2.5 text-sm transition active:-translate-y-0.5 active:border-[var(--accent)] active:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:active:border-[var(--accent)] dark:active:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)] xl:min-w-[52px] xl:px-3 xl:text-base"
       style={
         {
           '--accent': accent,
