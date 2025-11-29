@@ -227,6 +227,19 @@ export async function setPause(formData: FormData): Promise<void> {
   })
 }
 
+export async function pauseAllChores(formData: FormData): Promise<void> {
+  if (!isAuthorized()) return
+
+  const pausedUntil = formData.get('pausedUntil')?.toString() || null
+
+  await withUpdatedState((state) => {
+    for (const chore of state.chores) {
+      chore.pausedUntil = pausedUntil
+      chore.snoozedUntil = pausedUntil
+    }
+  })
+}
+
 export async function skipChore(formData: FormData): Promise<void> {
   if (!isAuthorized()) return
 
@@ -241,6 +254,30 @@ export async function skipChore(formData: FormData): Promise<void> {
 
     chore.pausedUntil = nextDay
     chore.snoozedUntil = nextDay
+  })
+}
+
+export async function setChoreSchedule(formData: FormData): Promise<void> {
+  if (!isAuthorized()) return
+
+  const choreId = formData.get('choreId')?.toString()
+  const cadence =
+    (formData.get('cadence')?.toString() as 'daily' | 'weekly' | undefined) ?? 'daily'
+  const daysOfWeek = formData
+    .getAll('daysOfWeek')
+    .map((value) => parseNumber(value))
+    .filter((day): day is number => typeof day === 'number' && day >= 0 && day <= 6)
+
+  if (!choreId) return
+
+  await withUpdatedState((state) => {
+    const chore = state.chores.find((c) => c.id === choreId)
+    if (!chore || chore.type !== 'repeated') return
+
+    chore.schedule = {
+      cadence,
+      daysOfWeek: cadence === 'weekly' ? (daysOfWeek.length ? daysOfWeek : undefined) : undefined,
+    }
   })
 }
 

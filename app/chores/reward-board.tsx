@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
+import { useEffect, useMemo, useRef, useState, useTransition, type CSSProperties } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Completion, Kid, Reward, RewardRedemption } from './data'
 import { redeemReward } from './actions'
@@ -51,8 +51,8 @@ export function RewardBoard({ columns, completions, redemptions }: RewardBoardPr
   }
 
   return (
-    <div className="full-bleed">
-      <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 md:px-4">
+    <div className="full-bleed md:h-full md:min-h-0">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 md:h-full md:min-h-0 md:grid-cols-3 md:px-4">
         {columns.map((column) => (
           <RewardColumn
             key={column.kid.id}
@@ -86,7 +86,7 @@ function RewardColumn({
 
   return (
     <div
-      className="flex flex-col gap-4 rounded-2xl border bg-white p-4 shadow-sm dark:bg-slate-900"
+      className="flex flex-col gap-4 rounded-2xl border bg-white p-4 shadow-sm dark:bg-slate-900 md:h-full md:min-h-0 md:overflow-y-auto"
       style={{
         borderColor: accent,
         backgroundColor: accentSoft,
@@ -98,7 +98,7 @@ function RewardColumn({
           {kid.name}
         </div>
         <div
-          className="flex items-center gap-2 rounded-full px-3 py-1 text-sm font-semibold shadow-sm"
+          className="flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold shadow-sm"
           style={{ backgroundColor: accentSoft, color: accent }}
         >
           ⭐️ <span className="tabular-nums">{starTotal}</span>
@@ -107,7 +107,7 @@ function RewardColumn({
 
       <div className="space-y-3">
         {rewards.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-center text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200">
+          <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-center text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200">
             No rewards yet. Check back soon!
           </div>
         ) : (
@@ -146,6 +146,11 @@ function RewardButton({
   const [isPending, startTransition] = useTransition()
   const available = rewardAvailableForKid(reward, kidId, redemptions)
   const enough = starTotal >= reward.cost
+  const accentSoft = withAlpha(accent, 0.12)
+  const accentVars = {
+    '--accent': accent,
+    '--accent-soft': accentSoft,
+  } as CSSProperties
 
   const statusLabel = !available
     ? 'Taken'
@@ -163,20 +168,21 @@ function RewardButton({
           }
         })
       }
-      className={`group flex w-full items-center gap-4 rounded-xl border-2 px-4 py-4 text-left text-slate-900 shadow transition dark:text-slate-50 ${
+      className={`group flex w-full items-center gap-4 rounded-xl border-2 border-slate-200 bg-white px-4 py-4 text-left text-slate-900 shadow transition dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 ${
         available && enough
-          ? 'border-emerald-500 bg-white hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 dark:border-emerald-400 dark:bg-slate-800'
-          : 'border-slate-300 bg-white opacity-70 dark:border-slate-700 dark:bg-slate-800'
+          ? 'focus-within:-translate-y-0.5 active:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:border-[var(--accent)] dark:focus-visible:outline-[var(--accent)]'
+          : 'opacity-70'
       }`}
       disabled={isPending || !available || !enough}
+      style={accentVars}
     >
-      <span className="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-slate-300 bg-slate-50 text-lg font-semibold text-slate-700 transition group-hover:-translate-y-0.5 group-hover:border-emerald-500 group-hover:bg-emerald-50 group-hover:text-emerald-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:group-hover:border-emerald-400 dark:group-hover:bg-emerald-900/40">
+      <span className="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-slate-300 bg-slate-50 text-lg font-semibold text-slate-700 transition group-hover:-translate-y-0.5 group-hover:border-[var(--accent)] group-hover:bg-[var(--accent-soft)] group-hover:text-[var(--accent)] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:group-hover:border-[var(--accent)] dark:group-hover:bg-[var(--accent-soft)]">
         {isPending ? '…' : reward.emoji}
       </span>
       <div className="flex min-w-0 flex-1 items-center gap-3">
         <div className="min-w-0">
-          <div className="text-lg font-semibold leading-tight">{reward.title}</div>
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">
+          <div className="text-base font-semibold leading-tight">{reward.title}</div>
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">
             Cost {reward.cost} ⭐️ • {reward.type === 'perpetual' ? 'Perpetual' : 'One-off'}
           </div>
         </div>
@@ -184,7 +190,7 @@ function RewardButton({
       <div
         className={`rounded-full px-3 py-1 text-xs font-semibold ${
           available && enough
-            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-100'
+            ? 'bg-[var(--accent-soft)] text-[var(--accent)]'
             : 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-200'
         }`}
       >

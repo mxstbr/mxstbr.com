@@ -13,7 +13,7 @@ import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useReward } from 'react-rewards'
 import type { Chore, Completion, Kid } from './data'
-import { completeChore, setKidColor, skipChore, undoChore } from './actions'
+import { completeChore, skipChore, undoChore } from './actions'
 import { sortByTimeOfDay, starsForKid, withAlpha } from './utils'
 import { PARENTAL_PIN } from './parental-pin'
 
@@ -477,28 +477,7 @@ function KidColumn({
         <div className="text-sm font-semibold text-slate-900 dark:text-slate-50 xl:text-base">
           {kid.name}
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <StarBadge value={starTotal} accent={accent} />
-          <form
-            action={setKidColor}
-            className="flex flex-wrap items-center gap-1"
-          >
-            <input type="hidden" name="kidId" value={kid.id} />
-            <input
-              type="color"
-              name="color"
-              defaultValue={kid.color}
-              className="h-9 w-9 cursor-pointer rounded-md border border-slate-300 bg-white p-1 shadow-sm dark:border-slate-700 dark:bg-slate-800"
-              aria-label={`${kid.name} color`}
-            />
-            <button
-              type="submit"
-              className="rounded-md border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-700 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-200"
-            >
-              Set
-            </button>
-          </form>
-        </div>
+        <StarBadge value={starTotal} accent={accent} />
       </div>
 
       <div className="space-y-4">
@@ -790,51 +769,59 @@ function CompletedChoreButton({
   ) => Promise<void> | void
 }) {
   const [isPending, startTransition] = useTransition()
-  const accentSoft = withAlpha(accent, 0.18)
+  const accentSoft = withAlpha(accent, 0.12)
+  const accentVars = {
+    '--accent': accent,
+    '--accent-soft': accentSoft,
+  } as CSSProperties
+
+  const handleUndo = () =>
+    startTransition(() => {
+      void onUndo(chore, completionId, kidId)
+    })
 
   return (
-    <div className="flex items-stretch gap-2">
+    <div
+      className="relative rounded-xl border-2 border-slate-200 bg-white shadow transition focus-within:-translate-y-0.5 active:-translate-y-0.5 focus-within:border-[var(--accent)] active:border-[var(--accent)] dark:border-slate-700 dark:bg-slate-800 dark:focus-within:border-[var(--accent)] dark:active:border-[var(--accent)]"
+      style={accentVars}
+    >
       <button
         type="button"
-        onClick={() =>
-          startTransition(() => {
-            void onUndo(chore, completionId, kidId)
-          })
-        }
-        className="group flex w-full items-center gap-3 rounded-xl border-2 border-emerald-400 bg-white px-3 py-3 pr-12 text-left text-slate-900 shadow transition active:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 disabled:opacity-60 dark:border-emerald-500/60 dark:bg-slate-800 dark:text-slate-50 xl:gap-4 xl:px-4 xl:py-3 xl:pr-14"
+        onClick={handleUndo}
+        className="group flex w-full items-start gap-3 px-3 py-3 text-left text-slate-900 transition active:bg-[var(--accent-soft)] focus-visible:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:text-slate-50 dark:active:bg-[var(--accent-soft)] dark:focus-visible:bg-[var(--accent-soft)] xl:gap-4 xl:px-4 xl:py-4"
         disabled={isPending}
+        aria-label={`Undo completion for "${chore.title}"`}
       >
-        <span
-          className="flex h-10 w-10 items-center justify-center rounded-lg border-2 text-sm font-semibold text-emerald-700 transition group-active:-translate-y-0.5 dark:text-emerald-200 xl:text-base"
-          style={{
-            borderColor: accent,
-            backgroundColor: accentSoft,
-            color: accent,
-          }}
-        >
-          ✓
-        </span>
-        <div className="flex min-w-0 flex-1 items-center gap-3">
-          <span className="text-lg leading-none xl:text-xl">{chore.emoji}</span>
-          <div className="min-w-0">
-            <div className="text-xs font-semibold leading-tight line-through xl:text-sm">
-              {chore.title}
-            </div>
-            <div className="text-xs font-medium text-emerald-700 dark:text-emerald-200">
-              Marked done
-            </div>
-          </div>
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-xl leading-none transition group-active:text-[var(--accent)] group-focus-visible:text-[var(--accent)] xl:text-3xl">
+            {chore.emoji}
+          </span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="rounded-full bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700 shadow-sm dark:bg-emerald-900/40 dark:text-emerald-100">
-            +{chore.stars} ⭐️
+        <div className="min-w-0 flex-1">
+          <div className="text-sm font-semibold leading-tight line-through text-slate-500 dark:text-slate-300/80 xl:text-base">
+            {chore.title}
           </div>
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-            Undo
+          <div className="text-xs font-semibold text-emerald-700 dark:text-emerald-200">
+            Marked done
           </div>
         </div>
       </button>
-      <SpeakIconButton text={chore.title} accent={accent} />
+      <div className="flex items-center justify-between border-t border-slate-200 px-3 py-1.5 text-xs font-semibold text-emerald-700 dark:border-slate-700 dark:text-emerald-200 xl:px-4">
+        <div className="flex items-center gap-2 text-sm font-semibold leading-none xl:text-base">
+          <div>+{chore.stars} stars</div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleUndo}
+            className="rounded-lg border-2 border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-slate-700 transition active:border-[var(--accent)] active:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:active:border-[var(--accent)] dark:active:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)]"
+            disabled={isPending}
+          >
+            Undo
+          </button>
+          <SpeakIconButton text={chore.title} accent={accent} />
+        </div>
+      </div>
     </div>
   )
 }

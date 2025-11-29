@@ -150,16 +150,19 @@ export function isOpenForKid(
   if (isPaused(chore, ctx)) return false
 
   const cadence = chore.schedule?.cadence ?? 'daily'
+  const daysOfWeek = (chore.schedule?.daysOfWeek ?? []).filter(
+    (day) => typeof day === 'number' && day >= 0 && day <= 6,
+  )
+  const allowedDays = daysOfWeek.length ? daysOfWeek : ALL_WEEKDAYS
+  const isScheduledToday = allowedDays.includes(ctx.weekday)
 
   if (cadence === 'weekly') {
-    const days = chore.schedule?.daysOfWeek ?? []
-    const windowStart = nearestScheduledOnOrBefore(ctx.todayIso, days)
-    if (!windowStart) return false
-    const windowEnd = nextScheduledAfter(windowStart, days)
+    if (!isScheduledToday) return false
+    const windowEnd = nextScheduledAfter(ctx.todayIso, allowedDays)
     const doneInWindow = hasCompletionInWindow(
       chore.id,
       kidId,
-      windowStart,
+      ctx.todayIso,
       windowEnd,
       completions,
       ctx,
@@ -168,6 +171,7 @@ export function isOpenForKid(
   }
 
   // daily cadence
+  if (daysOfWeek.length && !isScheduledToday) return false
   const windowEnd = shiftIsoDay(ctx.todayIso, 1)
   const doneToday = hasCompletionInWindow(
     chore.id,
