@@ -335,7 +335,7 @@ export function KidBoard({
                   Parents, please enter the pin to approve &quot;
                   {approvalRequest.chore.title}&quot;.
                 </p>
-              </div
+              </div>
               <button
                 type="button"
                 onClick={closeApprovalPrompt}
