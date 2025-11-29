@@ -106,13 +106,9 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref, sele
       onReward?.()
     }
 
-    router.refresh()
+    setTimeout(() => router.refresh(), 120)
     if (chore.type === 'perpetual') {
       setTimeout(() => router.refresh(), 5200)
-    }
-
-    if (onReward) {
-      onReward()
     }
   }
 
