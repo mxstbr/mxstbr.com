@@ -44,6 +44,7 @@
     "react": "19.0.0-rc-eb3ad065-20240822",
     "react-dom": "19.0.0-rc-eb3ad065-20240822",
     "react-feather": "^2.0.10",
+    "react-rewards": "^2.0.3",
     "react-hot-toast": "^2.4.1",
     "react-tweet": "^3.2.1",
     "recharts": "^3.1.2",

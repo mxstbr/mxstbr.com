@@ -3,6 +3,7 @@
 import { type CSSProperties, useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import Reward from 'react-rewards'
 import type { Chore, Completion, Kid } from './data'
 import { completeChore, setKidColor, skipChore, undoChore } from './actions'
 import { sortByTimeOfDay, starsForKid, withAlpha } from './utils'
@@ -75,6 +76,7 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref }: Ki
     chore: Chore,
     kidId: string,
     accent: string,
+    onReward?: () => void,
   ) => {
     const formData = new FormData()
     formData.append('choreId', chore.id)
@@ -86,7 +88,7 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref }: Ki
         ...prev,
         [kidId]: (prev[kidId] ?? 0) + result.awarded,
       }))
-      fireConfetti(accent)
+      onReward?.()
     }
 
     router.refresh()
@@ -95,13 +97,18 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref }: Ki
     }
   }
 
-  const handleCompleteRequest = (chore: Chore, kidId: string, accent: string) => {
+  const handleCompleteRequest = (
+    chore: Chore,
+    kidId: string,
+    accent: string,
+    onReward?: () => void,
+  ) => {
     if (mode === 'future') return
     if (mode === 'past') {
       setPending({ chore, kidId, accent })
       return
     }
-    void handleComplete(chore, kidId, accent)
+    void handleComplete(chore, kidId, accent, onReward)
   }
 
   const handleUndo = async (
@@ -207,7 +214,7 @@ function KidColumn({
   chores: Chore[]
   doneChores: { chore: Chore; completionId: string }[]
   starTotal: number
-  onComplete: (chore: Chore, kidId: string, accent: string) => Promise<void> | void
+  onComplete: (chore: Chore, kidId: string, accent: string, onReward?: () => void) => Promise<void> | void
   onUndo: (chore: Chore, completionId: string, kidId: string) => Promise<void> | void
   disableCompletion: boolean
 }) {
@@ -359,14 +366,16 @@ function ChoreButton({
   chore: Chore
   accent: string
   kidId: string
-  onComplete: (chore: Chore, kidId: string, accent: string) => Promise<void> | void
+  onComplete: (chore: Chore, kidId: string, accent: string, onReward?: () => void) => Promise<void> | void
   disabled?: boolean
 }) {
   const [isPending, startTransition] = useTransition()
+  const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [isSkipping, setIsSkipping] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const rewardRef = useRef<{ rewardMe: () => void } | null>(null)
   const accentSoft = withAlpha(accent, 0.12)
   const accentVars = {
     '--accent': accent,
@@ -406,34 +415,40 @@ function ChoreButton({
 
   return (
     <div className="flex items-stretch gap-2" style={accentVars}>
-      <button
-        type="button"
-        onClick={() =>
-          startTransition(() => {
-            if (completionDisabled) return
-            void onComplete(chore, kidId, accent)
-          })
-        }
-        className="group flex w-full items-center gap-4 rounded-xl border-2 border-slate-200 bg-white px-4 py-4 text-left text-slate-900 shadow transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:hover:border-[var(--accent)] dark:hover:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)]"
-        disabled={completionDisabled}
-        aria-label={`Mark "${chore.title}" as done`}
+      <Reward
+        ref={rewardRef}
+        type={chore.emoji ? 'emoji' : 'confetti'}
+        config={chore.emoji ? { emoji: [chore.emoji], spread: 80 } : { spread: 80 }}
       >
-        <span className="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-slate-300 bg-slate-50 text-lg font-semibold text-slate-700 transition group-hover:border-[var(--accent)] group-hover:bg-[var(--accent-soft)] group-hover:text-[var(--accent)] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:group-hover:border-[var(--accent)] dark:group-hover:bg-[var(--accent-soft)] dark:group-hover:text-[var(--accent)]">
-          {isPending ? '…' : ''}
-        </span>
-        <div className="flex min-w-0 flex-1 items-center gap-3">
-          <span className="text-3xl leading-none">{chore.emoji}</span>
-          <div className="min-w-0">
-            <div className="text-lg font-semibold leading-tight">{chore.title}</div>
-          </div>
-        </div>
-        <div className="flex flex-col items-end justify-center text-sm font-semibold text-amber-700 dark:text-amber-200">
-          <span className="leading-tight text-xl">+{chore.stars}</span>
-          <span className="text-xs font-medium text-slate-500 dark:text-slate-300">
-            stars
+        <button
+          type="button"
+          onClick={() =>
+            startTransition(() => {
+              if (completionDisabled) return
+              void onComplete(chore, kidId, accent, () => rewardRef.current?.rewardMe())
+            })
+          }
+          className="group flex w-full items-center gap-4 rounded-xl border-2 border-slate-200 bg-white px-4 py-4 text-left text-slate-900 shadow transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:hover:border-[var(--accent)] dark:hover:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)]"
+          disabled={completionDisabled}
+          aria-label={`Mark "${chore.title}" as done`}
+        >
+          <span className="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-slate-300 bg-slate-50 text-lg font-semibold text-slate-700 transition group-hover:border-[var(--accent)] group-hover:bg-[var(--accent-soft)] group-hover:text-[var(--accent)] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:group-hover:border-[var(--accent)] dark:group-hover:bg-[var(--accent-soft)] dark:group-hover:text-[var(--accent)]">
+            {isPending ? '…' : ''}
           </span>
-        </div>
-      </button>
+          <div className="flex min-w-0 flex-1 items-center gap-3">
+            <span className="text-3xl leading-none">{chore.emoji}</span>
+            <div className="min-w-0">
+              <div className="text-lg font-semibold leading-tight">{chore.title}</div>
+            </div>
+          </div>
+          <div className="flex flex-col items-end justify-center text-sm font-semibold text-amber-700 dark:text-amber-200">
+            <span className="leading-tight text-xl">+{chore.stars}</span>
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-300">
+              stars
+            </span>
+          </div>
+        </button>
+      </Reward>
       <div className="relative">
         <button
           type="button"
@@ -612,58 +627,4 @@ function SpeakIconButton({ text, accent }: { text: string; accent: string }) {
       {isSpeaking ? '…' : '🔊'}
     </button>
   )
-}
-
-function fireConfetti(accent: string) {
-  ensureConfettiStyles()
-  const container = document.createElement('div')
-  container.className = 'chores-confetti'
-  container.style.position = 'fixed'
-  container.style.inset = '0'
-  container.style.pointerEvents = 'none'
-  container.style.zIndex = '50'
-  document.body.appendChild(container)
-
-  const colors = [accent, '#f97316', '#22c55e', '#06b6d4', '#f472b6']
-  const pieces = 80
-
-  for (let i = 0; i < pieces; i++) {
-    const piece = document.createElement('span')
-    const size = 6 + Math.random() * 6
-    piece.style.position = 'absolute'
-    piece.style.width = `${size}px`
-    piece.style.height = `${size * 0.6}px`
-    piece.style.backgroundColor = colors[i % colors.length]
-    piece.style.left = `${Math.random() * 100}%`
-    piece.style.top = `-10%`
-    piece.style.opacity = '0.9'
-    piece.style.borderRadius = '2px'
-    const fall = 900 + Math.random() * 700
-    const drift = Math.random() * 40 - 20
-    const delay = Math.random() * 150
-    const rotation = 540 + Math.random() * 540
-    piece.style.animation = `chores-confetti-fall ${fall}ms ease-out ${delay}ms forwards`
-    piece.style.setProperty('--drift', `${drift}px`)
-    piece.style.setProperty('--rotation', `${rotation}deg`)
-    container.appendChild(piece)
-  }
-
-  setTimeout(() => {
-    container.remove()
-  }, 1800)
-}
-
-function ensureConfettiStyles() {
-  const id = 'chores-confetti-styles'
-  if (document.getElementById(id)) return
-
-  const style = document.createElement('style')
-  style.id = id
-  style.textContent = `
-    @keyframes chores-confetti-fall {
-      0% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0.9; }
-      100% { transform: translate3d(var(--drift, 0px), 110vh, 0) rotate(var(--rotation, 720deg)); opacity: 0; }
-    }
-  `
-  document.head.appendChild(style)
 }
