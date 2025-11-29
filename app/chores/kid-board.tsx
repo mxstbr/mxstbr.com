@@ -499,6 +499,7 @@ function ChoreButton({
   const [menuOpen, setMenuOpen] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [isSkipping, setIsSkipping] = useState(false)
+  const containerRef = useRef<HTMLDivElement | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const rewardId = useMemo(() => `chore-reward-${chore.id}`, [chore.id])
   const { reward, isAnimating } = useReward(rewardId, chore.emoji ? 'emoji' : 'confetti', {
@@ -511,6 +512,33 @@ function ChoreButton({
     '--accent-soft': accentSoft,
   } as CSSProperties
   const completionDisabled = isPending || disabled
+
+  useEffect(() => {
+    if (!menuOpen) return
+
+    let timeoutId: number
+    const resetTimer = () => {
+      window.clearTimeout(timeoutId)
+      timeoutId = window.setTimeout(() => setMenuOpen(false), 30_000)
+    }
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!containerRef.current) return
+      if (containerRef.current.contains(event.target as Node)) {
+        resetTimer()
+        return
+      }
+      setMenuOpen(false)
+    }
+
+    resetTimer()
+    document.addEventListener('pointerdown', handlePointerDown, true)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+      document.removeEventListener('pointerdown', handlePointerDown, true)
+    }
+  }, [menuOpen])
 
   const handleSpeak = async () => {
     if (isSpeaking) return
@@ -546,6 +574,7 @@ function ChoreButton({
     <div
       className={`relative rounded-xl border-2 border-slate-200 bg-white shadow transition focus-within:-translate-y-0.5 active:-translate-y-0.5 focus-within:border-[var(--accent)] active:border-[var(--accent)] dark:border-slate-700 dark:bg-slate-800 dark:focus-within:border-[var(--accent)] dark:active:border-[var(--accent)] ${menuOpen ? 'z-20' : ''}`}
       style={accentVars}
+      ref={containerRef}
     >
       <button
         type="button"
