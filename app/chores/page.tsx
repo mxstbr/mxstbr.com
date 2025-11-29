@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { KidBoard } from './kid-board'
 import { type Chore, getChoreState } from './data'
-import { getToday, hasCompletedTodayForKid, isOpenForKid, sortByTimeOfDay } from './utils'
+import { getToday, isOpenForKid, pacificDateFromTimestamp, sortByTimeOfDay } from './utils'
 import { PasswordForm } from 'app/cal/password-form'
 import { auth, isMax } from 'app/auth'
 
@@ -27,7 +27,7 @@ export default async function ChoresPage() {
   const ctx = getToday()
 
   const openChoresByKid: Record<string, Chore[]> = {}
-  const doneChoresByKid: Record<string, { chore: Chore; completionId: string }[]> = {}
+  const doneChoresByKid: Record<string, { chore: Chore; completionId: string; timestamp: string }[]> = {}
 
   for (const kid of state.kids) {
     openChoresByKid[kid.id] = []
@@ -39,19 +39,20 @@ export default async function ChoresPage() {
       if (isOpenForKid(chore, kid.id, state.completions, ctx)) {
         openChoresByKid[kid.id]?.push(chore)
       }
-
-      if (hasCompletedTodayForKid(chore.id, kid.id, state.completions, ctx)) {
-        const completion = state.completions.find(
-          (entry) =>
-            entry.choreId === chore.id &&
-            entry.kidId === kid.id &&
-            entry.timestamp.slice(0, 10) === ctx.todayIso,
-        )
-        if (completion) {
-          doneChoresByKid[kid.id]?.push({ chore, completionId: completion.id })
-        }
-      }
     }
+  }
+
+  for (const completion of state.completions) {
+    if (pacificDateFromTimestamp(completion.timestamp) !== ctx.todayIso) continue
+    const chore = state.chores.find((c) => c.id === completion.choreId)
+    if (!chore) continue
+    if (!chore.kidIds.includes(completion.kidId)) continue
+
+    doneChoresByKid[completion.kidId]?.push({
+      chore,
+      completionId: completion.id,
+      timestamp: completion.timestamp,
+    })
   }
 
   const columns = state.kids.map((kid) => ({
@@ -61,9 +62,9 @@ export default async function ChoresPage() {
       (doneChoresByKid[kid.id] ?? []).map((entry) => ({
         ...entry,
         timeOfDay: entry.chore.timeOfDay,
-        createdAt: entry.chore.createdAt,
+        createdAt: entry.timestamp ?? entry.chore.createdAt,
       })),
-    ).map(({ timeOfDay, createdAt, ...rest }) => rest),
+    ).map(({ timeOfDay, createdAt, timestamp, ...rest }) => rest),
   }))
 
   return (

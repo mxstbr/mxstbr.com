@@ -273,8 +273,8 @@ function ChoreButton({
       className="group flex w-full items-center gap-4 rounded-xl border-2 border-slate-200 bg-white px-4 py-4 text-left text-slate-900 shadow transition hover:-translate-y-0.5 hover:border-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
       disabled={isPending}
     >
-      <span className="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-slate-300 bg-slate-50 text-lg font-semibold text-slate-700 transition group-hover:-translate-y-0.5 group-hover:border-emerald-500 group-hover:bg-emerald-50 group-hover:text-emerald-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:group-hover:border-emerald-400 dark:group-hover:bg-emerald-900/40">
-        {isPending ? '…' : '✓'}
+      <span className="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-slate-300 bg-slate-50 text-lg font-semibold text-slate-700 transition group-hover:border-emerald-500 group-hover:bg-emerald-50 group-hover:text-emerald-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:group-hover:border-emerald-400 dark:group-hover:bg-emerald-900/40">
+        {isPending ? '…' : ''}
       </span>
       <div className="flex min-w-0 flex-1 items-center gap-3">
         <span className="text-3xl leading-none">{chore.emoji}</span>
@@ -305,7 +305,11 @@ function CompletedChoreButton({
   completionId: string
   accent: string
   kidId: string
-  onUndo: (chore: Chore, completionId: string, kidId: string) => Promise<void> | void
+  onUndo: (
+    chore: Chore,
+    completionId: string,
+    kidId: string,
+  ) => Promise<void> | void
 }) {
   const [isPending, startTransition] = useTransition()
   const accentSoft = withAlpha(accent, 0.18)
@@ -323,7 +327,11 @@ function CompletedChoreButton({
     >
       <span
         className="flex h-10 w-10 items-center justify-center rounded-lg border-2 text-lg font-semibold text-emerald-700 transition group-hover:-translate-y-0.5 dark:text-emerald-200"
-        style={{ borderColor: accent, backgroundColor: accentSoft, color: accent }}
+        style={{
+          borderColor: accent,
+          backgroundColor: accentSoft,
+          color: accent,
+        }}
       >
         ✓
       </span>
