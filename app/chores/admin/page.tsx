@@ -24,6 +24,7 @@ import {
 } from '../data'
 import { PasswordForm } from 'app/cal/password-form'
 import { auth, isMax } from 'app/auth'
+import { ParentalPinGate } from '../parental-pin-gate'
 import {
   DAY_NAMES,
   getToday,
@@ -316,6 +317,7 @@ function ChoreCard({
               {timeLabel} • {dueLabel}
               {paused ? ` • Paused until ${chore.pausedUntil}` : null}
               {doneToday && !paused ? ' • Done for today' : null}
+              {chore.requiresApproval ? ' • Parent pin required' : null}
             </div>
           </div>
         </div>
@@ -375,6 +377,20 @@ function ChoreCard({
             <option value="afternoon">Afternoon</option>
             <option value="evening">Evening</option>
           </select>
+          <div className="flex items-center gap-2 rounded-md border border-slate-300 bg-white px-2 py-1 text-[10px] font-semibold uppercase tracking-wide shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
+            <input type="hidden" name="requiresApproval" value="false" />
+            <input
+              id={`${chore.id}-requires-approval`}
+              type="checkbox"
+              name="requiresApproval"
+              value="true"
+              defaultChecked={chore.requiresApproval}
+              className="h-3.5 w-3.5 rounded border-slate-300 text-slate-900 focus:ring-slate-500 dark:border-slate-600 dark:bg-slate-900"
+            />
+            <label htmlFor={`${chore.id}-requires-approval`} className="cursor-pointer">
+              Parent pin
+            </label>
+          </div>
           <div className="flex flex-wrap gap-1">
             {allKids.map((k) => {
               const active = chore.kidIds.includes(k.id)
@@ -545,81 +561,83 @@ export default async function ChoreAdminPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
-          <p className="text-sm uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Chore control center
-          </p>
-          <h1 className="text-2xl font-bold leading-tight">Manage chores</h1>
-          <p className="text-slate-600 dark:text-slate-300">
-            Set up new chores, pause routines during travel, archive old tasks, and rename each
-            column. All changes sync instantly to the kid-facing board.
-          </p>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Today is {DAY_NAMES[ctx.weekday]}, {ctx.todayIso}.
-          </p>
+    <ParentalPinGate>
+      <div className="space-y-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1">
+            <p className="text-sm uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              Chore control center
+            </p>
+            <h1 className="text-2xl font-bold leading-tight">Manage chores</h1>
+            <p className="text-slate-600 dark:text-slate-300">
+              Set up new chores, pause routines during travel, archive old tasks, and rename each
+              column. All changes sync instantly to the kid-facing board.
+            </p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Today is {DAY_NAMES[ctx.weekday]}, {ctx.todayIso}.
+            </p>
+          </div>
+          <Link
+            href="/chores"
+            className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+          >
+            Open kid board
+          </Link>
+          <Link
+            href="/chores/rewards"
+            className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+          >
+            Open rewards
+          </Link>
         </div>
-        <Link
-          href="/chores"
-          className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-        >
-          Open kid board
-        </Link>
-        <Link
-          href="/chores/rewards"
-          className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-        >
-          Open rewards
-        </Link>
-      </div>
 
-      <AddChoreForm kids={state.kids} addChoreAction={addChore} />
+        <AddChoreForm kids={state.kids} addChoreAction={addChore} />
 
-      <div className="full-bleed">
-        <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 md:px-4">
-          {state.kids.map((kid) => (
-            <KidColumn
-              key={kid.id}
-              kid={kid}
-              openChores={sortByTimeOfDay(openChoresByKid[kid.id] ?? [])}
-              recurringChores={sortByTimeOfDay(recurringByKid[kid.id] ?? [])}
-              completions={state.completions}
-              ctx={ctx}
-              allKids={state.kids}
-            />
-          ))}
+        <div className="full-bleed">
+          <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 md:px-4">
+            {state.kids.map((kid) => (
+              <KidColumn
+                key={kid.id}
+                kid={kid}
+                openChores={sortByTimeOfDay(openChoresByKid[kid.id] ?? [])}
+                recurringChores={sortByTimeOfDay(recurringByKid[kid.id] ?? [])}
+                completions={state.completions}
+                ctx={ctx}
+                allKids={state.kids}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <div className="space-y-1">
+            <p className="text-sm uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              Rewards
+            </p>
+            <h2 className="text-xl font-bold leading-tight">Manage rewards</h2>
+            <p className="text-slate-600 dark:text-slate-300">
+              Add perks the kids can unlock and assign them to one or many columns.
+            </p>
+          </div>
+          <AddRewardForm kids={state.kids} addRewardAction={addReward} />
+        </div>
+
+        <div className="full-bleed">
+          <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 md:px-4">
+            {state.kids.map((kid) => (
+              <RewardColumn
+                key={kid.id}
+                kid={kid}
+                rewards={rewardsByKid[kid.id] ?? []}
+                completions={state.completions}
+                redemptions={state.rewardRedemptions}
+                allKids={state.kids}
+              />
+            ))}
+          </div>
         </div>
       </div>
-
-      <div className="space-y-3">
-        <div className="space-y-1">
-          <p className="text-sm uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Rewards
-          </p>
-          <h2 className="text-xl font-bold leading-tight">Manage rewards</h2>
-          <p className="text-slate-600 dark:text-slate-300">
-            Add perks the kids can unlock and assign them to one or many columns.
-          </p>
-        </div>
-        <AddRewardForm kids={state.kids} addRewardAction={addReward} />
-      </div>
-
-      <div className="full-bleed">
-        <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 md:px-4">
-          {state.kids.map((kid) => (
-            <RewardColumn
-              key={kid.id}
-              kid={kid}
-              rewards={rewardsByKid[kid.id] ?? []}
-              completions={state.completions}
-              redemptions={state.rewardRedemptions}
-              allKids={state.kids}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
+    </ParentalPinGate>
   )
 }
 

@@ -21,6 +21,7 @@ export type Chore = {
   emoji: string
   stars: number
   type: ChoreType
+  requiresApproval?: boolean
   schedule?: ChoreSchedule
   pausedUntil?: string | null
   snoozedUntil?: string | null
@@ -90,6 +91,7 @@ function createDefaultChores(kids: Kid[]): Chore[] {
       type: 'one-off',
       createdAt,
       timeOfDay: 'afternoon',
+      requiresApproval: false,
     },
     {
       id: crypto.randomUUID(),
@@ -101,6 +103,7 @@ function createDefaultChores(kids: Kid[]): Chore[] {
       schedule: { cadence: 'daily' },
       createdAt,
       timeOfDay: 'evening',
+      requiresApproval: false,
     },
     {
       id: crypto.randomUUID(),
@@ -112,6 +115,7 @@ function createDefaultChores(kids: Kid[]): Chore[] {
       schedule: { cadence: 'weekly', daysOfWeek: [3] }, // Wednesday
       createdAt,
       timeOfDay: 'evening',
+      requiresApproval: false,
     },
     {
       id: crypto.randomUUID(),
@@ -122,6 +126,7 @@ function createDefaultChores(kids: Kid[]): Chore[] {
       type: 'perpetual',
       createdAt,
       timeOfDay: 'morning',
+      requiresApproval: false,
     },
   ]
 }
@@ -157,6 +162,7 @@ function ensureChores(chores: Chore[] | undefined, kids: Kid[]): Chore[] {
       ...chore,
       kidIds: kidIds.length ? kidIds : [kids[0]?.id ?? 'kid-1'],
       timeOfDay: chore.timeOfDay ?? undefined,
+      requiresApproval: chore.requiresApproval ?? false,
     }
   })
 }

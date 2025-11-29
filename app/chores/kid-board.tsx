@@ -1,12 +1,13 @@
 'use client'
 
-import { type CSSProperties, useEffect, useMemo, useRef, useState, useTransition } from 'react'
+import { type CSSProperties, type FormEvent, useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useReward } from 'react-rewards'
 import type { Chore, Completion, Kid } from './data'
 import { completeChore, setKidColor, skipChore, undoChore } from './actions'
 import { sortByTimeOfDay, starsForKid, withAlpha } from './utils'
+import { PARENTAL_PIN } from './parental-pin'
 
 type Column = {
   kid: Kid
@@ -27,6 +28,14 @@ type PendingCompletion = {
   chore: Chore
   kidId: string
   accent: string
+  onReward?: () => void
+}
+
+type ApprovalRequest = {
+  chore: Chore
+  kidId: string
+  accent: string
+  onReward?: () => void
 }
 
 export function KidBoard({ columns, completions, mode, dayLabel, todayHref, selectedKidId }: KidBoardProps) {
@@ -43,6 +52,9 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref, sele
 
   const [totals, setTotals] = useState(initialTotals)
   const [pending, setPending] = useState<PendingCompletion | null>(null)
+  const [approvalRequest, setApprovalRequest] = useState<ApprovalRequest | null>(null)
+  const [pinValue, setPinValue] = useState('')
+  const [pinError, setPinError] = useState('')
   const [activeKidId, setActiveKidId] = useState<string>(
     selectedKidId && columns.some((c) => c.kid.id === selectedKidId)
       ? selectedKidId
@@ -113,18 +125,53 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref, sele
     }
   }
 
-  const handleCompleteRequest = (
+  const beginCompletion = (
     chore: Chore,
     kidId: string,
     accent: string,
     onReward?: () => void,
+    options?: { allowPast?: boolean },
   ) => {
     if (mode === 'future') return
-    if (mode === 'past') {
-      setPending({ chore, kidId, accent })
+    if (mode === 'past' && !options?.allowPast) {
+      setPending({ chore, kidId, accent, onReward })
+      return
+    }
+    if (chore.requiresApproval) {
+      setApprovalRequest({ chore, kidId, accent, onReward })
+      setPinValue('')
+      setPinError('')
       return
     }
     void handleComplete(chore, kidId, accent, onReward)
+  }
+
+  const closeApprovalPrompt = () => {
+    setApprovalRequest(null)
+    setPinValue('')
+    setPinError('')
+  }
+
+  const handlePinSubmit = async (event?: FormEvent<HTMLFormElement>) => {
+    event?.preventDefault()
+    if (!approvalRequest) return
+    const normalized = pinValue.trim()
+    if (normalized.length !== 4) {
+      setPinError('Enter all four digits.')
+      return
+    }
+    if (normalized !== PARENTAL_PIN) {
+      setPinError('Incorrect pin. Try again.')
+      return
+    }
+
+    await handleComplete(
+      approvalRequest.chore,
+      approvalRequest.kidId,
+      approvalRequest.accent,
+      approvalRequest.onReward,
+    )
+    closeApprovalPrompt()
   }
 
   const handleUndo = async (
@@ -181,7 +228,7 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref, sele
             chores={sortByTimeOfDay(mobileColumn.chores)}
             doneChores={mobileColumn.done}
             starTotal={totals[mobileColumn.kid.id] ?? 0}
-            onComplete={handleCompleteRequest}
+            onComplete={beginCompletion}
             onUndo={handleUndo}
             disableCompletion={mode === 'future'}
           />
@@ -195,7 +242,7 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref, sele
             chores={sortByTimeOfDay(column.chores)}
             doneChores={column.done}
             starTotal={totals[column.kid.id] ?? 0}
-            onComplete={handleCompleteRequest}
+            onComplete={beginCompletion}
             onUndo={handleUndo}
             disableCompletion={mode === 'future'}
           />
@@ -232,8 +279,14 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref, sele
               <button
                 type="button"
                 onClick={() => {
-                  void handleComplete(pending.chore, pending.kidId, pending.accent)
                   setPending(null)
+                  beginCompletion(
+                    pending.chore,
+                    pending.kidId,
+                    pending.accent,
+                    pending.onReward,
+                    { allowPast: true },
+                  )
                 }}
                 className="inline-flex items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-100"
               >
@@ -247,6 +300,71 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref, sele
                 Cancel
               </button>
             </div>
+          </div>
+        </div>
+      ) : null}
+      {approvalRequest ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl dark:bg-slate-900">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">
+                  Enter parental pin
+                </h2>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                  A parent pin is required to complete &quot;{approvalRequest.chore.title}&quot;.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={closeApprovalPrompt}
+                className="rounded-md p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800"
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+            <form onSubmit={handlePinSubmit} className="mt-4 space-y-3">
+              <label className="flex flex-col gap-2">
+                <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                  Pin
+                </span>
+                <input
+                  type="password"
+                  inputMode="numeric"
+                  pattern="[0-9]{4}"
+                  maxLength={4}
+                  value={pinValue}
+                  onChange={(event) => {
+                    const next = event.target.value.replace(/[^0-9]/g, '').slice(0, 4)
+                    setPinValue(next)
+                    setPinError('')
+                  }}
+                  className="rounded-md border border-slate-300 bg-white px-3 py-2 text-lg font-semibold tracking-widest text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+                  placeholder="1234"
+                  aria-label="Parental pin"
+                  autoFocus
+                />
+              </label>
+              {pinError ? (
+                <p className="text-sm font-semibold text-red-600 dark:text-red-400">{pinError}</p>
+              ) : null}
+              <div className="flex flex-wrap justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={closeApprovalPrompt}
+                  className="inline-flex items-center justify-center rounded-md border border-transparent px-3 py-2 text-sm font-semibold text-slate-600 transition hover:text-slate-900 dark:text-slate-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="inline-flex items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+                >
+                  Submit pin
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       ) : null}
@@ -448,6 +566,11 @@ function ChoreButton({
           <span className="text-3xl leading-none">{chore.emoji}</span>
           <div className="min-w-0">
             <div className="text-lg font-semibold leading-tight">{chore.title}</div>
+            {chore.requiresApproval ? (
+              <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800 dark:bg-amber-900/50 dark:text-amber-100">
+                Pin required
+              </div>
+            ) : null}
           </div>
         </div>
         <div className="flex flex-col items-end justify-center text-sm font-semibold text-amber-700 dark:text-amber-200">

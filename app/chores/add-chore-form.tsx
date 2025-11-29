@@ -54,7 +54,7 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
         </button>
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-200">
           Title
           <input
@@ -137,6 +137,26 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
             <option value="afternoon">Afternoon</option>
             <option value="evening">Evening</option>
           </select>
+        </label>
+
+        <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-200">
+          Parental approval
+          <div className="flex items-center gap-2 rounded-md border border-slate-300 bg-white px-3 py-2 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+            <input type="hidden" name="requiresApproval" value="false" />
+            <input
+              type="checkbox"
+              name="requiresApproval"
+              value="true"
+              className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-500 dark:border-slate-600 dark:bg-slate-900"
+              aria-label="Requires parental approval"
+            />
+            <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+              Requires pin
+            </span>
+          </div>
+          <span className="text-xs font-normal text-slate-500 dark:text-slate-400">
+            Kids must enter the parental pin to mark this chore complete.
+          </span>
         </label>
       </div>
 

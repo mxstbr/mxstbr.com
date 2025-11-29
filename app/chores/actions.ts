@@ -74,6 +74,10 @@ export async function addChore(formData: FormData): Promise<void> {
     .filter((day): day is number => typeof day === 'number' && day >= 0 && day <= 6)
   const daysOfWeek =
     rawDays.length > 0 ? rawDays : [new Date().getUTCDay()]
+  const requiresApprovalValues = formData
+    .getAll('requiresApproval')
+    .map((value) => value.toString().toLowerCase())
+  const requiresApproval = requiresApprovalValues.includes('on') || requiresApprovalValues.includes('true')
 
   if (!title || kidIds.length === 0) return
 
@@ -91,6 +95,7 @@ export async function addChore(formData: FormData): Promise<void> {
       type,
       createdAt,
       timeOfDay,
+      requiresApproval,
     }
 
     if (type === 'repeated') {
@@ -327,6 +332,11 @@ export async function setChoreKids(formData: FormData): Promise<void> {
   const choreId = formData.get('choreId')?.toString()
   const timeValue = formData.get('timeOfDay')
   const timeOfDay = parseTimeOfDay(timeValue)
+  const approvalEntries = formData
+    .getAll('requiresApproval')
+    .map((value) => value.toString().toLowerCase())
+  const shouldSetApproval = approvalEntries.length > 0
+  const requiresApproval = approvalEntries.includes('true') || approvalEntries.includes('on')
   const kidIds = formData
     .getAll('kidIds')
     .map((value) => value.toString())
@@ -343,6 +353,9 @@ export async function setChoreKids(formData: FormData): Promise<void> {
     chore.kidIds = validKidIds
     if (timeValue !== null) {
       chore.timeOfDay = timeOfDay ?? undefined
+    }
+    if (shouldSetApproval) {
+      chore.requiresApproval = requiresApproval
     }
   })
 }
