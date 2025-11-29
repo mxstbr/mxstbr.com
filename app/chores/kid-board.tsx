@@ -208,13 +208,13 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref, sele
   return (
     <div className="full-bleed">
       <div className="md:hidden">
-        <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">
+        <label className="mb-2 block text-xs font-semibold text-slate-700 dark:text-slate-200">
           Select kid
         </label>
         <select
           value={mobileColumn?.kid.id}
           onChange={(event) => handleKidChange(event.target.value)}
-          className="mb-4 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+          className="mb-4 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
         >
           {columns.map((col) => (
             <option key={col.kid.id} value={col.kid.id}>
@@ -253,17 +253,17 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref, sele
           <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl dark:bg-slate-900">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">
+                <h2 className="text-base font-semibold text-slate-900 dark:text-slate-50">
                   Editing a past day
                 </h2>
-                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
                   You&apos;re viewing {dayLabel}. Go to today to record chores, or complete this task for {dayLabel}.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setPending(null)}
-                className="rounded-md p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800"
+                className="rounded-md p-1 text-slate-500 transition active:bg-slate-100 active:text-slate-700 dark:active:bg-slate-800"
                 aria-label="Close"
               >
                 ×
@@ -272,7 +272,7 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref, sele
             <div className="mt-4 flex flex-wrap justify-end gap-2">
               <Link
                 href={todayHref}
-                className="inline-flex items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+                className="inline-flex items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition active:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:active:bg-slate-200"
               >
                 Go to today
               </Link>
@@ -288,14 +288,14 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref, sele
                     { allowPast: true },
                   )
                 }}
-                className="inline-flex items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-100"
+                className="inline-flex items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-800 shadow-sm transition active:border-slate-500 dark:border-slate-700 dark:text-slate-100"
               >
                 Complete for {dayLabel}
               </button>
               <button
                 type="button"
                 onClick={() => setPending(null)}
-                className="inline-flex items-center justify-center rounded-md border border-transparent px-3 py-2 text-sm font-semibold text-slate-600 transition hover:text-slate-900 dark:text-slate-300"
+                className="inline-flex items-center justify-center rounded-md border border-transparent px-3 py-2 text-xs font-semibold text-slate-600 transition active:text-slate-900 dark:text-slate-300"
               >
                 Cancel
               </button>
@@ -308,17 +308,17 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref, sele
           <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl dark:bg-slate-900">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">
+                <h2 className="text-base font-semibold text-slate-900 dark:text-slate-50">
                   Enter parental pin
                 </h2>
-                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
                   A parent pin is required to complete &quot;{approvalRequest.chore.title}&quot;.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={closeApprovalPrompt}
-                className="rounded-md p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800"
+                className="rounded-md p-1 text-slate-500 transition active:bg-slate-100 active:text-slate-700 dark:active:bg-slate-800"
                 aria-label="Close"
               >
                 ×
@@ -326,7 +326,7 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref, sele
             </div>
             <form onSubmit={handlePinSubmit} className="mt-4 space-y-3">
               <label className="flex flex-col gap-2">
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">
                   Pin
                 </span>
                 <input
@@ -340,26 +340,26 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref, sele
                     setPinValue(next)
                     setPinError('')
                   }}
-                  className="rounded-md border border-slate-300 bg-white px-3 py-2 text-lg font-semibold tracking-widest text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+                  className="rounded-md border border-slate-300 bg-white px-3 py-2 text-base font-semibold tracking-widest text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
                   placeholder="1234"
                   aria-label="Parental pin"
                   autoFocus
                 />
               </label>
               {pinError ? (
-                <p className="text-sm font-semibold text-red-600 dark:text-red-400">{pinError}</p>
+                <p className="text-xs font-semibold text-red-600 dark:text-red-400">{pinError}</p>
               ) : null}
               <div className="flex flex-wrap justify-end gap-2">
                 <button
                   type="button"
                   onClick={closeApprovalPrompt}
-                  className="inline-flex items-center justify-center rounded-md border border-transparent px-3 py-2 text-sm font-semibold text-slate-600 transition hover:text-slate-900 dark:text-slate-300"
+                  className="inline-flex items-center justify-center rounded-md border border-transparent px-3 py-2 text-xs font-semibold text-slate-600 transition active:text-slate-900 dark:text-slate-300"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="inline-flex items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+                  className="inline-flex items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition active:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:active:bg-slate-200"
                 >
                   Submit pin
                 </button>
@@ -402,7 +402,7 @@ function KidColumn({
       }}
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="text-base font-semibold text-slate-900 dark:text-slate-50 lg:text-lg">
+        <div className="text-sm font-semibold text-slate-900 dark:text-slate-50 lg:text-base">
           {kid.name}
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -428,7 +428,7 @@ function KidColumn({
 
       <div className="space-y-3">
         {chores.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-center text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200">
+          <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-center text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200">
             All clear! Come back when something new pops up.
           </div>
         ) : (
@@ -473,7 +473,7 @@ function StarBadge({ value, accent }: { value: number; accent: string }) {
 
   return (
     <div
-      className="flex items-center gap-2 rounded-full px-3 py-1 text-sm font-semibold shadow-sm"
+      className="flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold shadow-sm"
       style={{ backgroundColor: accentSoft, color: accent }}
     >
       ⭐️ <span className="tabular-nums">{value}</span>
@@ -591,13 +591,13 @@ function ChoreButton({
         <div className="flex flex-col items-center gap-2">
           <span
             id={rewardId}
-            className="text-3xl leading-none transition group-active:text-[var(--accent)] group-focus-visible:text-[var(--accent)] lg:text-4xl"
+            className="text-2xl leading-none transition group-active:text-[var(--accent)] group-focus-visible:text-[var(--accent)] lg:text-3xl"
           >
             {isPending ? '…' : chore.emoji}
           </span>
         </div>
         <div className="min-w-0 flex-1">
-          <div className="text-base font-semibold leading-tight lg:text-lg">{chore.title}</div>
+          <div className="text-sm font-semibold leading-tight lg:text-base">{chore.title}</div>
           {chore.requiresApproval ? (
             <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800 dark:bg-amber-900/50 dark:text-amber-100">
               Pin required
@@ -605,25 +605,20 @@ function ChoreButton({
           ) : null}
         </div>
       </button>
-      <div className="flex items-center justify-between border-t border-slate-200 px-3 py-2 text-sm font-semibold text-amber-700 dark:border-slate-700 dark:text-amber-200 lg:px-4">
-        <div className="flex flex-col text-left">
-          <span className="leading-tight text-lg lg:text-xl">+{chore.stars}</span>
-          <span className="text-xs font-medium text-slate-500 dark:text-slate-300">
-            stars
-          </span>
-        </div>
+      <div className="flex items-center justify-between border-t border-slate-200 px-3 py-1.5 text-xs font-semibold text-amber-700 dark:border-slate-700 dark:text-amber-200 lg:px-4">
+        <div className="text-sm font-semibold leading-none lg:text-base">+{chore.stars} stars</div>
         <div className="relative">
           <button
             type="button"
             onClick={() => setMenuOpen((open) => !open)}
-            className="flex h-10 w-10 items-center justify-center rounded-lg border-2 border-slate-200 bg-white text-base transition active:border-[var(--accent)] active:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:active:border-[var(--accent)] dark:active:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)] lg:h-11 lg:w-11 lg:text-lg"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border-2 border-slate-200 bg-white text-xs transition active:border-[var(--accent)] active:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:active:border-[var(--accent)] dark:active:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)] lg:h-10 lg:w-10 lg:text-sm"
             aria-expanded={menuOpen}
             aria-label="More actions"
           >
             ⋯
           </button>
           {menuOpen ? (
-            <div className="absolute right-0 top-full z-40 mt-2 w-44 rounded-xl border border-slate-200 bg-white p-1 text-sm shadow-lg dark:border-slate-700 dark:bg-slate-800">
+            <div className="absolute right-0 top-full z-40 mt-2 w-44 rounded-xl border border-slate-200 bg-white p-1 text-xs shadow-lg dark:border-slate-700 dark:bg-slate-800">
               <button
                 type="button"
                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-slate-800 transition active:bg-slate-100 focus-visible:bg-slate-100 dark:text-slate-100 dark:active:bg-slate-700 dark:focus-visible:bg-slate-700"
@@ -632,7 +627,7 @@ function ChoreButton({
                 }}
                 disabled={isSpeaking}
               >
-                <span className="text-lg">🔊</span>
+                <span className="text-base">🔊</span>
                 <span>Read task</span>
                 {isSpeaking ? <span className="ml-auto text-xs text-slate-500">…</span> : null}
               </button>
@@ -654,7 +649,7 @@ function ChoreButton({
                 }}
                 disabled={isSkipping}
               >
-                <span className="text-lg">⏭️</span>
+                <span className="text-base">⏭️</span>
                 <span>Skip task</span>
                 {isSkipping ? <span className="ml-auto text-xs text-slate-500">…</span> : null}
               </button>
@@ -695,11 +690,11 @@ function CompletedChoreButton({
             void onUndo(chore, completionId, kidId)
           })
         }
-        className="group flex w-full items-center gap-3 rounded-xl border-2 border-emerald-400 bg-white px-3 py-3 pr-12 text-left text-slate-900 shadow transition hover:-translate-y-0.5 hover:border-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:translate-y-0 disabled:opacity-60 dark:border-emerald-500/60 dark:bg-slate-800 dark:text-slate-50 lg:gap-4 lg:px-4 lg:py-3 lg:pr-14"
+        className="group flex w-full items-center gap-3 rounded-xl border-2 border-emerald-400 bg-white px-3 py-3 pr-12 text-left text-slate-900 shadow transition active:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 disabled:opacity-60 dark:border-emerald-500/60 dark:bg-slate-800 dark:text-slate-50 lg:gap-4 lg:px-4 lg:py-3 lg:pr-14"
         disabled={isPending}
       >
         <span
-          className="flex h-10 w-10 items-center justify-center rounded-lg border-2 text-base font-semibold text-emerald-700 transition group-hover:-translate-y-0.5 dark:text-emerald-200 lg:text-lg"
+          className="flex h-10 w-10 items-center justify-center rounded-lg border-2 text-sm font-semibold text-emerald-700 transition group-active:-translate-y-0.5 dark:text-emerald-200 lg:text-base"
           style={{
             borderColor: accent,
             backgroundColor: accentSoft,
@@ -709,9 +704,9 @@ function CompletedChoreButton({
           ✓
         </span>
         <div className="flex min-w-0 flex-1 items-center gap-3">
-          <span className="text-xl leading-none lg:text-2xl">{chore.emoji}</span>
+          <span className="text-lg leading-none lg:text-xl">{chore.emoji}</span>
           <div className="min-w-0">
-            <div className="text-sm font-semibold leading-tight line-through lg:text-base">
+            <div className="text-xs font-semibold leading-tight line-through lg:text-sm">
               {chore.title}
             </div>
             <div className="text-xs font-medium text-emerald-700 dark:text-emerald-200">
@@ -772,7 +767,7 @@ function SpeakIconButton({ text, accent }: { text: string; accent: string }) {
           setIsSpeaking(false)
         }
       }}
-      className="flex h-full min-w-[46px] items-center justify-center rounded-xl border-2 border-slate-200 bg-white px-2.5 text-base transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:hover:border-[var(--accent)] dark:hover:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)] lg:min-w-[52px] lg:px-3 lg:text-lg"
+      className="flex h-full min-w-[46px] items-center justify-center rounded-xl border-2 border-slate-200 bg-white px-2.5 text-sm transition active:-translate-y-0.5 active:border-[var(--accent)] active:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:active:border-[var(--accent)] dark:active:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)] lg:min-w-[52px] lg:px-3 lg:text-base"
       style={
         {
           '--accent': accent,
