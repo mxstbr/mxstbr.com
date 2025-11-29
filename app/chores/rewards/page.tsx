@@ -14,7 +14,13 @@ export const metadata: Metadata = {
   description: 'Redeem stars for treats.',
 }
 
-export default async function RewardsPage() {
+type RewardsPageProps = {
+  searchParams?: {
+    os?: string
+  }
+}
+
+export default async function RewardsPage({ searchParams }: RewardsPageProps) {
   const password = auth()
 
   if (!isMax()) {
@@ -22,6 +28,13 @@ export default async function RewardsPage() {
   }
 
   const state = await getChoreState()
+  const osParam = searchParams?.os
+  const choresHref = (() => {
+    const params = new URLSearchParams()
+    if (osParam) params.set('os', osParam)
+    const query = params.toString()
+    return query ? `/chores?${query}` : '/chores'
+  })()
 
   const rewardsByKid: Record<string, Reward[]> = {}
 
@@ -53,7 +66,7 @@ export default async function RewardsPage() {
           <h1 className="text-2xl font-bold leading-tight">Rewards</h1>
         </div>
         <Link
-          href="/chores"
+          href={choresHref}
           className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
         >
           Back to chores

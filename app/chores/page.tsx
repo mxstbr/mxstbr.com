@@ -25,6 +25,7 @@ export const metadata: Metadata = {
 type ChoresPageProps = {
   searchParams?: {
     day?: string
+    os?: string
   }
 }
 
@@ -47,6 +48,22 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
     month: 'short',
     day: 'numeric',
   }).format(dayDate)
+  const osParam = searchParams?.os
+
+  const choresHref = (day?: string) => {
+    const params = new URLSearchParams()
+    if (day) params.set('day', day)
+    if (osParam) params.set('os', osParam)
+    const query = params.toString()
+    return query ? `/chores?${query}` : '/chores'
+  }
+
+  const rewardsHref = () => {
+    const params = new URLSearchParams()
+    if (osParam) params.set('os', osParam)
+    const query = params.toString()
+    return query ? `/chores/rewards?${query}` : '/chores/rewards'
+  }
 
   const openChoresByKid: Record<string, Chore[]> = {}
   const doneChoresByKid: Record<
@@ -102,16 +119,14 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
         <div className="flex items-center gap-3">
           <div className="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white p-1 pr-3 text-sm font-semibold text-slate-800 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
             <Link
-              href={`/chores?day=${prevDay}`}
+              href={choresHref(prevDay)}
               aria-label="Previous day"
               className="rounded px-2 py-1 transition hover:bg-slate-100 dark:hover:bg-slate-700"
             >
               ‹
             </Link>
             <Link
-              href={
-                viewingToday ? '/chores' : `/chores?day=${todayCtx.todayIso}`
-              }
+              href={viewingToday ? choresHref() : choresHref(todayCtx.todayIso)}
               className={`rounded px-3 py-1 transition ${
                 viewingToday
                   ? 'bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200'
@@ -121,7 +136,7 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
               Today
             </Link>
             <Link
-              href={`/chores?day=${nextDay}`}
+              href={choresHref(nextDay)}
               aria-label="Next day"
               className="rounded px-2 py-1 transition hover:bg-slate-100 dark:hover:bg-slate-700"
             >
@@ -132,7 +147,7 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
             </span>
           </div>
           <Link
-            href="/chores/rewards"
+            href={rewardsHref()}
             className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           >
             Rewards →
