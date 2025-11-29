@@ -358,53 +358,7 @@ function StarBadge({ value, accent }: { value: number; accent: string }) {
       className="flex items-center gap-2 rounded-full px-3 py-1 text-sm font-semibold shadow-sm"
       style={{ backgroundColor: accentSoft, color: accent }}
     >
-      ⭐️ <AnimatedCount value={value} accent={accent} />
-    </div>
-  )
-}
-
-function AnimatedCount({ value, accent }: { value: number; accent: string }) {
-  const [displayValue, setDisplayValue] = useState(value)
-  const [range, setRange] = useState<[number, number] | null>(null)
-  const previous = useRef(value)
-
-  useEffect(() => {
-    if (value === previous.current) return
-
-    const from = previous.current
-    const to = value
-    setRange([from, to])
-    const duration = 800
-    const start = performance.now()
-    let raf: number
-
-    const tick = (now: number) => {
-      const progress = Math.min(1, (now - start) / duration)
-      const eased = 1 - Math.pow(1 - progress, 3)
-      setDisplayValue(Math.round(from + (to - from) * eased))
-      if (progress < 1) {
-        raf = requestAnimationFrame(tick)
-      } else {
-        previous.current = value
-        setRange(null)
-      }
-    }
-
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [value])
-
-  return (
-    <div className="flex flex-col items-start leading-tight">
-      <span className="tabular-nums text-base">{displayValue}</span>
-      {range ? (
-        <span
-          className="text-[10px] font-medium uppercase tracking-wide text-slate-600"
-          style={{ color: accent }}
-        >
-          {range[0]} → {range[1]}
-        </span>
-      ) : null}
+      ⭐️ <span className="tabular-nums">{value}</span>
     </div>
   )
 }
