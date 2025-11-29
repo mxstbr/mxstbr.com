@@ -401,13 +401,13 @@ function KidColumn({
         boxShadow: `0 14px 40px -22px ${accentSoft}, inset 0 1px 0 ${accentSoft}`,
       }}
     >
-      <div className="flex items-center justify-between gap-3">
-        <div className="text-lg font-semibold text-slate-900 dark:text-slate-50">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="text-base font-semibold text-slate-900 dark:text-slate-50 lg:text-lg">
           {kid.name}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <StarBadge value={starTotal} accent={accent} />
-          <form action={setKidColor} className="flex items-center gap-1">
+          <form action={setKidColor} className="flex flex-wrap items-center gap-1">
             <input type="hidden" name="kidId" value={kid.id} />
             <input
               type="color"
@@ -543,7 +543,10 @@ function ChoreButton({
   }
 
   return (
-    <div className="flex items-stretch gap-2" style={accentVars}>
+    <div
+      className={`relative rounded-xl border-2 border-slate-200 bg-white shadow transition focus-within:-translate-y-0.5 active:-translate-y-0.5 focus-within:border-[var(--accent)] active:border-[var(--accent)] dark:border-slate-700 dark:bg-slate-800 dark:focus-within:border-[var(--accent)] dark:active:border-[var(--accent)] ${menuOpen ? 'z-20' : ''}`}
+      style={accentVars}
+    >
       <button
         type="button"
         onClick={() =>
@@ -552,88 +555,83 @@ function ChoreButton({
             void onComplete(chore, kidId, accent, reward)
           })
         }
-        className="group flex w-full items-center gap-4 rounded-xl border-2 border-slate-200 bg-white px-4 py-4 text-left text-slate-900 shadow transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:hover:border-[var(--accent)] dark:hover:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)]"
+        className="group flex w-full items-start gap-3 px-3 py-3 text-left text-slate-900 transition active:bg-[var(--accent-soft)] focus-visible:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:text-slate-50 dark:active:bg-[var(--accent-soft)] dark:focus-visible:bg-[var(--accent-soft)] lg:gap-4 lg:px-4 lg:py-4"
         disabled={completionDisabled || isAnimating}
         aria-label={`Mark "${chore.title}" as done`}
       >
-        <span
-          id={rewardId}
-          className="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-slate-300 bg-slate-50 text-lg font-semibold text-slate-700 transition group-hover:border-[var(--accent)] group-hover:bg-[var(--accent-soft)] group-hover:text-[var(--accent)] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:group-hover:border-[var(--accent)] dark:group-hover:bg-[var(--accent-soft)] dark:group-hover:text-[var(--accent)]"
-        >
-          {isPending ? '…' : ''}
-        </span>
-        <div className="flex min-w-0 flex-1 items-center gap-3">
-          <span className="text-3xl leading-none">{chore.emoji}</span>
-          <div className="min-w-0">
-            <div className="text-lg font-semibold leading-tight">{chore.title}</div>
-            {chore.requiresApproval ? (
-              <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800 dark:bg-amber-900/50 dark:text-amber-100">
-                Pin required
-              </div>
-            ) : null}
-          </div>
+        <div className="flex flex-col items-center gap-2">
+          <span
+            id={rewardId}
+            className="text-3xl leading-none transition group-active:text-[var(--accent)] group-focus-visible:text-[var(--accent)] lg:text-4xl"
+          >
+            {isPending ? '…' : chore.emoji}
+          </span>
         </div>
-        <div className="flex flex-col items-end justify-center text-sm font-semibold text-amber-700 dark:text-amber-200">
-          <span className="leading-tight text-xl">+{chore.stars}</span>
+        <div className="min-w-0 flex-1">
+          <div className="text-base font-semibold leading-tight lg:text-lg">{chore.title}</div>
+          {chore.requiresApproval ? (
+            <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800 dark:bg-amber-900/50 dark:text-amber-100">
+              Pin required
+            </div>
+          ) : null}
+        </div>
+      </button>
+      <div className="flex items-center justify-between border-t border-slate-200 px-3 py-2 text-sm font-semibold text-amber-700 dark:border-slate-700 dark:text-amber-200 lg:px-4">
+        <div className="flex flex-col text-left">
+          <span className="leading-tight text-lg lg:text-xl">+{chore.stars}</span>
           <span className="text-xs font-medium text-slate-500 dark:text-slate-300">
             stars
           </span>
         </div>
-      </button>
-      <div className="relative">
-        <button
-          type="button"
-          onClick={() => setMenuOpen((open) => !open)}
-          className="flex h-full min-w-[52px] items-center justify-center rounded-xl border-2 border-slate-200 bg-white px-3 text-lg transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:hover:border-[var(--accent)] dark:hover:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)]"
-          style={
-            {
-              '--accent': accent,
-              '--accent-soft': accentSoft,
-            } as CSSProperties
-          }
-          aria-expanded={menuOpen}
-          aria-label="More actions"
-        >
-          ⋯
-        </button>
-        {menuOpen ? (
-          <div className="absolute right-0 top-full z-10 mt-1 w-44 rounded-xl border border-slate-200 bg-white p-1 text-sm shadow-lg dark:border-slate-700 dark:bg-slate-800">
-            <button
-              type="button"
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-slate-800 transition hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-700"
-              onClick={() => {
-                void handleSpeak()
-              }}
-              disabled={isSpeaking}
-            >
-              <span className="text-lg">🔊</span>
-              <span>Read task</span>
-              {isSpeaking ? <span className="ml-auto text-xs text-slate-500">…</span> : null}
-            </button>
-            <button
-              type="button"
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-slate-800 transition hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-700"
-              onClick={() => {
-                if (isSkipping) return
-                setIsSkipping(true)
-                setMenuOpen(false)
-                const formData = new FormData()
-                formData.append('choreId', chore.id)
-                startTransition(() => {
-                  void skipChore(formData).finally(() => {
-                    setIsSkipping(false)
-                    setTimeout(() => router.refresh(), 50)
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setMenuOpen((open) => !open)}
+            className="flex h-10 w-10 items-center justify-center rounded-lg border-2 border-slate-200 bg-white text-base transition active:border-[var(--accent)] active:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:active:border-[var(--accent)] dark:active:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)] lg:h-11 lg:w-11 lg:text-lg"
+            aria-expanded={menuOpen}
+            aria-label="More actions"
+          >
+            ⋯
+          </button>
+          {menuOpen ? (
+            <div className="absolute right-0 top-full z-40 mt-2 w-44 rounded-xl border border-slate-200 bg-white p-1 text-sm shadow-lg dark:border-slate-700 dark:bg-slate-800">
+              <button
+                type="button"
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-slate-800 transition active:bg-slate-100 focus-visible:bg-slate-100 dark:text-slate-100 dark:active:bg-slate-700 dark:focus-visible:bg-slate-700"
+                onClick={() => {
+                  void handleSpeak()
+                }}
+                disabled={isSpeaking}
+              >
+                <span className="text-lg">🔊</span>
+                <span>Read task</span>
+                {isSpeaking ? <span className="ml-auto text-xs text-slate-500">…</span> : null}
+              </button>
+              <button
+                type="button"
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-slate-800 transition active:bg-slate-100 focus-visible:bg-slate-100 dark:text-slate-100 dark:active:bg-slate-700 dark:focus-visible:bg-slate-700"
+                onClick={() => {
+                  if (isSkipping) return
+                  setIsSkipping(true)
+                  setMenuOpen(false)
+                  const formData = new FormData()
+                  formData.append('choreId', chore.id)
+                  startTransition(() => {
+                    void skipChore(formData).finally(() => {
+                      setIsSkipping(false)
+                      setTimeout(() => router.refresh(), 50)
+                    })
                   })
-                })
-              }}
-              disabled={isSkipping}
-            >
-              <span className="text-lg">⏭️</span>
-              <span>Skip task</span>
-              {isSkipping ? <span className="ml-auto text-xs text-slate-500">…</span> : null}
-            </button>
-          </div>
-        ) : null}
+                }}
+                disabled={isSkipping}
+              >
+                <span className="text-lg">⏭️</span>
+                <span>Skip task</span>
+                {isSkipping ? <span className="ml-auto text-xs text-slate-500">…</span> : null}
+              </button>
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>
   )
@@ -668,11 +666,11 @@ function CompletedChoreButton({
             void onUndo(chore, completionId, kidId)
           })
         }
-        className="group flex w-full items-center gap-4 rounded-xl border-2 border-emerald-400 bg-white px-4 py-3 pr-14 text-left text-slate-900 shadow transition hover:-translate-y-0.5 hover:border-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:translate-y-0 disabled:opacity-60 dark:border-emerald-500/60 dark:bg-slate-800 dark:text-slate-50"
+        className="group flex w-full items-center gap-3 rounded-xl border-2 border-emerald-400 bg-white px-3 py-3 pr-12 text-left text-slate-900 shadow transition hover:-translate-y-0.5 hover:border-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:translate-y-0 disabled:opacity-60 dark:border-emerald-500/60 dark:bg-slate-800 dark:text-slate-50 lg:gap-4 lg:px-4 lg:py-3 lg:pr-14"
         disabled={isPending}
       >
         <span
-          className="flex h-10 w-10 items-center justify-center rounded-lg border-2 text-lg font-semibold text-emerald-700 transition group-hover:-translate-y-0.5 dark:text-emerald-200"
+          className="flex h-10 w-10 items-center justify-center rounded-lg border-2 text-base font-semibold text-emerald-700 transition group-hover:-translate-y-0.5 dark:text-emerald-200 lg:text-lg"
           style={{
             borderColor: accent,
             backgroundColor: accentSoft,
@@ -682,9 +680,9 @@ function CompletedChoreButton({
           ✓
         </span>
         <div className="flex min-w-0 flex-1 items-center gap-3">
-          <span className="text-2xl leading-none">{chore.emoji}</span>
+          <span className="text-xl leading-none lg:text-2xl">{chore.emoji}</span>
           <div className="min-w-0">
-            <div className="text-base font-semibold leading-tight line-through">
+            <div className="text-sm font-semibold leading-tight line-through lg:text-base">
               {chore.title}
             </div>
             <div className="text-xs font-medium text-emerald-700 dark:text-emerald-200">
@@ -745,7 +743,7 @@ function SpeakIconButton({ text, accent }: { text: string; accent: string }) {
           setIsSpeaking(false)
         }
       }}
-      className="flex h-full min-w-[52px] items-center justify-center rounded-xl border-2 border-slate-200 bg-white px-3 text-lg transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:hover:border-[var(--accent)] dark:hover:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)]"
+      className="flex h-full min-w-[46px] items-center justify-center rounded-xl border-2 border-slate-200 bg-white px-2.5 text-base transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:hover:border-[var(--accent)] dark:hover:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)] lg:min-w-[52px] lg:px-3 lg:text-lg"
       style={
         {
           '--accent': accent,
