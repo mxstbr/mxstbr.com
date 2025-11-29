@@ -2,11 +2,24 @@ import type { Chore, Completion, Reward, RewardRedemption } from './data'
 
 export const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 export const DAY_ABBRS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+export const PACIFIC_TIMEZONE = 'America/Los_Angeles'
 const TIME_ORDER: Record<'morning' | 'afternoon' | 'evening', number> = {
   morning: 0,
   afternoon: 1,
   evening: 2,
 }
+
+const pacificDateFormatter = new Intl.DateTimeFormat('en-CA', {
+  timeZone: PACIFIC_TIMEZONE,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+})
+
+const pacificWeekdayFormatter = new Intl.DateTimeFormat('en-US', {
+  timeZone: PACIFIC_TIMEZONE,
+  weekday: 'short',
+})
 
 export type TodayContext = {
   todayIso: string
@@ -17,10 +30,28 @@ export type TodayContext = {
 export function getToday(): TodayContext {
   const now = new Date()
   return {
-    todayIso: now.toISOString().slice(0, 10),
-    weekday: now.getUTCDay(),
+    todayIso: formatPacificDate(now),
+    weekday: pacificWeekdayIndex(now),
     nowMs: now.getTime(),
   }
+}
+
+export function formatPacificDate(date: Date): string {
+  return pacificDateFormatter.format(date)
+}
+
+export function pacificWeekdayIndex(date: Date): number {
+  const weekday = pacificWeekdayFormatter.format(date)
+  const index = DAY_ABBRS.indexOf(weekday)
+  return index === -1 ? 0 : index
+}
+
+export function pacificDateFromTimestamp(timestamp: string): string {
+  const date = new Date(timestamp)
+  if (Number.isNaN(date.getTime())) {
+    return formatPacificDate(new Date())
+  }
+  return formatPacificDate(date)
 }
 
 export function hasCompletedTodayForKid(
@@ -33,7 +64,7 @@ export function hasCompletedTodayForKid(
     (completion) =>
       completion.choreId === choreId &&
       completion.kidId === kidId &&
-      completion.timestamp.slice(0, 10) === ctx.todayIso,
+      pacificDateFromTimestamp(completion.timestamp) === ctx.todayIso,
   )
 }
 

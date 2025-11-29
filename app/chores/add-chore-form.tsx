@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import type { Kid } from './data'
+import { pacificWeekdayIndex } from './utils'
 
 const DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
@@ -12,10 +13,10 @@ type AddChoreFormProps = {
 }
 
 export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
-  const now = useMemo(() => new Date(), [])
+  const pacificWeekday = useMemo(() => pacificWeekdayIndex(new Date()), [])
   const [type, setType] = useState<'one-off' | 'repeated' | 'perpetual'>('one-off')
   const [cadence, setCadence] = useState<'daily' | 'weekly'>('daily')
-  const [selectedDays, setSelectedDays] = useState<number[]>([now.getDay()])
+  const [selectedDays, setSelectedDays] = useState<number[]>([pacificWeekday])
   const [timeOfDay, setTimeOfDay] = useState<'' | 'morning' | 'afternoon' | 'evening'>('morning')
   const [selectedKids, setSelectedKids] = useState<string[]>(kids.map((kid) => kid.id))
 
