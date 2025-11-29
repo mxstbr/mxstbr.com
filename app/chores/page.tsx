@@ -86,16 +86,11 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-            Chores
-          </h1>
-          <div className="text-sm text-slate-600 dark:text-slate-300">
-            {readableDay}
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-white p-1 text-sm font-semibold text-slate-800 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
+        <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+          Chores
+        </h1>
+        <div className="flex items-center gap-3">
+          <div className="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white p-1 pr-3 text-sm font-semibold text-slate-800 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
             <Link
               href={`/chores?day=${prevDay}`}
               aria-label="Previous day"
@@ -120,6 +115,9 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
             >
               ›
             </Link>
+            <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
+              {readableDay}
+            </span>
           </div>
           <Link
             href="/chores/rewards"
