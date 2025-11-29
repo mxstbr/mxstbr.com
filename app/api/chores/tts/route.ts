@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { generateSpeech } from 'ai'
+import { experimental_generateSpeech as generateSpeech } from 'ai'
 import { openai } from '@ai-sdk/openai'
 import { isMax } from 'app/auth'
 
