@@ -96,6 +96,10 @@ function RewardColumn({
 }) {
   const accent = kid.color ?? '#0ea5e9'
   const accentSoft = withAlpha(accent, 0.12)
+  const sortedRewards = [...rewards].sort((a, b) => {
+    if (a.cost !== b.cost) return a.cost - b.cost
+    return a.title.localeCompare(b.title)
+  })
 
   return (
     <div
@@ -119,12 +123,12 @@ function RewardColumn({
       </div>
 
       <div className="space-y-3">
-        {rewards.length === 0 ? (
+        {sortedRewards.length === 0 ? (
           <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-center text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200">
             No rewards yet. Check back soon!
           </div>
         ) : (
-          rewards.map((reward) => (
+          sortedRewards.map((reward) => (
             <RewardButton
               key={reward.id}
               reward={reward}
