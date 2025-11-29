@@ -1,6 +1,14 @@
 'use client'
 
-import { type CSSProperties, type FormEvent, useEffect, useMemo, useRef, useState, useTransition } from 'react'
+import {
+  type CSSProperties,
+  type FormEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useReward } from 'react-rewards'
@@ -38,7 +46,14 @@ type ApprovalRequest = {
   onReward?: () => void
 }
 
-export function KidBoard({ columns, completions, mode, dayLabel, todayHref, selectedKidId }: KidBoardProps) {
+export function KidBoard({
+  columns,
+  completions,
+  mode,
+  dayLabel,
+  todayHref,
+  selectedKidId,
+}: KidBoardProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -52,13 +67,14 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref, sele
 
   const [totals, setTotals] = useState(initialTotals)
   const [pending, setPending] = useState<PendingCompletion | null>(null)
-  const [approvalRequest, setApprovalRequest] = useState<ApprovalRequest | null>(null)
+  const [approvalRequest, setApprovalRequest] =
+    useState<ApprovalRequest | null>(null)
   const [pinValue, setPinValue] = useState('')
   const [pinError, setPinError] = useState('')
   const [activeKidId, setActiveKidId] = useState<string>(
     selectedKidId && columns.some((c) => c.kid.id === selectedKidId)
       ? selectedKidId
-      : columns[0]?.kid.id ?? '',
+      : (columns[0]?.kid.id ?? ''),
   )
 
   useEffect(() => {
@@ -91,7 +107,9 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref, sele
 
     reset()
     const events = ['click', 'keydown', 'pointermove', 'touchstart']
-    events.forEach((event) => window.addEventListener(event, reset, { passive: true }))
+    events.forEach((event) =>
+      window.addEventListener(event, reset, { passive: true }),
+    )
 
     return () => {
       window.clearTimeout(timer)
@@ -203,7 +221,8 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref, sele
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
   }
 
-  const mobileColumn = columns.find((col) => col.kid.id === activeKidId) ?? columns[0]
+  const mobileColumn =
+    columns.find((col) => col.kid.id === activeKidId) ?? columns[0]
 
   return (
     <div className="full-bleed">
@@ -257,7 +276,8 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref, sele
                   Editing a past day
                 </h2>
                 <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
-                  You&apos;re viewing {dayLabel}. Go to today to record chores, or complete this task for {dayLabel}.
+                  You&apos;re viewing {dayLabel}. Go to today to record chores,
+                  or complete this task for {dayLabel}.
                 </p>
               </div>
               <button
@@ -309,12 +329,13 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref, sele
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-base font-semibold text-slate-900 dark:text-slate-50">
-                  Enter parental pin
+                  Parent approval required
                 </h2>
                 <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
-                  A parent pin is required to complete &quot;{approvalRequest.chore.title}&quot;.
+                  Parents, please enter the pin to approve &quot;
+                  {approvalRequest.chore.title}&quot;.
                 </p>
-              </div>
+              </div
               <button
                 type="button"
                 onClick={closeApprovalPrompt}
@@ -336,7 +357,9 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref, sele
                   maxLength={4}
                   value={pinValue}
                   onChange={(event) => {
-                    const next = event.target.value.replace(/[^0-9]/g, '').slice(0, 4)
+                    const next = event.target.value
+                      .replace(/[^0-9]/g, '')
+                      .slice(0, 4)
                     setPinValue(next)
                     setPinError('')
                   }}
@@ -347,7 +370,9 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref, sele
                 />
               </label>
               {pinError ? (
-                <p className="text-xs font-semibold text-red-600 dark:text-red-400">{pinError}</p>
+                <p className="text-xs font-semibold text-red-600 dark:text-red-400">
+                  {pinError}
+                </p>
               ) : null}
               <div className="flex flex-wrap justify-end gap-2">
                 <button
@@ -385,8 +410,17 @@ function KidColumn({
   chores: Chore[]
   doneChores: { chore: Chore; completionId: string }[]
   starTotal: number
-  onComplete: (chore: Chore, kidId: string, accent: string, onReward?: () => void) => Promise<void> | void
-  onUndo: (chore: Chore, completionId: string, kidId: string) => Promise<void> | void
+  onComplete: (
+    chore: Chore,
+    kidId: string,
+    accent: string,
+    onReward?: () => void,
+  ) => Promise<void> | void
+  onUndo: (
+    chore: Chore,
+    completionId: string,
+    kidId: string,
+  ) => Promise<void> | void
   disableCompletion: boolean
 }) {
   const accent = kid.color ?? '#0ea5e9'
@@ -407,7 +441,10 @@ function KidColumn({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <StarBadge value={starTotal} accent={accent} />
-          <form action={setKidColor} className="flex flex-wrap items-center gap-1">
+          <form
+            action={setKidColor}
+            className="flex flex-wrap items-center gap-1"
+          >
             <input type="hidden" name="kidId" value={kid.id} />
             <input
               type="color"
@@ -491,7 +528,12 @@ function ChoreButton({
   chore: Chore
   accent: string
   kidId: string
-  onComplete: (chore: Chore, kidId: string, accent: string, onReward?: () => void) => Promise<void> | void
+  onComplete: (
+    chore: Chore,
+    kidId: string,
+    accent: string,
+    onReward?: () => void,
+  ) => Promise<void> | void
   disabled?: boolean
 }) {
   const [isPending, startTransition] = useTransition()
@@ -502,10 +544,14 @@ function ChoreButton({
   const containerRef = useRef<HTMLDivElement | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const rewardId = useMemo(() => `chore-reward-${chore.id}`, [chore.id])
-  const { reward, isAnimating } = useReward(rewardId, chore.emoji ? 'emoji' : 'confetti', {
-    emoji: chore.emoji ? [chore.emoji] : undefined,
-    spread: 80,
-  })
+  const { reward, isAnimating } = useReward(
+    rewardId,
+    chore.emoji ? 'emoji' : 'confetti',
+    {
+      emoji: chore.emoji ? [chore.emoji] : undefined,
+      spread: 80,
+    },
+  )
   const accentSoft = withAlpha(accent, 0.12)
   const accentVars = {
     '--accent': accent,
@@ -597,16 +643,20 @@ function ChoreButton({
           </span>
         </div>
         <div className="min-w-0 flex-1">
-          <div className="text-sm font-semibold leading-tight lg:text-base">{chore.title}</div>
+          <div className="text-sm font-semibold leading-tight lg:text-base">
+            {chore.title}
+          </div>
           {chore.requiresApproval ? (
             <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800 dark:bg-amber-900/50 dark:text-amber-100">
-              Pin required
+              🔐 Parent approval required
             </div>
           ) : null}
         </div>
       </button>
       <div className="flex items-center justify-between border-t border-slate-200 px-3 py-1.5 text-xs font-semibold text-amber-700 dark:border-slate-700 dark:text-amber-200 lg:px-4">
-        <div className="text-sm font-semibold leading-none lg:text-base">+{chore.stars} stars</div>
+        <div className="text-sm font-semibold leading-none lg:text-base">
+          +{chore.stars} stars
+        </div>
         <div className="relative">
           <button
             type="button"
@@ -629,7 +679,9 @@ function ChoreButton({
               >
                 <span className="text-base">🔊</span>
                 <span>Read task</span>
-                {isSpeaking ? <span className="ml-auto text-xs text-slate-500">…</span> : null}
+                {isSpeaking ? (
+                  <span className="ml-auto text-xs text-slate-500">…</span>
+                ) : null}
               </button>
               <button
                 type="button"
@@ -651,7 +703,9 @@ function ChoreButton({
               >
                 <span className="text-base">⏭️</span>
                 <span>Skip task</span>
-                {isSkipping ? <span className="ml-auto text-xs text-slate-500">…</span> : null}
+                {isSkipping ? (
+                  <span className="ml-auto text-xs text-slate-500">…</span>
+                ) : null}
               </button>
             </div>
           ) : null}
@@ -748,7 +802,8 @@ function SpeakIconButton({ text, accent }: { text: string; accent: string }) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text }),
           })
-          if (!response.ok) throw new Error(`TTS failed with status ${response.status}`)
+          if (!response.ok)
+            throw new Error(`TTS failed with status ${response.status}`)
           const blob = await response.blob()
           const url = URL.createObjectURL(blob)
           const audio = new Audio(url)
