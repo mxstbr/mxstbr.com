@@ -115,7 +115,7 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
   }))
 
   return (
-    <div className="space-y-6 p-6 bg-slate-50 min-h-screen">
+    <div className="flex min-h-screen flex-col bg-slate-50 p-6 md:h-screen md:overflow-y-hidden">
       <div className="flex items-center justify-between gap-3 text-sm">
         <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
           Chores
@@ -158,14 +158,16 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
           </Link>
         </div>
       </div>
-      <KidBoard
-        columns={columns}
-        completions={state.completions}
-        mode={viewingToday ? 'today' : viewingFuture ? 'future' : 'past'}
-        dayLabel={readableDay}
-        todayHref={choresHref()}
-        selectedKidId={kidParam}
-      />
+      <div className="mt-6 md:flex-1 md:min-h-0">
+        <KidBoard
+          columns={columns}
+          completions={state.completions}
+          mode={viewingToday ? 'today' : viewingFuture ? 'future' : 'past'}
+          dayLabel={readableDay}
+          todayHref={choresHref()}
+          selectedKidId={kidParam}
+        />
+      </div>
     </div>
   )
 }

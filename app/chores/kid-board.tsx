@@ -225,7 +225,7 @@ export function KidBoard({
     columns.find((col) => col.kid.id === activeKidId) ?? columns[0]
 
   return (
-    <div className="full-bleed">
+    <div className="full-bleed md:h-full md:min-h-0">
       <div className="md:hidden">
         <label className="mb-2 block text-xs font-semibold text-slate-700 dark:text-slate-200">
           Select kid
@@ -253,7 +253,7 @@ export function KidBoard({
           />
         ) : null}
       </div>
-      <div className="hidden grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 md:px-4 md:grid">
+      <div className="hidden h-full min-h-0 grid-cols-1 gap-4 sm:gap-6 md:grid md:grid-cols-3 md:px-4">
         {columns.map((column) => (
           <KidColumn
             key={column.kid.id}
@@ -428,7 +428,7 @@ function KidColumn({
 
   return (
     <div
-      className="flex flex-col gap-4 rounded-2xl border bg-white p-4 shadow-sm dark:bg-slate-900"
+      className="flex flex-col gap-4 rounded-2xl border bg-white p-4 shadow-sm dark:bg-slate-900 md:h-full md:min-h-0 md:overflow-y-auto"
       style={{
         borderColor: accent,
         backgroundColor: accentSoft,
@@ -661,7 +661,7 @@ function ChoreButton({
           <button
             type="button"
             onClick={() => setMenuOpen((open) => !open)}
-            className="flex h-9 w-9 items-center justify-center rounded-lg border-2 border-slate-200 bg-white text-xs transition active:border-[var(--accent)] active:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:active:border-[var(--accent)] dark:active:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)] xl:h-10 xl:w-10 xl:text-sm"
+            className="flex px-2 items-center justify-center rounded-lg border-2 border-slate-200 bg-white text-xs transition active:border-[var(--accent)] active:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:active:border-[var(--accent)] dark:active:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)] xl:h-10 xl:w-10 xl:text-sm"
             aria-expanded={menuOpen}
             aria-label="More actions"
           >
