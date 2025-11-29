@@ -27,7 +27,27 @@ export type TodayContext = {
   nowMs: number
 }
 
-export function getToday(): TodayContext {
+const ISO_DAY_REGEX = /^\d{4}-\d{2}-\d{2}$/
+
+function dateFromIsoDay(day: string): Date | null {
+  if (!ISO_DAY_REGEX.test(day)) return null
+  const parsed = new Date(`${day}T12:00:00Z`)
+  if (Number.isNaN(parsed.getTime())) return null
+  return parsed
+}
+
+export function getToday(day?: string): TodayContext {
+  if (day) {
+    const parsed = dateFromIsoDay(day)
+    if (parsed) {
+      return {
+        todayIso: formatPacificDate(parsed),
+        weekday: pacificWeekdayIndex(parsed),
+        nowMs: parsed.getTime(),
+      }
+    }
+  }
+
   const now = new Date()
   return {
     todayIso: formatPacificDate(now),
@@ -189,6 +209,12 @@ export function withAlpha(color: string, alpha: number): string {
 
 export function appliesToKid(chore: Chore, kidId: string): boolean {
   return chore.kidIds.includes(kidId)
+}
+
+export function shiftIsoDay(dayIso: string, delta: number): string {
+  const base = dateFromIsoDay(dayIso) ?? new Date()
+  base.setUTCDate(base.getUTCDate() + delta)
+  return formatPacificDate(base)
 }
 
 export function sortByTimeOfDay<
