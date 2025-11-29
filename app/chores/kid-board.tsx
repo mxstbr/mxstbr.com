@@ -44,6 +44,33 @@ export function KidBoard({ columns, completions, mode, dayLabel, todayHref }: Ki
     setTotals(initialTotals)
   }, [initialTotals])
 
+  useEffect(() => {
+    const refresh = () => router.refresh()
+    const id = window.setInterval(refresh, 60_000)
+    return () => window.clearInterval(id)
+  }, [router])
+
+  useEffect(() => {
+    if (mode === 'today') return
+
+    let timer: number
+    const reset = () => {
+      window.clearTimeout(timer)
+      timer = window.setTimeout(() => {
+        router.replace(todayHref)
+      }, 30_000)
+    }
+
+    reset()
+    const events = ['click', 'keydown', 'pointermove', 'touchstart']
+    events.forEach((event) => window.addEventListener(event, reset, { passive: true }))
+
+    return () => {
+      window.clearTimeout(timer)
+      events.forEach((event) => window.removeEventListener(event, reset))
+    }
+  }, [mode, todayHref, router])
+
   const handleComplete = async (
     chore: Chore,
     kidId: string,
