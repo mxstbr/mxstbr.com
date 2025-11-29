@@ -109,7 +109,6 @@ function hasCompletionInWindow(
 
 export function isPaused(chore: Chore, ctx: TodayContext): boolean {
   return (
-    chore.type === 'repeated' &&
     !!chore.pausedUntil &&
     chore.pausedUntil >= ctx.todayIso
   )
@@ -124,6 +123,7 @@ export function isOpenForKid(
   if (!chore.kidIds.includes(kidId)) return false
   const createdDay = pacificDateFromTimestamp(chore.createdAt)
   if (createdDay > ctx.todayIso) return false
+  if (chore.snoozedUntil && chore.snoozedUntil > ctx.todayIso) return false
 
   if (chore.type === 'one-off') {
     const done = completions.some((completion) => {

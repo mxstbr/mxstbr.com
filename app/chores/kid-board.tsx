@@ -4,7 +4,7 @@ import { type CSSProperties, useEffect, useMemo, useRef, useState, useTransition
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { Chore, Completion, Kid } from './data'
-import { completeChore, setKidColor, undoChore } from './actions'
+import { completeChore, setKidColor, skipChore, undoChore } from './actions'
 import { sortByTimeOfDay, starsForKid, withAlpha } from './utils'
 
 type Column = {
@@ -363,12 +363,46 @@ function ChoreButton({
   disabled?: boolean
 }) {
   const [isPending, startTransition] = useTransition()
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [isSpeaking, setIsSpeaking] = useState(false)
+  const [isSkipping, setIsSkipping] = useState(false)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
   const accentSoft = withAlpha(accent, 0.12)
   const accentVars = {
     '--accent': accent,
     '--accent-soft': accentSoft,
   } as CSSProperties
   const completionDisabled = isPending || disabled
+
+  const handleSpeak = async () => {
+    if (isSpeaking) return
+    try {
+      setIsSpeaking(true)
+      audioRef.current?.pause()
+      const response = await fetch('/api/chores/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: chore.title }),
+      })
+      if (!response.ok) throw new Error(`TTS failed: ${response.status}`)
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+      const audio = new Audio(url)
+      audioRef.current = audio
+      audio.onended = () => {
+        URL.revokeObjectURL(url)
+        setIsSpeaking(false)
+      }
+      audio.onerror = () => {
+        URL.revokeObjectURL(url)
+        setIsSpeaking(false)
+      }
+      await audio.play()
+    } catch (error) {
+      console.error('Failed to play chore audio', error)
+      setIsSpeaking(false)
+    }
+  }
 
   return (
     <div className="flex items-stretch gap-2" style={accentVars}>
@@ -400,7 +434,62 @@ function ChoreButton({
           </span>
         </div>
       </button>
-      <SpeakIconButton text={chore.title} accent={accent} />
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setMenuOpen((open) => !open)}
+          className="flex h-full min-w-[52px] items-center justify-center rounded-xl border-2 border-slate-200 bg-white px-3 text-lg transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:hover:border-[var(--accent)] dark:hover:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)]"
+          style={
+            {
+              '--accent': accent,
+              '--accent-soft': accentSoft,
+            } as CSSProperties
+          }
+          aria-expanded={menuOpen}
+          aria-label="More actions"
+        >
+          ⋯
+        </button>
+        {menuOpen ? (
+          <div className="absolute right-0 top-full z-10 mt-1 w-44 rounded-xl border border-slate-200 bg-white p-1 text-sm shadow-lg dark:border-slate-700 dark:bg-slate-800">
+            <button
+              type="button"
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-slate-800 transition hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-700"
+              onClick={() => {
+                setMenuOpen(false)
+                void handleSpeak()
+              }}
+              disabled={isSpeaking}
+            >
+              <span className="text-lg">🔊</span>
+              <span>Read task</span>
+              {isSpeaking ? <span className="ml-auto text-xs text-slate-500">…</span> : null}
+            </button>
+            <button
+              type="button"
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-slate-800 transition hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-700"
+              onClick={() => {
+                if (isSkipping) return
+                setIsSkipping(true)
+                setMenuOpen(false)
+                const formData = new FormData()
+                formData.append('choreId', chore.id)
+                startTransition(() => {
+                  void skipChore(formData).finally(() => {
+                    setIsSkipping(false)
+                    setTimeout(() => router.refresh(), 50)
+                  })
+                })
+              }}
+              disabled={isSkipping}
+            >
+              <span className="text-lg">⏭️</span>
+              <span>Skip task</span>
+              {isSkipping ? <span className="ml-auto text-xs text-slate-500">…</span> : null}
+            </button>
+          </div>
+        ) : null}
+      </div>
     </div>
   )
 }

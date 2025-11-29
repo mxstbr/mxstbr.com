@@ -9,7 +9,7 @@ import {
   saveChoreState,
   type RewardType,
 } from './data'
-import { formatPacificDate, pacificDateFromTimestamp, starsForKid } from './utils'
+import { formatPacificDate, pacificDateFromTimestamp, shiftIsoDay, starsForKid } from './utils'
 import { bot } from 'app/lib/telegram'
 import { isMax } from 'app/auth'
 
@@ -219,6 +219,23 @@ export async function setPause(formData: FormData): Promise<void> {
     if (!chore || chore.type !== 'repeated') return
 
     chore.pausedUntil = pausedUntil || null
+  })
+}
+
+export async function skipChore(formData: FormData): Promise<void> {
+  if (!isAuthorized()) return
+
+  const choreId = formData.get('choreId')?.toString()
+  if (!choreId) return
+
+  const nextDay = shiftIsoDay(todayIsoDate(), 1)
+
+  await withUpdatedState((state) => {
+    const chore = state.chores.find((c) => c.id === choreId)
+    if (!chore) return
+
+    chore.pausedUntil = nextDay
+    chore.snoozedUntil = nextDay
   })
 }
 

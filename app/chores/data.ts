@@ -23,6 +23,7 @@ export type Chore = {
   type: ChoreType
   schedule?: ChoreSchedule
   pausedUntil?: string | null
+  snoozedUntil?: string | null
   createdAt: string
   completedAt?: string | null
   timeOfDay?: 'morning' | 'afternoon' | 'evening'
