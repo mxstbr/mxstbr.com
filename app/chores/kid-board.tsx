@@ -109,8 +109,8 @@ function KidColumn({
   chores: Chore[]
   doneChores: { chore: Chore; completionId: string }[]
   starTotal: number
-  onComplete: (chore: Chore, kidId: string, accent: string) => void
-  onUndo: (chore: Chore, completionId: string, kidId: string) => void
+  onComplete: (chore: Chore, kidId: string, accent: string) => Promise<void> | void
+  onUndo: (chore: Chore, completionId: string, kidId: string) => Promise<void> | void
 }) {
   const accent = kid.color ?? '#0ea5e9'
   const accentSoft = withAlpha(accent, 0.12)
