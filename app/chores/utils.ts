@@ -86,6 +86,21 @@ export function pacificDateFromTimestamp(timestamp: string): string {
   return formatPacificDate(date)
 }
 
+const NIGHT_START_MINUTES = 19 * 60 + 45
+const MORNING_START_MINUTES = 7 * 60
+
+function pacificTimeInMinutes(date: Date): number {
+  const parts = pacificDateTimeFormatter.formatToParts(date)
+  const hour = Number(parts.find((part) => part.type === 'hour')?.value ?? '0')
+  const minute = Number(parts.find((part) => part.type === 'minute')?.value ?? '0')
+  return hour * 60 + minute
+}
+
+export function isPacificNighttime(date: Date = new Date()): boolean {
+  const minutes = pacificTimeInMinutes(date)
+  return minutes >= NIGHT_START_MINUTES || minutes < MORNING_START_MINUTES
+}
+
 export function hasCompletedTodayForKid(
   choreId: string,
   kidId: string,

@@ -9,6 +9,7 @@ import {
   shiftIsoDay,
   sortByTimeOfDay,
 } from './utils'
+import { ScreenSaver } from './screen-saver'
 import { PasswordForm } from 'app/cal/password-form'
 import { auth, isMax } from 'app/auth'
 
@@ -59,6 +60,9 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
   }).format(dayDate)
   const osParam = searchParams?.os
   const kidParam = searchParams?.kid
+  const hasOpenChoresToday = state.chores.some((chore) =>
+    state.kids.some((kid) => isOpenForKid(chore, kid.id, state.completions, todayCtx)),
+  )
 
   const choresHref = (day?: string) => {
     const params = new URLSearchParams()
@@ -174,6 +178,7 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
           selectedKidId={kidParam}
         />
       </div>
+      <ScreenSaver noChoresToday={!hasOpenChoresToday} />
     </div>
   )
 }
