@@ -43,6 +43,7 @@ import {
   pacificDateFromTimestamp,
   PACIFIC_TIMEZONE,
 } from '../utils'
+import { ClippyChoresChat } from './clippy-chat'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -794,131 +795,135 @@ export default async function ChoreAdminPage({ searchParams }: AdminPageProps) {
   }
 
   return (
-    <ParentalPinGate>
-      <div className="space-y-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-1">
-            <p className="text-sm uppercase tracking-wide text-slate-500 dark:text-slate-400">
-              Chore control center
-            </p>
-            <h1 className="text-2xl font-bold leading-tight">Manage chores</h1>
-            <p className="text-slate-600 dark:text-slate-300">
-              Set up new chores, pause routines during travel, archive old tasks, and rename each
-              column. All changes sync instantly to the kid-facing board.
-            </p>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              Today is {DAY_NAMES[ctx.weekday]}, {ctx.todayIso}.
-            </p>
-          </div>
-          <Link
-            href="/chores"
-            className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-          >
-            Open kid board
-          </Link>
-          <Link
-            href="/chores/rewards"
-            className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-          >
-            Open rewards
-          </Link>
-        </div>
-
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+    <>
+      <ParentalPinGate>
+        <div className="space-y-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
               <p className="text-sm uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                Pause everything
+                Chore control center
               </p>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">
-                Pause all chores for every kid
-              </h2>
-              <p className="text-sm text-slate-600 dark:text-slate-300">
-                Hide all chores until a chosen date. Handy for travel or school breaks.
+              <h1 className="text-2xl font-bold leading-tight">Manage chores</h1>
+              <p className="text-slate-600 dark:text-slate-300">
+                Set up new chores, pause routines during travel, archive old tasks, and rename each
+                column. All changes sync instantly to the kid-facing board.
               </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Status: {globalPauseActive ? `Paused until ${globalPauseUntil}` : 'Active'}
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Today is {DAY_NAMES[ctx.weekday]}, {ctx.todayIso}.
               </p>
             </div>
-            <div className="flex flex-col items-start gap-2 md:flex-row md:items-center">
-              <form action={pauseAllChores} className="flex items-center gap-2">
-                <input
-                  type="date"
-                  name="pausedUntil"
-                  defaultValue={globalPauseUntil ?? ''}
-                  className="rounded-md border border-slate-300 bg-white px-2 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
-                />
-                <button
-                  type="submit"
-                  className="rounded-md border border-transparent bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
-                >
-                  Pause all
-                </button>
-              </form>
-              {globalPauseActive ? (
-                <form action={pauseAllChores}>
-                  <input type="hidden" name="pausedUntil" value="" />
+            <Link
+              href="/chores"
+              className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            >
+              Open kid board
+            </Link>
+            <Link
+              href="/chores/rewards"
+              className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            >
+              Open rewards
+            </Link>
+          </div>
+
+          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div className="space-y-1">
+                <p className="text-sm uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  Pause everything
+                </p>
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">
+                  Pause all chores for every kid
+                </h2>
+                <p className="text-sm text-slate-600 dark:text-slate-300">
+                  Hide all chores until a chosen date. Handy for travel or school breaks.
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Status: {globalPauseActive ? `Paused until ${globalPauseUntil}` : 'Active'}
+                </p>
+              </div>
+              <div className="flex flex-col items-start gap-2 md:flex-row md:items-center">
+                <form action={pauseAllChores} className="flex items-center gap-2">
+                  <input
+                    type="date"
+                    name="pausedUntil"
+                    defaultValue={globalPauseUntil ?? ''}
+                    className="rounded-md border border-slate-300 bg-white px-2 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+                  />
                   <button
                     type="submit"
-                    className="rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-200"
+                    className="rounded-md border border-transparent bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
                   >
-                    Resume now
+                    Pause all
                   </button>
                 </form>
-              ) : null}
+                {globalPauseActive ? (
+                  <form action={pauseAllChores}>
+                    <input type="hidden" name="pausedUntil" value="" />
+                    <button
+                      type="submit"
+                      className="rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-200"
+                    >
+                      Resume now
+                    </button>
+                  </form>
+                ) : null}
+              </div>
+            </div>
+          </div>
+
+          <AddChoreForm kids={state.kids} addChoreAction={addChore} />
+
+          <div className="full-bleed">
+            <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 md:px-4">
+              {state.kids.map((kid) => (
+                <KidColumn
+                  key={kid.id}
+                  kid={kid}
+                  openChores={sortByTimeOfDay(openChoresByKid[kid.id] ?? [])}
+                  recurringChores={sortByTimeOfDay(recurringByKid[kid.id] ?? [])}
+                  done={[...(doneByKid[kid.id] ?? [])].sort((a, b) =>
+                    b.timestamp.localeCompare(a.timestamp),
+                  )}
+                  completions={state.completions}
+                  ctx={ctx}
+                  allKids={state.kids}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <p className="text-sm uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                Rewards
+              </p>
+              <h2 className="text-xl font-bold leading-tight">Manage rewards</h2>
+              <p className="text-slate-600 dark:text-slate-300">
+                Add perks the kids can unlock and assign them to one or many columns.
+              </p>
+            </div>
+            <AddRewardForm kids={state.kids} addRewardAction={addReward} />
+          </div>
+
+          <div className="full-bleed">
+            <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 md:px-4">
+              {state.kids.map((kid) => (
+                <RewardColumn
+                  key={kid.id}
+                  kid={kid}
+                  rewards={rewardsByKid[kid.id] ?? []}
+                  completions={state.completions}
+                  redemptions={state.rewardRedemptions}
+                  allKids={state.kids}
+                />
+              ))}
             </div>
           </div>
         </div>
-        <AddChoreForm kids={state.kids} addChoreAction={addChore} />
-
-        <div className="full-bleed">
-          <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 md:px-4">
-            {state.kids.map((kid) => (
-              <KidColumn
-                key={kid.id}
-                kid={kid}
-                openChores={sortByTimeOfDay(openChoresByKid[kid.id] ?? [])}
-                recurringChores={sortByTimeOfDay(recurringByKid[kid.id] ?? [])}
-                done={[...(doneByKid[kid.id] ?? [])].sort((a, b) =>
-                  b.timestamp.localeCompare(a.timestamp),
-                )}
-                completions={state.completions}
-                ctx={ctx}
-                allKids={state.kids}
-              />
-            ))}
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          <div className="space-y-1">
-            <p className="text-sm uppercase tracking-wide text-slate-500 dark:text-slate-400">
-              Rewards
-            </p>
-            <h2 className="text-xl font-bold leading-tight">Manage rewards</h2>
-            <p className="text-slate-600 dark:text-slate-300">
-              Add perks the kids can unlock and assign them to one or many columns.
-            </p>
-          </div>
-          <AddRewardForm kids={state.kids} addRewardAction={addReward} />
-        </div>
-
-        <div className="full-bleed">
-          <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 md:px-4">
-            {state.kids.map((kid) => (
-              <RewardColumn
-                key={kid.id}
-                kid={kid}
-                rewards={rewardsByKid[kid.id] ?? []}
-                completions={state.completions}
-                redemptions={state.rewardRedemptions}
-                allKids={state.kids}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    </ParentalPinGate>
+      </ParentalPinGate>
+      <ClippyChoresChat />
+    </>
   )
 }
 
