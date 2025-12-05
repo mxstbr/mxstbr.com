@@ -148,7 +148,8 @@ export function isOpenForKid(
 ): boolean {
   if (!chore.kidIds.includes(kidId)) return false
   const createdDay = pacificDateFromTimestamp(chore.createdAt)
-  if (createdDay > ctx.todayIso) return false
+  const scheduledDay = chore.scheduledFor || createdDay
+  if (scheduledDay > ctx.todayIso) return false
   if (chore.snoozedUntil && chore.snoozedUntil > ctx.todayIso) return false
 
   if (chore.type === 'one-off') {
@@ -211,7 +212,9 @@ export function isOpenForKid(
 }
 
 export function scheduleLabel(chore: Chore): string {
-  if (chore.type === 'one-off') return 'One-off'
+  if (chore.type === 'one-off') {
+    return chore.scheduledFor ? `One-off · ${chore.scheduledFor}` : 'One-off'
+  }
   if (chore.type === 'perpetual') return 'Perpetual'
   if (chore.schedule?.cadence === 'weekly') {
     const days = chore.schedule.daysOfWeek ?? []

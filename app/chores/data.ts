@@ -22,6 +22,7 @@ export type Chore = {
   stars: number
   type: ChoreType
   requiresApproval?: boolean
+  scheduledFor?: string
   schedule?: ChoreSchedule
   pausedUntil?: string | null
   snoozedUntil?: string | null
@@ -77,6 +78,7 @@ const DEFAULT_KIDS: Kid[] = [
 
 function createDefaultChores(kids: Kid[]): Chore[] {
   const createdAt = new Date().toISOString()
+  const createdDay = createdAt.slice(0, 10)
   const kidA = kids[0]?.id ?? 'kid-1'
   const kidB = kids[1]?.id ?? 'kid-2'
   const kidC = kids[2]?.id ?? 'kid-3'
@@ -89,6 +91,7 @@ function createDefaultChores(kids: Kid[]): Chore[] {
       emoji: '🎒',
       stars: 5,
       type: 'one-off',
+      scheduledFor: createdDay,
       createdAt,
       timeOfDay: 'afternoon',
       requiresApproval: false,
@@ -124,6 +127,7 @@ function createDefaultChores(kids: Kid[]): Chore[] {
       emoji: '💖',
       stars: 1,
       type: 'perpetual',
+      scheduledFor: createdDay,
       createdAt,
       timeOfDay: 'morning',
       requiresApproval: false,
@@ -157,12 +161,17 @@ function ensureChores(chores: Chore[] | undefined, kids: Kid[]): Chore[] {
         : (chore as any).kidId
           ? [(chore as any).kidId]
           : [kids[0]?.id ?? 'kid-1']
+    const fallbackDay =
+      typeof chore.createdAt === 'string' && chore.createdAt.length >= 10
+        ? chore.createdAt.slice(0, 10)
+        : undefined
 
     return {
       ...chore,
       kidIds: kidIds.length ? kidIds : [kids[0]?.id ?? 'kid-1'],
       timeOfDay: chore.timeOfDay ?? undefined,
       requiresApproval: chore.requiresApproval ?? false,
+      scheduledFor: chore.scheduledFor ?? fallbackDay,
     }
   })
 }

@@ -15,6 +15,7 @@ import {
   adjustKidStars,
   setChoreKids,
   setRewardKids,
+  setOneOffDate,
 } from '../actions'
 import {
   type Chore,
@@ -271,7 +272,7 @@ function KidColumn({
       <div className="flex flex-1 flex-col gap-3">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-            Open today
+            Open & upcoming
           </h3>
           <span className="text-xs text-slate-500 dark:text-slate-400">
             {openChores.length} chore{openChores.length === 1 ? '' : 's'}
@@ -564,6 +565,26 @@ function ChoreCard({
             Archive
           </button>
         </form>
+        {chore.type === 'one-off' ? (
+          <form action={setOneOffDate} className="flex items-center gap-2">
+            <input type="hidden" name="choreId" value={chore.id} />
+            <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
+              Day
+            </label>
+            <input
+              type="date"
+              name="scheduledFor"
+              defaultValue={chore.scheduledFor ?? pacificDateFromTimestamp(chore.createdAt)}
+              className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-50"
+            />
+            <button
+              type="submit"
+              className="rounded-md border border-slate-300 px-2 py-1 text-xs font-semibold uppercase tracking-wide text-slate-700 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-200"
+            >
+              Set day
+            </button>
+          </form>
+        ) : null}
         <form action={setChoreKids} className="flex flex-wrap items-center gap-2">
           <input type="hidden" name="choreId" value={chore.id} />
           <select
@@ -763,7 +784,15 @@ export default async function ChoreAdminPage({ searchParams }: AdminPageProps) {
 
   for (const chore of state.chores) {
     for (const kid of state.kids) {
-      if (isOpenForKid(chore, kid.id, state.completions, ctx)) {
+      const scheduledDay =
+        chore.scheduledFor ?? pacificDateFromTimestamp(chore.createdAt)
+      const doneForKid = state.completions.some(
+        (completion) => completion.choreId === chore.id && completion.kidId === kid.id,
+      )
+      const isFutureOneOff =
+        chore.type === 'one-off' && scheduledDay > ctx.todayIso && !doneForKid
+
+      if (isOpenForKid(chore, kid.id, state.completions, ctx) || isFutureOneOff) {
         openChoresByKid[kid.id]?.push(chore)
       }
 

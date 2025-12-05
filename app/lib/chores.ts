@@ -15,6 +15,7 @@ import {
   setChoreKids,
   setRewardKids,
   redeemReward,
+  setOneOffDate,
 } from 'app/chores/actions'
 import { getChoreState } from 'app/chores/data'
 import {
@@ -124,6 +125,7 @@ export const choreTools = {
       days_of_week: daysOfWeekSchema,
       time_of_day: timeOfDaySchema,
       requires_approval: z.boolean().optional().default(false),
+      scheduled_for: isoDaySchema.optional(),
     }),
     execute: async ({
       title,
@@ -135,6 +137,7 @@ export const choreTools = {
       days_of_week,
       time_of_day,
       requires_approval,
+      scheduled_for,
     }) => {
       const formData = new FormData()
       formData.append('title', title)
@@ -142,6 +145,9 @@ export const choreTools = {
       formData.append('stars', stars.toString())
       kid_ids.forEach((kidId) => formData.append('kidIds', kidId))
       formData.append('type', type)
+      if (type === 'one-off' && scheduled_for) {
+        formData.append('scheduledFor', scheduled_for)
+      }
       if (type === 'repeated' && cadence) {
         formData.append('cadence', cadence)
         if (cadence === 'weekly') {
@@ -300,6 +306,25 @@ export const choreTools = {
       await setChoreKids(formData)
       return {
         message: 'Chore assignments saved',
+        snapshot: await loadChoreSnapshot(),
+      }
+    },
+  }),
+
+  set_one_off_date: tool({
+    description: 'Set the scheduled day for a one-off chore.',
+    inputSchema: z.object({
+      chore_id: z.string().min(1),
+      scheduled_for: isoDaySchema,
+    }),
+    execute: async ({ chore_id, scheduled_for }) => {
+      const formData = new FormData()
+      formData.append('choreId', chore_id)
+      formData.append('scheduledFor', scheduled_for)
+
+      await setOneOffDate(formData)
+      return {
+        message: `One-off scheduled for ${scheduled_for}`,
         snapshot: await loadChoreSnapshot(),
       }
     },

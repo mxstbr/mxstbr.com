@@ -55,6 +55,13 @@ function parseColor(value: FormDataEntryValue | null): string | null {
   return null
 }
 
+function parseIsoDay(value: FormDataEntryValue | null): string | null {
+  if (!value) return null
+  const raw = value.toString().trim()
+  if (!raw) return null
+  return /^\d{4}-\d{2}-\d{2}$/.test(raw) ? raw : null
+}
+
 export async function addChore(formData: FormData): Promise<void> {
   if (!isAuthorized()) return
 
@@ -68,6 +75,7 @@ export async function addChore(formData: FormData): Promise<void> {
   const type = (formData.get('type')?.toString() as ChoreType | undefined) ?? 'one-off'
   const cadence = (formData.get('cadence')?.toString() as 'daily' | 'weekly' | undefined) ?? 'daily'
   const timeOfDay = parseTimeOfDay(formData.get('timeOfDay')) ?? undefined
+  const scheduledFor = type === 'one-off' ? parseIsoDay(formData.get('scheduledFor')) : null
   const rawDays = formData
     .getAll('daysOfWeek')
     .map((value) => parseNumber(value))
@@ -96,6 +104,7 @@ export async function addChore(formData: FormData): Promise<void> {
       createdAt,
       timeOfDay,
       requiresApproval,
+      scheduledFor: scheduledFor ?? todayIsoDate(),
     }
 
     if (type === 'repeated') {
@@ -394,6 +403,21 @@ export async function setChoreKids(formData: FormData): Promise<void> {
     if (shouldSetApproval) {
       chore.requiresApproval = requiresApproval
     }
+  })
+}
+
+export async function setOneOffDate(formData: FormData): Promise<void> {
+  if (!isAuthorized()) return
+
+  const choreId = formData.get('choreId')?.toString()
+  const scheduledFor = parseIsoDay(formData.get('scheduledFor')) ?? todayIsoDate()
+  if (!choreId) return
+
+  await withUpdatedState((state) => {
+    const chore = state.chores.find((c) => c.id === choreId)
+    if (!chore || chore.type !== 'one-off') return
+
+    chore.scheduledFor = scheduledFor
   })
 }
 

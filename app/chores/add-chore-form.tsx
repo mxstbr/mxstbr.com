@@ -30,6 +30,9 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
   const [timeOfDay, setTimeOfDay] = useState<
     '' | 'morning' | 'afternoon' | 'evening'
   >('morning')
+  const [scheduledFor, setScheduledFor] = useState<string>(
+    new Date().toISOString().slice(0, 10),
+  )
   const [selectedKids, setSelectedKids] = useState<string[]>(
     kids.map((kid) => kid.id),
   )
@@ -155,6 +158,22 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
             <option value="evening">Evening</option>
           </select>
         </label>
+
+        {type === 'one-off' ? (
+          <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-200">
+            Scheduled for
+            <input
+              type="date"
+              name="scheduledFor"
+              value={scheduledFor}
+              onChange={(event) => setScheduledFor(event.target.value)}
+              className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+            />
+            <span className="text-xs font-normal text-slate-500 dark:text-slate-400">
+              One-offs appear on this day and roll over until completed.
+            </span>
+          </label>
+        ) : null}
 
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-200">
           Parental approval
