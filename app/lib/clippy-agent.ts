@@ -6,6 +6,7 @@ import { PRESETS } from '../cal/presets'
 import { dedent } from './dedent'
 import { calendarTools } from './calendar'
 import { telegramTools } from './telegram'
+import { choreTools } from './chores'
 
 const redis = Redis.fromEnv()
 
@@ -48,6 +49,14 @@ Email Events:
 • Never add the ✉️ to manual user requests.
 </calendar-management>
 
+<chores-management>
+• Handle: read ▸ add ▸ complete/undo ▸ pause/resume ▸ schedule ▸ assign kids ▸ archive chores ▸ manage rewards ▸ adjust kid stars.
+• Always read the current board with the tools before changing chores so you have the real kid IDs and existing tasks.
+• Ask follow-up questions when data is missing (kid, title, type, cadence/days, time of day, approval needs), but otherwise act without extra confirmation.
+• Use Pacific dates in YYYY-MM-DD for pauses or schedules. Never invent kid IDs—map names to IDs from the board.
+• Apply the parental pin flag when a chore requires approval and keep responses concise with a one-sentence summary of what changed.
+</chores-management>
+
 <date>Today's date is ${today.toISOString().split('T')[0]}</date>
 
 <PRESETS>
@@ -64,6 +73,7 @@ export const clippy = new Agent({
   tools: {
     ...calendarTools,
     ...telegramTools,
+    ...choreTools,
   },
   onStepFinish: async (result) => {
     await redis.lpush(`logs:${result.response.id}`, result)
