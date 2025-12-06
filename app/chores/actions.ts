@@ -125,6 +125,14 @@ export async function completeChore(formData: FormData): Promise<{ awarded: numb
   const kidId = formData.get('kidId')?.toString()
   if (!choreId || !kidId) return { awarded: 0 }
 
+  const requestedDay = parseIsoDay(formData.get('day'))
+  const today = todayIsoDate()
+  const targetDay = requestedDay ?? today
+  const completionTimestamp =
+    targetDay === today
+      ? new Date().toISOString()
+      : new Date(`${targetDay}T12:00:00Z`).toISOString()
+
   let awarded = 0
 
   await withUpdatedState((state) => {
@@ -132,14 +140,13 @@ export async function completeChore(formData: FormData): Promise<{ awarded: numb
     if (!chore) return
     if (!chore.kidIds.includes(kidId)) return
 
-    const today = todayIsoDate()
     const alreadyCompletedToday =
       chore.type === 'repeated' &&
       state.completions.some(
         (completion) =>
           completion.choreId === chore.id &&
           completion.kidId === kidId &&
-          pacificDateFromTimestamp(completion.timestamp) === today,
+          pacificDateFromTimestamp(completion.timestamp) === targetDay,
       )
 
     if (chore.type === 'one-off' && chore.completedAt) return
@@ -151,7 +158,7 @@ export async function completeChore(formData: FormData): Promise<{ awarded: numb
       id: crypto.randomUUID(),
       choreId: chore.id,
       kidId,
-      timestamp: new Date().toISOString(),
+      timestamp: completionTimestamp,
       starsAwarded: chore.stars,
     })
 
@@ -160,7 +167,7 @@ export async function completeChore(formData: FormData): Promise<{ awarded: numb
         state.completions.some((completion) => completion.choreId === chore.id && completion.kidId === id),
       )
       if (allDone) {
-        chore.completedAt = new Date().toISOString()
+        chore.completedAt = completionTimestamp
       }
     }
   })
@@ -177,12 +184,14 @@ export async function undoChore(formData: FormData): Promise<{ delta: number }> 
   if (!choreId || !kidId) return { delta: 0 }
 
   let delta = 0
-  const today = todayIsoDate()
+  const targetDay = parseIsoDay(formData.get('day')) ?? todayIsoDate()
 
   await withUpdatedState((state) => {
     const chore = state.chores.find((c) => c.id === choreId)
     if (!chore) return
 
+    const matchesDay = (entry: (typeof state.completions)[number]) =>
+      pacificDateFromTimestamp(entry.timestamp) === targetDay
     let index = -1
     if (completionId) {
       index = state.completions.findIndex(
@@ -190,7 +199,7 @@ export async function undoChore(formData: FormData): Promise<{ delta: number }> 
           entry.id === completionId &&
           entry.choreId === choreId &&
           entry.kidId === kidId &&
-          pacificDateFromTimestamp(entry.timestamp) === today,
+          matchesDay(entry),
       )
     }
 
@@ -199,7 +208,7 @@ export async function undoChore(formData: FormData): Promise<{ delta: number }> 
         (entry) =>
           entry.choreId === choreId &&
           entry.kidId === kidId &&
-          pacificDateFromTimestamp(entry.timestamp) === today,
+          matchesDay(entry),
       )
     }
 

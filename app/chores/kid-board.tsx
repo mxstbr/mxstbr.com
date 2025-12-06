@@ -27,6 +27,7 @@ type KidBoardProps = {
   columns: Column[]
   completions: Completion[]
   mode: 'today' | 'past' | 'future'
+  dayIso: string
   dayLabel: string
   todayHref: string
   selectedKidId?: string
@@ -43,6 +44,8 @@ type ApprovalRequest = {
   chore: Chore
   kidId: string
   accent: string
+  dayIso: string
+  reason: 'future' | 'requiresApproval'
   onReward?: () => void
 }
 
@@ -52,6 +55,7 @@ export function KidBoard({
   columns,
   completions,
   mode,
+  dayIso,
   dayLabel,
   todayHref,
   selectedKidId,
@@ -137,10 +141,14 @@ export function KidBoard({
     kidId: string,
     accent: string,
     onReward?: () => void,
+    targetDay?: string,
   ) => {
     const formData = new FormData()
     formData.append('choreId', chore.id)
     formData.append('kidId', kidId)
+    if (targetDay) {
+      formData.append('day', targetDay)
+    }
     const result = await completeChore(formData)
 
     if (result?.awarded && result.awarded > 0) {
@@ -165,18 +173,26 @@ export function KidBoard({
     onReward?: () => void,
     options?: { allowPast?: boolean },
   ) => {
-    if (mode === 'future') return
+    const targetDay = dayIso
     if (mode === 'past' && !options?.allowPast) {
       setPending({ chore, kidId, accent, onReward })
       return
     }
-    if (chore.requiresApproval) {
-      setApprovalRequest({ chore, kidId, accent, onReward })
+    const needsApproval = chore.requiresApproval || mode === 'future'
+    if (needsApproval) {
+      setApprovalRequest({
+        chore,
+        kidId,
+        accent,
+        dayIso: targetDay,
+        reason: mode === 'future' ? 'future' : 'requiresApproval',
+        onReward,
+      })
       setPinValue('')
       setPinError('')
       return
     }
-    void handleComplete(chore, kidId, accent, onReward)
+    void handleComplete(chore, kidId, accent, onReward, targetDay)
   }
 
   const closeApprovalPrompt = () => {
@@ -203,6 +219,7 @@ export function KidBoard({
       approvalRequest.kidId,
       approvalRequest.accent,
       approvalRequest.onReward,
+      approvalRequest.dayIso,
     )
     closeApprovalPrompt()
   }
@@ -216,6 +233,7 @@ export function KidBoard({
     formData.append('choreId', chore.id)
     formData.append('kidId', kidId)
     formData.append('completionId', completionId)
+    formData.append('day', dayIso)
     const result = await undoChore(formData)
 
     if (typeof result?.delta === 'number' && result.delta !== 0) {
@@ -269,7 +287,6 @@ export function KidBoard({
             starTotal={totals[mobileColumn.kid.id] ?? 0}
             onComplete={beginCompletion}
             onUndo={handleUndo}
-            disableCompletion={mode === 'future'}
           />
         ) : null}
       </div>
@@ -283,7 +300,6 @@ export function KidBoard({
             starTotal={totals[column.kid.id] ?? 0}
             onComplete={beginCompletion}
             onUndo={handleUndo}
-            disableCompletion={mode === 'future'}
           />
         ))}
       </div>
@@ -353,7 +369,9 @@ export function KidBoard({
                 </h2>
                 <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
                   Parents, please enter the pin to approve &quot;
-                  {approvalRequest.chore.title}&quot;.
+                  {approvalRequest.chore.title}&quot;
+                  {approvalRequest.reason === 'future' ? ` for ${dayLabel}` : ''}
+                  .
                 </p>
               </div>
               <button
@@ -424,7 +442,7 @@ function KidColumn({
   starTotal,
   onComplete,
   onUndo,
-  disableCompletion,
+  disableCompletion = false,
 }: {
   kid: Kid
   chores: Chore[]
@@ -441,7 +459,7 @@ function KidColumn({
     completionId: string,
     kidId: string,
   ) => Promise<void> | void
-  disableCompletion: boolean
+  disableCompletion?: boolean
 }) {
   const accent = kid.color ?? '#0ea5e9'
   const accentSoft = withAlpha(accent, 0.12)

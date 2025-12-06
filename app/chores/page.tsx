@@ -173,6 +173,7 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
           columns={columns}
           completions={state.completions}
           mode={viewingToday ? 'today' : viewingFuture ? 'future' : 'past'}
+          dayIso={ctx.todayIso}
           dayLabel={readableDay}
           todayHref={choresHref()}
           selectedKidId={kidParam}
