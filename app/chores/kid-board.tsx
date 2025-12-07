@@ -124,23 +124,40 @@ export function KidBoard({
   useEffect(() => {
     if (mode === 'today') return
 
+    const idleMs = 30_000
     let timer: number
-    const reset = () => {
+    const lastInteraction = { current: Date.now() }
+
+    const schedule = () => {
       window.clearTimeout(timer)
       timer = window.setTimeout(() => {
+        const idleLongEnough = Date.now() - lastInteraction.current >= idleMs
+        if (!idleLongEnough) {
+          schedule()
+          return
+        }
+
         router.replace(todayHref)
-      }, 30_000)
+      }, idleMs)
     }
 
-    reset()
+    const markInteraction = () => {
+      lastInteraction.current = Date.now()
+      schedule()
+    }
+
     const events = ['click', 'keydown', 'pointermove', 'touchstart']
     events.forEach((event) =>
-      window.addEventListener(event, reset, { passive: true }),
+      window.addEventListener(event, markInteraction, { passive: true }),
     )
+
+    schedule()
 
     return () => {
       window.clearTimeout(timer)
-      events.forEach((event) => window.removeEventListener(event, reset))
+      events.forEach((event) =>
+        window.removeEventListener(event, markInteraction),
+      )
     }
   }, [mode, todayHref, router])
 
