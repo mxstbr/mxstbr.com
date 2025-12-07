@@ -74,7 +74,7 @@ type RewardColumnProps = {
 }
 
 type AdminPageProps = {
-  searchParams?: { pwd?: string }
+  searchParams?: Promise<{ pwd?: string }>
 }
 
 const DAY_LETTERS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
@@ -747,13 +747,14 @@ function RewardCard({
 }
 
 export default async function ChoreAdminPage({ searchParams }: AdminPageProps) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined
   const password = auth()
 
   if (!isMax()) {
     return (
       <PasswordForm
         error={password ? 'Invalid password.' : undefined}
-        defaultPassword={searchParams?.pwd}
+        defaultPassword={resolvedSearchParams?.pwd}
       />
     )
   }
