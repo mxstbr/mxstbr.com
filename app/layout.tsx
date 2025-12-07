@@ -9,6 +9,7 @@ import { prodUrl } from './sitemap'
 import { size } from './og/utils'
 import { ReportView } from './components/report-view'
 import { headers } from 'next/headers'
+import { use } from 'react'
 
 export const metadata: Metadata = {
   metadataBase: new URL(prodUrl),
@@ -60,13 +61,13 @@ const cx = (...classes) => classes.filter(Boolean).join(' ')
 
 const inter = Inter({ subsets: ['latin'] })
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   // Check if this is an OS iframe by reading the custom header set by middleware
-  const headersList = await headers()
+  const headersList = use(headers())
   const isOsMode = headersList.get('x-os-mode') === 'true'
 
   return (
