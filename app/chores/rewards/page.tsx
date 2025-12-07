@@ -41,6 +41,12 @@ export default async function RewardsPage({ searchParams }: RewardsPageProps) {
     const query = params.toString()
     return query ? `/chores?${query}` : '/chores'
   })()
+  const rewardsHref = (() => {
+    const params = new URLSearchParams()
+    if (osParam) params.set('os', osParam)
+    const query = params.toString()
+    return query ? `/chores/rewards?${query}` : '/chores/rewards'
+  })()
 
   const rewardsByKid: Record<string, Reward[]> = {}
 
@@ -63,23 +69,30 @@ export default async function RewardsPage({ searchParams }: RewardsPageProps) {
   }))
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 p-6 md:h-screen md:overflow-y-hidden">
-      <div className="flex items-center justify-between gap-3 text-sm">
-        <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Rewards</h1>
-        <Link
-          href={choresHref}
-          className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-        >
-          Back to chores
-        </Link>
-      </div>
-
-      <div className="mt-6 md:flex-1 md:min-h-0">
+    <div className="flex min-h-screen flex-col bg-slate-50 p-6 pb-20 md:h-screen md:overflow-y-hidden md:pb-6">
+      <div className="md:flex-1 md:min-h-0 pb-16 md:pb-12">
         <RewardBoard
           columns={columns}
           completions={state.completions}
           redemptions={state.rewardRedemptions}
         />
+      </div>
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-300 bg-slate-100/95 px-2 backdrop-blur dark:border-slate-700 dark:bg-slate-900/90">
+        <div className="grid grid-cols-2 divide-x divide-slate-300 text-xs font-semibold uppercase tracking-wide text-slate-700 dark:divide-slate-700 dark:text-slate-200">
+          <Link
+            href={choresHref}
+            className="flex h-11 items-center justify-center transition hover:text-slate-900 dark:hover:text-white"
+          >
+            Chores
+          </Link>
+          <Link
+            href={rewardsHref}
+            className="flex h-11 items-center justify-center text-slate-900 transition hover:text-slate-900 dark:text-white"
+            aria-current="page"
+          >
+            Rewards
+          </Link>
+        </div>
       </div>
     </div>
   )
