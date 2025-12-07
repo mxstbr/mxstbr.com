@@ -15,26 +15,28 @@ export const metadata: Metadata = {
 }
 
 type RewardsPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     os?: string
     pwd?: string
-  }
+  }>
 }
 
 export default async function RewardsPage({ searchParams }: RewardsPageProps) {
-  const password = auth()
+  const resolvedSearchParams = searchParams ? await searchParams : undefined
+  const password = await auth()
+  const isAuthorized = await isMax()
 
-  if (!isMax()) {
+  if (!isAuthorized) {
     return (
       <PasswordForm
         error={password ? 'Invalid password.' : undefined}
-        defaultPassword={searchParams?.pwd}
+        defaultPassword={resolvedSearchParams?.pwd}
       />
     )
   }
 
   const state = await getChoreState()
-  const osParam = searchParams?.os
+  const osParam = resolvedSearchParams?.os
   const choresHref = (() => {
     const params = new URLSearchParams()
     if (osParam) params.set('os', osParam)

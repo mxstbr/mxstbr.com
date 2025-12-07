@@ -7,13 +7,13 @@ const redis = Redis.fromEnv()
 export const runtime = 'edge'
 
 export async function GET() {
-  if (!isMax()) return new NextResponse('Unauthorized', { status: 401 })
+  if (!(await isMax())) return new NextResponse('Unauthorized', { status: 401 })
   const timezone = await redis.get<string>('reminder:timezone')
   return NextResponse.json({ timezone })
 }
 
 export async function POST(req: Request) {
-  if (!isMax()) return new NextResponse('Unauthorized', { status: 401 })
+  if (!(await isMax())) return new NextResponse('Unauthorized', { status: 401 })
 
   let timezone: unknown
   try {
