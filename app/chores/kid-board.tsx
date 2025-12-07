@@ -14,7 +14,7 @@ import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useReward } from 'react-rewards'
 import type { Chore, Completion, Kid } from './data'
-import { completeChore, skipChore, undoChore } from './actions'
+import { completeChore, setKidColor, skipChore, undoChore } from './actions'
 import {
   msUntilNextPacificMidnight,
   sortByTimeOfDay,
@@ -471,8 +471,24 @@ function KidColumn({
   ) => Promise<void> | void
   disableCompletion?: boolean
 }) {
+  const router = useRouter()
   const accent = kid.color ?? '#0ea5e9'
-  const accentSoft = withAlpha(accent, 0.12)
+  const [accentOverride, setAccentOverride] = useState(accent)
+  const [colorModalOpen, setColorModalOpen] = useState(false)
+  const [pendingColor, setPendingColor] = useState(accent)
+  const [isSavingColor, setIsSavingColor] = useState(false)
+  const accentColor = accentOverride ?? accent
+  const accentSoft = withAlpha(accentColor, 0.12)
+  const swatches = [
+    '#0ea5e9',
+    '#8b5cf6',
+    '#f59e0b',
+    '#22c55e',
+    '#f97316',
+    '#14b8a6',
+    '#f472b6',
+    '#6366f1',
+  ]
   const timeGroups: {
     key: 'morning' | 'afternoon' | 'evening' | 'any'
     label: string
@@ -493,6 +509,27 @@ function KidColumn({
     any: [],
   }
 
+  useEffect(() => {
+    setAccentOverride(accent)
+    setPendingColor(accent)
+  }, [accent])
+
+  const handleSaveColor = async () => {
+    if (!pendingColor) return
+    setIsSavingColor(true)
+    const formData = new FormData()
+    formData.append('kidId', kid.id)
+    formData.append('color', pendingColor)
+    try {
+      await setKidColor(formData)
+      setAccentOverride(pendingColor)
+      setColorModalOpen(false)
+      router.refresh()
+    } finally {
+      setIsSavingColor(false)
+    }
+  }
+
   for (const chore of chores) {
     if (chore.timeOfDay === 'morning') {
       choresByTime.morning.push(chore)
@@ -509,16 +546,27 @@ function KidColumn({
     <div
       className="flex flex-col gap-4 rounded-2xl border bg-white p-4 shadow-sm dark:bg-slate-900 md:h-full md:min-h-0 md:overflow-y-auto"
       style={{
-        borderColor: accent,
+        borderColor: accentColor,
         backgroundColor: accentSoft,
         boxShadow: `0 14px 40px -22px ${accentSoft}, inset 0 1px 0 ${accentSoft}`,
       }}
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="text-sm font-semibold text-slate-900 dark:text-slate-50 xl:text-base">
-          {kid.name}
-        </div>
-        <StarBadge value={starTotal} accent={accent} />
+        <button
+          type="button"
+          onClick={() => {
+            setPendingColor(accentColor)
+            setColorModalOpen(true)
+          }}
+          className="inline-flex items-center gap-2 text-sm font-semibold text-slate-900 transition hover:text-slate-700 dark:text-slate-50 dark:hover:text-slate-200 xl:text-base"
+          aria-label={`Change ${kid.name}'s color`}
+        >
+          <span>{kid.name}</span>
+          <span aria-hidden="true" className="text-base text-slate-500">
+            ›
+          </span>
+        </button>
+        <StarBadge value={starTotal} accent={accentColor} />
       </div>
 
       <div className="space-y-4">
@@ -546,7 +594,7 @@ function KidColumn({
                     <ChoreButton
                       key={chore.id}
                       chore={chore}
-                      accent={accent}
+                      accent={accentColor}
                       kidId={kid.id}
                       onComplete={onComplete}
                       disabled={disableCompletion}
@@ -570,11 +618,81 @@ function KidColumn({
                 key={`${entry.chore.id}-${entry.completionId}`}
                 chore={entry.chore}
                 completionId={entry.completionId}
-                accent={accent}
+                accent={accentColor}
                 kidId={kid.id}
                 onUndo={onUndo}
               />
             ))}
+          </div>
+        </div>
+      ) : null}
+
+      {colorModalOpen ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl dark:bg-slate-900">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="text-base font-semibold text-slate-900 dark:text-slate-50">
+                  Choose a color
+                </h2>
+                <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
+                  Pick the color for {kid.name}&apos;s column.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setColorModalOpen(false)}
+                className="rounded-md p-1 text-slate-500 transition active:bg-slate-100 active:text-slate-700 dark:active:bg-slate-800"
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+            <div className="mt-4 space-y-4">
+              <div className="grid grid-cols-4 gap-2">
+                {swatches.map((swatch) => (
+                  <button
+                    key={swatch}
+                    type="button"
+                    onClick={() => setPendingColor(swatch)}
+                    className={`h-10 rounded-lg border-2 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
+                      pendingColor === swatch
+                        ? 'border-slate-900 shadow-sm dark:border-slate-100'
+                        : 'border-transparent shadow'
+                    }`}
+                    style={{ backgroundColor: swatch }}
+                    aria-label={`Select color ${swatch}`}
+                  />
+                ))}
+              </div>
+              <label className="flex items-center gap-3 text-xs font-semibold text-slate-700 dark:text-slate-200">
+                <span>Custom</span>
+                <input
+                  type="color"
+                  value={pendingColor}
+                  onChange={(event) => setPendingColor(event.target.value)}
+                  className="h-9 w-16 cursor-pointer rounded-md border border-slate-300 bg-white p-1 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+                  aria-label="Pick a custom color"
+                />
+              </label>
+            </div>
+            <div className="mt-4 flex flex-wrap justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setColorModalOpen(false)}
+                className="inline-flex items-center justify-center rounded-md border border-transparent px-3 py-2 text-xs font-semibold text-slate-600 transition active:text-slate-900 dark:text-slate-300"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveColor}
+                className="inline-flex items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition active:bg-slate-800 disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:active:bg-slate-200"
+                disabled={isSavingColor}
+              >
+                {isSavingColor ? 'Saving…' : 'Save color'}
+              </button>
+            </div>
           </div>
         </div>
       ) : null}
@@ -583,12 +701,13 @@ function KidColumn({
 }
 
 function StarBadge({ value, accent }: { value: number; accent: string }) {
-  const accentSoft = withAlpha(accent, 0.18)
+  const accentSoft = withAlpha(accent, 0.26)
+  const accentStrong = `color-mix(in srgb, ${accent} 82%, #0f172a)`
 
   return (
     <div
-      className="flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold shadow-sm"
-      style={{ backgroundColor: accentSoft, color: accent }}
+      className="flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold shadow-sm"
+      style={{ backgroundColor: accentSoft, color: accentStrong }}
     >
       ⭐️ <span className="tabular-nums">{value}</span>
     </div>
@@ -794,7 +913,7 @@ function ChoreButton({
           <button
             type="button"
             onClick={() => setMenuOpen((open) => !open)}
-            className="flex px-2 items-center justify-center rounded-lg border-2 border-slate-200 bg-white text-xs transition active:border-[var(--accent)] active:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:active:border-[var(--accent)] dark:active:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)] xl:h-10 xl:w-10 xl:text-sm"
+            className="flex h-11 w-11 items-center justify-center rounded-xl border-2 border-slate-200 bg-white text-sm transition active:border-[var(--accent)] active:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:active:border-[var(--accent)] dark:active:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)] xl:h-11 xl:w-11"
             aria-expanded={menuOpen}
             aria-label="More actions"
           >
