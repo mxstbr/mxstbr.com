@@ -130,6 +130,7 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
         <div className="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white p-1 pr-3 text-xs font-semibold text-slate-800 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
           <Link
             href={choresHref(prevDay)}
+            prefetch
             aria-label="Previous day"
             className="rounded px-2 py-1 transition hover:bg-slate-100 dark:hover:bg-slate-700"
           >
@@ -137,6 +138,7 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
           </Link>
           <Link
             href={viewingToday ? choresHref() : choresHref(todayCtx.todayIso)}
+            prefetch
             className={`rounded px-3 py-1 transition ${
               viewingToday
                 ? 'bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200'
@@ -147,6 +149,7 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
           </Link>
           <Link
             href={choresHref(nextDay)}
+            prefetch
             aria-label="Next day"
             className="rounded px-2 py-1 transition hover:bg-slate-100 dark:hover:bg-slate-700"
           >
