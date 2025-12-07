@@ -22,7 +22,9 @@ export const dynamic = 'force-static'
 export const revalidate = 60
 
 export async function generateStaticParams() {
-  return (await getNotes()).map((note) => note.frontmatter.slug)
+  return (await getNotes()).map((note) => ({
+    slug: note.frontmatter.slug,
+  }))
 }
 
 export async function generateMetadata({ params }) {
