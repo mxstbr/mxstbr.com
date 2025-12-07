@@ -23,9 +23,10 @@ type RewardsPageProps = {
 
 export default async function RewardsPage({ searchParams }: RewardsPageProps) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined
-  const password = auth()
+  const password = await auth()
+  const isAuthorized = await isMax()
 
-  if (!isMax()) {
+  if (!isAuthorized) {
     return (
       <PasswordForm
         error={password ? 'Invalid password.' : undefined}

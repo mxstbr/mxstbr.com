@@ -67,7 +67,8 @@ async function createEvent(formData: FormData): Promise<Boolean> {
 }
 
 async function getEvents(password: string) {
-  if (!isMax()) throw new Error('Invalid password.')
+  const hasAccess = await isMax()
+  if (!hasAccess) throw new Error('Invalid password.')
 
   const data: Event[] | null = await redis.json.get(`cal:${password}`)
 
@@ -166,7 +167,7 @@ export default async function Plan({
   searchParams?: Promise<{ pwd?: string }>
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined
-  const password = auth()
+  const password = await auth()
 
   if (!password)
     return <PasswordForm defaultPassword={resolvedSearchParams?.pwd} />

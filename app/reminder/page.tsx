@@ -7,7 +7,7 @@ import TimezoneClient from './TimezoneClient'
 const redis = Redis.fromEnv()
 
 export default async function ReminderPage() {
-  if (!isMax()) return notFound()
+  if (!(await isMax())) return notFound()
   const timezone = await redis.get<string>('reminder:timezone')
 
   return (

@@ -748,9 +748,10 @@ function RewardCard({
 
 export default async function ChoreAdminPage({ searchParams }: AdminPageProps) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined
-  const password = auth()
+  const password = await auth()
+  const isAuthorized = await isMax()
 
-  if (!isMax()) {
+  if (!isAuthorized) {
     return (
       <PasswordForm
         error={password ? 'Invalid password.' : undefined}

@@ -34,9 +34,10 @@ type ChoresPageProps = {
 
 export default async function ChoresPage({ searchParams }: ChoresPageProps) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined
-  const password = auth()
+  const password = await auth()
+  const isAuthorized = await isMax()
 
-  if (!isMax()) {
+  if (!isAuthorized) {
     return (
       <PasswordForm
         error={password ? 'Invalid password.' : undefined}

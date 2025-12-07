@@ -65,7 +65,7 @@ type LogStep = {
 
 export default async function DebugPage() {
   // Check authorization
-  if (!isMax()) {
+  if (!(await isMax())) {
     redirect('/')
   }
 
