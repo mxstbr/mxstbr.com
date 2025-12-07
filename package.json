@@ -1,9 +1,9 @@
 {
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "update-essay-views": "tsm update-essay-views.ts",
-    "build": "next build && tsm sync-essays-to-github.ts",
+    "build": "next build --webpack && tsm sync-essays-to-github.ts",
     "start": "next start",
     "create-reminder-schedule": "tsm create-reminder-schedule.ts"
   },
