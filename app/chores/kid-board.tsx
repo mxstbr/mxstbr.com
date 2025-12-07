@@ -17,10 +17,12 @@ import { completeChore, skipChore, undoChore } from './actions'
 import { msUntilNextPacificMidnight, sortByTimeOfDay, starsForKid, withAlpha } from './utils'
 import { PARENTAL_PIN } from './parental-pin'
 
+type FreshChore = Chore & { isNew?: boolean }
+
 type Column = {
   kid: Kid
-  chores: Chore[]
-  done: { chore: Chore; completionId: string }[]
+  chores: FreshChore[]
+  done: { chore: FreshChore; completionId: string }[]
 }
 
 type KidBoardProps = {
@@ -34,14 +36,14 @@ type KidBoardProps = {
 }
 
 type PendingCompletion = {
-  chore: Chore
+  chore: FreshChore
   kidId: string
   accent: string
   onReward?: () => void
 }
 
 type ApprovalRequest = {
-  chore: Chore
+  chore: FreshChore
   kidId: string
   accent: string
   dayIso: string
@@ -137,7 +139,7 @@ export function KidBoard({
   }, [mode, todayHref, router])
 
   const handleComplete = async (
-    chore: Chore,
+    chore: FreshChore,
     kidId: string,
     accent: string,
     onReward?: () => void,
@@ -167,7 +169,7 @@ export function KidBoard({
   }
 
   const beginCompletion = (
-    chore: Chore,
+    chore: FreshChore,
     kidId: string,
     accent: string,
     onReward?: () => void,
@@ -225,7 +227,7 @@ export function KidBoard({
   }
 
   const handleUndo = async (
-    chore: Chore,
+    chore: FreshChore,
     completionId: string,
     kidId: string,
   ) => {
@@ -445,17 +447,17 @@ function KidColumn({
   disableCompletion = false,
 }: {
   kid: Kid
-  chores: Chore[]
-  doneChores: { chore: Chore; completionId: string }[]
+  chores: FreshChore[]
+  doneChores: { chore: FreshChore; completionId: string }[]
   starTotal: number
   onComplete: (
-    chore: Chore,
+    chore: FreshChore,
     kidId: string,
     accent: string,
     onReward?: () => void,
   ) => Promise<void> | void
   onUndo: (
-    chore: Chore,
+    chore: FreshChore,
     completionId: string,
     kidId: string,
   ) => Promise<void> | void
@@ -590,11 +592,11 @@ function ChoreButton({
   kidId,
   disabled = false,
 }: {
-  chore: Chore
+  chore: FreshChore
   accent: string
   kidId: string
   onComplete: (
-    chore: Chore,
+    chore: FreshChore,
     kidId: string,
     accent: string,
     onReward?: () => void,
@@ -623,6 +625,10 @@ function ChoreButton({
     },
   )
   const accentSoft = withAlpha(accent, 0.12)
+  const isNew = chore.isNew
+  const cardToneClasses = isNew
+    ? 'border-amber-200 bg-amber-50 dark:border-amber-600 dark:bg-amber-900/40'
+    : 'border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800'
   const accentVars = {
     '--accent': accent,
     '--accent-soft': accentSoft,
@@ -688,7 +694,7 @@ function ChoreButton({
 
   return (
     <div
-      className={`relative rounded-xl border-2 border-slate-200 bg-white shadow transition focus-within:-translate-y-0.5 active:-translate-y-0.5 focus-within:border-[var(--accent)] active:border-[var(--accent)] dark:border-slate-700 dark:bg-slate-800 dark:focus-within:border-[var(--accent)] dark:active:border-[var(--accent)] ${menuOpen ? 'z-20' : ''}`}
+      className={`relative rounded-xl border-2 shadow transition focus-within:-translate-y-0.5 active:-translate-y-0.5 focus-within:border-[var(--accent)] active:border-[var(--accent)] dark:focus-within:border-[var(--accent)] dark:active:border-[var(--accent)] ${cardToneClasses} ${menuOpen ? 'z-20' : ''}`}
       style={accentVars}
       ref={containerRef}
     >
@@ -789,12 +795,12 @@ function CompletedChoreButton({
   kidId,
   onUndo,
 }: {
-  chore: Chore
+  chore: FreshChore
   completionId: string
   accent: string
   kidId: string
   onUndo: (
-    chore: Chore,
+    chore: FreshChore,
     completionId: string,
     kidId: string,
   ) => Promise<void> | void

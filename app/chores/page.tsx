@@ -47,6 +47,12 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
   const state = await getChoreState()
   const todayCtx = getToday()
   const ctx = getToday(searchParams?.day)
+  const now = Date.now()
+  const FOUR_HOURS_MS = 4 * 60 * 60 * 1000
+  const isNewChore = (chore: Chore) => {
+    const createdMs = Date.parse(chore.createdAt ?? '')
+    return Number.isFinite(createdMs) && now - createdMs <= FOUR_HOURS_MS
+  }
   const viewingToday = ctx.todayIso === todayCtx.todayIso
   const viewingPast = ctx.todayIso < todayCtx.todayIso
   const viewingFuture = ctx.todayIso > todayCtx.todayIso
@@ -91,9 +97,10 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
   }
 
   for (const chore of state.chores) {
+    const choreWithFreshness = { ...chore, isNew: isNewChore(chore) }
     for (const kid of state.kids) {
       if (isOpenForKid(chore, kid.id, state.completions, ctx)) {
-        openChoresByKid[kid.id]?.push(chore)
+        openChoresByKid[kid.id]?.push(choreWithFreshness)
       }
     }
   }
@@ -104,9 +111,10 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
     const chore = state.chores.find((c) => c.id === completion.choreId)
     if (!chore) continue
     if (!chore.kidIds.includes(completion.kidId)) continue
+    const choreWithFreshness = { ...chore, isNew: isNewChore(chore) }
 
     doneChoresByKid[completion.kidId]?.push({
-      chore,
+      chore: choreWithFreshness,
       completionId: completion.id,
       timestamp: completion.timestamp,
     })
