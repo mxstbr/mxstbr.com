@@ -1,14 +1,14 @@
 import { cookies } from 'next/headers'
 
-export function auth(): string | undefined {
-  const cookieStore = cookies()
+export async function auth(): Promise<string | undefined> {
+  const cookieStore = await cookies()
   const password = cookieStore.get('password')
 
   return password?.value
 }
 
-export function isMax() {
-  return auth() === process.env.CAL_PASSWORD
+export async function isMax(): Promise<boolean> {
+  return (await auth()) === process.env.CAL_PASSWORD
 }
 
 export function verifyBasicAuth(request: Request): boolean {

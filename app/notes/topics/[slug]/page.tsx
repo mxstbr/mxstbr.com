@@ -9,36 +9,48 @@ import type { Metadata } from 'next'
 export const dynamic = 'force-static'
 export const revalidate = 60
 
-export async function generateStaticParams() {
-  return (await getNotes()).map((note) =>
-    note.frontmatter.tags?.flatMap((tag) => tag.slug),
+export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
+  const tags = (await getNotes()).flatMap(
+    (note) => note.frontmatter.tags?.map((tag) => tag.slug) ?? [],
   )
+
+  return Array.from(new Set(tags)).map((slug) => ({ slug }))
 }
 
-export async function generateMetadata({ params }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
+  const { slug } = await params
   const allNotes = await getNotes()
   const tag = allNotes
     .find((note) =>
-      note.frontmatter.tags?.some((tag) => tag.slug === params.slug),
+      note.frontmatter.tags?.some((tag) => tag.slug === slug),
     )
-    ?.frontmatter.tags?.find((tag) => tag.slug === params.slug)
+    ?.frontmatter.tags?.find((tag) => tag.slug === slug)
 
   return {
-    title: `Notes on ${tag?.name || params.slug}`,
-    description: `Notes and explorations related to ${tag?.name || params.slug}`,
+    title: `Notes on ${tag?.name || slug}`,
+    description: `Notes and explorations related to ${tag?.name || slug}`,
   }
 }
 
-export default async function Page({ params }) {
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await params
   const allNotes = await getNotes()
   const notes = allNotes.filter((note) =>
-    note.frontmatter.tags?.some((tag) => tag.slug === params.slug),
+    note.frontmatter.tags?.some((tag) => tag.slug === slug),
   )
   const tag = allNotes
     .find((note) =>
-      note.frontmatter.tags?.some((tag) => tag.slug === params.slug),
+      note.frontmatter.tags?.some((tag) => tag.slug === slug),
     )
-    ?.frontmatter.tags?.find((tag) => tag.slug === params.slug)
+    ?.frontmatter.tags?.find((tag) => tag.slug === slug)
 
   if (!tag) return notFound()
 

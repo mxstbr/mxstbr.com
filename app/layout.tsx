@@ -60,13 +60,13 @@ const cx = (...classes) => classes.filter(Boolean).join(' ')
 
 const inter = Inter({ subsets: ['latin'] })
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   // Check if this is an OS iframe by reading the custom header set by middleware
-  const headersList = headers()
+  const headersList = await headers()
   const isOsMode = headersList.get('x-os-mode') === 'true'
 
   return (
