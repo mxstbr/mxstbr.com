@@ -8,13 +8,19 @@ import {
   useRef,
   useState,
   useTransition,
+  useCallback,
 } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useReward } from 'react-rewards'
 import type { Chore, Completion, Kid } from './data'
 import { completeChore, skipChore, undoChore } from './actions'
-import { msUntilNextPacificMidnight, sortByTimeOfDay, starsForKid, withAlpha } from './utils'
+import {
+  msUntilNextPacificMidnight,
+  sortByTimeOfDay,
+  starsForKid,
+  withAlpha,
+} from './utils'
 import { PARENTAL_PIN } from './parental-pin'
 
 type FreshChore = Chore & { isNew?: boolean }
@@ -372,7 +378,9 @@ export function KidBoard({
                 <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
                   Parents, please enter the pin to approve &quot;
                   {approvalRequest.chore.title}&quot;
-                  {approvalRequest.reason === 'future' ? ` for ${dayLabel}` : ''}
+                  {approvalRequest.reason === 'future'
+                    ? ` for ${dayLabel}`
+                    : ''}
                   .
                 </p>
               </div>
@@ -528,7 +536,9 @@ function KidColumn({
             .map((group) => (
               <div key={group.key} className="space-y-2">
                 <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-                  {group.emoji ? <span aria-hidden="true">{group.emoji}</span> : null}
+                  {group.emoji ? (
+                    <span aria-hidden="true">{group.emoji}</span>
+                  ) : null}
                   <span>{group.label}</span>
                 </div>
                 <div className="space-y-3">
@@ -611,6 +621,9 @@ function ChoreButton({
   const [skipConfirmOpen, setSkipConfirmOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const ttsUrlRef = useRef<string | null>(null)
+  const prefetchedTitleRef = useRef<string | null>(null)
+  const ttsPrefetchingRef = useRef(false)
   const { reward, isAnimating } = useReward(
     REWARD_TARGET_ID,
     chore.emoji ? 'emoji' : 'confetti',
@@ -651,6 +664,35 @@ function ChoreButton({
     })
   }
 
+  const fetchTtsUrl = useCallback(async () => {
+    if (ttsPrefetchingRef.current) return ttsUrlRef.current
+    if (ttsUrlRef.current && prefetchedTitleRef.current === chore.title) {
+      return ttsUrlRef.current
+    }
+    ttsPrefetchingRef.current = true
+    try {
+      const response = await fetch('/api/chores/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: chore.title }),
+      })
+      if (!response.ok) throw new Error(`TTS failed: ${response.status}`)
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+      if (ttsUrlRef.current && ttsUrlRef.current !== url) {
+        URL.revokeObjectURL(ttsUrlRef.current)
+      }
+      ttsUrlRef.current = url
+      prefetchedTitleRef.current = chore.title
+      return url
+    } catch (error) {
+      console.error('Failed to fetch chore audio', error)
+      return null
+    } finally {
+      ttsPrefetchingRef.current = false
+    }
+  }, [chore.title])
+
   useEffect(() => {
     if (!menuOpen) return
 
@@ -678,29 +720,31 @@ function ChoreButton({
     }
   }, [menuOpen])
 
+  useEffect(() => {
+    if (!menuOpen) return
+    void fetchTtsUrl()
+  }, [menuOpen, fetchTtsUrl])
+
+  useEffect(() => {
+    return () => {
+      if (ttsUrlRef.current) {
+        URL.revokeObjectURL(ttsUrlRef.current)
+        ttsUrlRef.current = null
+      }
+    }
+  }, [])
+
   const handleSpeak = async () => {
     if (isSpeaking) return
     try {
       setIsSpeaking(true)
       audioRef.current?.pause()
-      const response = await fetch('/api/chores/tts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: chore.title }),
-      })
-      if (!response.ok) throw new Error(`TTS failed: ${response.status}`)
-      const blob = await response.blob()
-      const url = URL.createObjectURL(blob)
+      const url = await fetchTtsUrl()
+      if (!url) throw new Error('TTS unavailable')
       const audio = new Audio(url)
       audioRef.current = audio
-      audio.onended = () => {
-        URL.revokeObjectURL(url)
-        setIsSpeaking(false)
-      }
-      audio.onerror = () => {
-        URL.revokeObjectURL(url)
-        setIsSpeaking(false)
-      }
+      audio.onended = () => setIsSpeaking(false)
+      audio.onerror = () => setIsSpeaking(false)
       await audio.play()
     } catch (error) {
       console.error('Failed to play chore audio', error)
@@ -801,7 +845,8 @@ function ChoreButton({
                   Skip this task?
                 </h2>
                 <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
-                  Are you sure you want to skip &quot;{chore.title}&quot; for now?
+                  Are you sure you want to skip &quot;{chore.title}&quot; for
+                  now?
                 </p>
               </div>
               <button
