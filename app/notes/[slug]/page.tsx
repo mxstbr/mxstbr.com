@@ -1,7 +1,7 @@
 import React from 'react'
 import { evaluate } from '@mdx-js/mdx'
 import * as runtime from 'react/jsx-runtime'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import remarkSmartypants from 'remark-smartypants'
 import remarkGfm from 'remark-gfm'
 import Prose from '../../components/prose'
@@ -22,15 +22,29 @@ export const dynamic = 'force-static'
 export const revalidate = 60
 
 export async function generateStaticParams() {
-  return (await getNotes()).map((note) => ({
-    slug: note.frontmatter.slug,
-  }))
+  const notes = await getNotes()
+  const slugs = new Set<string>()
+
+  for (const note of notes) {
+    slugs.add(note.frontmatter.slug)
+    note.frontmatter.previousSlugs?.forEach((slug) => slugs.add(slug))
+  }
+
+  return Array.from(slugs).map((slug) => ({ slug }))
 }
 
 export async function generateMetadata({ params }) {
-  const note = await getNote(params.slug)
+  const note =
+    (await getNote(params.slug)) ||
+    (await getNotes()).find((maybeNote) =>
+      maybeNote.frontmatter.previousSlugs?.includes(params.slug),
+    )
 
   if (!note) return null
+
+  if (note.frontmatter.slug !== params.slug) {
+    return redirect(`/notes/${note.frontmatter.slug}`)
+  }
 
   let {
     title,
@@ -68,9 +82,17 @@ const NOTE_CONTENT_ELEMENT_ID = 'note-content'
 
 export default async function Page({ params }) {
   const notes = await getNotes()
-  const note = notes.find((note) => note.frontmatter.slug === params.slug)
+  const note =
+    notes.find((note) => note.frontmatter.slug === params.slug) ||
+    notes.find((note) =>
+      note.frontmatter.previousSlugs?.includes(params.slug),
+    )
 
   if (!note) return notFound()
+
+  if (note.frontmatter.slug !== params.slug) {
+    return redirect(`/notes/${note.frontmatter.slug}`)
+  }
 
   const { content, frontmatter } = note
 
