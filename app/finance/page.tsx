@@ -102,7 +102,7 @@ export const metadata: Metadata = {
 }
 
 export default async function FinancePage() {
-  if (!isMax()) return notFound();
+  if (!(await isMax())) return notFound();
   
   // Generate portfolio history from the first holding date to today
   const { getHoldingsData } = await import('./holdings-data')

@@ -11,7 +11,7 @@ export function PasswordForm({
     <form
       action={async (formData) => {
         'use server'
-        const cookieStore = cookies()
+        const cookieStore = await cookies()
 
         const password = formData.get('password')
         if (typeof password !== 'string') return

@@ -24,29 +24,31 @@ export const metadata: Metadata = {
 }
 
 type ChoresPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     day?: string
     os?: string
     kid?: string
     pwd?: string
-  }
+  }>
 }
 
 export default async function ChoresPage({ searchParams }: ChoresPageProps) {
-  const password = auth()
+  const resolvedSearchParams = searchParams ? await searchParams : undefined
+  const password = await auth()
+  const isAuthorized = await isMax()
 
-  if (!isMax()) {
+  if (!isAuthorized) {
     return (
       <PasswordForm
         error={password ? 'Invalid password.' : undefined}
-        defaultPassword={searchParams?.pwd}
+        defaultPassword={resolvedSearchParams?.pwd}
       />
     )
   }
 
   const state = await getChoreState()
   const todayCtx = getToday()
-  const ctx = getToday(searchParams?.day)
+  const ctx = getToday(resolvedSearchParams?.day)
   const now = Date.now()
   const FOUR_HOURS_MS = 4 * 60 * 60 * 1000
   const isNewChore = (chore: Chore) => {
@@ -64,8 +66,8 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
     month: 'short',
     day: 'numeric',
   }).format(dayDate)
-  const osParam = searchParams?.os
-  const kidParam = searchParams?.kid
+  const osParam = resolvedSearchParams?.os
+  const kidParam = resolvedSearchParams?.kid
   const hasOpenChoresToday = state.chores.some((chore) =>
     state.kids.some((kid) => isOpenForKid(chore, kid.id, state.completions, todayCtx)),
   )
