@@ -163,12 +163,13 @@ async function updateEvent(oldEvent: Event, formData: FormData) {
 export default async function Plan({
   searchParams,
 }: {
-  searchParams?: { pwd?: string }
+  searchParams?: Promise<{ pwd?: string }>
 }) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined
   const password = auth()
 
   if (!password)
-    return <PasswordForm defaultPassword={searchParams?.pwd} />
+    return <PasswordForm defaultPassword={resolvedSearchParams?.pwd} />
 
   let events: Array<Event> | undefined
   try {
@@ -177,7 +178,7 @@ export default async function Plan({
     return (
       <PasswordForm
         error="Invalid password."
-        defaultPassword={searchParams?.pwd}
+        defaultPassword={resolvedSearchParams?.pwd}
       />
     )
   }
