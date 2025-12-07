@@ -83,14 +83,19 @@ export async function getNotes(): Promise<Array<Note>> {
     body: JSON.stringify({
       query: GET_POSTS_QUERY,
     }),
-  }).then((res) => res.json())
+  })
+    .then((res) => res.json())
+    .catch(() => ({ data: null }))
+
+  if (!data?.publication?.posts?.edges) return []
 
   return await Promise.all(
     data.publication.posts.edges.map(async ({ node: post }): Promise<Note> => {
       const views =
-        (await redis.get<number>(
-          ['pageviews', `/notes/${post.slug}`].join(':'),
-        )) ?? 0
+        (await redis.get<number>([
+          'pageviews',
+          `/notes/${post.slug}`,
+        ].join(':'))) ?? 0
 
       const { status, content } = parseStatusFromContent(post.content.markdown)
 

@@ -5,7 +5,8 @@
     "update-essay-views": "tsm update-essay-views.ts",
     "build": "next build && tsm sync-essays-to-github.ts",
     "start": "next start",
-    "create-reminder-schedule": "tsm create-reminder-schedule.ts"
+    "create-reminder-schedule": "tsm create-reminder-schedule.ts",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.53",
@@ -60,6 +61,7 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.19",
+    "@playwright/test": "^1.47.2",
     "postcss": "^8.4.41",
     "tailwindcss": "^3.4.10"
   }
