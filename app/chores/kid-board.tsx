@@ -608,6 +608,7 @@ function ChoreButton({
   const [menuOpen, setMenuOpen] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [isSkipping, setIsSkipping] = useState(false)
+  const [skipConfirmOpen, setSkipConfirmOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const { reward, isAnimating } = useReward(
@@ -634,6 +635,21 @@ function ChoreButton({
     '--accent-soft': accentSoft,
   } as CSSProperties
   const completionDisabled = isPending || disabled
+
+  const performSkip = () => {
+    if (isSkipping) return
+    setIsSkipping(true)
+    setMenuOpen(false)
+    setSkipConfirmOpen(false)
+    const formData = new FormData()
+    formData.append('choreId', chore.id)
+    startTransition(() => {
+      void skipChore(formData).finally(() => {
+        setIsSkipping(false)
+        setTimeout(() => router.refresh(), 50)
+      })
+    })
+  }
 
   useEffect(() => {
     if (!menuOpen) return
@@ -761,16 +777,8 @@ function ChoreButton({
                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-slate-800 transition active:bg-slate-100 focus-visible:bg-slate-100 dark:text-slate-100 dark:active:bg-slate-700 dark:focus-visible:bg-slate-700"
                 onClick={() => {
                   if (isSkipping) return
-                  setIsSkipping(true)
                   setMenuOpen(false)
-                  const formData = new FormData()
-                  formData.append('choreId', chore.id)
-                  startTransition(() => {
-                    void skipChore(formData).finally(() => {
-                      setIsSkipping(false)
-                      setTimeout(() => router.refresh(), 50)
-                    })
-                  })
+                  setSkipConfirmOpen(true)
                 }}
                 disabled={isSkipping}
               >
@@ -784,6 +792,47 @@ function ChoreButton({
           ) : null}
         </div>
       </div>
+      {skipConfirmOpen ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl dark:bg-slate-900">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="text-base font-semibold text-slate-900 dark:text-slate-50">
+                  Skip this task?
+                </h2>
+                <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
+                  Are you sure you want to skip &quot;{chore.title}&quot; for now?
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSkipConfirmOpen(false)}
+                className="rounded-md p-1 text-slate-500 transition active:bg-slate-100 active:text-slate-700 dark:active:bg-slate-800"
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+            <div className="mt-4 flex flex-wrap justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setSkipConfirmOpen(false)}
+                className="inline-flex items-center justify-center rounded-md border border-transparent px-3 py-2 text-xs font-semibold text-slate-600 transition active:text-slate-900 dark:text-slate-300"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={performSkip}
+                className="inline-flex items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition active:bg-slate-800 disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:active:bg-slate-200"
+                disabled={isSkipping}
+              >
+                Skip task
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }
