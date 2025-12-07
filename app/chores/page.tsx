@@ -134,8 +134,14 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
     ).map(({ timeOfDay, createdAt, timestamp, ...rest }) => rest),
   }))
 
+  const backgroundClass = viewingToday
+    ? 'bg-slate-50 dark:bg-slate-900'
+    : 'bg-slate-200 dark:bg-slate-950'
+
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 p-6 pb-20 md:h-screen md:overflow-y-hidden md:pb-6">
+    <div
+      className={`flex min-h-screen flex-col p-6 pb-20 md:h-screen md:overflow-y-hidden md:pb-6 ${backgroundClass}`}
+    >
       <div className="mb-5 flex justify-center text-sm md:mb-6 md:justify-start">
         <div className="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white p-1 pr-3 text-xs font-semibold text-slate-800 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
           <Link
