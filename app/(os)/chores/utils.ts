@@ -150,6 +150,8 @@ export function isOpenForKid(
   const createdDay = pacificDateFromTimestamp(chore.createdAt)
   const scheduledDay = chore.scheduledFor || createdDay
   if (scheduledDay > ctx.todayIso) return false
+  const snoozedForKid = chore.snoozedForKids?.[kidId]
+  if (snoozedForKid && snoozedForKid > ctx.todayIso) return false
   if (chore.snoozedUntil && chore.snoozedUntil > ctx.todayIso) return false
 
   if (chore.type === 'one-off') {

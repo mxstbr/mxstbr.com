@@ -262,16 +262,19 @@ export async function skipChore(formData: FormData): Promise<void> {
   if (!(await isAuthorized())) return
 
   const choreId = formData.get('choreId')?.toString()
-  if (!choreId) return
+  const kidId = formData.get('kidId')?.toString()
+  if (!choreId || !kidId) return
 
   const nextDay = shiftIsoDay(todayIsoDate(), 1)
 
   await withUpdatedState((state) => {
     const chore = state.chores.find((c) => c.id === choreId)
-    if (!chore) return
+    if (!chore || !chore.kidIds.includes(kidId)) return
 
-    chore.pausedUntil = nextDay
-    chore.snoozedUntil = nextDay
+    chore.snoozedForKids = {
+      ...chore.snoozedForKids,
+      [kidId]: nextDay,
+    }
   })
 }
 
