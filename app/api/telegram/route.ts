@@ -37,11 +37,7 @@ export async function POST(request: NextRequest) {
         )
 
         return `- ${call.toolName}(${JSON.stringify(call.input)})${
-          output
-            ? ` → ${JSON.stringify(
-                'output' in output ? output.output : output.error,
-              )}`
-            : ''
+          output ? ` → ${JSON.stringify(output.output)}` : ''
         }`
       })
 
