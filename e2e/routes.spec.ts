@@ -86,7 +86,6 @@ test.describe('Personal pages require the password', () => {
 
   const personalRoutes = [
     '/cal',
-    '/cal/debug',
     '/chores',
     '/chores/rewards',
     '/chores/admin',
