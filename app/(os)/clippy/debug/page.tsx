@@ -1,5 +1,6 @@
 import { Redis } from '@upstash/redis'
 import { isMax } from 'app/auth'
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
 const redis = Redis.fromEnv()
@@ -63,8 +64,13 @@ type LogStep = {
   isContinued: boolean
 }
 
-async function getLogKeys() {
-  const keys: string[] = []
+type LogKey = {
+  key: string
+  timestamp: number
+}
+
+async function getSortedLogKeys() {
+  const keys: LogKey[] = []
   let cursor = '0'
 
   do {
@@ -73,40 +79,69 @@ async function getLogKeys() {
       count: 100,
     })
 
-    keys.push(...batch)
+    for (const key of batch) {
+      const timestamp = Number(key.split(':')[1])
+
+      if (Number.isFinite(timestamp)) {
+        keys.push({ key, timestamp })
+      }
+    }
     cursor = nextCursor
   } while (cursor !== '0')
 
-  return keys
+  return keys.sort((a, b) => b.timestamp - a.timestamp)
 }
 
-export default async function DebugPage() {
+type DebugPageProps = {
+  searchParams?: Promise<{
+    page?: string | string[]
+    pageSize?: string | string[]
+  }>
+}
+
+function parseNumberParam(
+  value: string | string[] | undefined,
+  defaultValue: number,
+  {
+    min,
+    max,
+  }: {
+    min: number
+    max: number
+  },
+) {
+  const rawValue = Array.isArray(value) ? value[0] : value
+  const parsed = Number.parseInt(rawValue ?? '', 10)
+
+  if (!Number.isFinite(parsed)) return defaultValue
+
+  return Math.min(Math.max(parsed, min), max)
+}
+
+export default async function DebugPage({ searchParams }: DebugPageProps) {
   if (!(await isMax())) {
     redirect('/')
   }
 
-  const logKeys = await getLogKeys()
+  const resolvedSearchParams = searchParams ? await searchParams : undefined
 
-  const sortedKeys = logKeys
-    .map((key) => {
-      const timestamp = Number(key.split(':')[1])
+  const pageSize = parseNumberParam(resolvedSearchParams?.pageSize, 20, {
+    min: 1,
+    max: 50,
+  })
+  const page = parseNumberParam(resolvedSearchParams?.page, 1, {
+    min: 1,
+    max: Number.MAX_SAFE_INTEGER,
+  })
 
-      if (!Number.isFinite(timestamp)) return null
-
-      return { key, timestamp }
-    })
-    .filter(
-      (
-        entry,
-      ): entry is {
-        key: string
-        timestamp: number
-      } => entry !== null,
-    )
-    .sort((a, b) => b.timestamp - a.timestamp)
+  const sortedKeys = await getSortedLogKeys()
+  const totalPages = Math.max(1, Math.ceil(sortedKeys.length / pageSize))
+  const currentPage = Math.min(page, totalPages)
+  const startIndex = (currentPage - 1) * pageSize
+  const pageKeys = sortedKeys.slice(startIndex, startIndex + pageSize)
 
   const conversations = await Promise.all(
-    sortedKeys.map(async ({ key, timestamp }) => {
+    pageKeys.map(async ({ key, timestamp }) => {
       const logs: Array<LogStep> = await redis.lrange(key, 0, -1)
       const date = new Date(timestamp)
 
@@ -119,9 +154,67 @@ export default async function DebugPage() {
     }),
   )
 
+  const buildPageHref = (pageNumber: number) => {
+    const params = new URLSearchParams({
+      page: pageNumber.toString(),
+      pageSize: pageSize.toString(),
+    })
+
+    return `/clippy/debug?${params.toString()}`
+  }
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-6">Clippy Debug Logs</h1>
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
+        <div className="text-sm text-gray-600">
+          {sortedKeys.length === 0 ? (
+            'No conversations yet'
+          ) : (
+            <>
+              Showing{' '}
+              <span className="font-medium">
+                {startIndex + 1}–
+                {Math.min(startIndex + conversations.length, sortedKeys.length)}
+              </span>{' '}
+              of <span className="font-medium">{sortedKeys.length}</span> conversations
+            </>
+          )}
+        </div>
+
+        {sortedKeys.length > 0 && (
+          <div className="flex items-center gap-2 text-sm">
+            <Link
+              href={buildPageHref(Math.max(1, currentPage - 1))}
+              className={`px-3 py-1 rounded border transition-colors ${
+                currentPage === 1
+                  ? 'text-gray-400 border-gray-200 cursor-not-allowed'
+                  : 'text-blue-600 border-blue-200 hover:bg-blue-50'
+              }`}
+              aria-disabled={currentPage === 1}
+              tabIndex={currentPage === 1 ? -1 : undefined}
+            >
+              Previous
+            </Link>
+            <span className="text-gray-500">
+              Page {currentPage} of {totalPages}
+            </span>
+            <Link
+              href={buildPageHref(Math.min(totalPages, currentPage + 1))}
+              className={`px-3 py-1 rounded border transition-colors ${
+                currentPage === totalPages
+                  ? 'text-gray-400 border-gray-200 cursor-not-allowed'
+                  : 'text-blue-600 border-blue-200 hover:bg-blue-50'
+              }`}
+              aria-disabled={currentPage === totalPages}
+              tabIndex={currentPage === totalPages ? -1 : undefined}
+            >
+              Next
+            </Link>
+          </div>
+        )}
+      </div>
 
       {conversations.length === 0 ? (
         <p>No conversations found</p>
