@@ -569,7 +569,7 @@ function KidColumn({
       }}
     >
       <div
-        className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 py-1"
+        className="sticky top-0 z-10 -mx-4 -mt-4 flex flex-wrap items-center justify-between gap-3 px-4 pb-4 pt-4"
         style={{
           backgroundColor: accentSoft,
           boxShadow: `0 10px 30px -25px ${accentColor}`,
