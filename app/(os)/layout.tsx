@@ -3,14 +3,19 @@ import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react'
 import Script from 'next/script'
 import { ReportView } from '../components/report-view'
+import { PasswordForm } from './components/password-form'
+import { auth } from '../auth'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export default function OSRootLayout({
+export default async function OSRootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const password = await auth()
+  const isAuthorized = password === process.env.CAL_PASSWORD
+
   return (
     <html
       lang="en"
@@ -21,7 +26,18 @@ export default function OSRootLayout({
         className="antialiased mx-auto overflow-x-hidden"
         style={{ backgroundColor: '#c0c0c0' }}
       >
-        <main className="min-w-0 min-h-screen">{children}</main>
+        <main className="min-w-0 min-h-screen">
+          {isAuthorized ? (
+            children
+          ) : (
+            <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-b from-slate-50/70 via-white to-slate-100/80">
+              <PasswordForm
+                error={password ? 'Invalid password.' : undefined}
+                defaultPassword={password}
+              />
+            </div>
+          )}
+        </main>
         <Analytics />
         <ReportView />
         {/* Splitbee */}

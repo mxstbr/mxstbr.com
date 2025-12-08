@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { RewardBoard } from '../reward-board'
 import { getChoreState, type Reward } from '../data'
-import { PasswordForm } from '../../cal/password-form'
+import { PasswordForm } from '../../components/password-form'
 import { auth, isMax } from 'app/auth'
 
 export const dynamic = 'force-dynamic'
