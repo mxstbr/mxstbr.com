@@ -31,9 +31,32 @@ export async function POST(request: NextRequest) {
         ],
       })
 
-      // Only send a response if clippy generated one
+      const toolSummaries = result.toolCalls.map((call) => {
+        const output = result.toolResults.find(
+          (toolResult) => toolResult.toolCallId === call.toolCallId,
+        )
+
+        return `- ${call.toolName}(${JSON.stringify(call.input)})${
+          output
+            ? ` → ${JSON.stringify(
+                'output' in output ? output.output : output.error,
+              )}`
+            : ''
+        }`
+      })
+
+      const responseParts = [] as string[]
+
       if (result.text && result.text.trim()) {
-        await bot.telegram.sendMessage(chatId, result.text)
+        responseParts.push(result.text)
+      }
+
+      if (toolSummaries.length > 0) {
+        responseParts.push(`Tool calls:\n${toolSummaries.join('\n')}`)
+      }
+
+      if (responseParts.length > 0) {
+        await bot.telegram.sendMessage(chatId, responseParts.join('\n\n'))
       }
     } catch (error) {
       console.error('Error processing Telegram message:', error)
