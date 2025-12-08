@@ -9,6 +9,119 @@ import { telegramTools } from './telegram'
 import { choreTools } from './chores'
 
 const redis = Redis.fromEnv()
+const CONVERSATION_INDEX_KEY = 'clippy:conversations'
+
+function parseTimestamp(value: unknown) {
+  if (typeof value === 'number') {
+    return value > 1_000_000_000_000 ? value : value * 1000
+  }
+
+  if (typeof value === 'string') {
+    const numericValue = Number(value)
+
+    if (Number.isFinite(numericValue)) {
+      return numericValue > 1_000_000_000_000
+        ? numericValue
+        : numericValue * 1000
+    }
+
+    const parsedDate = Date.parse(value)
+    if (!Number.isNaN(parsedDate)) {
+      return parsedDate
+    }
+  }
+
+  return undefined
+}
+
+function extractSessionId(stepResult: any) {
+  const headers = stepResult?.request?.headers
+  if (!headers || typeof headers !== 'object') return undefined
+
+  const rawValue =
+    headers['x-session-id'] ??
+    headers['X-Session-Id'] ??
+    headers['X-SESSION-ID'] ??
+    headers['x-Session-Id']
+
+  if (!rawValue) return undefined
+  if (Array.isArray(rawValue)) return rawValue[0]
+  if (typeof rawValue === 'string') return rawValue
+  return String(rawValue)
+}
+
+function extractRequestMessages(stepResult: any) {
+  const body = stepResult?.request?.body
+  if (!body) return undefined
+
+  try {
+    const parsedBody = typeof body === 'string' ? JSON.parse(body) : body
+    if (parsedBody?.messages && Array.isArray(parsedBody.messages)) {
+      return parsedBody.messages
+    }
+  } catch (e) {}
+
+  return undefined
+}
+
+function extractConversationMessages(stepResult: any) {
+  if (
+    stepResult?.response?.messages &&
+    Array.isArray(stepResult.response.messages)
+  ) {
+    return stepResult.response.messages
+  }
+
+  return extractRequestMessages(stepResult)
+}
+
+async function persistConversationStep(stepResult: any) {
+  const conversationId =
+    stepResult?.response?.id ??
+    stepResult?.response?.requestId ??
+    stepResult?.request?.id ??
+    `clippy-${Date.now()}`
+  const timestamp =
+    parseTimestamp(stepResult?.response?.timestamp) ?? Date.now()
+
+  const baseKey = `clippy:conversation:${conversationId}`
+  const metaKey = `${baseKey}:meta`
+  const stepsKey = `${baseKey}:steps`
+  const messagesKey = `${baseKey}:messages`
+
+  const existingMeta = await redis.get(metaKey)
+  const parsedMeta =
+    typeof existingMeta === 'string'
+      ? JSON.parse(existingMeta)
+      : existingMeta ?? {}
+
+  const createdAt =
+    (typeof parsedMeta?.createdAt === 'number' && parsedMeta.createdAt) ||
+    timestamp
+  const sessionId = parsedMeta?.sessionId ?? extractSessionId(stepResult)
+
+  const meta = {
+    id: conversationId,
+    createdAt,
+    updatedAt: timestamp,
+    sessionId,
+    modelId: stepResult?.response?.modelId,
+    request: stepResult?.request,
+  }
+
+  const conversationMessages = extractConversationMessages(stepResult)
+
+  await redis.zadd(CONVERSATION_INDEX_KEY, {
+    score: createdAt,
+    member: conversationId,
+  })
+  await redis.rpush(stepsKey, stepResult)
+  await redis.set(metaKey, meta)
+
+  if (conversationMessages && conversationMessages.length > 0) {
+    await redis.set(messagesKey, conversationMessages)
+  }
+}
 
 export const SYSTEM_PROMPT = (today: Date) => dedent`
 You are the unified AI assistant named Clippy that helps Maxie and Minnie with calendar management.
@@ -76,7 +189,11 @@ export const clippy = new Agent({
     ...choreTools,
   },
   onStepFinish: async (result) => {
-    await redis.lpush(`logs:${result.response.id}`, result)
+    try {
+      await persistConversationStep(result)
+    } catch (error) {
+      console.error('Failed to persist Clippy step log', error)
+    }
   },
   stopWhen: stepCountIs(10),
 })
