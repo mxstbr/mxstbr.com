@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect, type Page, type TestInfo } from '@playwright/test'
 
 const CAL_PASSWORD = process.env.CAL_PASSWORD || 'test-password'
 
@@ -76,7 +76,13 @@ test.describe('Public pages render', () => {
 })
 
 test.describe('Personal pages require the password', () => {
-  const baseURL = test.info().project.use.baseURL || 'http://127.0.0.1:3000'
+  async function addPasswordCookie(page: Page, testInfo: TestInfo) {
+    const baseURL = testInfo.project.use.baseURL || 'http://127.0.0.1:3000'
+
+    await page.context().addCookies([
+      { name: 'password', value: CAL_PASSWORD, url: baseURL },
+    ])
+  }
 
   const personalRoutes = [
     '/cal',
@@ -90,10 +96,8 @@ test.describe('Personal pages require the password', () => {
   ]
 
   for (const path of personalRoutes) {
-    test(`${path} renders with the password`, async ({ page }) => {
-      await page.context().addCookies([
-        { name: 'password', value: CAL_PASSWORD, url: baseURL },
-      ])
+    test(`${path} renders with the password`, async ({ page }, testInfo) => {
+      await addPasswordCookie(page, testInfo)
 
       await expectPageOk(page, path)
     })
@@ -110,10 +114,8 @@ test.describe('Personal pages require the password', () => {
     })
   }
 
-  test('/os renders once authenticated', async ({ page }) => {
-    await page.context().addCookies([
-      { name: 'password', value: CAL_PASSWORD, url: baseURL },
-    ])
+  test('/os renders once authenticated', async ({ page }, testInfo) => {
+    await addPasswordCookie(page, testInfo)
 
     await expectPageOk(page, '/os')
 
