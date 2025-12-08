@@ -826,8 +826,8 @@ export default async function ChoreAdminPage({ searchParams }: AdminPageProps) {
   }
 
   return (
-    <>
-      <ParentalPinGate>
+    <ParentalPinGate>
+      <>
         <div className="space-y-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
@@ -952,9 +952,9 @@ export default async function ChoreAdminPage({ searchParams }: AdminPageProps) {
             </div>
           </div>
         </div>
-      </ParentalPinGate>
-      <ClippyChoresChat />
-    </>
+        <ClippyChoresChat />
+      </>
+    </ParentalPinGate>
   )
 }
 
