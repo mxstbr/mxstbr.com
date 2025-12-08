@@ -10,6 +10,7 @@ import {
   sortByTimeOfDay,
 } from './utils'
 import { ScreenSaver } from './screen-saver'
+import { RefreshButton } from './refresh-button'
 import { PasswordForm } from 'app/cal/password-form'
 import { auth, isMax } from 'app/auth'
 
@@ -142,7 +143,7 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
     <div
       className={`flex min-h-screen flex-col p-6 pb-20 md:h-screen md:overflow-y-hidden md:pb-6 ${backgroundClass}`}
     >
-      <div className="mb-5 flex justify-center text-sm md:mb-6 md:justify-start">
+      <div className="relative mb-5 flex justify-center text-sm md:mb-6 md:justify-start">
         <div className="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white p-1 pr-3 text-xs font-semibold text-slate-800 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
           <Link
             href={choresHref(prevDay)}
@@ -174,6 +175,9 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
           <span className="text-[11px] font-medium text-slate-600 dark:text-slate-300">
             {readableDay}
           </span>
+        </div>
+        <div className="absolute right-0 top-0">
+          <RefreshButton />
         </div>
       </div>
       <div className="md:flex-1 md:min-h-0 pb-16 md:pb-12">
