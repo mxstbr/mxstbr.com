@@ -16,7 +16,6 @@ test.describe('Public pages render', () => {
     '/investing',
     '/readme',
     '/notes',
-    '/oss',
     '/todos',
     '/thoughts/gatsby',
     '/thoughts/tech-choice-regrets-at-spectrum',
@@ -72,6 +71,15 @@ test.describe('Public pages render', () => {
     for (const path of topicPaths) {
       await expectPageOk(page, path)
     }
+  })
+
+  test('renders /oss when GitHub access is configured', async ({ page }) => {
+    test.skip(
+      !process.env.GITHUB_ACCESS_TOKEN,
+      'GitHub access token required to fetch OSS projects',
+    )
+
+    await expectPageOk(page, '/oss')
   })
 })
 

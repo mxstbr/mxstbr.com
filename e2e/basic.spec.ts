@@ -17,7 +17,7 @@ test('navigate to an essay from the homepage', async ({ page }) => {
     page.getByRole('link', { name: 'Margin considered harmful' }),
   ).toBeVisible()
 
-  await page.goto('/thoughts/margin')
+  await page.getByRole('link', { name: 'Margin considered harmful' }).click()
   await expect(page).toHaveURL(/\/thoughts\/margin/)
   await expect(
     page.getByRole('heading', { name: 'Margin considered harmful' }),
