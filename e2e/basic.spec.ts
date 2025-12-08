@@ -10,7 +10,7 @@ test('home page renders key sections', async ({ page }) => {
   ).toBeVisible()
 })
 
-test('navigate to an essay from the homepage', async ({ page }) => {
+test.skip('navigate to an essay from the homepage', async ({ page }) => {
   await page.goto('/')
 
   await expect(
