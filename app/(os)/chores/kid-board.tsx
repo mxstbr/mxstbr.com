@@ -10,6 +10,7 @@ import {
   useTransition,
   useCallback,
 } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useReward } from 'react-rewards'
@@ -896,6 +897,52 @@ function ChoreButton({
     }
   }
 
+  const skipConfirmModal =
+    skipConfirmOpen && typeof document !== 'undefined'
+      ? createPortal(
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4">
+            <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl dark:bg-slate-900">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-base font-semibold text-slate-900 dark:text-slate-50">
+                    Skip this task?
+                  </h2>
+                  <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
+                    Are you sure you want to skip &quot;{chore.title}&quot; for now?
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSkipConfirmOpen(false)}
+                  className="rounded-md p-1 text-slate-500 transition active:bg-slate-100 active:text-slate-700 dark:active:bg-slate-800"
+                  aria-label="Close"
+                >
+                  ×
+                </button>
+              </div>
+              <div className="mt-4 flex flex-wrap justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSkipConfirmOpen(false)}
+                  className="inline-flex items-center justify-center rounded-md border border-transparent px-3 py-2 text-xs font-semibold text-slate-600 transition active:text-slate-900 dark:text-slate-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={performSkip}
+                  className="inline-flex items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition active:bg-slate-800 disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:active:bg-slate-200"
+                  disabled={isSkipping}
+                >
+                  Skip task
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )
+      : null
+
   return (
     <div
       className={`relative rounded-xl border-2 shadow transition focus-within:-translate-y-0.5 active:-translate-y-0.5 focus-within:border-[var(--accent)] active:border-[var(--accent)] dark:focus-within:border-[var(--accent)] dark:active:border-[var(--accent)] ${cardToneClasses} ${menuOpen ? 'z-20' : ''}`}
@@ -980,48 +1027,7 @@ function ChoreButton({
           ) : null}
         </div>
       </div>
-      {skipConfirmOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl dark:bg-slate-900">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <h2 className="text-base font-semibold text-slate-900 dark:text-slate-50">
-                  Skip this task?
-                </h2>
-                <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
-                  Are you sure you want to skip &quot;{chore.title}&quot; for
-                  now?
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSkipConfirmOpen(false)}
-                className="rounded-md p-1 text-slate-500 transition active:bg-slate-100 active:text-slate-700 dark:active:bg-slate-800"
-                aria-label="Close"
-              >
-                ×
-              </button>
-            </div>
-            <div className="mt-4 flex flex-wrap justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setSkipConfirmOpen(false)}
-                className="inline-flex items-center justify-center rounded-md border border-transparent px-3 py-2 text-xs font-semibold text-slate-600 transition active:text-slate-900 dark:text-slate-300"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={performSkip}
-                className="inline-flex items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition active:bg-slate-800 disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:active:bg-slate-200"
-                disabled={isSkipping}
-              >
-                Skip task
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      {skipConfirmModal}
     </div>
   )
 }
