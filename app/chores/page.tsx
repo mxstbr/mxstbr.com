@@ -143,38 +143,43 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
     <div
       className={`flex min-h-screen flex-col p-6 pb-20 md:h-screen md:overflow-y-hidden md:pb-6 ${backgroundClass}`}
     >
-      <div className="relative mb-5 flex justify-center text-sm md:mb-6 md:justify-start">
-        <div className="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white p-1 pr-3 text-xs font-semibold text-slate-800 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
-          <Link
-            href={choresHref(prevDay)}
-            prefetch
-            aria-label="Previous day"
-            className="rounded px-2 py-1 transition hover:bg-slate-100 dark:hover:bg-slate-700"
-          >
-            ‹
-          </Link>
-          <Link
-            href={viewingToday ? choresHref() : choresHref(todayCtx.todayIso)}
-            prefetch
-            className={`rounded px-3 py-1 transition ${
-              viewingToday
-                ? 'bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200'
-                : 'hover:bg-slate-100 dark:hover:bg-slate-700'
-            }`}
-          >
-            Today
-          </Link>
-          <Link
-            href={choresHref(nextDay)}
-            prefetch
-            aria-label="Next day"
-            className="rounded px-2 py-1 transition hover:bg-slate-100 dark:hover:bg-slate-700"
-          >
-            ›
-          </Link>
-          <span className="text-[11px] font-medium text-slate-600 dark:text-slate-300">
+      <div className="relative mb-5 text-sm md:mb-6">
+        <div className="flex justify-center text-base font-semibold text-slate-900 dark:text-slate-100">
+          <h1>
             {readableDay}
-          </span>
+            {viewingToday ? ' ✅' : ''}
+          </h1>
+        </div>
+        <div className="mt-2 flex justify-center md:justify-start">
+          <div className="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white p-1 pr-3 text-xs font-semibold text-slate-800 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
+            <Link
+              href={choresHref(prevDay)}
+              prefetch
+              aria-label="Previous day"
+              className="rounded px-2 py-1 transition hover:bg-slate-100 dark:hover:bg-slate-700"
+            >
+              ‹
+            </Link>
+            <Link
+              href={viewingToday ? choresHref() : choresHref(todayCtx.todayIso)}
+              prefetch
+              className={`rounded px-3 py-1 transition ${
+                viewingToday
+                  ? 'bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200'
+                  : 'hover:bg-slate-100 dark:hover:bg-slate-700'
+              }`}
+            >
+              Today
+            </Link>
+            <Link
+              href={choresHref(nextDay)}
+              prefetch
+              aria-label="Next day"
+              className="rounded px-2 py-1 transition hover:bg-slate-100 dark:hover:bg-slate-700"
+            >
+              ›
+            </Link>
+          </div>
         </div>
         <div className="absolute right-0 top-0">
           <RefreshButton />
