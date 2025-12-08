@@ -65,10 +65,17 @@ type LogStep = {
 
 async function getLogKeys() {
   const keys: string[] = []
+  let cursor = '0'
 
-  for await (const key of redis.scanIterator({ match: 'logs:*', count: 100 })) {
-    keys.push(key)
-  }
+  do {
+    const [nextCursor, batch] = await redis.scan(cursor, {
+      match: 'logs:*',
+      count: 100,
+    })
+
+    keys.push(...batch)
+    cursor = nextCursor
+  } while (cursor !== '0')
 
   return keys
 }
