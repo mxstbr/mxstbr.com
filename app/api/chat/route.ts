@@ -6,7 +6,7 @@ import { convertToModelMessages } from 'ai'
 export const maxDuration = 30
 
 export async function POST(req: Request) {
-  if (!isMax()) throw new Error('Unauthorized')
+  if (!(await isMax())) throw new Error('Unauthorized')
   const { messages } = await req.json()
 
   const sessionId = req.headers.get('x-session-id')

@@ -25,29 +25,31 @@ export const metadata: Metadata = {
 }
 
 type ChoresPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     day?: string
     os?: string
     kid?: string
     pwd?: string
-  }
+  }>
 }
 
 export default async function ChoresPage({ searchParams }: ChoresPageProps) {
-  const password = auth()
+  const resolvedSearchParams = searchParams ? await searchParams : undefined
+  const password = await auth()
+  const isAuthorized = await isMax()
 
-  if (!isMax()) {
+  if (!isAuthorized) {
     return (
       <PasswordForm
         error={password ? 'Invalid password.' : undefined}
-        defaultPassword={searchParams?.pwd}
+        defaultPassword={resolvedSearchParams?.pwd}
       />
     )
   }
 
   const state = await getChoreState()
   const todayCtx = getToday()
-  const ctx = getToday(searchParams?.day)
+  const ctx = getToday(resolvedSearchParams?.day)
   const now = Date.now()
   const FOUR_HOURS_MS = 4 * 60 * 60 * 1000
   const isNewChore = (chore: Chore) => {
@@ -65,8 +67,8 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
     month: 'short',
     day: 'numeric',
   }).format(dayDate)
-  const osParam = searchParams?.os
-  const kidParam = searchParams?.kid
+  const osParam = resolvedSearchParams?.os
+  const kidParam = resolvedSearchParams?.kid
   const hasOpenChoresToday = state.chores.some((chore) =>
     state.kids.some((kid) => isOpenForKid(chore, kid.id, state.completions, todayCtx)),
   )
@@ -133,8 +135,14 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
     ).map(({ timeOfDay, createdAt, timestamp, ...rest }) => rest),
   }))
 
+  const backgroundClass = viewingToday
+    ? 'bg-slate-50 dark:bg-slate-900'
+    : 'bg-slate-200 dark:bg-slate-950'
+
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 p-6 pb-20 md:h-screen md:overflow-y-hidden md:pb-6">
+    <div
+      className={`flex min-h-screen flex-col p-6 pb-20 md:h-screen md:overflow-y-hidden md:pb-6 ${backgroundClass}`}
+    >
       <div className="relative mb-5 flex justify-center text-sm md:mb-6 md:justify-start">
         <div className="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white p-1 pr-3 text-xs font-semibold text-slate-800 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
           <Link

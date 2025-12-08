@@ -16,7 +16,7 @@ async function getLatestViews(slug: string): Promise<number> {
 }
 
 export default async function StatsPage() {
-  if (!isMax()) return notFound()
+  if (!(await isMax())) return notFound()
 
   const essays = getBlogPosts({ archived: true })
   const notes = await getNotes()

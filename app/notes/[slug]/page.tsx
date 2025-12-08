@@ -21,12 +21,17 @@ import { ReadingTime } from './reading-time'
 export const dynamic = 'force-static'
 export const revalidate = 60
 
-export async function generateStaticParams() {
-  return (await getNotes()).map((note) => note.frontmatter.slug)
+export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
+  return (await getNotes()).map((note) => ({ slug: note.frontmatter.slug }))
 }
 
-export async function generateMetadata({ params }) {
-  const note = await getNote(params.slug)
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await params
+  const note = await getNote(slug)
 
   if (!note) return null
 
@@ -45,7 +50,7 @@ export async function generateMetadata({ params }) {
       description,
       type: 'article',
       publishedTime,
-      url: `${prodUrl}/notes/${params.slug}`,
+      url: `${prodUrl}/notes/${slug}`,
       images: [
         {
           url: ogImage,
@@ -65,8 +70,9 @@ export async function generateMetadata({ params }) {
 const NOTE_CONTENT_ELEMENT_ID = 'note-content'
 
 export default async function Page({ params }) {
+  const { slug } = await params
   const notes = await getNotes()
-  const note = notes.find((note) => note.frontmatter.slug === params.slug)
+  const note = notes.find((note) => note.frontmatter.slug === slug)
 
   if (!note) return notFound()
 

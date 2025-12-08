@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 export async function POST(request: Request): Promise<Response> {
-  if (!isMax()) {
+  if (!(await isMax())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
