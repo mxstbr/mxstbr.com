@@ -16,14 +16,14 @@ import {
   setRewardKids,
   redeemReward,
   setOneOffDate,
-} from 'app/chores/actions'
-import { getChoreState } from 'app/chores/data'
+} from 'app/(os)/chores/actions'
+import { getChoreState } from 'app/(os)/chores/data'
 import {
   getToday,
   isOpenForKid,
   pacificDateFromTimestamp,
   sortByTimeOfDay,
-} from 'app/chores/utils'
+} from 'app/(os)/chores/utils'
 
 const isoDaySchema = z
   .string()

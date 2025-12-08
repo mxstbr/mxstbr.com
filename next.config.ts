@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next'
 import createMDX from '@next/mdx'
 import smartypants from 'remark-smartypants'
-import { getNotes } from './app/notes/hashnode'
+import { getNotes } from './app/(public)/notes/hashnode'
 
 const nextConfig: NextConfig = {
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
@@ -49,7 +49,7 @@ const nextConfig: NextConfig = {
     ]
   },
   outputFileTracingIncludes: {
-    '/stats': ['./app/thoughts/**/*'],
+    '/stats': ['./app/(public)/thoughts/**/*'],
   },
 }
 

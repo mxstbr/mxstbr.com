@@ -45,8 +45,8 @@
     "react": "19.0.0-rc-eb3ad065-20240822",
     "react-dom": "19.0.0-rc-eb3ad065-20240822",
     "react-feather": "^2.0.10",
-    "react-rewards": "^2.0.3",
     "react-hot-toast": "^2.4.1",
+    "react-rewards": "^2.0.3",
     "react-tweet": "^3.2.1",
     "recharts": "^3.1.2",
     "remark-gfm": "^4.0.0",
@@ -60,8 +60,9 @@
     "zod": "^3.24.4"
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.19",
     "@playwright/test": "^1.47.2",
+    "autoprefixer": "^10.4.19",
+    "baseline-browser-mapping": "^2.9.5",
     "postcss": "^8.4.41",
     "tailwindcss": "^3.4.10"
   }

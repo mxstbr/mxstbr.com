@@ -1,4 +1,4 @@
-import { getBlogPosts } from 'app/thoughts/utils'
+import { getBlogPosts } from 'app/(public)/thoughts/utils'
 
 export function NewsletterSignupForm({ className = '' }) {
   const posts = getBlogPosts({ archived: true })

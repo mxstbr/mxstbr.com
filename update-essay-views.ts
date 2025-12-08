@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { Redis } from '@upstash/redis'
-import { getBlogPosts } from './app/thoughts/utils'
+import { getBlogPosts } from './app/(public)/thoughts/utils'
 import env from '@next/env'
 
 const projectDir = process.cwd()
@@ -48,7 +48,14 @@ async function main() {
 
   // Update each blog post file with the latest view count
   for (const post of posts) {
-    const filePath = path.join(projectDir, `app/thoughts/${post.slug}/page.mdx`)
+    const filePath = path.join(
+      projectDir,
+      'app',
+      '(public)',
+      'thoughts',
+      post.slug,
+      'page.mdx',
+    )
     const fileContent = fs.readFileSync(filePath, 'utf-8')
     const updatedContent = fileContent.replace(
       /export const meta = {([\s\S]*?)(?:^|,\s*)(views:\s*(?:\d+\s*\+\s*\d+|\d+))\s*,?\s*}/,

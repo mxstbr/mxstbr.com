@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { getBlogPosts } from 'app/thoughts/utils'
+import { getBlogPosts } from 'app/(public)/thoughts/utils'
 import { ItemList, ItemListItem } from './item-list'
 import { NewsletterSignupForm } from './newsletter-form'
 
