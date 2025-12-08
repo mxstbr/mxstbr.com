@@ -633,7 +633,7 @@ function KidColumn({
       </div>
 
       {doneChores.length ? (
-        <div className="space-y-2">
+        <div className="mt-6 space-y-2 md:mt-8">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
             <span>Done today</span>
             <span className="h-px flex-1 rounded-full bg-slate-200 dark:bg-slate-700" />
