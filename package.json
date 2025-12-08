@@ -6,6 +6,7 @@
     "build": "next build --webpack && tsm sync-essays-to-github.ts",
     "start": "next start",
     "create-reminder-schedule": "tsm create-reminder-schedule.ts",
+    "set-telegram-webhook": "tsm set-telegram-webhook.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {

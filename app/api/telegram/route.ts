@@ -16,20 +16,31 @@ export async function POST(request: NextRequest) {
   const update: Update = await request.json()
   if ('message' in update) {
     const message = update.message
-    const result = await clippy.generate({
-      messages: [
-        {
-          role: 'user',
-          content: dedent`
-            The following message was sent in a Telegram group chat between Maxie and Minnie.
-            Determine whether it is meant for you and, if so, respond to it. If not, do nothing.
-            <message>${JSON.stringify(message)}</message>`,
-        },
-      ],
-    })
+    const chatId = message.chat.id
 
-    return NextResponse.json({ message: result.text })
+    try {
+      const result = await clippy.generate({
+        messages: [
+          {
+            role: 'user',
+            content: dedent`
+              The following message was sent in a Telegram group chat between Maxie and Minnie.
+              Determine whether it is meant for you and, if so, respond to it. If not, do nothing.
+              <message>${JSON.stringify(message)}</message>`,
+          },
+        ],
+      })
+
+      // Only send a response if clippy generated one
+      if (result.text && result.text.trim()) {
+        await bot.telegram.sendMessage(chatId, result.text)
+      }
+    } catch (error) {
+      console.error('Error processing Telegram message:', error)
+      // Still return 200 to acknowledge receipt, but log the error
+    }
   }
 
-  return NextResponse.json({ message: 'Received successfully.' })
+  // Always return 200 OK to acknowledge receipt
+  return NextResponse.json({ ok: true })
 }
