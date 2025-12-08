@@ -2,7 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import ArrowLeft from 'react-feather/dist/icons/arrow-left'
-import Prose from '../../../components/prose'
+import Prose from '../../../../components/prose'
 import { getNotes } from '../../hashnode'
 import type { Metadata } from 'next'
 

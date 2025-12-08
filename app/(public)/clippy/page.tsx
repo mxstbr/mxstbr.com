@@ -1,4 +1,4 @@
-import Chat from '../cal/chat'
+import Chat from '../../(os)/cal/chat'
 import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'

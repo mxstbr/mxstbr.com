@@ -1,4 +1,4 @@
-import { getRepos } from '../github'
+import { getRepos } from '../../github'
 import ossProjects from './data'
 import Prose from 'app/components/prose'
 import { Metadata } from 'next'

@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { EMOJI_FOR_STATUS, Note, getNotes } from './hashnode'
-import Prose from '../components/prose'
+import Prose from '../../components/prose'
 import Tag from 'react-feather/dist/icons/tag'
 import type { Metadata } from 'next'
 

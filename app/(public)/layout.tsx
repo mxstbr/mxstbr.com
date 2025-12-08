@@ -1,14 +1,13 @@
-import './global.css'
+import '../global.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { Navbar } from './components/nav'
+import { Navbar } from '../components/nav'
 import { Analytics } from '@vercel/analytics/react'
 import Script from 'next/script'
-import Footer from './components/footer'
-import { prodUrl } from './sitemap'
-import { size } from './og/utils'
-import { ReportView } from './components/report-view'
-import { headers } from 'next/headers'
+import Footer from '../components/footer'
+import { prodUrl } from '../sitemap'
+import { size } from '../og/utils'
+import { ReportView } from '../components/report-view'
 
 export const metadata: Metadata = {
   metadataBase: new URL(prodUrl),
@@ -56,41 +55,25 @@ export const metadata: Metadata = {
   },
 }
 
-const cx = (...classes) => classes.filter(Boolean).join(' ')
-
 const inter = Inter({ subsets: ['latin'] })
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  // Check if this is an OS iframe by reading the custom header set by middleware
-  const headersList = await headers()
-  const isOsMode = headersList.get('x-os-mode') === 'true'
-
   return (
     <html
       lang="en"
-      className={cx(
-        isOsMode ? 'text-black' : 'text-slate-900 bg-slate-50 dark:text-slate-100 dark:bg-slate-950',
-        inter.className,
-      )}
-      style={isOsMode ? { backgroundColor: '#c0c0c0' } : {}}
+      className={`text-slate-900 bg-slate-50 dark:text-slate-100 dark:bg-slate-950 ${inter.className}`}
     >
-      <body className={`antialiased ${isOsMode ? '' : 'mt-8 px-4'} mx-auto overflow-x-hidden`} style={isOsMode ? { backgroundColor: '#c0c0c0' } : {}}>
-        <main className={`min-w-0 ${isOsMode ? 'min-h-screen' : 'max-w-prose mx-auto mt-6 px-2 space-y-16'}`}>
-          {isOsMode ? (
-            children
-          ) : (
-            <>
-              <div className=" space-y-8 sm:space-y-12">
-                <Navbar />
-                {children}
-              </div>
-              <Footer />
-            </>
-          )}
+      <body className="antialiased mt-8 px-4 mx-auto overflow-x-hidden">
+        <main className="min-w-0 max-w-prose mx-auto mt-6 px-2 space-y-16">
+          <div className="space-y-8 sm:space-y-12">
+            <Navbar />
+            {children}
+          </div>
+          <Footer />
         </main>
         <Analytics />
         <ReportView />
