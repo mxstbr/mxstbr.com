@@ -284,7 +284,7 @@ export function KidBoard({
     columns.find((col) => col.kid.id === activeKidId) ?? columns[0]
 
   return (
-    <div className="full-bleed md:h-full md:min-h-0">
+    <div className="full-bleed md:h-full md:min-h-0 md:overflow-hidden">
       <span
         id={REWARD_TARGET_ID}
         className="pointer-events-none fixed bottom-4 left-1/2 z-40 -translate-x-1/2 text-2xl md:bottom-6"

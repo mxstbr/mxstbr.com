@@ -141,7 +141,7 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
 
   return (
     <div
-      className={`flex min-h-screen flex-col p-6 pb-20 md:h-screen md:overflow-y-hidden md:pb-6 ${backgroundClass}`}
+      className={`flex min-h-screen flex-col p-6 pb-20 md:h-screen md:overflow-hidden md:overscroll-none md:pb-6 ${backgroundClass}`}
     >
       <div className="mb-5 text-sm md:mb-6">
         <div className="flex items-center gap-4">
@@ -185,7 +185,7 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
           </div>
         </div>
       </div>
-      <div className="md:flex-1 md:min-h-0 pb-16 md:pb-12">
+      <div className="md:flex-1 md:min-h-0 pb-16 md:pb-0 md:overflow-hidden">
         <KidBoard
           columns={columns}
           completions={state.completions}
