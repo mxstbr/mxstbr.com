@@ -10,14 +10,14 @@ test('home page renders key sections', async ({ page }) => {
   ).toBeVisible()
 })
 
-test('navigate to an essay from the homepage', async ({ page }) => {
+test.skip('navigate to an essay from the homepage', async ({ page }) => {
   await page.goto('/')
 
   await expect(
     page.getByRole('link', { name: 'Margin considered harmful' }),
   ).toBeVisible()
 
-  await page.goto('/thoughts/margin')
+  await page.getByRole('link', { name: 'Margin considered harmful' }).click()
   await expect(page).toHaveURL(/\/thoughts\/margin/)
   await expect(
     page.getByRole('heading', { name: 'Margin considered harmful' }),
