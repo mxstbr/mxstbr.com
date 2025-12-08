@@ -801,6 +801,7 @@ function ChoreButton({
     setSkipConfirmOpen(false)
     const formData = new FormData()
     formData.append('choreId', chore.id)
+    formData.append('kidId', kidId)
     startTransition(() => {
       void skipChore(formData).finally(() => {
         setIsSkipping(false)

@@ -26,6 +26,7 @@ export type Chore = {
   schedule?: ChoreSchedule
   pausedUntil?: string | null
   snoozedUntil?: string | null
+  snoozedForKids?: Record<string, string | null>
   createdAt: string
   completedAt?: string | null
   timeOfDay?: 'morning' | 'afternoon' | 'evening'
@@ -166,12 +167,24 @@ function ensureChores(chores: Chore[] | undefined, kids: Kid[]): Chore[] {
         ? chore.createdAt.slice(0, 10)
         : undefined
 
+    const snoozedForKidsEntries = (chore as any).snoozedForKids
+      ? Object.entries((chore as any).snoozedForKids)
+          .filter(([kidId, until]) =>
+            kidIds.includes(kidId) &&
+            (typeof until === 'string' || until === null || typeof until === 'undefined'),
+          )
+          .map(([kidId, until]) => [kidId, until ?? null])
+      : []
+
+    const snoozedForKids = Object.fromEntries(snoozedForKidsEntries)
+
     return {
       ...chore,
       kidIds: kidIds.length ? kidIds : [kids[0]?.id ?? 'kid-1'],
       timeOfDay: chore.timeOfDay ?? undefined,
       requiresApproval: chore.requiresApproval ?? false,
       scheduledFor: chore.scheduledFor ?? fallbackDay,
+      snoozedForKids,
     }
   })
 }
