@@ -562,7 +562,7 @@ function KidColumn({
 
   return (
     <div
-      className="flex flex-col gap-4 rounded-2xl border bg-white p-4 shadow-sm dark:bg-slate-900 md:h-full md:min-h-0 md:overflow-y-auto"
+      className="flex flex-col gap-4 overflow-hidden rounded-2xl border bg-white p-4 shadow-sm dark:bg-slate-900 md:h-full md:min-h-0 md:overflow-y-auto"
       style={{
         borderColor: accentColor,
         backgroundColor: accentSoft,
