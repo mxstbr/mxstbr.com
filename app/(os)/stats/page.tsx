@@ -1,6 +1,6 @@
 import React from 'react'
-import { getBlogPosts } from '../../../(public)/thoughts/utils'
-import { getNotes } from '../../../(public)/notes/hashnode'
+import { getBlogPosts } from 'app/(public)/thoughts/utils'
+import { getNotes } from 'app/(public)/notes/hashnode'
 import { isMax } from 'app/auth'
 import { notFound } from 'next/navigation'
 import Prose from 'app/components/prose'

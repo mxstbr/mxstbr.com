@@ -1,10 +1,10 @@
-import { BlogPosts } from './components/posts'
 import { investments } from './investing/investments'
 import Link from 'next/link'
-import { ItemList, ItemListItem } from './components/item-list'
-import { StellateIcon } from './components/stellate-icon'
-import { Section } from './components/section'
-import { ShopifyIcon } from './components/shopify-icon'
+import { BlogPosts } from 'app/components/posts'
+import { ItemList, ItemListItem } from 'app/components/item-list'
+import { StellateIcon } from 'app/components/stellate-icon'
+import { Section } from 'app/components/section'
+import { ShopifyIcon } from 'app/components/shopify-icon'
 
 export default async function Home() {
   return (

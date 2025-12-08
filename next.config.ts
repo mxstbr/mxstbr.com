@@ -49,7 +49,7 @@ const nextConfig: NextConfig = {
     ]
   },
   outputFileTracingIncludes: {
-    '/stats': ['./app/thoughts/**/*'],
+    '/stats': ['./app/(public)/thoughts/**/*'],
   },
 }
 

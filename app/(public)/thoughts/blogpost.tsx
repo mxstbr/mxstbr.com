@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { formatDate, getBlogPosts } from 'app/thoughts/utils'
+import { formatDate, getBlogPosts } from 'app/(public)/thoughts/utils'
 import { prodUrl } from 'app/sitemap'
 import Prose from 'app/components/prose'
 import { size } from 'app/og/utils'
