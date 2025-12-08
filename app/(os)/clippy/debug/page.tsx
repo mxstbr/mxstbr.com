@@ -69,9 +69,81 @@ type LogKey = {
   timestamp: number
 }
 
+function parseTimestamp(value: unknown) {
+  if (typeof value === 'number') {
+    return value > 1_000_000_000_000 ? value : value * 1000
+  }
+
+  if (typeof value === 'string') {
+    const numericValue = Number(value)
+
+    if (Number.isFinite(numericValue)) {
+      return numericValue > 1_000_000_000_000
+        ? numericValue
+        : numericValue * 1000
+    }
+
+    const parsedDate = Date.parse(value)
+    if (!Number.isNaN(parsedDate)) {
+      return parsedDate
+    }
+  }
+
+  return undefined
+}
+
+function parseTimestampFromKey(key: string) {
+  const [, timestampPart] = key.split(':')
+  const timestamp = Number(timestampPart)
+
+  if (Number.isFinite(timestamp)) {
+    return timestamp
+  }
+
+  return undefined
+}
+
+async function getTimestampForKey(key: string) {
+  const timestampFromKey = parseTimestampFromKey(key)
+  if (timestampFromKey !== undefined) {
+    return timestampFromKey
+  }
+
+  const latestLog = await redis.lindex(key, 0)
+
+  if (!latestLog) {
+    return 0
+  }
+
+  let parsedLog: any
+
+  try {
+    parsedLog = typeof latestLog === 'string' ? JSON.parse(latestLog) : latestLog
+  } catch (e) {
+    return 0
+  }
+
+  const timestampCandidates = [
+    parsedLog.response?.timestamp,
+    parsedLog.response?.created,
+    parsedLog.timestamp,
+  ]
+
+  for (const candidate of timestampCandidates) {
+    const parsed = parseTimestamp(candidate)
+    if (parsed !== undefined) {
+      return parsed
+    }
+  }
+
+  return 0
+}
+
 async function getSortedLogKeys() {
   const keys: LogKey[] = []
   let cursor = '0'
+
+  const collectedKeys: string[] = []
 
   do {
     const [nextCursor, batch] = await redis.scan(cursor, {
@@ -79,15 +151,20 @@ async function getSortedLogKeys() {
       count: 100,
     })
 
-    for (const key of batch) {
-      const timestamp = Number(key.split(':')[1])
-
-      if (Number.isFinite(timestamp)) {
-        keys.push({ key, timestamp })
-      }
-    }
+    collectedKeys.push(...batch)
     cursor = nextCursor
   } while (cursor !== '0')
+
+  const keysWithTimestamps = await Promise.all(
+    collectedKeys.map(async (key) => ({
+      key,
+      timestamp: await getTimestampForKey(key),
+    })),
+  )
+
+  for (const item of keysWithTimestamps) {
+    keys.push(item)
+  }
 
   return keys.sort((a, b) => b.timestamp - a.timestamp)
 }
