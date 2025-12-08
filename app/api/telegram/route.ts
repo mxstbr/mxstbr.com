@@ -17,6 +17,7 @@ export async function POST(request: NextRequest) {
   if ('message' in update) {
     const message = update.message
     const chatId = message.chat.id
+    const toolStatuses: { name: string; success: boolean }[] = []
 
     try {
       const result = await clippy.generate({
@@ -31,9 +32,22 @@ export async function POST(request: NextRequest) {
         ],
       })
 
+      toolStatuses.push({ name: 'clippy.generate', success: true })
+
       // Only send a response if clippy generated one
       if (result.text && result.text.trim()) {
-        await bot.telegram.sendMessage(chatId, result.text)
+        const toolDetails = toolStatuses
+          .map(({ name, success }) => `- ${name}: ${success ? 'success' : 'failed'}`)
+          .join('\n')
+
+        const responseText = dedent`
+          ${result.text.trim()}
+
+          Tools called:
+          ${toolDetails}
+        `
+
+        await bot.telegram.sendMessage(chatId, responseText)
       }
     } catch (error) {
       console.error('Error processing Telegram message:', error)
