@@ -25,7 +25,7 @@ import {
   type RewardRedemption,
   getChoreState,
 } from '../data'
-import { PasswordForm } from 'app/cal/password-form'
+import { PasswordForm } from '../../cal/password-form'
 import { auth, isMax } from 'app/auth'
 import { ParentalPinGate } from '../parental-pin-gate'
 import {

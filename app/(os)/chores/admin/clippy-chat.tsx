@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { ChevronDown, MessageSquare } from 'react-feather'
-import Chat from 'app/cal/chat'
+import Chat from '../../cal/chat'
 
 export function ClippyChoresChat() {
   const [isOpen, setIsOpen] = useState(false)

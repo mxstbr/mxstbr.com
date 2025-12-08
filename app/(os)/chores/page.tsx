@@ -11,8 +11,8 @@ import {
 } from './utils'
 import { ScreenSaver } from './screen-saver'
 import { RefreshButton } from './refresh-button'
-import { PasswordForm } from 'app/cal/password-form'
-import { auth, isMax } from 'app/auth'
+import { PasswordForm } from '../cal/password-form'
+import { auth, isMax } from '../../auth'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
