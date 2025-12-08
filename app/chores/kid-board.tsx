@@ -568,7 +568,15 @@ function KidColumn({
         boxShadow: `0 14px 40px -22px ${accentSoft}, inset 0 1px 0 ${accentSoft}`,
       }}
     >
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div
+        className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 py-1"
+        style={{
+          backgroundColor: accentSoft,
+          boxShadow: `0 10px 30px -25px ${accentColor}`,
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
+        }}
+      >
         <button
           type="button"
           onClick={() => {
