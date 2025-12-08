@@ -193,15 +193,17 @@ export default async function Plan({
       </div>
       <CreateEventForm createEventAction={createEvent} />
       <div className="my-24">
-      <Link href="/cal/debug">Debug view →</Link>
-</div>
+        <Link href="/clippy/debug">Debug view →</Link>
+      </div>
       <details className="mt-24">
-      <summary className="mb-12">Click here to see the raw events list (↓ end date)</summary>
-      <EventList
-        events={events}
-        deleteEvent={deleteEvent}
-        updateEvent={updateEvent}
-      />
+        <summary className="mb-12">
+          Click here to see the raw events list (↓ end date)
+        </summary>
+        <EventList
+          events={events}
+          deleteEvent={deleteEvent}
+          updateEvent={updateEvent}
+        />
       </details>
     </>
   )
