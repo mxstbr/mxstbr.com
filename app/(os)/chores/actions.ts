@@ -134,6 +134,7 @@ export async function completeChore(formData: FormData): Promise<{ awarded: numb
       : new Date(`${targetDay}T12:00:00Z`).toISOString()
 
   let awarded = 0
+  let telegramMessage: string | null = null
 
   await withUpdatedState((state) => {
     const chore = state.chores.find((c) => c.id === choreId)
@@ -170,7 +171,19 @@ export async function completeChore(formData: FormData): Promise<{ awarded: numb
         chore.completedAt = completionTimestamp
       }
     }
+
+    const kid = state.kids.find((k) => k.id === kidId)
+    if (kid && process.env.TELEGRAM_BOT_TOKEN) {
+      const starTotal = starsForKid(state.completions, kidId)
+      telegramMessage = `${kid.name} completed "${chore.title}" (+${awarded} ⭐️, ${starTotal} ⭐️ total)`
+    }
   })
+
+  if (telegramMessage) {
+    bot.telegram
+      .sendMessage('-4904434425', telegramMessage)
+      .catch((err) => console.error('Failed to send Telegram completion message', err))
+  }
 
   return { awarded }
 }
@@ -185,6 +198,7 @@ export async function undoChore(formData: FormData): Promise<{ delta: number }> 
 
   let delta = 0
   const targetDay = parseIsoDay(formData.get('day')) ?? todayIsoDate()
+  let telegramMessage: string | null = null
 
   await withUpdatedState((state) => {
     const chore = state.chores.find((c) => c.id === choreId)
@@ -225,7 +239,19 @@ export async function undoChore(formData: FormData): Promise<{ delta: number }> 
         chore.completedAt = null
       }
     }
+
+    const kid = state.kids.find((k) => k.id === kidId)
+    if (kid && process.env.TELEGRAM_BOT_TOKEN) {
+      const starTotal = starsForKid(state.completions, kidId)
+      telegramMessage = `${kid.name} undid "${chore.title}" (${delta} ⭐️, ${starTotal} ⭐️ total)`
+    }
   })
+
+  if (telegramMessage) {
+    bot.telegram
+      .sendMessage('-4904434425', telegramMessage)
+      .catch((err) => console.error('Failed to send Telegram undo message', err))
+  }
 
   return { delta }
 }
