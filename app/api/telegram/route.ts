@@ -17,7 +17,6 @@ export async function POST(request: NextRequest) {
   if ('message' in update) {
     const message = update.message
     const chatId = message.chat.id
-    const toolStatuses: { name: string; success: boolean }[] = []
 
     try {
       const result = await clippy.generate({
@@ -32,22 +31,41 @@ export async function POST(request: NextRequest) {
         ],
       })
 
-      toolStatuses.push({ name: 'clippy.generate', success: true })
+      // Extract tool calls from the result steps
+      const allToolCalls =
+        result.steps?.flatMap((step) => step.toolCalls || []) || []
 
-      // Only send a response if clippy generated one
+      // Only send a response if clippy generated one or if there were tool calls
       if (result.text && result.text.trim()) {
-        const toolDetails = toolStatuses
-          .map(({ name, success }) => `- ${name}: ${success ? 'success' : 'failed'}`)
-          .join('\n')
+        let toolDetails = ''
+        if (allToolCalls.length > 0) {
+          toolDetails =
+            '\n\nTools called:\n' +
+            allToolCalls
+              .map((tc) => {
+                const input = 'input' in tc ? tc.input : {}
+                const argsStr = JSON.stringify(input, null, 2)
+                return `- ${tc.toolName}: success\n  Args: ${argsStr}`
+              })
+              .join('\n')
+        }
 
-        const responseText = dedent`
-          ${result.text.trim()}
-
-          Tools called:
-          ${toolDetails}
-        `
+        const responseText = `${result.text.trim()}${toolDetails}`
 
         await bot.telegram.sendMessage(chatId, responseText)
+      } else if (allToolCalls.length > 0) {
+        // Send tool calls even if no text response
+        const toolDetails =
+          'Tools called:\n' +
+          allToolCalls
+            .map((tc) => {
+              const input = 'input' in tc ? tc.input : {}
+              const argsStr = JSON.stringify(input, null, 2)
+              return `- ${tc.toolName}: success\n  Args: ${argsStr}`
+            })
+            .join('\n')
+
+        await bot.telegram.sendMessage(chatId, toolDetails)
       }
     } catch (error) {
       console.error('Error processing Telegram message:', error)
