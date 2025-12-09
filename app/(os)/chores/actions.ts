@@ -1,6 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { headers } from 'next/headers'
 import {
   Chore,
   ChoreState,
@@ -69,14 +70,24 @@ function parseIsoDay(value: FormDataEntryValue | null): string | null {
   return /^\d{4}-\d{2}-\d{2}$/.test(raw) ? raw : null
 }
 
-function getBaseUrl(): string {
+async function getBaseUrl(): Promise<string> {
   if (process.env.SITE_URL) return process.env.SITE_URL
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
+
+  const headerList = await headers()
+  const forwardedProto = headerList.get('x-forwarded-proto') ?? 'https'
+  const forwardedHost = headerList.get('x-forwarded-host')
+  if (forwardedHost) return `${forwardedProto}://${forwardedHost}`
+
+  const host = headerList.get('host')
+  const proto = headerList.get('x-forwarded-proto') ?? 'http'
+  if (host) return `${proto}://${host}`
+
   return 'http://localhost:3000'
 }
 
-function approvalUrl(choreId: string, kidId: string, dayIso: string): string {
-  const baseUrl = getBaseUrl()
+async function approvalUrl(choreId: string, kidId: string, dayIso: string): Promise<string> {
+  const baseUrl = await getBaseUrl()
   const url = new URL(`/chores/approve/${encodeURIComponent(choreId)}`, baseUrl)
   url.searchParams.set('kidId', kidId)
   url.searchParams.set('day', dayIso)
@@ -259,19 +270,16 @@ export async function requestApproval(formData: FormData): Promise<{ ok: boolean
     return { ok: false, error: 'Telegram is not configured' }
   }
 
-  const link = approvalUrl(chore.id, kid.id, targetDay)
+  const link = await approvalUrl(chore.id, kid.id, targetDay)
+  if (link.includes('localhost') && process.env.NODE_ENV === 'production') {
+    console.error('Approval link resolved to localhost in production, not sending')
+    return { ok: false, error: 'Invalid approval link' }
+  }
   const dayLabel = targetDay === todayIsoDate() ? 'today' : targetDay
+  const message = `${kid.name} requested approval for "${chore.title}" (${dayLabel}).\nApprove: ${link}`
 
   try {
-    await bot.telegram.sendMessage(
-      '-4904434425',
-      `${kid.name} requested approval for "${chore.title}" (${dayLabel}).`,
-      {
-        reply_markup: {
-          inline_keyboard: [[{ text: 'Approve chore ✅', url: link }]],
-        },
-      },
-    )
+    await bot.telegram.sendMessage('-4904434425', message)
   } catch (error) {
     console.error('Failed to send Telegram approval request', error)
     return { ok: false, error: 'Could not send approval request' }
