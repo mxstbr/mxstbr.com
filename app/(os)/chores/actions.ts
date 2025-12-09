@@ -200,9 +200,12 @@ async function applyCompletion({
   }
 
   if (telegramMessage) {
-    const message = undoLink ? `${telegramMessage}\nUndo: ${undoLink}` : telegramMessage
+    const keyboard = undoLink
+      ? { reply_markup: { inline_keyboard: [[{ text: 'Undo', url: undoLink }]] } }
+      : undefined
+
     bot.telegram
-      .sendMessage('-4904434425', message)
+      .sendMessage('-4904434425', telegramMessage, keyboard)
       .catch((err) => console.error('Failed to send Telegram completion message', err))
   }
 
@@ -305,10 +308,12 @@ export async function requestApproval(formData: FormData): Promise<{ ok: boolean
     return { ok: false, error: 'Invalid approval link' }
   }
   const dayLabel = targetDay === todayIsoDate() ? 'today' : targetDay
-  const message = `${kid.name} requested approval for "${chore.title}" (${dayLabel}).\nApprove: ${link}`
+  const message = `${kid.name} requested approval for "${chore.title}" (${dayLabel}).`
 
   try {
-    await bot.telegram.sendMessage('-4904434425', message)
+    await bot.telegram.sendMessage('-4904434425', message, {
+      reply_markup: { inline_keyboard: [[{ text: 'Approve', url: link }]] },
+    })
   } catch (error) {
     console.error('Failed to send Telegram approval request', error)
     return { ok: false, error: 'Could not send approval request' }
