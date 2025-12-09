@@ -20,6 +20,7 @@ function todayIsoDate(): string {
 
 export type CompletionResult = {
   awarded: number
+  completionId?: string
   choreTitle?: string
   kidName?: string
   status: 'completed' | 'skipped' | 'invalid' | 'unauthorized'
@@ -94,6 +95,20 @@ async function approvalUrl(choreId: string, kidId: string, dayIso: string): Prom
   return url.toString()
 }
 
+async function undoUrl(
+  completionId: string,
+  choreId: string,
+  kidId: string,
+  dayIso: string,
+): Promise<string> {
+  const baseUrl = await getBaseUrl()
+  const url = new URL(`/chores/undo/${encodeURIComponent(completionId)}`, baseUrl)
+  url.searchParams.set('choreId', choreId)
+  url.searchParams.set('kidId', kidId)
+  url.searchParams.set('day', dayIso)
+  return url.toString()
+}
+
 async function applyCompletion({
   choreId,
   kidId,
@@ -109,6 +124,7 @@ async function applyCompletion({
       ? new Date().toISOString()
       : new Date(`${targetDay}T12:00:00Z`).toISOString()
   let telegramMessage: string | null = null
+  let undoLink: string | null = null
   let result: CompletionResult = {
     awarded: 0,
     status: 'invalid',
@@ -141,8 +157,10 @@ async function applyCompletion({
 
     const awarded = chore.stars
 
+    const completionId = crypto.randomUUID()
+
     state.completions.unshift({
-      id: crypto.randomUUID(),
+      id: completionId,
       choreId: chore.id,
       kidId,
       timestamp: completionTimestamp,
@@ -167,13 +185,24 @@ async function applyCompletion({
       awarded,
       choreTitle: chore.title,
       kidName: kid.name,
+      completionId,
       status: 'completed',
     }
   })
 
+  if (telegramMessage && result.completionId) {
+    const link = await undoUrl(result.completionId, choreId, kidId, targetDay)
+    if (link.includes('localhost') && process.env.NODE_ENV === 'production') {
+      console.error('Undo link resolved to localhost in production, not sending')
+    } else {
+      undoLink = link
+    }
+  }
+
   if (telegramMessage) {
+    const message = undoLink ? `${telegramMessage}\nUndo: ${undoLink}` : telegramMessage
     bot.telegram
-      .sendMessage('-4904434425', telegramMessage)
+      .sendMessage('-4904434425', message)
       .catch((err) => console.error('Failed to send Telegram completion message', err))
   }
 
@@ -288,21 +317,33 @@ export async function requestApproval(formData: FormData): Promise<{ ok: boolean
   return { ok: true }
 }
 
-export async function undoChore(formData: FormData): Promise<{ delta: number }> {
-  if (!(await isAuthorized())) return { delta: 0 }
+type UndoResult = {
+  choreTitle?: string
+  delta: number
+  kidName?: string
+  status: 'undone' | 'not_found' | 'invalid'
+}
 
-  const choreId = formData.get('choreId')?.toString()
-  const kidId = formData.get('kidId')?.toString()
-  const completionId = formData.get('completionId')?.toString()
-  if (!choreId || !kidId) return { delta: 0 }
-
-  let delta = 0
-  const targetDay = parseIsoDay(formData.get('day')) ?? todayIsoDate()
+async function applyUndo({
+  choreId,
+  completionId,
+  kidId,
+  targetDay,
+  notifyTelegram = true,
+}: {
+  choreId: string
+  completionId?: string | null
+  kidId: string
+  notifyTelegram?: boolean
+  targetDay: string
+}): Promise<UndoResult> {
   let telegramMessage: string | null = null
+  let result: UndoResult = { delta: 0, status: 'invalid' }
 
   await withUpdatedState((state) => {
     const chore = state.chores.find((c) => c.id === choreId)
-    if (!chore) return
+    const kid = state.kids.find((k) => k.id === kidId)
+    if (!chore || !kid) return
 
     const matchesDay = (entry: (typeof state.completions)[number]) =>
       pacificDateFromTimestamp(entry.timestamp) === targetDay
@@ -326,10 +367,13 @@ export async function undoChore(formData: FormData): Promise<{ delta: number }> 
       )
     }
 
-    if (index === -1) return
+    if (index === -1) {
+      result = { delta: 0, status: 'not_found' }
+      return
+    }
 
     const [removed] = state.completions.splice(index, 1)
-    delta = -removed.starsAwarded
+    const delta = -removed.starsAwarded
 
     if (chore.type === 'one-off') {
       const allDone = chore.kidIds.every((id) =>
@@ -340,20 +384,55 @@ export async function undoChore(formData: FormData): Promise<{ delta: number }> 
       }
     }
 
-    const kid = state.kids.find((k) => k.id === kidId)
-    if (kid && process.env.TELEGRAM_BOT_TOKEN) {
-      const starTotal = starsForKid(state.completions, kidId)
+    const starTotal = starsForKid(state.completions, kidId)
+
+    if (process.env.TELEGRAM_BOT_TOKEN) {
       telegramMessage = `${kid.name} undid "${chore.title}" (${delta} ⭐️, ${starTotal} ⭐️ total)`
+    }
+
+    result = {
+      choreTitle: chore.title,
+      delta,
+      kidName: kid.name,
+      status: 'undone',
     }
   })
 
-  if (telegramMessage) {
+  if (telegramMessage && notifyTelegram) {
     bot.telegram
       .sendMessage('-4904434425', telegramMessage)
       .catch((err) => console.error('Failed to send Telegram undo message', err))
   }
 
-  return { delta }
+  return result
+}
+
+export async function undoChore(formData: FormData): Promise<{ delta: number }> {
+  if (!(await isAuthorized())) return { delta: 0 }
+
+  const choreId = formData.get('choreId')?.toString()
+  const kidId = formData.get('kidId')?.toString()
+  const completionId = formData.get('completionId')?.toString()
+  if (!choreId || !kidId) return { delta: 0 }
+
+  const targetDay = parseIsoDay(formData.get('day')) ?? todayIsoDate()
+  const result = await applyUndo({ choreId, kidId, completionId, targetDay })
+
+  return { delta: result.delta }
+}
+
+export async function undoChoreViaLink({
+  choreId,
+  completionId,
+  kidId,
+  targetDay,
+}: {
+  choreId: string
+  completionId?: string | null
+  kidId: string
+  targetDay: string
+}): Promise<UndoResult> {
+  return applyUndo({ choreId, kidId, completionId, targetDay })
 }
 
 export async function setPause(formData: FormData): Promise<void> {
