@@ -163,6 +163,31 @@ function normalizeMessages(value: any): any[] {
   return []
 }
 
+function getToolResultPreview(content: any) {
+  const truncate = (value: string) => {
+    const singleLine = value.replace(/\s+/g, ' ').trim()
+    return singleLine.length > 120 ? `${singleLine.slice(0, 120)}…` : singleLine
+  }
+
+  if (typeof content === 'string') return truncate(content)
+
+  if (Array.isArray(content) && content.length) {
+    const first = content[0]
+    if (typeof first === 'string') return truncate(first)
+    if (typeof first?.text === 'string') return truncate(first.text)
+  }
+
+  if (content && typeof content === 'object') {
+    if (typeof content.text === 'string') return truncate(content.text)
+    if (typeof content.message === 'string') return truncate(content.message)
+    try {
+      return truncate(JSON.stringify(content))
+    } catch (e) {}
+  }
+
+  return 'View result'
+}
+
 function parseLogStep(log: any): LogStep | undefined {
   if (!log) return undefined
   if (typeof log === 'object') return log as LogStep
@@ -558,14 +583,19 @@ export default async function DebugPage({ searchParams }: DebugPageProps) {
                           {isTool && (
                             <div className="whitespace-pre-wrap flex justify-start">
                               <div className="max-w-full px-4 py-2 rounded-lg shadow-sm border text-sm bg-slate-100 text-slate-900 border-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700">
-                                <div className="font-semibold mb-1 opacity-70 text-xs">
-                                  Tool Result
-                                </div>
-                                <div className="my-2 p-2 rounded bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 text-green-900 dark:text-green-100">
-                                  <div className="flex items-start gap-2">
-                                    <div className="flex-1">{renderContent(content, index)}</div>
+                                <details className="space-y-2">
+                                  <summary className="flex items-start justify-between gap-2 cursor-pointer font-semibold text-xs opacity-70">
+                                    <span>Tool Result</span>
+                                    <span className="text-[11px] font-normal text-gray-500 max-w-[260px] truncate">
+                                      {getToolResultPreview(content)}
+                                    </span>
+                                  </summary>
+                                  <div className="my-2 p-2 rounded bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 text-green-900 dark:text-green-100">
+                                    <div className="flex items-start gap-2">
+                                      <div className="flex-1">{renderContent(content, index)}</div>
+                                    </div>
                                   </div>
-                                </div>
+                                </details>
                               </div>
                             </div>
                           )}

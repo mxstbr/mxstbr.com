@@ -93,7 +93,7 @@ async function persistConversationStep(stepResult: any) {
   const parsedMeta =
     typeof existingMeta === 'string'
       ? JSON.parse(existingMeta)
-      : existingMeta ?? {}
+      : (existingMeta ?? {})
 
   const createdAt =
     (typeof parsedMeta?.createdAt === 'number' && parsedMeta.createdAt) ||
@@ -181,7 +181,7 @@ ${JSON.stringify(
 </PRESETS>`
 
 export const clippy = new Agent({
-  model: openai('gpt-4o-mini'),
+  model: openai('gpt-5-mini'),
   system: SYSTEM_PROMPT(new Date()),
   tools: {
     ...calendarTools,
