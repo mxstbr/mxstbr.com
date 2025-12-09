@@ -18,6 +18,7 @@ import type { Chore, Completion, Kid } from './data'
 import { completeChore, setKidColor, skipChore, undoChore } from './actions'
 import {
   msUntilNextPacificMidnight,
+  pacificTimeInMinutes,
   sortByTimeOfDay,
   starsForKid,
   withAlpha,
@@ -58,7 +59,21 @@ type ApprovalRequest = {
   onReward?: () => void
 }
 
+type TimeGroupKey = 'morning' | 'afternoon' | 'evening' | 'any'
+
 const REWARD_TARGET_ID = 'chores-reward-target'
+const RECOLLAPSE_IDLE_MS = 45_000
+
+function shouldAutoCollapse(
+  mode: KidBoardProps['mode'],
+  minutes: number,
+  key: TimeGroupKey,
+): boolean {
+  if (mode !== 'today') return false
+  if (key === 'morning') return minutes >= 12 * 60
+  if (key === 'afternoon') return minutes >= 18 * 60
+  return false
+}
 
 export function KidBoard({
   columns,
@@ -86,6 +101,9 @@ export function KidBoard({
     useState<ApprovalRequest | null>(null)
   const [pinValue, setPinValue] = useState('')
   const [pinError, setPinError] = useState('')
+  const [pacificMinutes, setPacificMinutes] = useState(() =>
+    pacificTimeInMinutes(),
+  )
   const [activeKidId, setActiveKidId] = useState<string>(
     selectedKidId && columns.some((c) => c.kid.id === selectedKidId)
       ? selectedKidId
@@ -95,6 +113,13 @@ export function KidBoard({
   useEffect(() => {
     setTotals(initialTotals)
   }, [initialTotals])
+
+  useEffect(() => {
+    const refreshMinutes = () => setPacificMinutes(pacificTimeInMinutes())
+    const id = window.setInterval(refreshMinutes, 60_000)
+    refreshMinutes()
+    return () => window.clearInterval(id)
+  }, [])
 
   useEffect(() => {
     let timeoutId: number
@@ -313,6 +338,8 @@ export function KidBoard({
             starTotal={totals[mobileColumn.kid.id] ?? 0}
             onComplete={beginCompletion}
             onUndo={handleUndo}
+            mode={mode}
+            pacificMinutes={pacificMinutes}
           />
         ) : null}
       </div>
@@ -326,6 +353,8 @@ export function KidBoard({
             starTotal={totals[column.kid.id] ?? 0}
             onComplete={beginCompletion}
             onUndo={handleUndo}
+            mode={mode}
+            pacificMinutes={pacificMinutes}
           />
         ))}
       </div>
@@ -470,6 +499,8 @@ function KidColumn({
   starTotal,
   onComplete,
   onUndo,
+  mode,
+  pacificMinutes,
   disableCompletion = false,
 }: {
   kid: Kid
@@ -487,6 +518,8 @@ function KidColumn({
     completionId: string,
     kidId: string,
   ) => Promise<void> | void
+  mode: KidBoardProps['mode']
+  pacificMinutes: number
   disableCompletion?: boolean
 }) {
   const router = useRouter()
@@ -507,25 +540,110 @@ function KidColumn({
     '#f472b6',
     '#6366f1',
   ]
-  const timeGroups: {
-    key: 'morning' | 'afternoon' | 'evening' | 'any'
-    label: string
-    emoji?: string
-  }[] = [
-    { key: 'morning', label: 'Morning', emoji: '🌅' },
-    { key: 'afternoon', label: 'Afternoon', emoji: '☀️' },
-    { key: 'evening', label: 'Evening', emoji: '🌙' },
-    { key: 'any', label: 'Any time' },
-  ]
-  const choresByTime: Record<
-    'morning' | 'afternoon' | 'evening' | 'any',
-    Chore[]
-  > = {
+  const timeGroups = useMemo<
+    { key: TimeGroupKey; label: string; emoji?: string }[]
+  >(
+    () => [
+      { key: 'morning', label: 'Morning', emoji: '🌅' },
+      { key: 'afternoon', label: 'Afternoon', emoji: '☀️' },
+      { key: 'evening', label: 'Evening', emoji: '🌙' },
+      { key: 'any', label: 'Any time' },
+    ],
+    [],
+  )
+  const [collapsedGroups, setCollapsedGroups] = useState<
+    Record<TimeGroupKey, boolean>
+  >(() => {
+    const initial: Record<TimeGroupKey, boolean> = {
+      morning: false,
+      afternoon: false,
+      evening: false,
+      any: false,
+    }
+    for (const group of timeGroups) {
+      initial[group.key] = shouldAutoCollapse(
+        mode,
+        pacificMinutes,
+        group.key,
+      )
+    }
+    return initial
+  })
+  const manualExpansions = useRef<Set<TimeGroupKey>>(new Set())
+  const recollapseTimer = useRef<number>()
+  const choresByTime: Record<TimeGroupKey, Chore[]> = {
     morning: [],
     afternoon: [],
     evening: [],
     any: [],
   }
+
+  const scheduleRecollapse = useCallback(() => {
+    if (recollapseTimer.current) {
+      window.clearTimeout(recollapseTimer.current)
+    }
+
+    const needsRecollapse = Array.from(manualExpansions.current).some((key) =>
+      shouldAutoCollapse(mode, pacificMinutes, key),
+    )
+    if (!needsRecollapse) return
+
+    recollapseTimer.current = window.setTimeout(() => {
+      setCollapsedGroups((prev) => {
+        let changed = false
+        const next = { ...prev }
+        for (const key of Array.from(manualExpansions.current)) {
+          if (shouldAutoCollapse(mode, pacificMinutes, key) && !next[key]) {
+            next[key] = true
+            changed = true
+          }
+        }
+        manualExpansions.current.clear()
+        return changed ? next : prev
+      })
+    }, RECOLLAPSE_IDLE_MS)
+  }, [mode, pacificMinutes])
+
+  useEffect(() => {
+    setCollapsedGroups((prev) => {
+      let changed = false
+      const next = { ...prev }
+      for (const group of timeGroups) {
+        const autoCollapse = shouldAutoCollapse(
+          mode,
+          pacificMinutes,
+          group.key,
+        )
+        if (!autoCollapse) {
+          manualExpansions.current.delete(group.key)
+          continue
+        }
+        if (manualExpansions.current.has(group.key)) continue
+        if (!next[group.key]) {
+          next[group.key] = true
+          changed = true
+        }
+      }
+      return changed ? next : prev
+    })
+  }, [mode, pacificMinutes, timeGroups])
+
+  useEffect(() => {
+    const events = ['click', 'keydown', 'pointermove', 'touchstart']
+    const handleInteraction = () => scheduleRecollapse()
+    events.forEach((event) =>
+      window.addEventListener(event, handleInteraction, { passive: true }),
+    )
+    scheduleRecollapse()
+    return () => {
+      if (recollapseTimer.current) {
+        window.clearTimeout(recollapseTimer.current)
+      }
+      events.forEach((event) =>
+        window.removeEventListener(event, handleInteraction),
+      )
+    }
+  }, [scheduleRecollapse])
 
   useEffect(() => {
     setAccentOverride(accent)
@@ -546,6 +664,20 @@ function KidColumn({
     } finally {
       setIsSavingColor(false)
     }
+  }
+
+  const toggleGroup = (key: TimeGroupKey) => {
+    setCollapsedGroups((prev) => {
+      const nextCollapsed = !prev[key]
+      const next = { ...prev, [key]: nextCollapsed }
+      if (!nextCollapsed && shouldAutoCollapse(mode, pacificMinutes, key)) {
+        manualExpansions.current.add(key)
+      } else if (nextCollapsed) {
+        manualExpansions.current.delete(key)
+      }
+      return next
+    })
+    scheduleRecollapse()
   }
 
   for (const chore of chores) {
@@ -607,28 +739,51 @@ function KidColumn({
               items: choresByTime[group.key],
             }))
             .filter((group) => group.items.length > 0)
-            .map((group) => (
-              <div key={group.key} className="space-y-2">
-                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-                  {group.emoji ? (
-                    <span aria-hidden="true">{group.emoji}</span>
+            .map((group) => {
+              const collapsed = collapsedGroups[group.key]
+              return (
+                <div key={group.key} className="space-y-2">
+                  <button
+                    type="button"
+                    onClick={() => toggleGroup(group.key)}
+                    className="flex w-full items-center gap-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 transition hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100"
+                    aria-expanded={!collapsed}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={`text-base text-slate-500 transition-transform ${
+                        collapsed ? '' : 'rotate-90'
+                      }`}
+                    >
+                      &gt;
+                    </span>
+                    {group.emoji ? (
+                      <span aria-hidden="true">{group.emoji}</span>
+                    ) : null}
+                    <span>{group.label}</span>
+                    {collapsed ? (
+                      <span className="ml-auto text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                        {group.items.length} left
+                      </span>
+                    ) : null}
+                  </button>
+                  {!collapsed ? (
+                    <div className="space-y-3">
+                      {group.items.map((chore) => (
+                        <ChoreButton
+                          key={chore.id}
+                          chore={chore}
+                          accent={accentColor}
+                          kidId={kid.id}
+                          onComplete={onComplete}
+                          disabled={disableCompletion}
+                        />
+                      ))}
+                    </div>
                   ) : null}
-                  <span>{group.label}</span>
                 </div>
-                <div className="space-y-3">
-                  {group.items.map((chore) => (
-                    <ChoreButton
-                      key={chore.id}
-                      chore={chore}
-                      accent={accentColor}
-                      kidId={kid.id}
-                      onComplete={onComplete}
-                      disabled={disableCompletion}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))
+              )
+            })
         )}
       </div>
 

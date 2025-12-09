@@ -89,7 +89,7 @@ export function pacificDateFromTimestamp(timestamp: string): string {
 const NIGHT_START_MINUTES = 19 * 60 + 45
 const MORNING_START_MINUTES = 7 * 60
 
-function pacificTimeInMinutes(date: Date): number {
+export function pacificTimeInMinutes(date: Date = new Date()): number {
   const parts = pacificDateTimeFormatter.formatToParts(date)
   const hour = Number(parts.find((part) => part.type === 'hour')?.value ?? '0')
   const minute = Number(parts.find((part) => part.type === 'minute')?.value ?? '0')
