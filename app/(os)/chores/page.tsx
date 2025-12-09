@@ -145,7 +145,7 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
     >
       <div className="mb-5 text-sm md:mb-6">
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
-          <div className="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white p-1 pr-3 text-xs font-semibold text-slate-800 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
+          <div className="inline-flex w-fit justify-self-start items-center gap-2 rounded-md border border-slate-300 bg-white p-1 pr-3 text-xs font-semibold text-slate-800 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
             <Link
               href={choresHref(prevDay)}
               prefetch
