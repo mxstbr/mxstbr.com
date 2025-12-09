@@ -57,10 +57,15 @@ type ApprovalRequest = {
   onReward?: () => void
 }
 
+type ApprovalRequestLookup = Record<string, Record<string, boolean>>
+
 type TimeGroupKey = 'morning' | 'afternoon' | 'evening' | 'any'
 
 const REWARD_TARGET_ID = 'chores-reward-target'
 const RECOLLAPSE_IDLE_MS = 45_000
+const APPROVAL_REQUESTS_KEY = 'chores:approval-requests'
+
+const approvalRequestKey = (kidId: string, choreId: string) => `${kidId}:${choreId}`
 
 function shouldAutoCollapse(
   mode: KidBoardProps['mode'],
@@ -101,6 +106,8 @@ export function KidBoard({
     'pending' | 'sent' | 'error' | ''
   >('')
   const [approvalError, setApprovalError] = useState('')
+  const [approvalRequests, setApprovalRequests] =
+    useState<ApprovalRequestLookup>({})
   const [pacificMinutes, setPacificMinutes] = useState(() =>
     pacificTimeInMinutes(),
   )
@@ -113,6 +120,21 @@ export function KidBoard({
   useEffect(() => {
     setTotals(initialTotals)
   }, [initialTotals])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const stored = window.localStorage.getItem(APPROVAL_REQUESTS_KEY)
+    if (!stored) return
+
+    try {
+      const parsed = JSON.parse(stored)
+      if (parsed && typeof parsed === 'object') {
+        setApprovalRequests(parsed)
+      }
+    } catch (error) {
+      console.error('Failed to read approval requests', error)
+    }
+  }, [])
 
   useEffect(() => {
     const refreshMinutes = () => setPacificMinutes(pacificTimeInMinutes())
@@ -146,6 +168,31 @@ export function KidBoard({
     const id = window.setInterval(refresh, 60_000)
     return () => window.clearInterval(id)
   }, [router])
+
+  const markApprovalRequestSent = useCallback((request: ApprovalRequest) => {
+    setApprovalRequests((prev) => {
+      const key = approvalRequestKey(request.kidId, request.chore.id)
+      const approvalsForDay = prev[request.dayIso] ?? {}
+      if (approvalsForDay[key]) return prev
+
+      const nextForDay = { ...approvalsForDay, [key]: true }
+      const next = { ...prev, [request.dayIso]: nextForDay }
+
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(APPROVAL_REQUESTS_KEY, JSON.stringify(next))
+      }
+
+      return next
+    })
+  }, [])
+
+  const approvalRequestedForDay = useCallback(
+    (choreId: string, kidId: string, targetDay: string) => {
+      const key = approvalRequestKey(kidId, choreId)
+      return Boolean(approvalRequests[targetDay]?.[key])
+    },
+    [approvalRequests],
+  )
 
   useEffect(() => {
     if (mode === 'today') return
@@ -230,12 +277,13 @@ export function KidBoard({
       const response = await requestApproval(formData)
       if (response?.ok) {
         setApprovalStatus('sent')
+        markApprovalRequestSent(request)
       } else {
         setApprovalStatus('error')
         setApprovalError(response?.error ?? 'Unable to send approval request.')
       }
     },
-    [],
+    [markApprovalRequestSent],
   )
 
   const beginCompletion = async (
@@ -252,6 +300,18 @@ export function KidBoard({
     }
     const needsApproval = chore.requiresApproval || mode === 'future'
     if (needsApproval) {
+      if (approvalRequestedForDay(chore.id, kidId, targetDay)) {
+        setApprovalRequest({
+          chore,
+          kidId,
+          accent,
+          dayIso: targetDay,
+          reason: mode === 'future' ? 'future' : 'requiresApproval',
+          onReward,
+        })
+        setApprovalStatus('sent')
+        return
+      }
       const request: ApprovalRequest = {
         chore,
         kidId,
@@ -303,6 +363,7 @@ export function KidBoard({
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
   }
 
+  const approvalRequestsForDay = approvalRequests[dayIso] ?? {}
   const mobileColumn =
     columns.find((col) => col.kid.id === activeKidId) ?? columns[0]
 
@@ -338,6 +399,7 @@ export function KidBoard({
             onUndo={handleUndo}
             mode={mode}
             pacificMinutes={pacificMinutes}
+            approvalRequestsForDay={approvalRequestsForDay}
           />
         ) : null}
       </div>
@@ -353,6 +415,7 @@ export function KidBoard({
             onUndo={handleUndo}
             mode={mode}
             pacificMinutes={pacificMinutes}
+            approvalRequestsForDay={approvalRequestsForDay}
           />
         ))}
       </div>
@@ -488,6 +551,7 @@ function KidColumn({
   onUndo,
   mode,
   pacificMinutes,
+  approvalRequestsForDay,
   disableCompletion = false,
 }: {
   kid: Kid
@@ -507,6 +571,7 @@ function KidColumn({
   ) => Promise<void> | void
   mode: KidBoardProps['mode']
   pacificMinutes: number
+  approvalRequestsForDay: Record<string, boolean>
   disableCompletion?: boolean
 }) {
   const router = useRouter()
@@ -764,6 +829,11 @@ function KidColumn({
                           kidId={kid.id}
                           onComplete={onComplete}
                           disabled={disableCompletion}
+                          approvalRequested={
+                            approvalRequestsForDay[
+                              approvalRequestKey(kid.id, chore.id)
+                            ] ?? false
+                          }
                         />
                       ))}
                     </div>
@@ -887,6 +957,7 @@ function ChoreButton({
   accent,
   onComplete,
   kidId,
+  approvalRequested = false,
   disabled = false,
 }: {
   chore: FreshChore
@@ -898,6 +969,7 @@ function ChoreButton({
     accent: string,
     onReward?: () => void,
   ) => Promise<void> | void
+  approvalRequested?: boolean
   disabled?: boolean
 }) {
   const [isPending, startTransition] = useTransition()
@@ -934,7 +1006,7 @@ function ChoreButton({
     '--accent': accent,
     '--accent-soft': accentSoft,
   } as CSSProperties
-  const completionDisabled = isPending || disabled
+  const completionDisabled = isPending || disabled || approvalRequested
 
   const performSkip = () => {
     if (isSkipping) return
@@ -1102,7 +1174,11 @@ function ChoreButton({
         }
         className="group flex w-full items-start gap-3 px-3 py-3 text-left text-slate-900 transition active:bg-[var(--accent-soft)] focus-visible:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:text-slate-50 dark:active:bg-[var(--accent-soft)] dark:focus-visible:bg-[var(--accent-soft)] xl:gap-4 xl:px-4 xl:py-4"
         disabled={completionDisabled || isAnimating}
-        aria-label={`Mark "${chore.title}" as done`}
+        aria-label={
+          approvalRequested
+            ? `Waiting for approval on "${chore.title}"`
+            : `Mark "${chore.title}" as done`
+        }
       >
         <div className="flex flex-col items-center gap-2">
           <span className="text-xl leading-none transition group-active:text-[var(--accent)] group-focus-visible:text-[var(--accent)] xl:text-3xl">
@@ -1115,12 +1191,20 @@ function ChoreButton({
           </div>
         </div>
       </button>
-      <div className="flex items-center justify-between border-t border-slate-200 px-3 py-1.5 text-xs font-semibold text-amber-700 dark:border-slate-700 dark:text-amber-200 xl:px-4">
-        <div className="flex items-center gap-2 text-sm font-semibold leading-none xl:text-base">
-          <div>+{chore.stars} stars</div>
-          {chore.requiresApproval ? (
-            <div className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800 dark:bg-amber-900/50 dark:text-amber-100">
-              🔐 Parent OK
+      <div className="flex items-start justify-between border-t border-slate-200 px-3 py-1.5 text-xs font-semibold text-amber-700 dark:border-slate-700 dark:text-amber-200 xl:px-4">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2 text-sm font-semibold leading-none xl:text-base">
+            <div>+{chore.stars} stars</div>
+            {chore.requiresApproval ? (
+              <div className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800 dark:bg-amber-900/50 dark:text-amber-100">
+                🔐 Parent OK
+              </div>
+            ) : null}
+          </div>
+          {approvalRequested ? (
+            <div className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-200">
+              <span aria-hidden="true">📨</span>
+              <span>Request sent to parents</span>
             </div>
           ) : null}
         </div>
