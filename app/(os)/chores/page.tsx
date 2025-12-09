@@ -144,7 +144,7 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
       className={`flex min-h-screen flex-col p-6 pb-20 md:h-screen md:overflow-y-hidden md:pb-6 ${backgroundClass}`}
     >
       <div className="mb-5 text-sm md:mb-6">
-        <div className="flex items-center gap-4">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
           <div className="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white p-1 pr-3 text-xs font-semibold text-slate-800 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
             <Link
               href={choresHref(prevDay)}
@@ -174,7 +174,7 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
               ›
             </Link>
           </div>
-          <div className="flex flex-1 justify-center text-base font-semibold text-slate-900 dark:text-slate-100">
+          <div className="flex justify-center text-base font-semibold text-slate-900 dark:text-slate-100">
             <h1>
               {readableDay}
               {viewingToday ? ' ✅' : ''}
