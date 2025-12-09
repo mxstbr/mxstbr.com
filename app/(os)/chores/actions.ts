@@ -17,6 +17,13 @@ function todayIsoDate(): string {
   return formatPacificDate(new Date())
 }
 
+export type CompletionResult = {
+  awarded: number
+  choreTitle?: string
+  kidName?: string
+  status: 'completed' | 'skipped' | 'invalid' | 'unauthorized'
+}
+
 async function isAuthorized(): Promise<boolean> {
   return isMax()
 }
@@ -60,6 +67,106 @@ function parseIsoDay(value: FormDataEntryValue | null): string | null {
   const raw = value.toString().trim()
   if (!raw) return null
   return /^\d{4}-\d{2}-\d{2}$/.test(raw) ? raw : null
+}
+
+function getBaseUrl(): string {
+  if (process.env.SITE_URL) return process.env.SITE_URL
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
+  return 'http://localhost:3000'
+}
+
+function approvalUrl(choreId: string, kidId: string, dayIso: string): string {
+  const baseUrl = getBaseUrl()
+  const url = new URL(`/chores/approve/${encodeURIComponent(choreId)}`, baseUrl)
+  url.searchParams.set('kidId', kidId)
+  url.searchParams.set('day', dayIso)
+  return url.toString()
+}
+
+async function applyCompletion({
+  choreId,
+  kidId,
+  targetDay,
+}: {
+  choreId: string
+  kidId: string
+  targetDay: string
+}): Promise<CompletionResult> {
+  const today = todayIsoDate()
+  const completionTimestamp =
+    targetDay === today
+      ? new Date().toISOString()
+      : new Date(`${targetDay}T12:00:00Z`).toISOString()
+  let telegramMessage: string | null = null
+  let result: CompletionResult = {
+    awarded: 0,
+    status: 'invalid',
+  }
+
+  await withUpdatedState((state) => {
+    const chore = state.chores.find((c) => c.id === choreId)
+    const kid = state.kids.find((k) => k.id === kidId)
+    if (!chore || !kid) return
+    if (!chore.kidIds.includes(kidId)) return
+
+    result = {
+      awarded: 0,
+      choreTitle: chore.title,
+      kidName: kid.name,
+      status: 'skipped',
+    }
+
+    const alreadyCompletedToday =
+      chore.type === 'repeated' &&
+      state.completions.some(
+        (completion) =>
+          completion.choreId === chore.id &&
+          completion.kidId === kidId &&
+          pacificDateFromTimestamp(completion.timestamp) === targetDay,
+      )
+
+    if (chore.type === 'one-off' && chore.completedAt) return
+    if (alreadyCompletedToday) return
+
+    const awarded = chore.stars
+
+    state.completions.unshift({
+      id: crypto.randomUUID(),
+      choreId: chore.id,
+      kidId,
+      timestamp: completionTimestamp,
+      starsAwarded: chore.stars,
+    })
+
+    if (chore.type === 'one-off') {
+      const allDone = chore.kidIds.every((id) =>
+        state.completions.some((completion) => completion.choreId === chore.id && completion.kidId === id),
+      )
+      if (allDone) {
+        chore.completedAt = completionTimestamp
+      }
+    }
+
+    const starTotal = starsForKid(state.completions, kidId)
+    if (process.env.TELEGRAM_BOT_TOKEN) {
+      telegramMessage = `${kid.name} completed "${chore.title}" (+${awarded} ⭐️, ${starTotal} ⭐️ total)`
+    }
+
+    result = {
+      awarded,
+      choreTitle: chore.title,
+      kidName: kid.name,
+      status: 'completed',
+    }
+  })
+
+  if (telegramMessage) {
+    bot.telegram
+      .sendMessage('-4904434425', telegramMessage)
+      .catch((err) => console.error('Failed to send Telegram completion message', err))
+  }
+
+  return result
 }
 
 export async function addChore(formData: FormData): Promise<void> {
@@ -118,74 +225,59 @@ export async function addChore(formData: FormData): Promise<void> {
   })
 }
 
-export async function completeChore(formData: FormData): Promise<{ awarded: number }> {
-  if (!(await isAuthorized())) return { awarded: 0 }
+export async function completeChore(formData: FormData): Promise<CompletionResult> {
+  if (!(await isAuthorized())) return { awarded: 0, status: 'unauthorized' }
 
   const choreId = formData.get('choreId')?.toString()
   const kidId = formData.get('kidId')?.toString()
-  if (!choreId || !kidId) return { awarded: 0 }
+  if (!choreId || !kidId) return { awarded: 0, status: 'invalid' }
 
-  const requestedDay = parseIsoDay(formData.get('day'))
-  const today = todayIsoDate()
-  const targetDay = requestedDay ?? today
-  const completionTimestamp =
-    targetDay === today
-      ? new Date().toISOString()
-      : new Date(`${targetDay}T12:00:00Z`).toISOString()
+  const targetDay = parseIsoDay(formData.get('day')) ?? todayIsoDate()
+  return applyCompletion({ choreId, kidId, targetDay })
+}
 
-  let awarded = 0
-  let telegramMessage: string | null = null
+export async function approveChoreViaLink(
+  choreId: string,
+  kidId: string,
+  targetDay: string,
+): Promise<CompletionResult> {
+  return applyCompletion({ choreId, kidId, targetDay })
+}
 
-  await withUpdatedState((state) => {
-    const chore = state.chores.find((c) => c.id === choreId)
-    if (!chore) return
-    if (!chore.kidIds.includes(kidId)) return
+export async function requestApproval(formData: FormData): Promise<{ ok: boolean; error?: string }> {
+  const choreId = formData.get('choreId')?.toString()
+  const kidId = formData.get('kidId')?.toString()
+  if (!choreId || !kidId) return { ok: false, error: 'Missing chore or kid' }
 
-    const alreadyCompletedToday =
-      chore.type === 'repeated' &&
-      state.completions.some(
-        (completion) =>
-          completion.choreId === chore.id &&
-          completion.kidId === kidId &&
-          pacificDateFromTimestamp(completion.timestamp) === targetDay,
-      )
+  const targetDay = parseIsoDay(formData.get('day')) ?? todayIsoDate()
+  const state = await getChoreState()
+  const chore = state.chores.find((c) => c.id === choreId)
+  const kid = state.kids.find((k) => k.id === kidId)
+  if (!chore || !kid) return { ok: false, error: 'Chore or kid not found' }
 
-    if (chore.type === 'one-off' && chore.completedAt) return
-    if (alreadyCompletedToday) return
-
-    awarded = chore.stars
-
-    state.completions.unshift({
-      id: crypto.randomUUID(),
-      choreId: chore.id,
-      kidId,
-      timestamp: completionTimestamp,
-      starsAwarded: chore.stars,
-    })
-
-    if (chore.type === 'one-off') {
-      const allDone = chore.kidIds.every((id) =>
-        state.completions.some((completion) => completion.choreId === chore.id && completion.kidId === id),
-      )
-      if (allDone) {
-        chore.completedAt = completionTimestamp
-      }
-    }
-
-    const kid = state.kids.find((k) => k.id === kidId)
-    if (kid && process.env.TELEGRAM_BOT_TOKEN) {
-      const starTotal = starsForKid(state.completions, kidId)
-      telegramMessage = `${kid.name} completed "${chore.title}" (+${awarded} ⭐️, ${starTotal} ⭐️ total)`
-    }
-  })
-
-  if (telegramMessage) {
-    bot.telegram
-      .sendMessage('-4904434425', telegramMessage)
-      .catch((err) => console.error('Failed to send Telegram completion message', err))
+  if (!process.env.TELEGRAM_BOT_TOKEN) {
+    return { ok: false, error: 'Telegram is not configured' }
   }
 
-  return { awarded }
+  const link = approvalUrl(chore.id, kid.id, targetDay)
+  const dayLabel = targetDay === todayIsoDate() ? 'today' : targetDay
+
+  try {
+    await bot.telegram.sendMessage(
+      '-4904434425',
+      `${kid.name} requested approval for "${chore.title}" (${dayLabel}).`,
+      {
+        reply_markup: {
+          inline_keyboard: [[{ text: 'Approve chore ✅', url: link }]],
+        },
+      },
+    )
+  } catch (error) {
+    console.error('Failed to send Telegram approval request', error)
+    return { ok: false, error: 'Could not send approval request' }
+  }
+
+  return { ok: true }
 }
 
 export async function undoChore(formData: FormData): Promise<{ delta: number }> {
