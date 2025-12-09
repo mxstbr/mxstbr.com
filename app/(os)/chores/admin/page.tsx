@@ -508,6 +508,7 @@ function ChoreCard({
           : 'Any time'
 
   const handleCompleteChore = async (formData: FormData) => {
+    'use server'
     await completeChore(formData)
   }
 
