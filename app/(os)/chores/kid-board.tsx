@@ -2,7 +2,6 @@
 
 import {
   type CSSProperties,
-  type FormEvent,
   useEffect,
   useMemo,
   useRef,
@@ -15,7 +14,7 @@ import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useReward } from 'react-rewards'
 import type { Chore, Completion, Kid } from './data'
-import { completeChore, setKidColor, skipChore, undoChore } from './actions'
+import { completeChore, requestApproval, setKidColor, skipChore, undoChore } from './actions'
 import {
   msUntilNextPacificMidnight,
   pacificTimeInMinutes,
@@ -23,7 +22,6 @@ import {
   starsForKid,
   withAlpha,
 } from './utils'
-import { PARENTAL_PIN } from './parental-pin'
 
 type FreshChore = Chore & { isNew?: boolean }
 
@@ -99,8 +97,10 @@ export function KidBoard({
   const [pending, setPending] = useState<PendingCompletion | null>(null)
   const [approvalRequest, setApprovalRequest] =
     useState<ApprovalRequest | null>(null)
-  const [pinValue, setPinValue] = useState('')
-  const [pinError, setPinError] = useState('')
+  const [approvalStatus, setApprovalStatus] = useState<
+    'pending' | 'sent' | 'error' | ''
+  >('')
+  const [approvalError, setApprovalError] = useState('')
   const [pacificMinutes, setPacificMinutes] = useState(() =>
     pacificTimeInMinutes(),
   )
@@ -217,7 +217,28 @@ export function KidBoard({
     }
   }
 
-  const beginCompletion = (
+  const sendApprovalRequest = useCallback(
+    async (request: ApprovalRequest) => {
+      const formData = new FormData()
+      formData.append('choreId', request.chore.id)
+      formData.append('kidId', request.kidId)
+      formData.append('day', request.dayIso)
+
+      setApprovalStatus('pending')
+      setApprovalError('')
+
+      const response = await requestApproval(formData)
+      if (response?.ok) {
+        setApprovalStatus('sent')
+      } else {
+        setApprovalStatus('error')
+        setApprovalError(response?.error ?? 'Unable to send approval request.')
+      }
+    },
+    [],
+  )
+
+  const beginCompletion = async (
     chore: FreshChore,
     kidId: string,
     accent: string,
@@ -231,48 +252,25 @@ export function KidBoard({
     }
     const needsApproval = chore.requiresApproval || mode === 'future'
     if (needsApproval) {
-      setApprovalRequest({
+      const request: ApprovalRequest = {
         chore,
         kidId,
         accent,
         dayIso: targetDay,
         reason: mode === 'future' ? 'future' : 'requiresApproval',
         onReward,
-      })
-      setPinValue('')
-      setPinError('')
+      }
+      setApprovalRequest(request)
+      void sendApprovalRequest(request)
       return
     }
-    void handleComplete(chore, kidId, accent, onReward, targetDay)
+    await handleComplete(chore, kidId, accent, onReward, targetDay)
   }
 
   const closeApprovalPrompt = () => {
     setApprovalRequest(null)
-    setPinValue('')
-    setPinError('')
-  }
-
-  const handlePinSubmit = async (event?: FormEvent<HTMLFormElement>) => {
-    event?.preventDefault()
-    if (!approvalRequest) return
-    const normalized = pinValue.trim()
-    if (normalized.length !== 4) {
-      setPinError('Enter all four digits.')
-      return
-    }
-    if (normalized !== PARENTAL_PIN) {
-      setPinError('Incorrect pin. Try again.')
-      return
-    }
-
-    await handleComplete(
-      approvalRequest.chore,
-      approvalRequest.kidId,
-      approvalRequest.accent,
-      approvalRequest.onReward,
-      approvalRequest.dayIso,
-    )
-    closeApprovalPrompt()
+    setApprovalStatus('')
+    setApprovalError('')
   }
 
   const handleUndo = async (
@@ -423,12 +421,9 @@ export function KidBoard({
                   Parent approval required
                 </h2>
                 <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
-                  Parents, please enter the pin to approve &quot;
-                  {approvalRequest.chore.title}&quot;
-                  {approvalRequest.reason === 'future'
-                    ? ` for ${dayLabel}`
-                    : ''}
-                  .
+                  We sent a request to approve &quot;{approvalRequest.chore.title}&quot;
+                  {approvalRequest.reason === 'future' ? ` for ${dayLabel}` : ''}.
+                  Parents can tap the Telegram button to complete it.
                 </p>
               </div>
               <button
@@ -440,33 +435,18 @@ export function KidBoard({
                 ×
               </button>
             </div>
-            <form onSubmit={handlePinSubmit} className="mt-4 space-y-3">
-              <label className="flex flex-col gap-2">
-                <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">
-                  Pin
-                </span>
-                <input
-                  type="password"
-                  inputMode="numeric"
-                  pattern="[0-9]{4}"
-                  maxLength={4}
-                  value={pinValue}
-                  onChange={(event) => {
-                    const next = event.target.value
-                      .replace(/[^0-9]/g, '')
-                      .slice(0, 4)
-                    setPinValue(next)
-                    setPinError('')
-                  }}
-                  className="rounded-md border border-slate-300 bg-white px-3 py-2 text-base font-semibold tracking-widest text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
-                  placeholder="1234"
-                  aria-label="Parental pin"
-                  autoFocus
-                />
-              </label>
-              {pinError ? (
-                <p className="text-xs font-semibold text-red-600 dark:text-red-400">
-                  {pinError}
+            <div className="mt-4 space-y-3 text-sm text-slate-700 dark:text-slate-200">
+              {approvalStatus === 'pending' ? (
+                <p>Sending approval request…</p>
+              ) : null}
+              {approvalStatus === 'sent' ? (
+                <p>
+                  Request sent! Check Telegram for a button to mark this chore as complete.
+                </p>
+              ) : null}
+              {approvalStatus === 'error' ? (
+                <p className="font-semibold text-red-600 dark:text-red-400">
+                  {approvalError || 'We could not send the request. Please try again.'}
                 </p>
               ) : null}
               <div className="flex flex-wrap justify-end gap-2">
@@ -475,16 +455,23 @@ export function KidBoard({
                   onClick={closeApprovalPrompt}
                   className="inline-flex items-center justify-center rounded-md border border-transparent px-3 py-2 text-xs font-semibold text-slate-600 transition active:text-slate-900 dark:text-slate-300"
                 >
-                  Cancel
+                  Close
                 </button>
-                <button
-                  type="submit"
-                  className="inline-flex items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition active:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:active:bg-slate-200"
-                >
-                  Submit pin
-                </button>
+                {approvalStatus === 'error' ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (approvalRequest) {
+                        void sendApprovalRequest(approvalRequest)
+                      }
+                    }}
+                    className="inline-flex items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition active:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:active:bg-slate-200"
+                  >
+                    Try again
+                  </button>
+                ) : null}
               </div>
-            </form>
+            </div>
           </div>
         </div>
       ) : null}
