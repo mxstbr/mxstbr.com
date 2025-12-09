@@ -23,7 +23,7 @@ export default function LogoWrapper() {
 
 // From: https://www.joshwcomeau.com/snippets/react-hooks/use-interval/
 function useInterval(callback: Function, delay: number) {
-  const intervalRef = useRef<number | undefined>()
+  const intervalRef = useRef<number | undefined>(undefined)
   const savedCallback = useRef(callback)
   useEffect(() => {
     savedCallback.current = callback

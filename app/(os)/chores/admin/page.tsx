@@ -507,6 +507,10 @@ function ChoreCard({
           ? 'Morning'
           : 'Any time'
 
+  const handleCompleteChore = async (formData: FormData) => {
+    await completeChore(formData)
+  }
+
   return (
     <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 shadow-sm dark:border-slate-700 dark:bg-slate-800/70">
       <div className="flex items-start justify-between gap-3">
@@ -528,7 +532,7 @@ function ChoreCard({
       </div>
 
       <div className="mt-3 flex flex-wrap gap-2">
-        <form action={completeChore}>
+        <form action={handleCompleteChore}>
           <input type="hidden" name="choreId" value={chore.id} />
           <input type="hidden" name="kidId" value={kid.id} />
           <button

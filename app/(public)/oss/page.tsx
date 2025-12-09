@@ -39,10 +39,17 @@ export const metadata: Metadata = {
 export default async function OSS() {
   const repos = await getRepos(ossProjects.map((project) => project.repo)).then(
     (repos) =>
-      repos.map((repo) => ({
-        ...ossProjects.find((project) => repo.nameWithOwner === project.repo),
-        ...repo,
-      })),
+      repos.map((repo) => {
+        const project = ossProjects.find(
+          (current) => current.repo === repo.nameWithOwner,
+        )
+
+        return {
+          ...project,
+          ...repo,
+          description: repo.description || project?.description || '',
+        }
+      }),
   )
 
   return (
