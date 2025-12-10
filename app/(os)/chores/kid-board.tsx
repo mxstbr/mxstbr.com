@@ -814,7 +814,7 @@ function KidColumn({
                     ) : null}
                     <span>{group.label}</span>
                     {collapsed ? (
-                      <span className="ml-auto text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                      <span className="ml-auto rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
                         {group.items.length} left
                       </span>
                     ) : null}
