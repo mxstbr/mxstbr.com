@@ -1,4 +1,4 @@
-import { getChoreState } from 'app/chores/data'
+import { getChoreState } from 'app/(os)/chores/data'
 import { createMcpHandler } from 'mcp-handler'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
