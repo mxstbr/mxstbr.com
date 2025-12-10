@@ -5,6 +5,8 @@ import { bot } from 'app/lib/telegram'
 import { clippy } from 'app/lib/clippy-agent'
 import { dedent } from 'app/lib/dedent'
 
+export const maxDuration = 60
+
 export async function POST(request: NextRequest) {
   if (
     request.headers.get('X-Telegram-Bot-Api-Secret-Token') !==
@@ -18,57 +20,55 @@ export async function POST(request: NextRequest) {
     const message = update.message
     const chatId = message.chat.id
 
+    let thinkingMessage
+
     try {
+      thinkingMessage = await bot.telegram.sendMessage(chatId, 'Thinking…')
+
+      const userContent =
+        ('text' in message && message.text) ||
+        ('caption' in message && message.caption) ||
+        ''
+
       const result = await clippy.generate({
         messages: [
           {
-            role: 'user',
+            role: 'system',
             content: dedent`
-              The following message was sent in a Telegram group chat between Maxie and Minnie.
-              Determine whether it is meant for you and, if so, respond to it. If not, do nothing.
+              You are Clippy, the assistant for Maxie and Minnie.
+              Treat every message sent in their Telegram chat as being addressed to you and reply accordingly.
+              Message details:
               <message>${JSON.stringify(message)}</message>`,
           },
+          { role: 'user', content: userContent },
         ],
       })
 
-      // Extract tool calls from the result steps
-      const allToolCalls =
-        result.steps?.flatMap((step) => step.toolCalls || []) || []
+      const responseText = result.text?.trim()
 
-      // Only send a response if clippy generated one or if there were tool calls
-      if (result.text && result.text.trim()) {
-        let toolDetails = ''
-        if (allToolCalls.length > 0) {
-          toolDetails =
-            '\n\nTools called:\n' +
-            allToolCalls
-              .map((tc) => {
-                const input = 'input' in tc ? tc.input : {}
-                const argsStr = JSON.stringify(input, null, 2)
-                return `- ${tc.toolName}: success\n  Args: ${argsStr}`
-              })
-              .join('\n')
-        }
-
-        const responseText = `${result.text.trim()}${toolDetails}`
-
-        await bot.telegram.sendMessage(chatId, responseText)
-      } else if (allToolCalls.length > 0) {
-        // Send tool calls even if no text response
-        const toolDetails =
-          'Tools called:\n' +
-          allToolCalls
-            .map((tc) => {
-              const input = 'input' in tc ? tc.input : {}
-              const argsStr = JSON.stringify(input, null, 2)
-              return `- ${tc.toolName}: success\n  Args: ${argsStr}`
-            })
-            .join('\n')
-
-        await bot.telegram.sendMessage(chatId, toolDetails)
-      }
+      await bot.telegram.editMessageText(
+        chatId,
+        thinkingMessage.message_id,
+        undefined,
+        responseText || 'Sorry, I could not generate a response.',
+      )
     } catch (error) {
       console.error('Error processing Telegram message:', error)
+
+      if (thinkingMessage) {
+        await bot.telegram
+          .editMessageText(
+            chatId,
+            thinkingMessage.message_id,
+            undefined,
+            'Sorry, something went wrong while generating a response.',
+          )
+          .catch(() => {})
+      } else {
+        await bot.telegram
+          .sendMessage(chatId, 'Sorry, something went wrong while generating a response.')
+          .catch(() => {})
+      }
       // Still return 200 to acknowledge receipt, but log the error
     }
   }

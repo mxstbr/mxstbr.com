@@ -814,7 +814,7 @@ function KidColumn({
                     ) : null}
                     <span>{group.label}</span>
                     {collapsed ? (
-                      <span className="ml-auto text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                      <span className="ml-auto rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
                         {group.items.length} left
                       </span>
                     ) : null}
@@ -1197,16 +1197,10 @@ function ChoreButton({
             <div>+{chore.stars} stars</div>
             {chore.requiresApproval ? (
               <div className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800 dark:bg-amber-900/50 dark:text-amber-100">
-                🔐 Parent OK
+                {approvalRequested ? '⏳ Waiting for approval' : '🔐 Parent OK'}
               </div>
             ) : null}
           </div>
-          {approvalRequested ? (
-            <div className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-200">
-              <span aria-hidden="true">📨</span>
-              <span>Request sent to parents</span>
-            </div>
-          ) : null}
         </div>
         <div className="relative">
           <button
