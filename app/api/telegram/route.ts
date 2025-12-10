@@ -7,43 +7,6 @@ import { dedent } from 'app/lib/dedent'
 
 export const maxDuration = 60
 
-function escapeHtml(value: string) {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-}
-
-function formatToolCalls(allToolCalls: any[]) {
-  return (
-    'Tools called:\n' +
-    allToolCalls
-      .map((tc) => {
-        const input = ('input' in tc && tc.input) || {}
-        const redactedInput =
-          input && typeof input === 'object'
-            ? Object.fromEntries(
-                Object.entries(input).map(([key, value]) =>
-                  key.toLowerCase() === 'message' && typeof value === 'string'
-                    ? [key, '[hidden]']
-                    : [key, value],
-                ),
-              )
-            : {}
-        const argsStr = JSON.stringify(redactedInput, null, 2)
-        const spoilerContent =
-          Object.keys(redactedInput).length === 0
-            ? ''
-            : `\n<tg-spoiler><pre>${escapeHtml(argsStr)}</pre></tg-spoiler>`
-
-        return `- ${tc.toolName}: success${spoilerContent}`
-      })
-      .join('\n')
-  )
-}
-
 export async function POST(request: NextRequest) {
   if (
     request.headers.get('X-Telegram-Bot-Api-Secret-Token') !==
@@ -57,37 +20,50 @@ export async function POST(request: NextRequest) {
     const message = update.message
     const chatId = message.chat.id
 
+    let thinkingMessage
+
     try {
+      thinkingMessage = await bot.telegram.sendMessage(chatId, 'Thinking…')
+
       const result = await clippy.generate({
         messages: [
           {
-            role: 'user',
+            role: 'system',
             content: dedent`
-              The following message was sent in a Telegram group chat between Maxie and Minnie.
-              Determine whether it is meant for you and, if so, respond to it. If not, do nothing.
+              You are Clippy, the assistant for Maxie and Minnie.
+              Treat every message sent in their Telegram chat as being addressed to you and reply accordingly.
+              Message details:
               <message>${JSON.stringify(message)}</message>`,
           },
+          { role: 'user', content: message.text || '' },
         ],
       })
 
-      // Extract tool calls from the result steps
-      const allToolCalls =
-        result.steps?.flatMap((step) => step.toolCalls || []) || []
+      const responseText = result.text?.trim()
 
-      // Only send a response if clippy generated one or if there were tool calls
-      if (result.text && result.text.trim()) {
-        await bot.telegram.sendMessage(chatId, result.text.trim())
-      }
-
-      if (allToolCalls.length > 0) {
-        const toolDetails = formatToolCalls(allToolCalls)
-
-        await bot.telegram.sendMessage(chatId, toolDetails, {
-          parse_mode: 'HTML',
-        })
-      }
+      await bot.telegram.editMessageText(
+        chatId,
+        thinkingMessage.message_id,
+        undefined,
+        responseText || 'Sorry, I could not generate a response.',
+      )
     } catch (error) {
       console.error('Error processing Telegram message:', error)
+
+      if (thinkingMessage) {
+        await bot.telegram
+          .editMessageText(
+            chatId,
+            thinkingMessage.message_id,
+            undefined,
+            'Sorry, something went wrong while generating a response.',
+          )
+          .catch(() => {})
+      } else {
+        await bot.telegram
+          .sendMessage(chatId, 'Sorry, something went wrong while generating a response.')
+          .catch(() => {})
+      }
       // Still return 200 to acknowledge receipt, but log the error
     }
   }
