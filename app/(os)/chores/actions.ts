@@ -23,6 +23,8 @@ export type CompletionResult = {
   completionId?: string
   choreTitle?: string
   kidName?: string
+  telegramMessage?: string | null
+  undoLink?: string | null
   status: 'completed' | 'skipped' | 'invalid' | 'unauthorized'
 }
 
@@ -113,9 +115,11 @@ async function applyCompletion({
   choreId,
   kidId,
   targetDay,
+  notifyTelegram = true,
 }: {
   choreId: string
   kidId: string
+  notifyTelegram?: boolean
   targetDay: string
 }): Promise<CompletionResult> {
   const today = todayIsoDate()
@@ -127,6 +131,8 @@ async function applyCompletion({
   let undoLink: string | null = null
   let result: CompletionResult = {
     awarded: 0,
+    telegramMessage: null,
+    undoLink: null,
     status: 'invalid',
   }
 
@@ -199,7 +205,10 @@ async function applyCompletion({
     }
   }
 
-  if (telegramMessage) {
+  result.telegramMessage = telegramMessage
+  result.undoLink = undoLink
+
+  if (telegramMessage && notifyTelegram) {
     const keyboard = undoLink
       ? { reply_markup: { inline_keyboard: [[{ text: 'Undo', url: undoLink }]] } }
       : undefined
@@ -284,7 +293,7 @@ export async function approveChoreViaLink(
   kidId: string,
   targetDay: string,
 ): Promise<CompletionResult> {
-  return applyCompletion({ choreId, kidId, targetDay })
+  return applyCompletion({ choreId, kidId, targetDay, notifyTelegram: false })
 }
 
 export async function requestApproval(formData: FormData): Promise<{ ok: boolean; error?: string }> {
@@ -326,6 +335,7 @@ type UndoResult = {
   choreTitle?: string
   delta: number
   kidName?: string
+  telegramMessage?: string | null
   status: 'undone' | 'not_found' | 'invalid'
 }
 
@@ -343,7 +353,7 @@ async function applyUndo({
   targetDay: string
 }): Promise<UndoResult> {
   let telegramMessage: string | null = null
-  let result: UndoResult = { delta: 0, status: 'invalid' }
+  let result: UndoResult = { delta: 0, status: 'invalid', telegramMessage: null }
 
   await withUpdatedState((state) => {
     const chore = state.chores.find((c) => c.id === choreId)
@@ -399,6 +409,7 @@ async function applyUndo({
       choreTitle: chore.title,
       delta,
       kidName: kid.name,
+      telegramMessage,
       status: 'undone',
     }
   })
@@ -437,7 +448,7 @@ export async function undoChoreViaLink({
   kidId: string
   targetDay: string
 }): Promise<UndoResult> {
-  return applyUndo({ choreId, kidId, completionId, targetDay })
+  return applyUndo({ choreId, kidId, completionId, targetDay, notifyTelegram: false })
 }
 
 export async function setPause(formData: FormData): Promise<void> {

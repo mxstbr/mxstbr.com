@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
+import { bot } from 'app/lib/telegram'
 import { approveChoreViaLink, type CompletionResult } from '../../actions'
 import { formatPacificDate } from '../../utils'
 
@@ -163,6 +164,17 @@ export async function POST(
   }
 
   const result = await approveChoreViaLink(choreId, kidId, targetDay)
+
+  if (result.telegramMessage) {
+    const keyboard = result.undoLink
+      ? { reply_markup: { inline_keyboard: [[{ text: 'Undo', url: result.undoLink }]] } }
+      : undefined
+
+    bot.telegram
+      .sendMessage('-4904434425', result.telegramMessage, keyboard)
+      .catch((error) => console.error('Failed to send Telegram approval confirmation', error))
+  }
+
   const responseCopy = messages[result.status]
   const heading = responseCopy?.heading ?? 'Approval complete'
   const detail =
