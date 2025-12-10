@@ -25,6 +25,11 @@ export async function POST(request: NextRequest) {
     try {
       thinkingMessage = await bot.telegram.sendMessage(chatId, 'Thinking…')
 
+      const userContent =
+        ('text' in message && message.text) ||
+        ('caption' in message && message.caption) ||
+        ''
+
       const result = await clippy.generate({
         messages: [
           {
@@ -35,7 +40,7 @@ export async function POST(request: NextRequest) {
               Message details:
               <message>${JSON.stringify(message)}</message>`,
           },
-          { role: 'user', content: message.text || '' },
+          { role: 'user', content: userContent },
         ],
       })
 
