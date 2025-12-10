@@ -5,6 +5,43 @@ import { bot } from 'app/lib/telegram'
 import { clippy } from 'app/lib/clippy-agent'
 import { dedent } from 'app/lib/dedent'
 
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+function formatToolCalls(allToolCalls: any[]) {
+  return (
+    'Tools called:\n' +
+    allToolCalls
+      .map((tc) => {
+        const input = ('input' in tc && tc.input) || {}
+        const redactedInput =
+          input && typeof input === 'object'
+            ? Object.fromEntries(
+                Object.entries(input).map(([key, value]) =>
+                  key.toLowerCase() === 'message' && typeof value === 'string'
+                    ? [key, '[hidden]']
+                    : [key, value],
+                ),
+              )
+            : {}
+        const argsStr = JSON.stringify(redactedInput, null, 2)
+        const spoilerContent =
+          Object.keys(redactedInput).length === 0
+            ? ''
+            : `\n<tg-spoiler><pre>${escapeHtml(argsStr)}</pre></tg-spoiler>`
+
+        return `- ${tc.toolName}: success${spoilerContent}`
+      })
+      .join('\n')
+  )
+}
+
 export async function POST(request: NextRequest) {
   if (
     request.headers.get('X-Telegram-Bot-Api-Secret-Token') !==
@@ -37,35 +74,15 @@ export async function POST(request: NextRequest) {
 
       // Only send a response if clippy generated one or if there were tool calls
       if (result.text && result.text.trim()) {
-        let toolDetails = ''
-        if (allToolCalls.length > 0) {
-          toolDetails =
-            '\n\nTools called:\n' +
-            allToolCalls
-              .map((tc) => {
-                const input = 'input' in tc ? tc.input : {}
-                const argsStr = JSON.stringify(input, null, 2)
-                return `- ${tc.toolName}: success\n  Args: ${argsStr}`
-              })
-              .join('\n')
-        }
+        await bot.telegram.sendMessage(chatId, result.text.trim())
+      }
 
-        const responseText = `${result.text.trim()}${toolDetails}`
+      if (allToolCalls.length > 0) {
+        const toolDetails = formatToolCalls(allToolCalls)
 
-        await bot.telegram.sendMessage(chatId, responseText)
-      } else if (allToolCalls.length > 0) {
-        // Send tool calls even if no text response
-        const toolDetails =
-          'Tools called:\n' +
-          allToolCalls
-            .map((tc) => {
-              const input = 'input' in tc ? tc.input : {}
-              const argsStr = JSON.stringify(input, null, 2)
-              return `- ${tc.toolName}: success\n  Args: ${argsStr}`
-            })
-            .join('\n')
-
-        await bot.telegram.sendMessage(chatId, toolDetails)
+        await bot.telegram.sendMessage(chatId, toolDetails, {
+          parse_mode: 'HTML',
+        })
       }
     } catch (error) {
       console.error('Error processing Telegram message:', error)
