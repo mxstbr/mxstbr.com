@@ -42,6 +42,11 @@ async function isAuthorized(formData?: FormData | null): Promise<boolean> {
   return isMax()
 }
 
+async function requireAuthorization(formData?: FormData | null): Promise<void> {
+  if (await isAuthorized(formData)) return
+  throw new Error('Unauthorized')
+}
+
 async function withUpdatedState(
   updater: (state: ChoreState) => Promise<void> | void,
 ): Promise<void> {
@@ -232,7 +237,7 @@ async function applyCompletion({
 }
 
 export async function addChore(formData: FormData): Promise<void> {
-  if (!(await isAuthorized(formData))) return
+  await requireAuthorization(formData)
 
   const title = formData.get('title')?.toString().trim()
   const emoji = formData.get('emoji')?.toString().trim() || '⭐️'
@@ -288,7 +293,7 @@ export async function addChore(formData: FormData): Promise<void> {
 }
 
 export async function completeChore(formData: FormData): Promise<CompletionResult> {
-  if (!(await isAuthorized(formData))) return { awarded: 0, status: 'unauthorized' }
+  await requireAuthorization(formData)
 
   const choreId = formData.get('choreId')?.toString()
   const kidId = formData.get('kidId')?.toString()
@@ -434,7 +439,7 @@ async function applyUndo({
 }
 
 export async function undoChore(formData: FormData): Promise<{ delta: number }> {
-  if (!(await isAuthorized(formData))) return { delta: 0 }
+  await requireAuthorization(formData)
 
   const choreId = formData.get('choreId')?.toString()
   const kidId = formData.get('kidId')?.toString()
@@ -462,7 +467,7 @@ export async function undoChoreViaLink({
 }
 
 export async function setPause(formData: FormData): Promise<void> {
-  if (!(await isAuthorized(formData))) return
+  await requireAuthorization(formData)
 
   const choreId = formData.get('choreId')?.toString()
   const pausedUntil = formData.get('pausedUntil')?.toString()
@@ -477,7 +482,7 @@ export async function setPause(formData: FormData): Promise<void> {
 }
 
 export async function pauseAllChores(formData: FormData): Promise<void> {
-  if (!(await isAuthorized(formData))) return
+  await requireAuthorization(formData)
 
   const pausedUntil = formData.get('pausedUntil')?.toString() || null
 
@@ -490,7 +495,7 @@ export async function pauseAllChores(formData: FormData): Promise<void> {
 }
 
 export async function skipChore(formData: FormData): Promise<void> {
-  if (!(await isAuthorized(formData))) return
+  await requireAuthorization(formData)
 
   const choreId = formData.get('choreId')?.toString()
   const kidId = formData.get('kidId')?.toString()
@@ -510,7 +515,7 @@ export async function skipChore(formData: FormData): Promise<void> {
 }
 
 export async function setChoreSchedule(formData: FormData): Promise<void> {
-  if (!(await isAuthorized(formData))) return
+  await requireAuthorization(formData)
 
   const choreId = formData.get('choreId')?.toString()
   const cadence =
@@ -534,7 +539,7 @@ export async function setChoreSchedule(formData: FormData): Promise<void> {
 }
 
 export async function renameKid(formData: FormData): Promise<void> {
-  if (!(await isAuthorized(formData))) return
+  await requireAuthorization(formData)
 
   const kidId = formData.get('kidId')?.toString()
   const name = formData.get('name')?.toString().trim()
@@ -552,7 +557,7 @@ export async function renameKid(formData: FormData): Promise<void> {
 }
 
 export async function setKidColor(formData: FormData): Promise<void> {
-  if (!(await isAuthorized(formData))) return
+  await requireAuthorization(formData)
 
   const kidId = formData.get('kidId')?.toString()
   const color = parseColor(formData.get('color'))
@@ -566,7 +571,7 @@ export async function setKidColor(formData: FormData): Promise<void> {
 }
 
 export async function archiveChore(formData: FormData): Promise<void> {
-  if (!(await isAuthorized(formData))) return
+  await requireAuthorization(formData)
 
   const choreId = formData.get('choreId')?.toString()
   if (!choreId) return
@@ -577,7 +582,7 @@ export async function archiveChore(formData: FormData): Promise<void> {
 }
 
 export async function setTimeOfDay(formData: FormData): Promise<void> {
-  if (!(await isAuthorized(formData))) return
+  await requireAuthorization(formData)
 
   const choreId = formData.get('choreId')?.toString()
   const timeOfDay = parseTimeOfDay(formData.get('timeOfDay'))
@@ -591,7 +596,7 @@ export async function setTimeOfDay(formData: FormData): Promise<void> {
 }
 
 export async function adjustKidStars(formData: FormData): Promise<void> {
-  if (!(await isAuthorized(formData))) return
+  await requireAuthorization(formData)
 
   const kidId = formData.get('kidId')?.toString()
   const rawDelta = parseNumber(formData.get('delta'))
@@ -616,7 +621,7 @@ export async function adjustKidStars(formData: FormData): Promise<void> {
 }
 
 export async function setChoreKids(formData: FormData): Promise<void> {
-  if (!(await isAuthorized(formData))) return
+  await requireAuthorization(formData)
 
   const choreId = formData.get('choreId')?.toString()
   const timeValue = formData.get('timeOfDay')
@@ -650,7 +655,7 @@ export async function setChoreKids(formData: FormData): Promise<void> {
 }
 
 export async function setOneOffDate(formData: FormData): Promise<void> {
-  if (!(await isAuthorized(formData))) return
+  await requireAuthorization(formData)
 
   const choreId = formData.get('choreId')?.toString()
   const scheduledFor = parseIsoDay(formData.get('scheduledFor')) ?? todayIsoDate()
@@ -665,7 +670,7 @@ export async function setOneOffDate(formData: FormData): Promise<void> {
 }
 
 export async function addReward(formData: FormData): Promise<void> {
-  if (!(await isAuthorized(formData))) return
+  await requireAuthorization(formData)
 
   const title = formData.get('title')?.toString().trim()
   const emoji = formData.get('emoji')?.toString().trim() || '🎁'
@@ -695,7 +700,7 @@ export async function addReward(formData: FormData): Promise<void> {
 }
 
 export async function archiveReward(formData: FormData): Promise<void> {
-  if (!(await isAuthorized(formData))) return
+  await requireAuthorization(formData)
 
   const rewardId = formData.get('rewardId')?.toString()
   if (!rewardId) return
@@ -707,7 +712,7 @@ export async function archiveReward(formData: FormData): Promise<void> {
 }
 
 export async function setRewardKids(formData: FormData): Promise<void> {
-  if (!(await isAuthorized(formData))) return
+  await requireAuthorization(formData)
 
   const rewardId = formData.get('rewardId')?.toString()
   const kidIds = formData
@@ -728,7 +733,7 @@ export async function setRewardKids(formData: FormData): Promise<void> {
 }
 
 export async function redeemReward(formData: FormData): Promise<{ success: boolean }> {
-  if (!(await isAuthorized(formData))) return { success: false }
+  await requireAuthorization(formData)
 
   const rewardId = formData.get('rewardId')?.toString()
   const kidId = formData.get('kidId')?.toString()
