@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
+import { bot } from 'app/lib/telegram'
 import { formatPacificDate } from '../../utils'
 import { undoChoreViaLink } from '../../actions'
 
@@ -164,6 +165,13 @@ export async function POST(
   }
 
   const result = await undoChoreViaLink({ choreId, kidId, completionId, targetDay })
+
+  if (result.telegramMessage) {
+    bot.telegram
+      .sendMessage('-4904434425', result.telegramMessage)
+      .catch((error) => console.error('Failed to send Telegram undo confirmation', error))
+  }
+
   const responseCopy = messages[result.status]
   const heading = responseCopy?.heading ?? 'Undo complete'
   const detail =
