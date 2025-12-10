@@ -2891,7 +2891,7 @@ snapshots:
       ai: 5.0.78(zod@4.1.13)
       react: 19.2.1
       swr: 2.3.6(react@19.2.1)
-    throttleit: 2.1.0
+      throttleit: 2.1.0
     optionalDependencies:
       zod: 4.1.13
 
@@ -4451,14 +4451,14 @@ snapshots:
 
   math-intrinsics@1.1.0: {}
 
-  mcp-handler@1.0.4(@modelcontextprotocol/sdk@1.24.3(zod@4.1.13))(next@15.6.0-canary.58(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)):
+  mcp-handler@1.0.4(@modelcontextprotocol/sdk@1.24.3(zod@4.1.13))(next@16.0.8(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)):
     dependencies:
       '@modelcontextprotocol/sdk': 1.24.3(zod@4.1.13)
       chalk: 5.6.2
       commander: 11.1.0
       redis: 4.7.1
     optionalDependencies:
-      next: 15.6.0-canary.58(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)
+      next: 16.0.8(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
 
   mdast-util-find-and-replace@3.0.2:
     dependencies:
@@ -5745,10 +5745,6 @@ snapshots:
       browserslist: 4.25.4
       escalade: 3.2.0
       picocolors: 1.1.1
-
-  uri-js@4.4.1:
-    dependencies:
-      punycode: 2.3.1
 
   use-sync-external-store@1.5.0(react@19.2.1):
     dependencies:
