@@ -12,6 +12,33 @@ function toTitle(name: string) {
   return name.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())
 }
 
+function isAsyncIterable<T>(value: unknown): value is AsyncIterable<T> {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    Symbol.asyncIterator in (value as Record<symbol, unknown>)
+  )
+}
+
+async function resolveToolResult(output: unknown) {
+  if (isAsyncIterable(output)) {
+    const items: unknown[] = []
+    for await (const item of output) {
+      items.push(item)
+    }
+    return items.length === 1 ? items[0] : items
+  }
+  return output
+}
+
+function toStructuredContent(value: unknown) {
+  if (!value || typeof value !== 'object') return undefined
+  if (Array.isArray(value)) return undefined
+  if (isAsyncIterable(value)) return undefined
+
+  return value as Record<string, unknown>
+}
+
 function formatCompletionMessage(result: any) {
   const choreTitle = result?.choreTitle ?? 'chore'
   const kidName = result?.kidName ? ` for ${result.kidName}` : ''
@@ -86,8 +113,18 @@ const handler = createMcpHandler(
           inputSchema: tool.inputSchema as any,
           annotations: options.annotations,
         },
-        async (args?: unknown) => {
-          const result = await tool.execute((args ?? {}) as any)
+        async (args, extra) => {
+          const execute = tool.execute
+          if (!execute) {
+            throw new Error(`Tool "${name}" is missing an execute function`)
+          }
+
+          const rawResult = await execute((args ?? {}) as any, {
+            toolCallId: crypto.randomUUID ? crypto.randomUUID() : `${name}-${Date.now()}`,
+            messages: [],
+            abortSignal: extra.signal,
+          })
+          const result = await resolveToolResult(rawResult)
 
           return {
             content: [
@@ -96,7 +133,7 @@ const handler = createMcpHandler(
                 text: formatChoreMessage(name, result),
               },
             ],
-            structuredContent: result,
+            structuredContent: toStructuredContent(result),
           }
         },
       )
