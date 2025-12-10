@@ -13,6 +13,7 @@ import { ScreenSaver } from './screen-saver'
 import { RefreshButton } from './refresh-button'
 import { PasswordForm } from '../components/password-form'
 import { auth, isMax } from '../../auth'
+import { ChoresErrorBoundary } from './error-boundary'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -143,77 +144,85 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
     <div
       className={`flex min-h-screen flex-col p-6 pb-20 md:h-screen md:overflow-y-hidden md:pb-6 ${backgroundClass}`}
     >
-      <div className="mb-5 text-sm md:mb-6">
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
-          <div className="inline-flex w-fit justify-self-start items-center gap-2 rounded-md border border-slate-300 bg-white p-1 pr-3 text-xs font-semibold text-slate-800 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
-            <Link
-              href={choresHref(prevDay)}
-              prefetch
-              aria-label="Previous day"
-              className="rounded px-2 py-1 transition hover:bg-slate-100 dark:hover:bg-slate-700"
-            >
-              ‹
-            </Link>
-            <Link
-              href={viewingToday ? choresHref() : choresHref(todayCtx.todayIso)}
-              prefetch
-              className={`rounded px-3 py-1 transition ${
-                viewingToday
-                  ? 'bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200'
-                  : 'hover:bg-slate-100 dark:hover:bg-slate-700'
-              }`}
-            >
-              Today
-            </Link>
-            <Link
-              href={choresHref(nextDay)}
-              prefetch
-              aria-label="Next day"
-              className="rounded px-2 py-1 transition hover:bg-slate-100 dark:hover:bg-slate-700"
-            >
-              ›
-            </Link>
-          </div>
-          <div className="flex justify-center text-base font-semibold text-slate-900 dark:text-slate-100">
-            <h1>
-              {readableDay}
-              {viewingToday ? ' ✅' : ''}
-            </h1>
-          </div>
-          <div className="flex justify-end">
-            <RefreshButton />
+      <ChoresErrorBoundary label="the toolbar">
+        <div className="mb-5 text-sm md:mb-6">
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+            <div className="inline-flex w-fit justify-self-start items-center gap-2 rounded-md border border-slate-300 bg-white p-1 pr-3 text-xs font-semibold text-slate-800 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
+              <Link
+                href={choresHref(prevDay)}
+                prefetch
+                aria-label="Previous day"
+                className="rounded px-2 py-1 transition hover:bg-slate-100 dark:hover:bg-slate-700"
+              >
+                ‹
+              </Link>
+              <Link
+                href={viewingToday ? choresHref() : choresHref(todayCtx.todayIso)}
+                prefetch
+                className={`rounded px-3 py-1 transition ${
+                  viewingToday
+                    ? 'bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200'
+                    : 'hover:bg-slate-100 dark:hover:bg-slate-700'
+                }`}
+              >
+                Today
+              </Link>
+              <Link
+                href={choresHref(nextDay)}
+                prefetch
+                aria-label="Next day"
+                className="rounded px-2 py-1 transition hover:bg-slate-100 dark:hover:bg-slate-700"
+              >
+                ›
+              </Link>
+            </div>
+            <div className="flex justify-center text-base font-semibold text-slate-900 dark:text-slate-100">
+              <h1>
+                {readableDay}
+                {viewingToday ? ' ✅' : ''}
+              </h1>
+            </div>
+            <div className="flex justify-end">
+              <RefreshButton />
+            </div>
           </div>
         </div>
-      </div>
+      </ChoresErrorBoundary>
       <div className="md:flex-1 md:min-h-0 pb-16 md:pb-12">
-        <KidBoard
-          columns={columns}
-          completions={state.completions}
-          mode={viewingToday ? 'today' : viewingFuture ? 'future' : 'past'}
-          dayIso={ctx.todayIso}
-          dayLabel={readableDay}
-          todayHref={choresHref()}
-          selectedKidId={kidParam}
-        />
+        <ChoresErrorBoundary label="the chore board">
+          <KidBoard
+            columns={columns}
+            completions={state.completions}
+            mode={viewingToday ? 'today' : viewingFuture ? 'future' : 'past'}
+            dayIso={ctx.todayIso}
+            dayLabel={readableDay}
+            todayHref={choresHref()}
+            selectedKidId={kidParam}
+          />
+        </ChoresErrorBoundary>
       </div>
-      <ScreenSaver noChoresToday={!hasOpenChoresToday} />
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-300 bg-slate-100/95 px-2 backdrop-blur dark:border-slate-700 dark:bg-slate-900/90">
-        <div className="grid grid-cols-2 divide-x divide-slate-300 text-xs font-semibold uppercase tracking-wide text-slate-700 dark:divide-slate-700 dark:text-slate-200">
-          <Link
-            href={choresHref()}
-            className="flex h-11 items-center justify-center text-slate-900 transition hover:text-slate-900 dark:text-white"
-            aria-current="page"
-          >
-            Chores
-          </Link>
-          <Link
-            href={rewardsHref()}
-            className="flex h-11 items-center justify-center transition hover:text-slate-900 dark:hover:text-white"
-          >
-            Rewards
-          </Link>
+      <ChoresErrorBoundary label="the screen saver">
+        <ScreenSaver noChoresToday={!hasOpenChoresToday} />
+      </ChoresErrorBoundary>
+      <ChoresErrorBoundary label="the navigation bar">
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-300 bg-slate-100/95 px-2 backdrop-blur dark:border-slate-700 dark:bg-slate-900/90">
+          <div className="grid grid-cols-2 divide-x divide-slate-300 text-xs font-semibold uppercase tracking-wide text-slate-700 dark:divide-slate-700 dark:text-slate-200">
+            <Link
+              href={choresHref()}
+              className="flex h-11 items-center justify-center text-slate-900 transition hover:text-slate-900 dark:text-white"
+              aria-current="page"
+            >
+              Chores
+            </Link>
+            <Link
+              href={rewardsHref()}
+              className="flex h-11 items-center justify-center transition hover:text-slate-900 dark:hover:text-white"
+            >
+              Rewards
+            </Link>
+          </div>
         </div>
-      </div>
+      </ChoresErrorBoundary>
     </div>
   )
 }
