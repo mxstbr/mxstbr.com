@@ -5,6 +5,8 @@ import { bot } from 'app/lib/telegram'
 import { clippy } from 'app/lib/clippy-agent'
 import { dedent } from 'app/lib/dedent'
 
+export const maxDuration = 60
+
 export async function POST(request: NextRequest) {
   if (
     request.headers.get('X-Telegram-Bot-Api-Secret-Token') !==
