@@ -30,6 +30,14 @@ const isoDaySchema = z
   .regex(/^\d{4}-\d{2}-\d{2}$/)
   .describe('Pacific date in YYYY-MM-DD format')
 
+const automationToken =
+  process.env.CLIPPY_AUTOMATION_TOKEN ?? process.env.CAL_PASSWORD
+
+function appendAutomationToken(formData: FormData) {
+  if (!automationToken) return
+  formData.append('automationToken', automationToken)
+}
+
 const kidIdsSchema = z.array(z.string().min(1)).min(1)
 const daysOfWeekSchema = z.array(z.number().int().min(0).max(6)).optional()
 const timeOfDaySchema = z.enum(['morning', 'afternoon', 'evening']).optional()
@@ -140,6 +148,7 @@ export const choreTools = {
       scheduled_for,
     }) => {
       const formData = new FormData()
+      appendAutomationToken(formData)
       formData.append('title', title)
       if (emoji) formData.append('emoji', emoji)
       formData.append('stars', stars.toString())
@@ -173,6 +182,7 @@ export const choreTools = {
     }),
     execute: async ({ chore_id, kid_id }) => {
       const formData = new FormData()
+      appendAutomationToken(formData)
       formData.append('choreId', chore_id)
       formData.append('kidId', kid_id)
       const result = await completeChore(formData)
@@ -193,6 +203,7 @@ export const choreTools = {
     }),
     execute: async ({ chore_id, kid_id, completion_id }) => {
       const formData = new FormData()
+      appendAutomationToken(formData)
       formData.append('choreId', chore_id)
       formData.append('kidId', kid_id)
       if (completion_id) formData.append('completionId', completion_id)
@@ -214,6 +225,7 @@ export const choreTools = {
     }),
     execute: async ({ chore_id, cadence, days_of_week }) => {
       const formData = new FormData()
+      appendAutomationToken(formData)
       formData.append('choreId', chore_id)
       formData.append('cadence', cadence)
       ;(days_of_week ?? []).forEach((day) => formData.append('daysOfWeek', day.toString()))
@@ -244,6 +256,7 @@ export const choreTools = {
     }),
     execute: async ({ chore_id, paused_until }) => {
       const formData = new FormData()
+      appendAutomationToken(formData)
       formData.append('choreId', chore_id)
       formData.append('pausedUntil', paused_until)
       await setPause(formData)
@@ -264,6 +277,7 @@ export const choreTools = {
     }),
     execute: async ({ paused_until }) => {
       const formData = new FormData()
+      appendAutomationToken(formData)
       formData.append('pausedUntil', paused_until)
       await pauseAllChores(formData)
 
@@ -292,6 +306,7 @@ export const choreTools = {
       requires_approval,
     }) => {
       const formData = new FormData()
+      appendAutomationToken(formData)
       formData.append('choreId', chore_id)
       kid_ids.forEach((kidId) => formData.append('kidIds', kidId))
       if (time_of_day) {
@@ -319,6 +334,7 @@ export const choreTools = {
     }),
     execute: async ({ chore_id, scheduled_for }) => {
       const formData = new FormData()
+      appendAutomationToken(formData)
       formData.append('choreId', chore_id)
       formData.append('scheduledFor', scheduled_for)
 
@@ -337,6 +353,7 @@ export const choreTools = {
     }),
     execute: async ({ chore_id }) => {
       const formData = new FormData()
+      appendAutomationToken(formData)
       formData.append('choreId', chore_id)
       await archiveChore(formData)
 
@@ -356,6 +373,7 @@ export const choreTools = {
     }),
     execute: async ({ kid_id, name, color }) => {
       const formData = new FormData()
+      appendAutomationToken(formData)
       formData.append('kidId', kid_id)
       formData.append('name', name)
       if (color) formData.append('color', color)
@@ -377,6 +395,7 @@ export const choreTools = {
     }),
     execute: async ({ kid_id, delta, mode }) => {
       const formData = new FormData()
+      appendAutomationToken(formData)
       formData.append('kidId', kid_id)
       formData.append('delta', delta.toString())
       formData.append('mode', mode)
@@ -400,6 +419,7 @@ export const choreTools = {
     }),
     execute: async ({ title, emoji, cost, reward_type, kid_ids }) => {
       const formData = new FormData()
+      appendAutomationToken(formData)
       formData.append('title', title)
       if (emoji) formData.append('emoji', emoji)
       formData.append('cost', cost.toString())
@@ -422,6 +442,7 @@ export const choreTools = {
     }),
     execute: async ({ reward_id, kid_ids }) => {
       const formData = new FormData()
+      appendAutomationToken(formData)
       formData.append('rewardId', reward_id)
       kid_ids.forEach((kidId) => formData.append('kidIds', kidId))
 
@@ -440,6 +461,7 @@ export const choreTools = {
     }),
     execute: async ({ reward_id }) => {
       const formData = new FormData()
+      appendAutomationToken(formData)
       formData.append('rewardId', reward_id)
       await archiveReward(formData)
 
@@ -458,6 +480,7 @@ export const choreTools = {
     }),
     execute: async ({ reward_id, kid_id }) => {
       const formData = new FormData()
+      appendAutomationToken(formData)
       formData.append('rewardId', reward_id)
       formData.append('kidId', kid_id)
 
