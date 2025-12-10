@@ -9,13 +9,9 @@ import {
   archiveReward,
   completeChore,
   renameKid,
-  setPause,
-  setChoreSchedule,
   pauseAllChores,
   adjustKidStars,
-  setChoreKids,
   setRewardKids,
-  setOneOffDate,
 } from '../actions'
 import {
   type Chore,
@@ -43,6 +39,7 @@ import {
   pacificDateFromTimestamp,
 } from '../utils'
 import { ClippyChoresChat } from './clippy-chat'
+import { ChoreEditor, RevealPanel } from './client-panels'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -80,7 +77,6 @@ type AdminPageProps = {
 type ChoreStatus = 'open' | 'paused' | 'completed' | 'scheduled'
 
 const PAGE_SIZE = 9
-const DAY_LETTERS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
 function choreStatus(chore: Chore, kids: Kid[], completions: Completion[], ctx: TodayContext): ChoreStatus {
   if (isPaused(chore, ctx)) return 'paused'
@@ -115,86 +111,6 @@ function sortChores(
   })
 
   return sorted
-}
-
-function SchedulePresetButton({
-  choreId,
-  label,
-  days,
-  cadence = 'weekly',
-  active,
-}: {
-  choreId: string
-  label: string
-  days?: number[]
-  cadence?: 'daily' | 'weekly'
-  active?: boolean
-}) {
-  return (
-    <form action={setChoreSchedule}>
-      <input type="hidden" name="choreId" value={choreId} />
-      <input type="hidden" name="cadence" value={cadence} />
-      {cadence === 'weekly'
-        ? (days ?? []).map((day) => (
-            <input key={`${choreId}-${day}`} type="hidden" name="daysOfWeek" value={day} />
-          ))
-        : null}
-      <button
-        type="submit"
-        className={`rounded-md border px-2 py-1 text-[10px] font-semibold uppercase tracking-wide transition ${
-          active
-            ? 'border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900'
-            : 'border-slate-300 text-slate-700 hover:border-slate-500 dark:border-slate-700 dark:text-slate-200'
-        }`}
-      >
-        {label}
-      </button>
-    </form>
-  )
-}
-
-function CustomScheduleForm({
-  choreId,
-  selectedDays,
-}: {
-  choreId: string
-  selectedDays: number[]
-}) {
-  return (
-    <form action={setChoreSchedule} className="flex flex-wrap items-center gap-1">
-      <input type="hidden" name="choreId" value={choreId} />
-      <input type="hidden" name="cadence" value="weekly" />
-      {DAY_LETTERS.map((label, index) => {
-        const active = selectedDays.includes(index)
-        return (
-          <label
-            key={`${choreId}-day-${index}`}
-            className={`flex cursor-pointer items-center justify-center rounded-md border px-2 py-1 text-[10px] font-semibold transition ${
-              active
-                ? 'border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900'
-                : 'border-slate-300 text-slate-700 hover:border-slate-500 dark:border-slate-700 dark:text-slate-200'
-            }`}
-            title={DAY_NAMES[index]}
-          >
-            <input
-              type="checkbox"
-              name="daysOfWeek"
-              value={index}
-              defaultChecked={active}
-              className="sr-only"
-            />
-            {label}
-          </label>
-        )
-      })}
-      <button
-        type="submit"
-        className="rounded-md border border-slate-300 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-700 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-200"
-      >
-        Save days
-      </button>
-    </form>
-  )
 }
 
 // Rebuilt admin components live below.
@@ -331,230 +247,110 @@ function ChoreCard({ chore, kids, completions, ctx }: { chore: Chore; kids: Kid[
   const kidSelectOptions = assignedKids.length ? assignedKids : kids
 
   return (
-    <div className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md dark:border-slate-700 dark:bg-slate-900/80">
-      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-        <div className="flex items-start gap-3">
-          <div className="text-2xl leading-none">{chore.emoji}</div>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <h3 className="text-lg font-semibold leading-tight text-slate-900 dark:text-slate-50">{chore.title}</h3>
-              <StatusBadge status={status} />
+    <div className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/70">
+      <div className="flex flex-col gap-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-2xl shadow-inner dark:bg-slate-800">
+              {chore.emoji}
             </div>
-            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-              <span className="rounded-md bg-slate-100 px-2 py-1 font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
-                {chore.type === 'one-off' ? 'One-off' : chore.type === 'perpetual' ? 'Perpetual' : 'Repeated'}
-              </span>
-              <span className="rounded-md bg-slate-100 px-2 py-1 font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
-                {timeLabel}
-              </span>
-              <span className="rounded-md bg-white px-2 py-1 font-semibold text-slate-700 shadow-sm dark:bg-slate-800 dark:text-slate-200">
-                ⭐️ {chore.stars}
-              </span>
-              <span className="rounded-md bg-slate-100 px-2 py-1 font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
-                {chore.requiresApproval ? 'Parent pin required' : 'No pin needed'}
-              </span>
-              {status === 'paused' && chore.pausedUntil ? (
-                <span className="font-semibold text-amber-700 dark:text-amber-300">Paused until {chore.pausedUntil}</span>
-              ) : null}
-              {chore.type === 'one-off' && chore.completedAt ? (
-                <span className="font-semibold text-emerald-700 dark:text-emerald-300">Finished</span>
-              ) : null}
-            </div>
-            <p className="text-sm text-slate-600 dark:text-slate-300">
-              {dueLabel}
-              {chore.type === 'one-off' ? ` • Scheduled for ${scheduledDay}` : ''}
-              {doneToday.length && status !== 'paused' ? ` • Done today by ${doneToday.map((kid) => kid.name).join(', ')}` : ''}
-            </p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Created {createdLabel}</p>
-            <div className="flex flex-wrap gap-2">
-              {assignedKids.map((kid) => (
-                <KidBadge
-                  key={kid.id}
-                  kid={kid}
-                  active={doneToday.some((k) => k.id === kid.id) ? 'done' : openKids.some((k) => k.id === kid.id) ? 'open' : undefined}
-                />
-              ))}
+            <div className="space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="text-lg font-semibold leading-tight text-slate-900 dark:text-slate-50">{chore.title}</h3>
+                <StatusBadge status={status} />
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Created {createdLabel}</p>
             </div>
           </div>
+          <div className="flex flex-col items-end gap-1 text-right text-xs text-slate-500 dark:text-slate-400">
+            <span className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-slate-800 shadow-sm dark:bg-slate-800 dark:text-slate-100">
+              ⭐️ {chore.stars}
+            </span>
+            <span className="rounded-md bg-slate-100 px-2 py-1 font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+              {timeLabel}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
+          <span className="rounded-md bg-slate-100 px-2 py-1 font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+            {chore.type === 'one-off' ? 'One-off' : chore.type === 'perpetual' ? 'Perpetual' : 'Repeated'}
+          </span>
+          <span className="rounded-md bg-slate-100 px-2 py-1 font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+            {chore.requiresApproval ? 'Parent pin required' : 'No pin needed'}
+          </span>
+          {status === 'paused' && chore.pausedUntil ? (
+            <span className="rounded-md bg-amber-100 px-2 py-1 font-semibold text-amber-800 dark:bg-amber-900/40 dark:text-amber-100">
+              Paused until {chore.pausedUntil}
+            </span>
+          ) : null}
+          {chore.type === 'one-off' && chore.completedAt ? (
+            <span className="rounded-md bg-emerald-100 px-2 py-1 font-semibold text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-100">
+              Finished
+            </span>
+          ) : null}
+        </div>
+
+        <p className="text-sm text-slate-600 dark:text-slate-200">
+          {dueLabel}
+          {chore.type === 'one-off' ? ` • Scheduled for ${scheduledDay}` : ''}
+          {doneToday.length && status !== 'paused' ? ` • Done today by ${doneToday.map((kid) => kid.name).join(', ')}` : ''}
+        </p>
+
+        <div className="flex flex-wrap gap-2">
+          {assignedKids.map((kid) => (
+            <KidBadge
+              key={kid.id}
+              kid={kid}
+              active={doneToday.some((k) => k.id === kid.id) ? 'done' : openKids.some((k) => k.id === kid.id) ? 'open' : undefined}
+            />
+          ))}
         </div>
       </div>
 
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <form action={completeChore} className="flex flex-wrap items-center gap-2">
-            <input type="hidden" name="choreId" value={chore.id} />
-            <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">Mark done</label>
-            <select
-              name="kidId"
-              defaultValue={kidSelectOptions[0]?.id ?? ''}
-              className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-700 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-              aria-label="Kid"
-            >
-              {kidSelectOptions.map((kid) => (
-                <option key={kid.id} value={kid.id}>
-                  {kid.name}
-                </option>
-              ))}
-            </select>
-            <input
-              type="date"
-              name="day"
-              defaultValue={ctx.todayIso}
-              className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50"
-            />
-            <button
-              type="submit"
-              className="rounded-md bg-slate-900 px-3 py-1 text-xs font-semibold text-white transition hover:bg-slate-800 disabled:opacity-50 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
-              disabled={status === 'paused'}
-            >
-              Save completion
-            </button>
-          </form>
-
-          <form action={archiveChore}>
-            <input type="hidden" name="choreId" value={chore.id} />
-            <button
-              type="submit"
-              className="rounded-md border border-transparent px-3 py-1 text-xs font-semibold text-slate-500 transition hover:bg-slate-100 dark:hover:bg-slate-800"
-            >
-              Archive
-            </button>
-          </form>
-        </div>
-
-        {chore.type === 'one-off' ? (
-          <form action={setOneOffDate} className="flex flex-wrap items-center gap-2">
-            <input type="hidden" name="choreId" value={chore.id} />
-            <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">Day</label>
-            <input
-              type="date"
-              name="scheduledFor"
-              defaultValue={chore.scheduledFor ?? pacificDateFromTimestamp(chore.createdAt)}
-              className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-50"
-            />
-            <button
-              type="submit"
-              className="rounded-md border border-slate-300 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-700 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-200"
-            >
-              Set day
-            </button>
-          </form>
-        ) : null}
-
-        {chore.type === 'repeated' ? (
-          <div className="space-y-2 rounded-md border border-dashed border-slate-300 p-3 text-sm dark:border-slate-700">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">Schedule</span>
-              <SchedulePresetButton choreId={chore.id} label="Daily" cadence="daily" active={chore.schedule?.cadence !== 'weekly'} />
-              <SchedulePresetButton
-                choreId={chore.id}
-                label="Weekdays"
-                days={[1, 2, 3, 4, 5]}
-                active={chore.schedule?.cadence === 'weekly' && (chore.schedule?.daysOfWeek ?? []).length === 5 && (chore.schedule?.daysOfWeek ?? []).every((day) => [1, 2, 3, 4, 5].includes(day))}
-              />
-              <SchedulePresetButton
-                choreId={chore.id}
-                label="Weekends"
-                days={[0, 6]}
-                active={chore.schedule?.cadence === 'weekly' && (chore.schedule?.daysOfWeek ?? []).length === 2 && (chore.schedule?.daysOfWeek ?? []).every((day) => [0, 6].includes(day))}
-              />
-              <SchedulePresetButton
-                choreId={chore.id}
-                label="Custom"
-                cadence="weekly"
-                active={chore.schedule?.cadence === 'weekly' && !!(chore.schedule?.daysOfWeek?.length && (chore.schedule?.daysOfWeek?.length ?? 0) !== 7)}
-              />
-            </div>
-            <CustomScheduleForm choreId={chore.id} selectedDays={chore.schedule?.daysOfWeek ?? []} />
-            <form action={setPause} className="flex flex-wrap items-center gap-2 text-xs">
-              <input type="hidden" name="choreId" value={chore.id} />
-              <input
-                type="date"
-                name="pausedUntil"
-                defaultValue={chore.pausedUntil ?? ''}
-                className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-50"
-              />
-              <button
-                type="submit"
-                className="rounded-md border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-700 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-200"
-              >
-                Pause
-              </button>
-              {chore.pausedUntil ? (
-                <button
-                  type="submit"
-                  name="pausedUntil"
-                  value=""
-                  className="rounded-md border border-transparent bg-slate-900 px-3 py-1 text-xs font-semibold text-white transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
-                >
-                  Resume
-                </button>
-              ) : null}
-            </form>
-          </div>
-        ) : null}
-
-        <form action={setChoreKids} className="flex flex-col gap-2 rounded-md border border-slate-200 p-3 text-xs dark:border-slate-800">
+      <div className="flex flex-wrap items-center gap-3 rounded-xl bg-slate-50 px-3 py-2 text-xs text-slate-700 shadow-inner dark:bg-slate-800/70 dark:text-slate-200">
+        <form action={completeChore} className="flex flex-wrap items-center gap-2">
           <input type="hidden" name="choreId" value={chore.id} />
-          <div className="flex flex-wrap items-center gap-2">
-            <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">Assignments</label>
-            <select
-              name="timeOfDay"
-              defaultValue={chore.timeOfDay ?? ''}
-              className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-700 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-              aria-label="Time of day"
-            >
-              <option value="">Any time</option>
-              <option value="morning">Morning</option>
-              <option value="afternoon">Afternoon</option>
-              <option value="evening">Evening</option>
-            </select>
-            <div className="flex items-center gap-2 rounded-md border border-slate-300 bg-white px-2 py-1 text-[10px] font-semibold uppercase tracking-wide shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
-              <input type="hidden" name="requiresApproval" value="false" />
-              <input
-                id={`${chore.id}-requires-approval`}
-                type="checkbox"
-                name="requiresApproval"
-                value="true"
-                defaultChecked={chore.requiresApproval}
-                className="h-3.5 w-3.5 rounded border-slate-300 text-slate-900 focus:ring-slate-500 dark:border-slate-600 dark:bg-slate-900"
-              />
-              <label htmlFor={`${chore.id}-requires-approval`} className="cursor-pointer">
-                Parent pin
-              </label>
-            </div>
-          </div>
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Mark done</span>
+          <select
+            name="kidId"
+            defaultValue={kidSelectOptions[0]?.id ?? ''}
+            className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-700 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+            aria-label="Kid"
+          >
+            {kidSelectOptions.map((kid) => (
+              <option key={kid.id} value={kid.id}>
+                {kid.name}
+              </option>
+            ))}
+          </select>
+          <input
+            type="date"
+            name="day"
+            defaultValue={ctx.todayIso}
+            className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50"
+          />
+          <button
+            type="submit"
+            className="rounded-md bg-slate-900 px-3 py-1 text-xs font-semibold text-white transition hover:bg-slate-800 disabled:opacity-50 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+            disabled={status === 'paused'}
+          >
+            Save completion
+          </button>
+        </form>
 
-          <div className="flex flex-wrap gap-2">
-            {kids.map((kid) => {
-              const active = chore.kidIds.includes(kid.id)
-              return (
-                <label
-                  key={kid.id}
-                  className={`flex items-center gap-1 rounded-md border px-2 py-1 text-[10px] font-semibold uppercase tracking-wide ${
-                    active
-                      ? 'border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900'
-                      : 'border-slate-300 text-slate-700 hover:border-slate-500 dark:border-slate-700 dark:text-slate-200'
-                  }`}
-                >
-                  <input type="checkbox" name="kidIds" value={kid.id} defaultChecked={active} className="sr-only" />
-                  {kid.name}
-                </label>
-              )
-            })}
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="submit"
-              className="rounded-md border border-slate-300 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-700 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-200"
-            >
-              Save changes
-            </button>
-            <span className="text-[11px] text-slate-500 dark:text-slate-400">Kid toggles save when you click this button.</span>
-          </div>
+        <form action={archiveChore}>
+          <input type="hidden" name="choreId" value={chore.id} />
+          <button
+            type="submit"
+            className="rounded-md border border-transparent px-3 py-1 text-xs font-semibold text-slate-500 transition hover:bg-slate-100 dark:hover:bg-slate-700"
+          >
+            Archive
+          </button>
         </form>
       </div>
+
+      <ChoreEditor chore={chore} kids={kids} ctx={ctx} />
     </div>
   )
 }
@@ -571,118 +367,112 @@ type FilterState = {
 
 function ChoreFilters({ kids, filters }: { kids: Kid[]; filters: FilterState }) {
   return (
-    <form className="grid grid-cols-1 gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-3 dark:border-slate-800 dark:bg-slate-900" method="get">
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">Kid</label>
-        <select
-          name="kid"
-          defaultValue={filters.kid}
-          className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-        >
-          <option value="all">All kids</option>
-          {kids.map((kid) => (
-            <option key={kid.id} value={kid.id}>
-              {kid.name}
-            </option>
-          ))}
-        </select>
+    <form className="space-y-3 rounded-xl border border-slate-200 bg-white/80 p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/80" method="get">
+      <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
+        <label className="flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-2 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          Kid
+          <select
+            name="kid"
+            defaultValue={filters.kid}
+            className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-800 outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+          >
+            <option value="all">All kids</option>
+            {kids.map((kid) => (
+              <option key={kid.id} value={kid.id}>
+                {kid.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-2 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          Type
+          <select
+            name="type"
+            defaultValue={filters.type}
+            className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-800 outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+          >
+            <option value="all">Any</option>
+            <option value="one-off">One-off</option>
+            <option value="repeated">Repeated</option>
+            <option value="perpetual">Perpetual</option>
+          </select>
+        </label>
+        <label className="flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-2 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          Time
+          <select
+            name="timeOfDay"
+            defaultValue={filters.timeOfDay}
+            className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-800 outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+          >
+            <option value="all">Any</option>
+            <option value="morning">Morning</option>
+            <option value="afternoon">Afternoon</option>
+            <option value="evening">Evening</option>
+          </select>
+        </label>
+        <label className="flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-2 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          Status
+          <select
+            name="status"
+            defaultValue={filters.status}
+            className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-800 outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+          >
+            <option value="all">Any</option>
+            <option value="open">Open</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="paused">Paused</option>
+            <option value="completed">Completed</option>
+          </select>
+        </label>
+        <label className="flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-2 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          Approval
+          <select
+            name="approval"
+            defaultValue={filters.approval}
+            className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-800 outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+          >
+            <option value="all">Any</option>
+            <option value="pin">Pin</option>
+            <option value="none">No pin</option>
+          </select>
+        </label>
+        <label className="flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-2 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          Sort
+          <select
+            name="sort"
+            defaultValue={filters.sort ?? 'created-desc'}
+            className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-800 outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+          >
+            <option value="created-desc">Newest</option>
+            <option value="created-asc">Oldest</option>
+            <option value="stars-desc">Most stars</option>
+            <option value="stars-asc">Fewest stars</option>
+            <option value="title">Title</option>
+          </select>
+        </label>
       </div>
 
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">Type</label>
-        <select
-          name="type"
-          defaultValue={filters.type}
-          className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-        >
-          <option value="all">All types</option>
-          <option value="one-off">One-off</option>
-          <option value="repeated">Repeated</option>
-          <option value="perpetual">Perpetual</option>
-        </select>
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">Time of day</label>
-        <select
-          name="timeOfDay"
-          defaultValue={filters.timeOfDay}
-          className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-        >
-          <option value="all">Any time</option>
-          <option value="morning">Morning</option>
-          <option value="afternoon">Afternoon</option>
-          <option value="evening">Evening</option>
-        </select>
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">Status</label>
-        <select
-          name="status"
-          defaultValue={filters.status}
-          className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-        >
-          <option value="all">Any status</option>
-          <option value="open">Open</option>
-          <option value="scheduled">Scheduled</option>
-          <option value="paused">Paused</option>
-          <option value="completed">Completed</option>
-        </select>
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">Approval</label>
-        <select
-          name="approval"
-          defaultValue={filters.approval}
-          className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-        >
-          <option value="all">Any</option>
-          <option value="pin">Requires pin</option>
-          <option value="none">No pin</option>
-        </select>
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">Sort</label>
-        <select
-          name="sort"
-          defaultValue={filters.sort ?? 'created-desc'}
-          className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-        >
-          <option value="created-desc">Newest first</option>
-          <option value="created-asc">Oldest first</option>
-          <option value="stars-desc">Most stars</option>
-          <option value="stars-asc">Fewest stars</option>
-          <option value="title">Title</option>
-        </select>
-      </div>
-
-      <div className="flex flex-col gap-1 sm:col-span-2 lg:col-span-3">
-        <label className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">Search</label>
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
-          <input
-            type="search"
-            name="q"
-            defaultValue={filters.q}
-            placeholder="Find chores by title or emoji"
-            className="flex-1 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
-          />
-          <div className="flex items-center gap-2">
-            <button
-              type="submit"
-              className="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
-            >
-              Apply
-            </button>
-            <a
-              className="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-200"
-              href="/chores/admin"
-            >
-              Reset
-            </a>
-          </div>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+        <input
+          type="search"
+          name="q"
+          defaultValue={filters.q}
+          placeholder="Find chores by title or emoji"
+          className="flex-1 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+        />
+        <div className="flex items-center gap-2">
+          <button
+            type="submit"
+            className="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+          >
+            Apply filters
+          </button>
+          <a
+            className="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-200"
+            href="/chores/admin"
+          >
+            Reset
+          </a>
         </div>
       </div>
     </form>
@@ -920,7 +710,7 @@ export default async function ChoreAdminPage({ searchParams }: AdminPageProps) {
   return (
     <ParentalPinGate>
       <>
-        <div className="space-y-6">
+        <div className="mx-auto flex max-w-6xl flex-col gap-8">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
               <p className="text-sm uppercase tracking-wide text-slate-500 dark:text-slate-400">
@@ -996,7 +786,12 @@ export default async function ChoreAdminPage({ searchParams }: AdminPageProps) {
             </div>
           </div>
 
-          <AddChoreForm kids={state.kids} addChoreAction={addChore} />
+          <RevealPanel
+            label="Add a chore"
+            description="Create a new task without cluttering the page until you need it."
+          >
+            <AddChoreForm kids={state.kids} addChoreAction={addChore} />
+          </RevealPanel>
 
           <div className="full-bleed">
             <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 md:px-4">
@@ -1006,7 +801,7 @@ export default async function ChoreAdminPage({ searchParams }: AdminPageProps) {
             </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
               <div className="space-y-1">
                 <p className="text-sm uppercase tracking-wide text-slate-500 dark:text-slate-400">Chores</p>
@@ -1023,9 +818,9 @@ export default async function ChoreAdminPage({ searchParams }: AdminPageProps) {
 
             <ChoreFilters kids={state.kids} filters={filters} />
 
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <div className="mx-auto flex max-w-5xl flex-col gap-4">
               {visibleChores.length === 0 ? (
-                <div className="col-span-full rounded-xl border border-dashed border-slate-300 bg-white p-6 text-center text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+                <div className="rounded-xl border border-dashed border-slate-300 bg-white p-6 text-center text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
                   No chores match these filters. Adjust the search or add a new task above.
                 </div>
               ) : (
@@ -1054,7 +849,9 @@ export default async function ChoreAdminPage({ searchParams }: AdminPageProps) {
                 Add perks the kids can unlock and assign them to one or many columns.
               </p>
             </div>
-            <AddRewardForm kids={state.kids} addRewardAction={addReward} />
+            <RevealPanel label="Add a reward" description="Open the form when you need to add a new perk.">
+              <AddRewardForm kids={state.kids} addRewardAction={addReward} />
+            </RevealPanel>
           </div>
 
           <div className="full-bleed">

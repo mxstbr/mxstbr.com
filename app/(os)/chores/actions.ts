@@ -654,6 +654,65 @@ export async function setChoreKids(formData: FormData): Promise<void> {
   })
 }
 
+export async function updateChoreSettings(formData: FormData): Promise<void> {
+  await requireAuthorization(formData)
+
+  const choreId = formData.get('choreId')?.toString()
+  if (!choreId) return
+
+  const timeOfDay = parseTimeOfDay(formData.get('timeOfDay')) ?? undefined
+  const approvalEntries = formData
+    .getAll('requiresApproval')
+    .map((value) => value.toString().toLowerCase())
+  const requiresApproval = approvalEntries.includes('true') || approvalEntries.includes('on')
+
+  const kidIds = formData
+    .getAll('kidIds')
+    .map((value) => value.toString())
+    .filter(Boolean)
+
+  const cadence = formData.get('cadence')?.toString() === 'weekly' ? 'weekly' : 'daily'
+  const daysOfWeek = formData
+    .getAll('daysOfWeek')
+    .map((value) => Number(value))
+    .filter((value) => Number.isInteger(value) && value >= 0 && value <= 6)
+
+  const pausedUntil = formData.get('pausedUntil')?.toString() ?? ''
+  const scheduledFor = parseIsoDay(formData.get('scheduledFor'))
+
+  await withUpdatedState((state) => {
+    const chore = state.chores.find((c) => c.id === choreId)
+    if (!chore) return
+
+    const validKidIds = (kidIds.length ? kidIds : chore.kidIds).filter((id) =>
+      state.kids.some((kid) => kid.id === id),
+    )
+    if (!validKidIds.length) return
+
+    chore.kidIds = validKidIds
+    chore.timeOfDay = timeOfDay
+    chore.requiresApproval = requiresApproval
+
+    if (chore.type === 'repeated') {
+      chore.schedule =
+        cadence === 'daily'
+          ? { cadence: 'daily' }
+          : {
+              cadence: 'weekly',
+              daysOfWeek: daysOfWeek.length
+                ? daysOfWeek
+                : chore.schedule?.daysOfWeek ?? [0, 1, 2, 3, 4, 5, 6],
+            }
+
+      chore.pausedUntil = pausedUntil || undefined
+    }
+
+    if (chore.type === 'one-off' && scheduledFor) {
+      chore.scheduledFor = scheduledFor
+    }
+  })
+}
+
 export async function setOneOffDate(formData: FormData): Promise<void> {
   await requireAuthorization(formData)
 
