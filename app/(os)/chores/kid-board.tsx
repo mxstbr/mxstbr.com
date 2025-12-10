@@ -668,6 +668,10 @@ function KidColumn({
         )
         if (!autoCollapse) {
           manualExpansions.current.delete(group.key)
+          if (next[group.key]) {
+            next[group.key] = false
+            changed = true
+          }
           continue
         }
         if (manualExpansions.current.has(group.key)) continue
