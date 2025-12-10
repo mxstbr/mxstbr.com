@@ -5,6 +5,8 @@ import { bot } from 'app/lib/telegram'
 import { clippy } from 'app/lib/clippy-agent'
 import { dedent } from 'app/lib/dedent'
 
+export const maxDuration = 60
+
 function escapeHtml(value: string) {
   return value
     .replace(/&/g, '&amp;')
