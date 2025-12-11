@@ -43,7 +43,7 @@ export default function Chat() {
               className={`whitespace-pre-wrap flex ${isUser ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-xs md:max-w-md px-4 py-2 rounded-lg shadow-sm border text-sm
+                className={`max-w-xs md:max-w-md px-4 py-2 rounded-lg shadow-xs border text-sm
                   ${
                     isUser
                       ? 'bg-blue-100 text-blue-900 border-blue-200 dark:bg-blue-900 dark:text-blue-100 dark:border-blue-700'
@@ -62,7 +62,7 @@ export default function Chat() {
                         return (
                           <div
                             key={`${message.id}-${i}`}
-                            className="my-2 p-2 rounded bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 text-yellow-900 dark:text-yellow-100"
+                            className="my-2 p-2 rounded-sm bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 text-yellow-900 dark:text-yellow-100"
                           >
                             <div className="text-xs font-medium mb-1">
                               🔧 Tool Call: {part.type.replace('tool-', '')}
@@ -103,7 +103,7 @@ export default function Chat() {
         className="border-t border-slate-200 dark:border-slate-700 w-full"
       >
         <input
-          className="w-full p-3 bg-transparent dark:bg-transparent text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:outline-none border-none shadow-none rounded-none"
+          className="w-full p-3 bg-transparent dark:bg-transparent text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-hidden focus:outline-hidden border-none shadow-none rounded-none"
           style={{ boxShadow: 'none', border: 'none' }}
           value={input}
           placeholder="Say something..."

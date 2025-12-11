@@ -65,7 +65,6 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.17",
     "@playwright/test": "^1.47.2",
-    "autoprefixer": "^10.4.19",
     "baseline-browser-mapping": "^2.9.5",
     "postcss": "^8.4.41",
     "tailwindcss": "^4.1.17"

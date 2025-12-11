@@ -1,5 +1,15 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @config "../tailwind.config.js";
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
 
 ::selection {
   background-color: #47a3f3;
@@ -42,79 +52,79 @@ html {
        size. The result is a zoom effect of the whole layout. */
     font-size: clamp(0.6rem, calc(0.7rem + 0.55vw), 1rem);
   }
-}
 
-a {
-  @apply underline decoration-slate-300 decoration-2 hover:decoration-slate-350;
-  @apply dark:decoration-slate-600 dark:hover:decoration-slate-500;
-}
-
-.prose a {
-  @apply underline decoration-slate-400 decoration-2 hover:decoration-slate-500;
-  @apply dark:decoration-slate-500 dark:hover:decoration-slate-400;
-}
-
-.prose sup a {
-  @apply no-underline;
-}
-
-.prose .anchor {
-  @apply absolute invisible no-underline;
-
-  margin-left: -1em;
-  padding-right: 0.5em;
-  width: 80%;
-  max-width: 700px;
-  cursor: pointer;
-}
-
-.anchor:hover {
-  @apply visible;
-}
-
-.prose li p {
-  margin: 0;
-}
-
-mark {
-  @apply bg-yellow-slate-100 text-inherit dark:bg-slate-800;
-}
-
-pre::-webkit-scrollbar {
-  display: none;
-}
-
-pre {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-}
-
-@media (prefers-color-scheme: dark) {
-  pre {
-    @apply bg-slate-900;
+  a {
+    @apply underline decoration-slate-300 decoration-2 hover:decoration-slate-350;
+    @apply dark:decoration-slate-600 dark:hover:decoration-slate-500;
   }
-}
 
-/* Remove Safari input shadow on mobile */
-input[type='text'],
-input[type='email'] {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-}
+  .prose a {
+    @apply underline decoration-slate-400 decoration-2 hover:decoration-slate-500;
+    @apply dark:decoration-slate-500 dark:hover:decoration-slate-400;
+  }
 
-table {
-  display: block;
-  max-width: fit-content;
-  overflow-x: auto;
-  white-space: nowrap;
-}
+  .prose sup a {
+    @apply no-underline;
+  }
 
-.full-bleed {
-  width: 100vw;
-  position: relative;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
+  .prose .anchor {
+    @apply absolute invisible no-underline;
+
+    margin-left: -1em;
+    padding-right: 0.5em;
+    width: 80%;
+    max-width: 700px;
+    cursor: pointer;
+  }
+
+  .anchor:hover {
+    @apply visible;
+  }
+
+  .prose li p {
+    margin: 0;
+  }
+
+  mark {
+    @apply bg-yellow-slate-100 text-inherit dark:bg-slate-800;
+  }
+
+  pre::-webkit-scrollbar {
+    display: none;
+  }
+
+  pre {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  @media (prefers-color-scheme: dark) {
+    pre {
+      @apply bg-slate-900;
+    }
+  }
+
+  /* Remove Safari input shadow on mobile */
+  input[type='text'],
+  input[type='email'] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+
+  table {
+    display: block;
+    max-width: fit-content;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .full-bleed {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+  }
 }

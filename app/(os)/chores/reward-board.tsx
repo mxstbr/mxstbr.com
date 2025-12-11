@@ -103,7 +103,7 @@ function RewardColumn({
 
   return (
     <div
-      className="flex flex-col gap-4 rounded-2xl border bg-white p-4 shadow-sm dark:bg-slate-900 md:h-full md:min-h-0 md:overflow-y-auto"
+      className="flex flex-col gap-4 rounded-2xl border bg-white p-4 shadow-xs dark:bg-slate-900 md:h-full md:min-h-0 md:overflow-y-auto"
       style={{
         borderColor: accent,
         backgroundColor: accentSoft,
@@ -115,7 +115,7 @@ function RewardColumn({
           {kid.name}
         </div>
         <div
-          className="flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold shadow-sm"
+          className="flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold shadow-xs"
           style={{ backgroundColor: accentSoft, color: accent }}
         >
           ⭐️ <span className="tabular-nums">{starTotal}</span>
@@ -185,7 +185,7 @@ function RewardButton({
           }
         })
       }
-      className={`group flex w-full items-center gap-4 rounded-xl border-2 border-slate-200 bg-white px-4 py-4 text-left text-slate-900 shadow transition dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 ${
+      className={`group flex w-full items-center gap-4 rounded-xl border-2 border-slate-200 bg-white px-4 py-4 text-left text-slate-900 shadow-sm transition dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 ${
         available && enough
           ? 'focus-within:-translate-y-0.5 active:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:border-[var(--accent)] dark:focus-visible:outline-[var(--accent)]'
           : 'opacity-70'
