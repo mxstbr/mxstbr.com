@@ -73,9 +73,15 @@ function shouldAutoCollapse(
   key: TimeGroupKey,
 ): boolean {
   if (mode !== 'today') return false
-  if (key === 'morning') return minutes >= 12 * 60
-  if (key === 'afternoon') return minutes >= 18 * 60
-  return false
+  if (key === 'any') return false
+  const currentGroup: TimeGroupKey =
+    minutes < 12 * 60
+      ? 'morning'
+      : minutes < 18 * 60
+        ? 'afternoon'
+        : 'evening'
+
+  return key !== currentGroup
 }
 
 export function KidBoard({
@@ -621,6 +627,7 @@ function KidColumn({
     }
     return initial
   })
+  const [collapsedDone, setCollapsedDone] = useState(true)
   const manualExpansions = useRef<Set<TimeGroupKey>>(new Set())
   const recollapseTimer = useRef<number | undefined>(undefined)
   const choresByTime: Record<TimeGroupKey, Chore[]> = {
@@ -667,6 +674,10 @@ function KidColumn({
           group.key,
         )
         if (!autoCollapse) {
+          if (next[group.key]) {
+            next[group.key] = false
+            changed = true
+          }
           manualExpansions.current.delete(group.key)
           continue
         }
@@ -847,21 +858,43 @@ function KidColumn({
       {doneChores.length ? (
         <div className="mt-6 space-y-2 md:mt-8">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-            <span>Done today</span>
+            <button
+              type="button"
+              onClick={() => setCollapsedDone((prev) => !prev)}
+              className="inline-flex items-center gap-2 transition hover:text-slate-900 dark:hover:text-slate-100"
+              aria-expanded={!collapsedDone}
+            >
+              <span
+                aria-hidden="true"
+                className={`text-base text-slate-500 transition-transform ${
+                  collapsedDone ? '' : 'rotate-90'
+                }`}
+              >
+                &gt;
+              </span>
+              <span>Done today</span>
+            </button>
             <span className="h-px flex-1 rounded-full bg-slate-200 dark:bg-slate-700" />
+            {collapsedDone ? (
+              <span className="rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                {doneChores.length} done
+              </span>
+            ) : null}
           </div>
-          <div className="space-y-2">
-            {doneChores.map((entry) => (
-              <CompletedChoreButton
-                key={`${entry.chore.id}-${entry.completionId}`}
-                chore={entry.chore}
-                completionId={entry.completionId}
-                accent={accentColor}
-                kidId={kid.id}
-                onUndo={onUndo}
-              />
-            ))}
-          </div>
+          {!collapsedDone ? (
+            <div className="space-y-2">
+              {doneChores.map((entry) => (
+                <CompletedChoreButton
+                  key={`${entry.chore.id}-${entry.completionId}`}
+                  chore={entry.chore}
+                  completionId={entry.completionId}
+                  accent={accentColor}
+                  kidId={kid.id}
+                  onUndo={onUndo}
+                />
+              ))}
+            </div>
+          ) : null}
         </div>
       ) : null}
 
