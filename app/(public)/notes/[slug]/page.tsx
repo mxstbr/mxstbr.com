@@ -69,7 +69,11 @@ export async function generateMetadata({
 
 const NOTE_CONTENT_ELEMENT_ID = 'note-content'
 
-export default async function Page({ params }) {
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
   const { slug } = await params
   const notes = await getNotes()
   const note = notes.find((note) => note.frontmatter.slug === slug)
@@ -119,7 +123,7 @@ export default async function Page({ params }) {
             dateModified: frontmatter.updatedAt || frontmatter.publishedAt,
             description: frontmatter.summary,
             image: generateOgImage(note),
-            url: `${prodUrl}/notes/${params.slug}`,
+            url: `${prodUrl}/notes/${slug}`,
             author: {
               '@type': 'Person',
               '@id': 'mxstbr',

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { isPacificNighttime } from './utils'
 
 const INACTIVITY_TIMEOUT_MS = 60_000
@@ -9,6 +9,7 @@ const TIME_CHECK_INTERVAL_MS = 30_000
 export function ScreenSaver({ noChoresToday }: { noChoresToday: boolean }) {
   const [isNighttime, setIsNighttime] = useState(() => isPacificNighttime())
   const [visible, setVisible] = useState(false)
+  const resetTimerRef = useRef<() => void>(() => {})
 
   useEffect(() => {
     const updateNighttime = () => setIsNighttime(isPacificNighttime())
@@ -22,6 +23,7 @@ export function ScreenSaver({ noChoresToday }: { noChoresToday: boolean }) {
   useEffect(() => {
     if (!shouldEnable) {
       setVisible(false)
+      resetTimerRef.current = () => {}
       return
     }
 
@@ -31,6 +33,8 @@ export function ScreenSaver({ noChoresToday }: { noChoresToday: boolean }) {
       setVisible(false)
       timeoutId = window.setTimeout(() => setVisible(true), INACTIVITY_TIMEOUT_MS)
     }
+
+    resetTimerRef.current = resetTimer
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
@@ -51,10 +55,25 @@ export function ScreenSaver({ noChoresToday }: { noChoresToday: boolean }) {
       window.clearTimeout(timeoutId)
       events.forEach((event) => window.removeEventListener(event, resetTimer))
       document.removeEventListener('visibilitychange', handleVisibilityChange)
+      resetTimerRef.current = () => {}
     }
   }, [shouldEnable])
 
   if (!shouldEnable || !visible) return null
 
-  return <div className="fixed inset-0 z-[80] bg-black transition-opacity duration-200" aria-hidden="true" />
+  const handleOverlayInteraction = (event: ReactPointerEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    event.stopPropagation()
+    resetTimerRef.current()
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-[80] bg-black transition-opacity duration-200"
+      aria-hidden="true"
+      onPointerDown={handleOverlayInteraction}
+      onPointerUp={handleOverlayInteraction}
+      onClick={handleOverlayInteraction}
+    />
+  )
 }
