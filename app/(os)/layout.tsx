@@ -1,12 +1,12 @@
 import '../global.css'
-import { Inter } from 'next/font/google'
+import { GeistSans } from 'geist/font/sans'
 import { Analytics } from '@vercel/analytics/react'
 import Script from 'next/script'
 import { ReportView } from '../components/report-view'
 import { PasswordForm } from './components/password-form'
 import { auth } from '../auth'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = GeistSans
 
 export default async function OSRootLayout({
   children,

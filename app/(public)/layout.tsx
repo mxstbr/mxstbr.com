@@ -1,6 +1,6 @@
 import '../global.css'
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { GeistSans } from 'geist/font/sans'
 import { Navbar } from '../components/nav'
 import { Analytics } from '@vercel/analytics/react'
 import Script from 'next/script'
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
   },
 }
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = GeistSans
 
 export default function RootLayout({
   children,

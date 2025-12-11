@@ -5,6 +5,10 @@ import { getNotes } from './app/(public)/notes/hashnode'
 
 const nextConfig: NextConfig = {
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
+  turbopack: {},
+  experimental: {
+    mdxRs: true,
+  },
   async redirects() {
     const notes = await getNotes()
     const previousSlugNotesRedirects = notes
