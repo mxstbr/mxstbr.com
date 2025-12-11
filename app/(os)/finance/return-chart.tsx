@@ -196,7 +196,7 @@ export default function ReturnChart({ returnHistory }: ReturnChartProps) {
             This chart compares <strong>time-weighted</strong> (green) vs <strong>money-weighted</strong> (gray dashed) returns. 
             Time-weighted ignores cash flow timing and shows pure stock-picking performance.
           </p>
-          <p className="text-xs bg-blue-50 dark:bg-blue-900/20 p-2 rounded border-l-2 border-blue-400">
+          <p className="text-xs bg-blue-50 dark:bg-blue-900/20 p-2 rounded-sm border-l-2 border-blue-400">
             <strong>Key Difference:</strong> Time-weighted return stays smooth through new purchases, while money-weighted 
             return drops when you invest more money (visible as the gray dashed line dipping when you buy more shares).
           </p>

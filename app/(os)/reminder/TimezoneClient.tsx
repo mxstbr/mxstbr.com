@@ -43,7 +43,7 @@ export default function TimezoneClient({
         <strong>Browser timezone:</strong> {browserTz}
       </p>
       <button
-        className="rounded bg-black px-4 py-2 font-semibold text-white disabled:opacity-50"
+        className="rounded-sm bg-black px-4 py-2 font-semibold text-white disabled:opacity-50"
         onClick={onUpdate}
         disabled={busy}
       >

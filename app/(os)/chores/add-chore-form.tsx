@@ -54,7 +54,7 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
   return (
     <form
       action={addChoreAction}
-      className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+      className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900"
     >
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
@@ -79,7 +79,7 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
             name="title"
             required
             placeholder="Pack for trip"
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-xs outline-hidden transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
           />
         </label>
 
@@ -89,7 +89,7 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
             name="emoji"
             maxLength={4}
             placeholder="🎒"
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-xs outline-hidden transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
           />
         </label>
 
@@ -100,7 +100,7 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
             type="number"
             min={0}
             defaultValue={1}
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-xs outline-hidden transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
           />
         </label>
 
@@ -150,7 +150,7 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
                 event.target.value as '' | 'morning' | 'afternoon' | 'evening',
               )
             }
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-xs outline-hidden transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
           >
             <option value="">Any time</option>
             <option value="morning">Morning</option>
@@ -167,7 +167,7 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
               name="scheduledFor"
               value={scheduledFor}
               onChange={(event) => setScheduledFor(event.target.value)}
-              className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+              className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-xs outline-hidden transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
             />
             <span className="text-xs font-normal text-slate-500 dark:text-slate-400">
               One-offs appear on this day and roll over until completed.
@@ -177,13 +177,13 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
 
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-200">
           Parental approval
-          <div className="flex items-center gap-2 rounded-md border border-slate-300 bg-white px-3 py-2 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+          <div className="flex items-center gap-2 rounded-md border border-slate-300 bg-white px-3 py-2 shadow-xs dark:border-slate-700 dark:bg-slate-800">
             <input type="hidden" name="requiresApproval" value="false" />
             <input
               type="checkbox"
               name="requiresApproval"
               value="true"
-              className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-500 dark:border-slate-600 dark:bg-slate-900"
+              className="h-4 w-4 rounded-sm border-slate-300 text-slate-900 focus:ring-slate-500 dark:border-slate-600 dark:bg-slate-900"
               aria-label="Requires parental approval"
             />
             <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">
@@ -207,7 +207,7 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
                 event.target.value as 'one-off' | 'repeated' | 'perpetual',
               )
             }
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-xs outline-hidden transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
           >
             <option value="one-off">One-off</option>
             <option value="repeated">Repeated</option>
@@ -228,7 +228,7 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
                 onChange={(event) =>
                   setCadence(event.target.value as 'daily' | 'weekly')
                 }
-                className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+                className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-xs outline-hidden transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
               >
                 <option value="daily">Daily</option>
                 <option value="weekly">Weekly</option>

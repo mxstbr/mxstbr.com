@@ -123,13 +123,13 @@ export function HoldingDeleteButton({ index, ticker, deleteAction }: HoldingDele
         <button
           onClick={handleDelete}
           disabled={loading}
-          className="px-2 py-1 text-xs font-medium text-white bg-red-600 hover:bg-red-700 disabled:bg-red-400 rounded transition-colors"
+          className="px-2 py-1 text-xs font-medium text-white bg-red-600 hover:bg-red-700 disabled:bg-red-400 rounded-sm transition-colors"
         >
           {loading ? 'Deleting...' : 'Confirm'}
         </button>
         <button
           onClick={() => setShowConfirm(false)}
-          className="px-2 py-1 text-xs font-medium text-slate-700 dark:text-slate-300 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 rounded transition-colors"
+          className="px-2 py-1 text-xs font-medium text-slate-700 dark:text-slate-300 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 rounded-sm transition-colors"
         >
           Cancel
         </button>
@@ -140,7 +140,7 @@ export function HoldingDeleteButton({ index, ticker, deleteAction }: HoldingDele
   return (
     <button
       onClick={() => setShowConfirm(true)}
-      className="px-2 py-1 text-xs font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+      className="px-2 py-1 text-xs font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-sm transition-colors"
     >
       Delete
     </button>
@@ -291,7 +291,7 @@ export function HoldingsListItem({ holding, index, editAction, deleteAction }: H
       <div className="flex gap-2">
         <button
           onClick={() => setIsEditing(true)}
-          className="px-3 py-1 text-xs font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+          className="px-3 py-1 text-xs font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-sm transition-colors"
         >
           Edit
         </button>

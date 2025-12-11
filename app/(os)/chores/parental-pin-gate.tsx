@@ -63,7 +63,7 @@ export function ParentalPinGate({ children }: { children: React.ReactNode }) {
                 setPin(next)
                 setError('')
               }}
-              className="rounded-md border border-slate-300 bg-white px-3 py-2 text-lg font-semibold tracking-widest text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+              className="rounded-md border border-slate-300 bg-white px-3 py-2 text-lg font-semibold tracking-widest text-slate-900 shadow-xs outline-hidden transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
               placeholder="1234"
               aria-label="Parental pin"
               autoFocus

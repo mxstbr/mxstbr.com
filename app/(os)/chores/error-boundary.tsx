@@ -32,7 +32,7 @@ export class ChoresErrorBoundary extends Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="rounded-md border border-slate-300 bg-white/70 p-4 text-sm text-slate-800 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100">
+        <div className="rounded-md border border-slate-300 bg-white/70 p-4 text-sm text-slate-800 shadow-xs backdrop-blur dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
               <p className="font-semibold">We couldn't load {this.props.label}.</p>

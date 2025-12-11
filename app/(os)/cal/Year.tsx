@@ -707,7 +707,7 @@ function EventOverlays(props: {
           <a
             key={`${eventId}-${idx}`}
             href={`#${eventId}`}
-            className="absolute h-5 rounded flex items-center text-[10px] font-semibold no-underline transition-opacity hover:opacity-90 px-1.5 shadow-sm"
+            className="absolute h-5 rounded-sm flex items-center text-[10px] font-semibold no-underline transition-opacity hover:opacity-90 px-1.5 shadow-xs"
             style={{
               left: `${adjustedLeft}%`,
               width: `${adjustedWidth}%`,

@@ -38,7 +38,7 @@ export function PasswordForm({
           <label className="block space-y-2 text-sm font-medium text-slate-800">
             <span>Password</span>
             <input
-              className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-900 shadow-inner outline-none transition focus:border-slate-400 focus:bg-white focus:ring-2 focus:ring-slate-200"
+              className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-900 shadow-inner outline-hidden transition focus:border-slate-400 focus:bg-white focus:ring-2 focus:ring-slate-200"
               type="password"
               name="password"
               defaultValue={defaultPassword}
