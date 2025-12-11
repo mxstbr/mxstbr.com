@@ -21,6 +21,8 @@ export async function POST(request: NextRequest) {
     const chatId = message.chat.id
 
     let thinkingMessage
+    let draftText = ''
+    let lastDraftUpdate = 0
 
     try {
       thinkingMessage = await bot.telegram.sendMessage(chatId, 'Thinking…')
@@ -30,7 +32,7 @@ export async function POST(request: NextRequest) {
         ('caption' in message && message.caption) ||
         ''
 
-      const result = await clippy.generate({
+      const stream = await clippy.stream({
         messages: [
           {
             role: 'system',
@@ -44,7 +46,24 @@ export async function POST(request: NextRequest) {
         ],
       })
 
-      const responseText = result.text?.trim()
+      for await (const delta of stream.textStream) {
+        draftText += delta
+
+        const now = Date.now()
+        if (now - lastDraftUpdate >= 500) {
+          await bot.telegram.editMessageText(
+            chatId,
+            thinkingMessage.message_id,
+            undefined,
+            draftText.trim()
+              ? `Thinking… (draft)\n\n${draftText.trim()}`
+              : 'Thinking…',
+          )
+          lastDraftUpdate = now
+        }
+      }
+
+      const responseText = draftText.trim()
 
       await bot.telegram.editMessageText(
         chatId,
