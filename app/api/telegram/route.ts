@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
             thinkingMessage.message_id,
             undefined,
             draftText.trim()
-              ? `Thinking… (draft)\n\n${draftText.trim()}`
+              ? `${draftText.trim()}\nThinking…`
               : 'Thinking…',
           )
           lastDraftUpdate = now
