@@ -58,33 +58,6 @@ html {
     @apply dark:decoration-slate-600 dark:hover:decoration-slate-500;
   }
 
-  .prose a {
-    @apply underline decoration-slate-400 decoration-2 hover:decoration-slate-500;
-    @apply dark:decoration-slate-500 dark:hover:decoration-slate-400;
-  }
-
-  .prose sup a {
-    @apply no-underline;
-  }
-
-  .prose .anchor {
-    @apply absolute invisible no-underline;
-
-    margin-left: -1em;
-    padding-right: 0.5em;
-    width: 80%;
-    max-width: 700px;
-    cursor: pointer;
-  }
-
-  .anchor:hover {
-    @apply visible;
-  }
-
-  .prose li p {
-    margin: 0;
-  }
-
   mark {
     @apply bg-yellow-slate-100 text-inherit dark:bg-slate-800;
   }
@@ -127,4 +100,31 @@ html {
     margin-left: -50vw;
     margin-right: -50vw;
   }
+}
+
+.prose a {
+  @apply underline decoration-slate-400 decoration-2 hover:decoration-slate-500;
+  @apply dark:decoration-slate-500 dark:hover:decoration-slate-400;
+}
+
+.prose sup a {
+  @apply no-underline;
+}
+
+.prose .anchor {
+  @apply absolute invisible no-underline;
+
+  margin-left: -1em;
+  padding-right: 0.5em;
+  width: 80%;
+  max-width: 700px;
+  cursor: pointer;
+}
+
+.anchor:hover {
+  @apply visible;
+}
+
+.prose li p {
+  margin: 0;
 }
