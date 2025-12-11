@@ -44,6 +44,11 @@ import {
 } from '../utils'
 import { ClippyChoresChat } from './clippy-chat'
 
+async function handleCompleteChore(formData: FormData): Promise<void> {
+  'use server'
+  await completeChore(formData)
+}
+
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 export const fetchCache = 'force-no-store'
@@ -381,7 +386,7 @@ function ChoreCard({ chore, kids, completions, ctx }: { chore: Chore; kids: Kid[
 
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-2">
-          <form action={completeChore} className="flex flex-wrap items-center gap-2">
+          <form action={handleCompleteChore} className="flex flex-wrap items-center gap-2">
             <input type="hidden" name="choreId" value={chore.id} />
             <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">Mark done</label>
             <select

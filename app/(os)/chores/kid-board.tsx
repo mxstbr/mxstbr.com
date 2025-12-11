@@ -622,7 +622,7 @@ function KidColumn({
     return initial
   })
   const manualExpansions = useRef<Set<TimeGroupKey>>(new Set())
-  const recollapseTimer = useRef<number>()
+  const recollapseTimer = useRef<number | undefined>(undefined)
   const choresByTime: Record<TimeGroupKey, Chore[]> = {
     morning: [],
     afternoon: [],
