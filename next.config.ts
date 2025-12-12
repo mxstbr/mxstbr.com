@@ -1,6 +1,5 @@
 import type { NextConfig } from 'next'
 import createMDX from '@next/mdx'
-import smartypants from 'remark-smartypants'
 import { getNotes } from './app/(public)/notes/hashnode'
 
 const nextConfig: NextConfig = {
@@ -59,7 +58,9 @@ const nextConfig: NextConfig = {
 
 const withMDX = createMDX({
   options: {
-    remarkPlugins: [smartypants],
+    // Turbopack requires MDX plugins be specified as serializable values.
+    // Use the plugin module name string instead of an imported function.
+    remarkPlugins: ['remark-smartypants'],
   },
 })
 
