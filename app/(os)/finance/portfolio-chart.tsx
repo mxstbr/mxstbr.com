@@ -2,6 +2,7 @@
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { PortfolioValue } from './portfolio-calculator'
+import { useMoneyVisibility, BlurredValue } from './money-visibility'
 
 // Utility function to format dollar values rounded to nearest dollar
 function formatDollar(value: number): string {
@@ -13,6 +14,7 @@ interface PortfolioChartProps {
 }
 
 export default function PortfolioChart({ portfolioHistory }: PortfolioChartProps) {
+  const { unlocked, requestUnlock } = useMoneyVisibility()
   // Format data for the chart
   const chartData = portfolioHistory.map(item => ({
     date: item.date,
@@ -29,15 +31,15 @@ export default function PortfolioChart({ portfolioHistory }: PortfolioChartProps
       return (
         <div className="bg-white dark:bg-slate-800 p-3 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg">
           <p className="text-slate-600 dark:text-slate-400">
-            {new Date(label).toLocaleDateString('en-US', { 
+            {new Date(label).toLocaleDateString('en-US', {
               weekday: 'long',
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
             })}
           </p>
           <p className="text-slate-900 dark:text-slate-100 font-semibold">
-            ${formatDollar(payload[0].value)}
+            <BlurredValue>${formatDollar(payload[0].value)}</BlurredValue>
           </p>
         </div>
       )
@@ -50,7 +52,16 @@ export default function PortfolioChart({ portfolioHistory }: PortfolioChartProps
       <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-6">
         Portfolio Value Over Time
       </h2>
-      <div className="h-96">
+      <div className="relative h-96">
+        {!unlocked ? (
+          <button
+            type="button"
+            onClick={requestUnlock}
+            className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/70 text-sm font-semibold text-slate-800 backdrop-blur-sm transition hover:bg-white/80 dark:bg-slate-900/70 dark:text-slate-100 dark:hover:bg-slate-900/80"
+          >
+            Dollar values hidden — click to enter parental pin
+          </button>
+        ) : null}
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={chartData}
@@ -67,10 +78,10 @@ export default function PortfolioChart({ portfolioHistory }: PortfolioChartProps
               className="text-slate-600 dark:text-slate-400"
               fontSize={12}
             />
-            <YAxis 
+            <YAxis
               className="text-slate-600 dark:text-slate-400"
               fontSize={12}
-              tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+              tickFormatter={(value) => (unlocked ? `$${(value / 1000).toFixed(0)}k` : '•••')}
             />
             <Tooltip content={<CustomTooltip />} />
             <Line 
