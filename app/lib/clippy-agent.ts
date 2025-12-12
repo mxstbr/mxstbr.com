@@ -7,6 +7,7 @@ import { dedent } from './dedent'
 import { calendarTools } from './calendar'
 import { telegramTools } from './telegram'
 import { choreTools } from './chores'
+import { financeTools } from './finance'
 
 const redis = Redis.fromEnv()
 const CONVERSATION_INDEX_KEY = 'clippy:conversations'
@@ -187,6 +188,7 @@ export const clippy = new Agent({
     ...calendarTools,
     ...telegramTools,
     ...choreTools,
+    ...financeTools,
   },
   onStepFinish: async (result) => {
     try {
