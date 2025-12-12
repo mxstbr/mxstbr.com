@@ -413,7 +413,7 @@ function Card(props: { title: string; dragging?: boolean }) {
   return (
     <div
       className={
-        'bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded px-3 py-2 text-sm shadow-sm cursor-grab active:cursor-grabbing select-none' +
+        'bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-sm px-3 py-2 text-sm shadow-xs cursor-grab active:cursor-grabbing select-none' +
         (props.dragging ? ' shadow-md' : '')
       }
     >

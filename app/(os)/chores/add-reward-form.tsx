@@ -25,7 +25,7 @@ export function AddRewardForm({ kids, addRewardAction }: AddRewardFormProps) {
   return (
     <form
       action={addRewardAction}
-      className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+      className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900"
     >
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
@@ -49,7 +49,7 @@ export function AddRewardForm({ kids, addRewardAction }: AddRewardFormProps) {
             name="title"
             required
             placeholder="RC car"
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-xs outline-hidden transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
           />
         </label>
 
@@ -59,7 +59,7 @@ export function AddRewardForm({ kids, addRewardAction }: AddRewardFormProps) {
             name="emoji"
             maxLength={4}
             placeholder="🚗"
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-xs outline-hidden transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
           />
         </label>
 
@@ -70,7 +70,7 @@ export function AddRewardForm({ kids, addRewardAction }: AddRewardFormProps) {
             type="number"
             min={1}
             defaultValue={5}
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-xs outline-hidden transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
           />
         </label>
 
@@ -82,7 +82,7 @@ export function AddRewardForm({ kids, addRewardAction }: AddRewardFormProps) {
             onChange={(event) =>
               setType(event.target.value as 'one-off' | 'perpetual')
             }
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-xs outline-hidden transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
           >
             <option value="one-off">One-off</option>
             <option value="perpetual">Perpetual</option>

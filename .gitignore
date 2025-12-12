@@ -9,6 +9,8 @@
 /coverage
 playwright-report/
 test-results/
+compare-sites.ts
+generate-viewer.ts
 blob-report/
 
 # next.js

@@ -21,14 +21,14 @@ export function NewsletterSignupForm({ className = '' }) {
           type="email"
           name="email"
           placeholder="your@email.com"
-          className="w-full rounded-sm px-2 py-1 border-slate-300 dark:border-slate-700 dark:bg-black dark:text-white"
+          className="w-full rounded-xs px-2 py-1 border-slate-300 dark:border-slate-700 dark:bg-black dark:text-white"
         />
         <input type="hidden" value="1" name="embed" />
         <div className="relative">
           <input
             type="submit"
             value="Get notified of new essays"
-            className="px-4 h-full py-1 cursor-pointer bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 rounded-sm"
+            className="px-4 h-full py-1 cursor-pointer bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 rounded-xs"
           />
           <div
             className="absolute -bottom-6 left-0 right-0 text-center text-slate-500 dark:text-slate-400 text-sm underline decoration-dotted decoration-slate-300 dark:decoration-slate-500 cursor-help"

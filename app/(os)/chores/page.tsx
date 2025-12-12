@@ -147,19 +147,19 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
       <ChoresErrorBoundary label="the toolbar">
         <div className="mb-5 text-sm md:mb-6">
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
-            <div className="inline-flex w-fit justify-self-start items-center gap-2 rounded-md border border-slate-300 bg-white p-1 pr-3 text-xs font-semibold text-slate-800 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
+            <div className="inline-flex w-fit justify-self-start items-center gap-2 rounded-md border border-slate-300 bg-white p-1 pr-3 text-xs font-semibold text-slate-800 shadow-xs dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
               <Link
                 href={choresHref(prevDay)}
                 prefetch
                 aria-label="Previous day"
-                className="rounded px-2 py-1 transition hover:bg-slate-100 dark:hover:bg-slate-700"
+                className="rounded-sm px-2 py-1 transition hover:bg-slate-100 dark:hover:bg-slate-700"
               >
                 ‹
               </Link>
               <Link
                 href={viewingToday ? choresHref() : choresHref(todayCtx.todayIso)}
                 prefetch
-                className={`rounded px-3 py-1 transition ${
+                className={`rounded-sm px-3 py-1 transition ${
                   viewingToday
                     ? 'bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200'
                     : 'hover:bg-slate-100 dark:hover:bg-slate-700'
@@ -171,7 +171,7 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
                 href={choresHref(nextDay)}
                 prefetch
                 aria-label="Next day"
-                className="rounded px-2 py-1 transition hover:bg-slate-100 dark:hover:bg-slate-700"
+                className="rounded-sm px-2 py-1 transition hover:bg-slate-100 dark:hover:bg-slate-700"
               >
                 ›
               </Link>

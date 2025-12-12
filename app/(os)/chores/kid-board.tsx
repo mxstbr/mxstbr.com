@@ -387,7 +387,7 @@ export function KidBoard({
         <select
           value={mobileColumn?.kid.id}
           onChange={(event) => handleKidChange(event.target.value)}
-          className="mb-4 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+          className="mb-4 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-900 shadow-xs dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
         >
           {columns.map((col) => (
             <option key={col.kid.id} value={col.kid.id}>
@@ -450,7 +450,7 @@ export function KidBoard({
             <div className="mt-4 flex flex-wrap justify-end gap-2">
               <Link
                 href={todayHref}
-                className="inline-flex items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition active:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:active:bg-slate-200"
+                className="inline-flex items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-xs transition active:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:active:bg-slate-200"
               >
                 Go to today
               </Link>
@@ -466,7 +466,7 @@ export function KidBoard({
                     { allowPast: true },
                   )
                 }}
-                className="inline-flex items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-800 shadow-sm transition active:border-slate-500 dark:border-slate-700 dark:text-slate-100"
+                className="inline-flex items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-800 shadow-xs transition active:border-slate-500 dark:border-slate-700 dark:text-slate-100"
               >
                 Complete for {dayLabel}
               </button>
@@ -534,7 +534,7 @@ export function KidBoard({
                         void sendApprovalRequest(approvalRequest)
                       }
                     }}
-                    className="inline-flex items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition active:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:active:bg-slate-200"
+                    className="inline-flex items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-xs transition active:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:active:bg-slate-200"
                   >
                     Try again
                   </button>
@@ -757,7 +757,7 @@ function KidColumn({
 
   return (
     <div
-      className="flex flex-col gap-4 overflow-hidden rounded-2xl border bg-white p-4 shadow-sm dark:bg-slate-900 md:h-full md:min-h-0 md:overflow-y-auto"
+      className="flex flex-col gap-4 overflow-hidden rounded-2xl border bg-white p-4 shadow-xs dark:bg-slate-900 md:h-full md:min-h-0 md:overflow-y-auto"
       style={{
         borderColor: accentColor,
         backgroundColor: accentSoft,
@@ -928,8 +928,8 @@ function KidColumn({
                     onClick={() => setPendingColor(swatch)}
                     className={`h-10 rounded-lg border-2 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
                       pendingColor === swatch
-                        ? 'border-slate-900 shadow-sm dark:border-slate-100'
-                        : 'border-transparent shadow'
+                        ? 'border-slate-900 shadow-xs dark:border-slate-100'
+                        : 'border-transparent shadow-sm'
                     }`}
                     style={{ backgroundColor: swatch }}
                     aria-label={`Select color ${swatch}`}
@@ -942,7 +942,7 @@ function KidColumn({
                   type="color"
                   value={pendingColor}
                   onChange={(event) => setPendingColor(event.target.value)}
-                  className="h-9 w-16 cursor-pointer rounded-md border border-slate-300 bg-white p-1 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+                  className="h-9 w-16 cursor-pointer rounded-md border border-slate-300 bg-white p-1 shadow-xs dark:border-slate-700 dark:bg-slate-800"
                   aria-label="Pick a custom color"
                 />
               </label>
@@ -958,7 +958,7 @@ function KidColumn({
               <button
                 type="button"
                 onClick={handleSaveColor}
-                className="inline-flex items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition active:bg-slate-800 disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:active:bg-slate-200"
+                className="inline-flex items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-xs transition active:bg-slate-800 disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:active:bg-slate-200"
                 disabled={isSavingColor}
               >
                 {isSavingColor ? 'Saving…' : 'Save color'}
@@ -977,7 +977,7 @@ function StarBadge({ value, accent }: { value: number; accent: string }) {
 
   return (
     <div
-      className="flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold shadow-sm"
+      className="flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold shadow-xs"
       style={{ backgroundColor: accentSoft, color: accentStrong }}
     >
       ⭐️ <span className="tabular-nums">{value}</span>
@@ -1179,7 +1179,7 @@ function ChoreButton({
                 <button
                   type="button"
                   onClick={performSkip}
-                  className="inline-flex items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition active:bg-slate-800 disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:active:bg-slate-200"
+                  className="inline-flex items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-xs transition active:bg-slate-800 disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:active:bg-slate-200"
                   disabled={isSkipping}
                 >
                   Skip task
@@ -1193,7 +1193,7 @@ function ChoreButton({
 
   return (
     <div
-      className={`relative rounded-xl border-2 shadow transition focus-within:-translate-y-0.5 active:-translate-y-0.5 focus-within:border-[var(--accent)] active:border-[var(--accent)] dark:focus-within:border-[var(--accent)] dark:active:border-[var(--accent)] ${cardToneClasses} ${menuOpen ? 'z-20' : ''}`}
+      className={`relative rounded-xl border-2 shadow-sm transition focus-within:-translate-y-0.5 active:-translate-y-0.5 focus-within:border-[var(--accent)] active:border-[var(--accent)] dark:focus-within:border-[var(--accent)] dark:active:border-[var(--accent)] ${cardToneClasses} ${menuOpen ? 'z-20' : ''}`}
       style={accentVars}
       ref={containerRef}
     >
@@ -1317,7 +1317,7 @@ function CompletedChoreButton({
 
   return (
     <div
-      className="relative rounded-xl border-2 border-slate-200 bg-white shadow transition focus-within:-translate-y-0.5 active:-translate-y-0.5 focus-within:border-[var(--accent)] active:border-[var(--accent)] dark:border-slate-700 dark:bg-slate-800 dark:focus-within:border-[var(--accent)] dark:active:border-[var(--accent)]"
+      className="relative rounded-xl border-2 border-slate-200 bg-white shadow-sm transition focus-within:-translate-y-0.5 active:-translate-y-0.5 focus-within:border-[var(--accent)] active:border-[var(--accent)] dark:border-slate-700 dark:bg-slate-800 dark:focus-within:border-[var(--accent)] dark:active:border-[var(--accent)]"
       style={accentVars}
     >
       <button
