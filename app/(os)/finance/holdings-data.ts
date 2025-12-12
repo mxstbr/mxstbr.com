@@ -16,8 +16,11 @@ const HOLDINGS_KEY = 'finance:holdings'
 // Store holdings data in Redis
 export async function storeHoldingsData(holdings: StockHolding[]): Promise<void> {
   try {
+    const sortedHoldings = [...holdings].sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+    )
     // Store as JSON string, following pattern from other parts of the codebase
-    await redis.set(HOLDINGS_KEY, holdings)
+    await redis.set(HOLDINGS_KEY, sortedHoldings)
   } catch (error) {
     console.error('Error storing holdings data in Redis:', error)
     throw new Error('Failed to store holdings data')
