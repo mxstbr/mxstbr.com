@@ -1,9 +1,9 @@
 {
   "private": true,
   "scripts": {
-    "dev": "next dev --webpack",
+    "dev": "next dev",
     "update-essay-views": "tsm update-essay-views.ts",
-    "build": "next build --webpack && tsm sync-essays-to-github.ts",
+    "build": "next build && tsm sync-essays-to-github.ts",
     "start": "next start",
     "create-reminder-schedule": "tsm create-reminder-schedule.ts",
     "set-telegram-webhook": "tsm set-telegram-webhook.ts",
