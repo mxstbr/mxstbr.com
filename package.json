@@ -43,7 +43,7 @@
     "gray-matter": "^4.0.3",
     "hero-patterns": "^2.1.0",
     "mcp-handler": "^1.0.4",
-    "next": "16.0.8",
+    "next": "16.0.10",
     "prettier": "^3.3.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
