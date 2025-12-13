@@ -77,7 +77,7 @@ function shouldAutoCollapse(
   const currentGroup: TimeGroupKey =
     minutes < 12 * 60
       ? 'morning'
-      : minutes < 18 * 60
+      : minutes < 20 * 60
         ? 'afternoon'
         : 'evening'
 
