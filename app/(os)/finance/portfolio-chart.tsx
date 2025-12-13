@@ -27,8 +27,24 @@ interface PortfolioChartProps {
 export default function PortfolioChart({ portfolioHistory }: PortfolioChartProps) {
   const { unlocked, requestUnlock } = useMoneyVisibility()
   const tickers = Array.from(
-    new Set(portfolioHistory.flatMap(item => Object.keys(item.holdings)))
+    new Set(portfolioHistory.flatMap(item => Object.keys(item.holdings || {})))
   ).sort()
+
+  const colorPalette = [
+    '#10b981',
+    '#6366f1',
+    '#f59e0b',
+    '#ef4444',
+    '#8b5cf6',
+    '#06b6d4',
+    '#f97316'
+  ]
+
+  const series = tickers.map((ticker, index) => ({
+    ticker,
+    dataKey: `holding_${index}`,
+    color: colorPalette[index % colorPalette.length],
+  }))
 
   // Format data for the chart
   const chartData: ChartDataPoint[] = portfolioHistory.map(item => {
@@ -41,22 +57,13 @@ export default function PortfolioChart({ portfolioHistory }: PortfolioChartProps
       })
     }
 
-    tickers.forEach(ticker => {
-      entry[ticker] = Math.round(item.holdings[ticker]?.value || 0)
+    series.forEach(({ ticker, dataKey }) => {
+      const holdingValue = item.holdings?.[ticker]?.value ?? 0
+      entry[dataKey] = Math.round(holdingValue)
     })
 
     return entry
   })
-
-  const colorPalette = [
-    '#10b981',
-    '#6366f1',
-    '#f59e0b',
-    '#ef4444',
-    '#8b5cf6',
-    '#06b6d4',
-    '#f97316'
-  ]
 
   // Custom tooltip for the chart
   const CustomTooltip = (props: {
@@ -151,25 +158,21 @@ export default function PortfolioChart({ portfolioHistory }: PortfolioChartProps
                 color: 'rgb(148 163 184)' // slate-400
               }}
             />
-            {tickers.map((ticker, index) => {
-              const color = colorPalette[index % colorPalette.length]
-
-              return (
-                <Area
-                  key={ticker}
-                  type="monotone"
-                  dataKey={ticker}
-                  name={ticker}
-                  stackId="portfolio"
-                  stroke={color}
-                  fill={color}
-                  fillOpacity={0.25}
-                  strokeWidth={2.5}
-                  activeDot={{ r: 5, className: 'opacity-80' }}
-                  isAnimationActive={false}
-                />
-              )
-            })}
+            {series.map(({ ticker, dataKey, color }) => (
+              <Area
+                key={dataKey}
+                type="monotone"
+                dataKey={dataKey}
+                name={ticker}
+                stackId="portfolio"
+                stroke={color}
+                fill={color}
+                fillOpacity={0.25}
+                strokeWidth={2.5}
+                activeDot={{ r: 5, className: 'opacity-80' }}
+                isAnimationActive={false}
+              />
+            ))}
           </AreaChart>
         </ResponsiveContainer>
       </div>
