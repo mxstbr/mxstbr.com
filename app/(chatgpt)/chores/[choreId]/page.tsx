@@ -10,7 +10,7 @@ import {
   CheckCircle,
   Clock,
   Members,
-  Shield,
+  ShieldCheck,
   Star,
 } from '@openai/apps-sdk-ui/components/Icon'
 import { type Chore, getChoreState } from 'app/(os)/chores/data'
@@ -169,7 +169,7 @@ export default async function ChoreCardPage({ params, searchParams }: PageProps)
               <DetailRow icon={<Clock className="size-4" />} label="Time of day">
                 {timeOfDayLabel}
               </DetailRow>
-              <DetailRow icon={<Shield className="size-4" />} label="Approval">
+              <DetailRow icon={<ShieldCheck className="size-4" />} label="Approval">
                 {chore.requiresApproval ? 'Requires parent approval' : 'No approval needed'}
               </DetailRow>
               <DetailRow icon={<Calendar className="size-4" />} label="Created">
