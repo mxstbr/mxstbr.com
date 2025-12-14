@@ -1038,62 +1038,66 @@ export default async function ChoreAdminPage({ searchParams }: AdminPageProps) {
             </div>
 
             <div className="mt-4 space-y-3">
-              {analytics.map((day) => (
-                <div
-                  key={day.dayIso}
-                  className="rounded-lg border border-slate-200 bg-white p-3 shadow-xs dark:border-slate-800 dark:bg-slate-900"
-                >
-                  <div className="flex items-center justify-between text-sm font-semibold text-slate-900 dark:text-slate-50">
-                    <span>{day.label}</span>
-                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                      {day.entries.reduce((sum, entry) => sum + entry.completed, 0)} completed
-                    </span>
-                  </div>
+              <div className="flex items-center gap-4 text-xs font-semibold text-slate-600 dark:text-slate-300">
+                {state.kids.map((kid) => (
+                  <span key={kid.id} className="inline-flex items-center gap-2">
+                    <span
+                      className="h-2 w-2 rounded-full"
+                      style={{ backgroundColor: kid.color ?? '#0ea5e9' }}
+                    />
+                    {kid.name}
+                  </span>
+                ))}
+              </div>
 
-                  <div className="mt-3 space-y-2">
-                    {day.entries.map((entry) => {
-                      const total = entry.completed + entry.missed
-                      const width = (total / maxBarValue) * 100
-                      const completedWidth = (entry.completed / maxBarValue) * 100
-                      const accent = entry.kid.color ?? '#0ea5e9'
-                      const muted = withAlpha(accent, 0.45)
-
-                      return (
-                        <div key={`${day.dayIso}-${entry.kid.id}`} className="space-y-1">
-                          <div className="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-200">
-                            <span className="flex items-center gap-2">
-                              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: accent }} />
-                              {entry.kid.name}
-                            </span>
-                            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                              {entry.completed} done · {entry.missed} missed
-                            </span>
-                          </div>
-
-                          <div className="relative h-3 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
-                            {total === 0 ? (
-                              <div className="absolute inset-0 bg-slate-200/60 dark:bg-slate-700/60" />
-                            ) : (
-                              <>
-                                <div
-                                  className="absolute left-0 top-0 h-full"
-                                  style={{ width: `${width}%`, backgroundColor: muted }}
-                                />
-                                {entry.completed ? (
-                                  <div
-                                    className="absolute left-0 top-0 h-full"
-                                    style={{ width: `${completedWidth}%`, backgroundColor: accent }}
-                                  />
-                                ) : null}
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
+              <div className="relative">
+                <div className="absolute inset-0 flex h-56 flex-col justify-between">
+                  {[...Array(4)].map((_, index) => (
+                    <div
+                      key={index}
+                      className="h-px w-full bg-slate-200/70 dark:bg-slate-800/80"
+                    />
+                  ))}
                 </div>
-              ))}
+
+                <div className="relative flex h-56 items-end gap-3 sm:gap-4">
+                  {analytics.map((day) => (
+                    <div key={day.dayIso} className="flex flex-1 flex-col items-center gap-2">
+                      <div className="flex h-full w-full items-end justify-center gap-1 sm:gap-1.5">
+                        {day.entries.map((entry) => {
+                          const total = entry.completed + entry.missed
+                          const totalHeight = (total / maxBarValue) * 100
+                          const barHeight = total ? `${totalHeight}%` : '8px'
+                          const completedHeight = (entry.completed / maxBarValue) * 100
+                          const accent = entry.kid.color ?? '#0ea5e9'
+                          const muted = withAlpha(accent, 0.45)
+
+                          return (
+                            <div
+                              key={`${day.dayIso}-${entry.kid.id}`}
+                              className="relative w-5 overflow-hidden rounded-sm sm:w-6"
+                              style={{ height: barHeight, backgroundColor: total ? muted : undefined }}
+                            >
+                              {total === 0 ? (
+                                <div className="absolute inset-0 rounded-sm border border-dashed border-slate-200 dark:border-slate-800" />
+                              ) : null}
+                              {entry.completed ? (
+                                <div
+                                  className="absolute bottom-0 left-0 right-0 rounded-sm"
+                                  style={{ height: `${completedHeight}%`, backgroundColor: accent }}
+                                />
+                              ) : null}
+                            </div>
+                          )
+                        })}
+                      </div>
+                      <span className="text-center text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+                        {day.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
