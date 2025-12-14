@@ -1062,7 +1062,7 @@ export default async function ChoreAdminPage({ searchParams }: AdminPageProps) {
 
                 <div className="relative flex h-56 items-end gap-3 sm:gap-4">
                   {analytics.map((day) => (
-                    <div key={day.dayIso} className="flex flex-1 flex-col items-center gap-2">
+                    <div key={day.dayIso} className="flex h-56 flex-1 flex-col items-center gap-2">
                       <div className="flex h-full w-full items-end justify-center gap-1 sm:gap-1.5">
                         {day.entries.map((entry) => {
                           const total = entry.completed + entry.missed
