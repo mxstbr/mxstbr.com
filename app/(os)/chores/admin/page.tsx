@@ -41,6 +41,8 @@ import {
   type TodayContext,
   withAlpha,
   pacificDateFromTimestamp,
+  shiftIsoDay,
+  DAY_ABBRS,
 } from '../utils'
 import { ClippyChoresChat } from './clippy-chat'
 
@@ -86,6 +88,68 @@ type ChoreStatus = 'open' | 'paused' | 'completed' | 'scheduled'
 
 const PAGE_SIZE = 9
 const DAY_LETTERS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+
+type KidDayStats = {
+  kid: Kid
+  completed: number
+  missed: number
+}
+
+type DailyChoreAnalytics = {
+  dayIso: string
+  label: string
+  entries: KidDayStats[]
+}
+
+function formatDayLabel(dayIso: string, weekday: number): string {
+  const date = new Date(`${dayIso}T12:00:00Z`)
+  const monthDay = new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+  }).format(date)
+
+  return `${DAY_ABBRS[weekday]} · ${monthDay}`
+}
+
+function buildChoreAnalytics(
+  state: { kids: Kid[]; chores: Chore[]; completions: Completion[] },
+  ctx: TodayContext,
+): DailyChoreAnalytics[] {
+  const days = Array.from({ length: 7 }, (_, index) => shiftIsoDay(ctx.todayIso, -index))
+
+  return days.map((dayIso) => {
+    const dayCtx = getToday(dayIso)
+    const dayCompletions = state.completions.filter(
+      (completion) => pacificDateFromTimestamp(completion.timestamp) === dayIso,
+    )
+
+    const entries = state.kids.map((kid) => {
+      const completed = dayCompletions.filter((completion) => completion.kidId === kid.id).length
+
+      const due = state.chores.reduce((total, chore) => {
+        if (!chore.kidIds.includes(kid.id)) return total
+        const completedOnDay = dayCompletions.some(
+          (completion) => completion.choreId === chore.id && completion.kidId === kid.id,
+        )
+        const openOnDay = isOpenForKid(chore, kid.id, state.completions, dayCtx)
+
+        return completedOnDay || openOnDay ? total + 1 : total
+      }, 0)
+
+      return {
+        kid,
+        completed,
+        missed: Math.max(due - completed, 0),
+      }
+    })
+
+    return {
+      dayIso,
+      label: formatDayLabel(dayIso, dayCtx.weekday),
+      entries,
+    }
+  })
+}
 
 function choreStatus(chore: Chore, kids: Kid[], completions: Completion[], ctx: TodayContext): ChoreStatus {
   if (isPaused(chore, ctx)) return 'paused'
@@ -922,6 +986,12 @@ export default async function ChoreAdminPage({ searchParams }: AdminPageProps) {
     return `/chores/admin${query ? `?${query}` : ''}`
   }
 
+  const analytics = buildChoreAnalytics(state, ctx)
+  const maxBarValue = Math.max(
+    1,
+    ...analytics.flatMap((day) => day.entries.map((entry) => entry.completed + entry.missed)),
+  )
+
   return (
     <ParentalPinGate>
       <>
@@ -953,6 +1023,78 @@ export default async function ChoreAdminPage({ searchParams }: AdminPageProps) {
             >
               Open rewards
             </Link>
+          </div>
+
+          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900">
+            <div className="space-y-1">
+              <p className="text-sm uppercase tracking-wide text-slate-500 dark:text-slate-400">Last 7 days</p>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">
+                Chore completion by kid
+              </h2>
+              <p className="text-sm text-slate-600 dark:text-slate-300">
+                Track how many chores each kid completed versus what stayed open each day. Bars use kid colors: solid
+                for done, softer for missed.
+              </p>
+            </div>
+
+            <div className="mt-4 space-y-3">
+              {analytics.map((day) => (
+                <div
+                  key={day.dayIso}
+                  className="rounded-lg border border-slate-200 bg-white p-3 shadow-xs dark:border-slate-800 dark:bg-slate-900"
+                >
+                  <div className="flex items-center justify-between text-sm font-semibold text-slate-900 dark:text-slate-50">
+                    <span>{day.label}</span>
+                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                      {day.entries.reduce((sum, entry) => sum + entry.completed, 0)} completed
+                    </span>
+                  </div>
+
+                  <div className="mt-3 space-y-2">
+                    {day.entries.map((entry) => {
+                      const total = entry.completed + entry.missed
+                      const width = (total / maxBarValue) * 100
+                      const completedWidth = (entry.completed / maxBarValue) * 100
+                      const accent = entry.kid.color ?? '#0ea5e9'
+                      const muted = withAlpha(accent, 0.45)
+
+                      return (
+                        <div key={`${day.dayIso}-${entry.kid.id}`} className="space-y-1">
+                          <div className="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-200">
+                            <span className="flex items-center gap-2">
+                              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: accent }} />
+                              {entry.kid.name}
+                            </span>
+                            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                              {entry.completed} done · {entry.missed} missed
+                            </span>
+                          </div>
+
+                          <div className="relative h-3 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                            {total === 0 ? (
+                              <div className="absolute inset-0 bg-slate-200/60 dark:bg-slate-700/60" />
+                            ) : (
+                              <>
+                                <div
+                                  className="absolute left-0 top-0 h-full"
+                                  style={{ width: `${width}%`, backgroundColor: muted }}
+                                />
+                                {entry.completed ? (
+                                  <div
+                                    className="absolute left-0 top-0 h-full"
+                                    style={{ width: `${completedWidth}%`, backgroundColor: accent }}
+                                  />
+                                ) : null}
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900">
