@@ -1,7 +1,6 @@
 import { choreTools } from 'app/lib/chores'
 import { createMcpHandler } from 'mcp-handler'
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
 
 export const maxDuration = 60
 
@@ -9,90 +8,6 @@ type ChoreToolName = keyof typeof choreTools
 
 function toTitle(name: string) {
   return name.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())
-}
-
-function isAsyncIterable<T>(value: unknown): value is AsyncIterable<T> {
-  return (
-    value !== null &&
-    typeof value === 'object' &&
-    Symbol.asyncIterator in (value as Record<symbol, unknown>)
-  )
-}
-
-async function resolveToolResult(output: unknown) {
-  if (isAsyncIterable(output)) {
-    const items: unknown[] = []
-    for await (const item of output) {
-      items.push(item)
-    }
-    return items.length === 1 ? items[0] : items
-  }
-  return output
-}
-
-function toStructuredContent(value: unknown) {
-  if (!value || typeof value !== 'object') return undefined
-  if (Array.isArray(value)) return undefined
-  if (isAsyncIterable(value)) return undefined
-
-  return value as Record<string, unknown>
-}
-
-function formatCompletionMessage(result: any) {
-  const choreTitle = result?.choreTitle ?? 'chore'
-  const kidName = result?.kidName ? ` for ${result.kidName}` : ''
-  const awarded =
-    typeof result?.awarded === 'number' && result.awarded > 0
-      ? ` (+${result.awarded} stars)`
-      : ''
-
-  switch (result?.status) {
-    case 'completed':
-      return `Marked "${choreTitle}"${kidName} complete${awarded}`
-    case 'skipped':
-      return `Skipped "${choreTitle}"${kidName} (already handled)`
-    case 'unauthorized':
-      return 'Not authorized to complete this chore'
-    default:
-      return 'Could not complete chore'
-  }
-}
-
-function formatUndoMessage(result: any) {
-  const choreTitle = result?.choreTitle ?? 'chore'
-  const kidName = result?.kidName ? ` for ${result.kidName}` : ''
-  const stars =
-    typeof result?.delta === 'number' && result.delta !== 0
-      ? ` (${Math.abs(result.delta)} stars restored)`
-      : ''
-
-  switch (result?.status) {
-    case 'undone':
-      return `Undid "${choreTitle}"${kidName}${stars}`
-    case 'not_found':
-      return 'No completion found to undo'
-    default:
-      return 'Could not undo completion'
-  }
-}
-
-function formatChoreMessage(name: ChoreToolName, result: any) {
-  if (result && typeof result.message === 'string' && result.message.trim()) {
-    return result.message
-  }
-
-  switch (name) {
-    case 'read_chore_board':
-      return `Loaded chore board for ${result?.ctx?.todayIso ?? 'today'}`
-    case 'complete_chore':
-      return formatCompletionMessage(result)
-    case 'undo_chore_completion':
-      return formatUndoMessage(result)
-    case 'redeem_reward':
-      return result?.success ? 'Reward redeemed' : 'Could not redeem reward'
-    default:
-      return `${toTitle(name)} executed`
-  }
 }
 
 const handler = createMcpHandler(
