@@ -1,13 +1,10 @@
 import { openai } from '@ai-sdk/openai'
-import { stepCountIs, Experimental_Agent as Agent } from 'ai'
+import { createMCPClient, stepCountIs, Experimental_Agent as Agent } from 'ai'
 import { Redis } from '@upstash/redis'
 import { colors } from 'app/(os)/cal/data'
 import { PRESETS } from 'app/(os)/cal/presets'
 import { dedent } from './dedent'
-import { calendarTools } from './calendar'
-import { telegramTools } from './telegram'
-import { choreTools } from './chores'
-import { financeTools } from './finance'
+import { siteUrl } from './site-url'
 
 const redis = Redis.fromEnv()
 const CONVERSATION_INDEX_KEY = 'clippy:conversations'
@@ -181,21 +178,43 @@ ${JSON.stringify(
 )}
 </PRESETS>`
 
-export const clippy = new Agent({
-  model: openai('gpt-5-mini'),
-  system: SYSTEM_PROMPT(new Date()),
-  tools: {
-    ...calendarTools,
-    ...telegramTools,
-    ...choreTools,
-    ...financeTools,
-  },
-  onStepFinish: async (result) => {
-    try {
-      await persistConversationStep(result)
-    } catch (error) {
-      console.error('Failed to persist Clippy step log', error)
-    }
-  },
-  stopWhen: stepCountIs(10),
-})
+let clippyPromise: Promise<Agent> | null = null
+
+export async function getClippy() {
+  if (clippyPromise) return clippyPromise
+
+  clippyPromise = (async () => {
+    const token =
+      process.env.CLIPPY_AUTOMATION_TOKEN ?? process.env.CAL_PASSWORD
+
+    const client = await createMCPClient({
+      transport: {
+        type: 'sse',
+        url: new URL('/api/sse', siteUrl()).toString(),
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      },
+      name: 'clippy-mcp-client',
+      onUncaughtError: (error) => {
+        console.error('Clippy MCP client error', error)
+      },
+    })
+
+    const tools = await client.tools()
+
+    return new Agent({
+      model: openai('gpt-5-mini'),
+      system: SYSTEM_PROMPT(new Date()),
+      tools,
+      onStepFinish: async (result) => {
+        try {
+          await persistConversationStep(result)
+        } catch (error) {
+          console.error('Failed to persist Clippy step log', error)
+        }
+      },
+      stopWhen: stepCountIs(10),
+    })
+  })()
+
+  return clippyPromise
+}

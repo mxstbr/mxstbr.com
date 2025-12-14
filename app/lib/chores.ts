@@ -24,7 +24,8 @@ import {
   sortByTimeOfDay,
   scheduleLabel,
 } from 'app/(os)/chores/utils'
-import { tool } from './tool'
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { siteUrl } from './site-url'
 
 const isoDaySchema = z
   .string()
@@ -196,12 +197,6 @@ export function toChoresTodayMetadata(
   }
 }
 
-function siteUrl() {
-  if (process.env.SITE_URL) return process.env.SITE_URL
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
-  return 'http://localhost:3000'
-}
-
 function outputTemplateUrl(pathname: string) {
   return new URL(pathname, siteUrl()).toString()
 }
@@ -252,8 +247,8 @@ function formatUndoMessage(result: any): string {
   }
 }
 
-export const choreTools = {
-  read_chore_board: tool({
+const choreTools = {
+  read_chore_board: {
     description:
       'Read the current chore board including kids, chores, completions, and rewards.',
     inputSchema: z.object({
@@ -278,9 +273,9 @@ export const choreTools = {
       'openai/outputTemplate': outputTemplateUrl('/chores/today'),
       'openai/widgetAccessible': true,
     },
-  }),
+  },
 
-  create_chore: tool({
+  create_chore: {
     description: 'Create a new chore for one or more kids.',
     inputSchema: z.object({
       title: z.string().min(1, 'Title is required'),
@@ -353,9 +348,9 @@ export const choreTools = {
         }),
       }
     },
-  }),
+  },
 
-  complete_chore: tool({
+  complete_chore: {
     description: 'Mark a chore done for a kid and award their stars.',
     inputSchema: z.object({
       chore_id: z.string().min(1),
@@ -385,9 +380,9 @@ export const choreTools = {
         structuredContent: toStructuredContent({ ...result, snapshot }),
       }
     },
-  }),
+  },
 
-  undo_chore_completion: tool({
+  undo_chore_completion: {
     description: 'Undo a chore completion for a kid.',
     inputSchema: z.object({
       chore_id: z.string().min(1),
@@ -421,9 +416,9 @@ export const choreTools = {
         structuredContent: toStructuredContent({ ...result, snapshot }),
       }
     },
-  }),
+  },
 
-  set_chore_schedule: tool({
+  set_chore_schedule: {
     description: 'Update the cadence or days of week for a repeated chore.',
     inputSchema: z.object({
       chore_id: z.string().min(1),
@@ -470,9 +465,9 @@ export const choreTools = {
         structuredContent: toStructuredContent({ message, snapshot }),
       }
     },
-  }),
+  },
 
-  pause_chore: tool({
+  pause_chore: {
     description: 'Pause or resume a single chore.',
     inputSchema: z.object({
       chore_id: z.string().min(1),
@@ -510,9 +505,9 @@ export const choreTools = {
         structuredContent: toStructuredContent({ message, snapshot }),
       }
     },
-  }),
+  },
 
-  pause_all_chores: tool({
+  pause_all_chores: {
     description: 'Pause or resume every chore at once.',
     inputSchema: z.object({
       paused_until: z
@@ -542,9 +537,9 @@ export const choreTools = {
         structuredContent: toStructuredContent({ message, snapshot }),
       }
     },
-  }),
+  },
 
-  set_chore_assignments: tool({
+  set_chore_assignments: {
     description:
       'Update which kids a chore applies to, whether it needs approval, and its time of day.',
     inputSchema: z.object({
@@ -598,9 +593,9 @@ export const choreTools = {
         }),
       }
     },
-  }),
+  },
 
-  set_one_off_date: tool({
+  set_one_off_date: {
     description: 'Set the scheduled day for a one-off chore.',
     inputSchema: z.object({
       chore_id: z.string().min(1),
@@ -631,9 +626,9 @@ export const choreTools = {
         structuredContent: toStructuredContent({ message, snapshot }),
       }
     },
-  }),
+  },
 
-  archive_chore: tool({
+  archive_chore: {
     description: 'Archive a chore so it disappears from the board.',
     inputSchema: z.object({
       chore_id: z.string().min(1),
@@ -658,9 +653,9 @@ export const choreTools = {
         }),
       }
     },
-  }),
+  },
 
-  rename_kid: tool({
+  rename_kid: {
     description: 'Rename a kid column and optionally update its accent color.',
     inputSchema: z.object({
       kid_id: z.string().min(1),
@@ -695,9 +690,9 @@ export const choreTools = {
         structuredContent: toStructuredContent({ message, snapshot }),
       }
     },
-  }),
+  },
 
-  adjust_kid_stars: tool({
+  adjust_kid_stars: {
     description: 'Manually add or remove stars from a kid balance.',
     inputSchema: z.object({
       kid_id: z.string().min(1),
@@ -732,9 +727,9 @@ export const choreTools = {
         structuredContent: toStructuredContent({ message, snapshot }),
       }
     },
-  }),
+  },
 
-  add_reward: tool({
+  add_reward: {
     description: 'Create a reward that kids can redeem with their stars.',
     inputSchema: z.object({
       title: z.string().min(1),
@@ -777,9 +772,9 @@ export const choreTools = {
         structuredContent: toStructuredContent({ message, snapshot }),
       }
     },
-  }),
+  },
 
-  set_reward_kids: tool({
+  set_reward_kids: {
     description: 'Assign which kids can see a reward.',
     inputSchema: z.object({
       reward_id: z.string().min(1),
@@ -812,9 +807,9 @@ export const choreTools = {
         }),
       }
     },
-  }),
+  },
 
-  archive_reward: tool({
+  archive_reward: {
     description: 'Archive or remove a reward.',
     inputSchema: z.object({
       reward_id: z.string().min(1),
@@ -839,9 +834,9 @@ export const choreTools = {
         }),
       }
     },
-  }),
+  },
 
-  redeem_reward: tool({
+  redeem_reward: {
     description: 'Redeem a reward for a kid if they have enough stars.',
     inputSchema: z.object({
       reward_id: z.string().min(1),
@@ -874,5 +869,32 @@ export const choreTools = {
         structuredContent: toStructuredContent({ ...result, snapshot }),
       }
     },
-  }),
+  },
+}
+
+function toTitle(name: string) {
+  return name.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())
+}
+
+const anyOutputSchema = z.object({}).passthrough()
+
+export function registerChoreTools(server: McpServer) {
+  for (const [name, def] of Object.entries(choreTools)) {
+    server.registerTool(
+      name,
+      {
+        title: toTitle(name),
+        description: def.description,
+        inputSchema: def.inputSchema as any,
+        outputSchema: anyOutputSchema,
+        annotations:
+          name === 'read_chore_board' ? { readOnlyHint: true } : undefined,
+        _meta: (def as any)._meta,
+      },
+      async (args: any) => {
+        const result = await (def as any).execute(args)
+        return result
+      },
+    )
+  }
 }

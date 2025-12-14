@@ -1,9 +1,9 @@
-import { tool } from 'ai'
 import { Redis } from '@upstash/redis'
 import z from 'zod/v3'
 import { colors, toDayString } from 'app/(os)/cal/data'
 import type { Event } from 'app/(os)/cal/data'
 import { revalidatePath } from 'next/cache'
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 
 const redis = Redis.fromEnv()
 
@@ -33,15 +33,18 @@ const eventSchema = z
     }
   })
 
-// Define the calendar tools
-export const calendarTools = {
-  // ---------------------------------------------------------------------
-  // CREATE --------------------------------------------------------------
-  // ---------------------------------------------------------------------
-  create_event: tool({
-    description: 'Create a new calendar event',
-    inputSchema: eventSchema,
-    execute: async ({ start, end, color, label, border, background }) => {
+const anyOutputSchema = z.object({}).passthrough()
+
+export function registerCalendarTools(server: McpServer) {
+  server.registerTool(
+    'create_event',
+    {
+      title: 'Create Event',
+      description: 'Create a new calendar event',
+      inputSchema: eventSchema,
+      outputSchema: anyOutputSchema,
+    },
+    async ({ start, end, color, label, border, background }) => {
       // Normalise to YYYY-MM-DD format
       const startDay = toDayString(start)
       const endDay = toDayString(end)
@@ -67,28 +70,35 @@ export const calendarTools = {
       revalidatePath('/cal')
 
       return {
-        message: `✅ Event "${label || 'untitled'}" created`,
-        event: newEvent,
+        content: [],
+        structuredContent: {
+          message: `✅ Event "${label || 'untitled'}" created`,
+          event: newEvent,
+        },
       }
     },
-  }),
+  )
 
-  // ---------------------------------------------------------------------
-  // READ ----------------------------------------------------------------
-  // ---------------------------------------------------------------------
-  read_events: tool({
-    description:
-      'Return all calendar events, optionally filtered by date range',
-    inputSchema: z.object({
-      start_date: z.string().optional().default('2024-01-01'),
-      end_date: z.string().optional().default('9999-12-31'),
-    }),
-    execute: async ({ start_date, end_date }) => {
+  server.registerTool(
+    'read_events',
+    {
+      title: 'Read Events',
+      description: 'Return all calendar events, optionally filtered by date range',
+      inputSchema: z.object({
+        start_date: z.string().optional().default('2024-01-01'),
+        end_date: z.string().optional().default('9999-12-31'),
+      }),
+      outputSchema: anyOutputSchema,
+      annotations: { readOnlyHint: true },
+    },
+    async ({ start_date, end_date }) => {
       const events: Array<Event> | null = await redis.json.get(
         `cal:${process.env.CAL_PASSWORD}`,
       )
 
-      if (!events) return { events: [] }
+      if (!events) {
+        return { content: [], structuredContent: { events: [] } }
+      }
 
       // Filter events that start OR end within the date range
       const filteredEvents = events.filter((event) => {
@@ -101,21 +111,22 @@ export const calendarTools = {
         )
       })
 
-      return { events: filteredEvents }
+      return { content: [], structuredContent: { events: filteredEvents } }
     },
-  }),
+  )
 
-  // ---------------------------------------------------------------------
-  // UPDATE --------------------------------------------------------------
-  // ---------------------------------------------------------------------
-  update_event: tool({
-    description:
-      'Update an existing calendar event (provide oldEvent and newEvent)',
-    inputSchema: z.object({
-      oldEvent: eventSchema,
-      newEvent: eventSchema,
-    }),
-    execute: async ({ oldEvent, newEvent }) => {
+  server.registerTool(
+    'update_event',
+    {
+      title: 'Update Event',
+      description: 'Update an existing calendar event (provide oldEvent and newEvent)',
+      inputSchema: z.object({
+        oldEvent: eventSchema,
+        newEvent: eventSchema,
+      }),
+      outputSchema: anyOutputSchema,
+    },
+    async ({ oldEvent, newEvent }) => {
       const events: Array<Event> | null = await redis.json.get(
         `cal:${process.env.CAL_PASSWORD}`,
       )
@@ -151,17 +162,22 @@ export const calendarTools = {
       await redis.json.set(`cal:${process.env.CAL_PASSWORD}`, '$', events)
       revalidatePath('/cal')
 
-      return { message: '✏️ Event updated', event: updatedEvent }
+      return {
+        content: [],
+        structuredContent: { message: '✏️ Event updated', event: updatedEvent },
+      }
     },
-  }),
+  )
 
-  // ---------------------------------------------------------------------
-  // DELETE --------------------------------------------------------------
-  // ---------------------------------------------------------------------
-  delete_event: tool({
-    description: 'Delete a calendar event',
-    inputSchema: z.object({ event: eventSchema }),
-    execute: async ({ event }) => {
+  server.registerTool(
+    'delete_event',
+    {
+      title: 'Delete Event',
+      description: 'Delete a calendar event',
+      inputSchema: z.object({ event: eventSchema }),
+      outputSchema: anyOutputSchema,
+    },
+    async ({ event }) => {
       const events: Array<Event> | null = await redis.json.get(
         `cal:${process.env.CAL_PASSWORD}`,
       )
@@ -186,7 +202,7 @@ export const calendarTools = {
       await redis.json.set(`cal:${process.env.CAL_PASSWORD}`, '$', events)
       revalidatePath('/cal')
 
-      return { message: '🗑️ Event deleted' }
+      return { content: [], structuredContent: { message: '🗑️ Event deleted' } }
     },
-  }),
+  )
 }
