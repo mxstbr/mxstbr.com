@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useCallback, useMemo, useState } from 'react'
 import Link from 'next/link'
@@ -6,7 +6,12 @@ import { Badge, type BadgeProps } from '@openai/apps-sdk-ui/components/Badge'
 import { Avatar } from '@openai/apps-sdk-ui/components/Avatar'
 import { Button } from '@openai/apps-sdk-ui/components/Button'
 import { EmptyMessage } from '@openai/apps-sdk-ui/components/EmptyMessage'
-import { ArrowRotateCw, Calendar, Clock, Members } from '@openai/apps-sdk-ui/components/Icon'
+import {
+  ArrowRotateCw,
+  Calendar,
+  Clock,
+  Members,
+} from '@openai/apps-sdk-ui/components/Icon'
 import type { Chore, Kid } from 'app/(os)/chores/data'
 import { scheduleLabel } from 'app/(os)/chores/utils'
 import { useOpenAiGlobal, useWidgetState } from 'app/(chatgpt)/openai-hooks'
@@ -90,14 +95,24 @@ export default function TodaysChoresPage() {
           const kid = kidById.get(kidId)
           if (!kid) return null
 
-          const isOpen = (openByKid[kidId] ?? []).some((entry) => entry.id === chore.id)
-          const isDone = (doneByKid[kidId] ?? []).some((entry) => entry.chore.id === chore.id)
-          const status: KidStatus['status'] = isDone ? 'done' : isOpen ? 'due' : 'closed'
+          const isOpen = (openByKid[kidId] ?? []).some(
+            (entry) => entry.id === chore.id,
+          )
+          const isDone = (doneByKid[kidId] ?? []).some(
+            (entry) => entry.chore.id === chore.id,
+          )
+          const status: KidStatus['status'] = isDone
+            ? 'done'
+            : isOpen
+              ? 'due'
+              : 'closed'
           return { kid, status }
         })
         .filter(Boolean) as KidStatus[]
 
-      const timeOfDay = chore.timeOfDay ? timeOfDayLabels[chore.timeOfDay] : 'Any time'
+      const timeOfDay = chore.timeOfDay
+        ? timeOfDayLabels[chore.timeOfDay]
+        : 'Any time'
 
       return {
         id: chore.id,
@@ -116,7 +131,10 @@ export default function TodaysChoresPage() {
     if (!callTool || refreshing) return
     setRefreshing(true)
     try {
-      await callTool('read_chore_board', todayIso ? { day: todayIso } : undefined)
+      await callTool(
+        'read_chore_board',
+        todayIso ? { day: todayIso } : undefined,
+      )
     } finally {
       setRefreshing(false)
     }
@@ -134,7 +152,8 @@ export default function TodaysChoresPage() {
               </h1>
             </div>
             <Button
-              variant="secondary"
+              variant="outline"
+              color="secondary"
               size="md"
               onClick={onRefresh}
               disabled={!callTool || refreshing}
@@ -164,15 +183,17 @@ export default function TodaysChoresPage() {
             <EmptyMessage.Icon>🧹</EmptyMessage.Icon>
             <EmptyMessage.Title>No chore board loaded</EmptyMessage.Title>
             <EmptyMessage.Description>
-              Ask ChatGPT to run the <code>read_chore_board</code> tool to populate today&apos;s
-              chores here.
+              Ask ChatGPT to run the <code>read_chore_board</code> tool to
+              populate today&apos;s chores here.
             </EmptyMessage.Description>
           </EmptyMessage>
         ) : chores.length === 0 ? (
           <EmptyMessage className="rounded-3xl border border-default bg-surface px-6 py-10 shadow-xl sm:px-8">
             <EmptyMessage.Icon>🎉</EmptyMessage.Icon>
             <EmptyMessage.Title>All clear</EmptyMessage.Title>
-            <EmptyMessage.Description>No open chores found for today.</EmptyMessage.Description>
+            <EmptyMessage.Description>
+              No open chores found for today.
+            </EmptyMessage.Description>
           </EmptyMessage>
         ) : (
           <div className="grid gap-4">
@@ -216,7 +237,9 @@ function ChoreRow({
       onClick={onSelect}
       className={[
         'group w-full text-left rounded-3xl border bg-surface p-5 shadow-xl transition sm:p-6',
-        selected ? 'border-slate-400 ring-2 ring-slate-300' : 'border-default hover:border-slate-300',
+        selected
+          ? 'border-slate-400 ring-2 ring-slate-300'
+          : 'border-default hover:border-slate-300',
       ].join(' ')}
     >
       <div className="flex flex-wrap items-start gap-4">
@@ -248,7 +271,9 @@ function ChoreRow({
           <div className="space-y-1">
             <p className="text-xs font-semibold text-secondary">Chore</p>
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-lg font-semibold leading-tight sm:text-xl">{chore.title}</h2>
+              <h2 className="text-lg font-semibold leading-tight sm:text-xl">
+                {chore.title}
+              </h2>
               <Link
                 href={`/chores/${encodeURIComponent(chore.id)}`}
                 className="text-sm font-semibold text-secondary underline decoration-transparent transition group-hover:decoration-current"
@@ -274,11 +299,21 @@ function ChoreRow({
                   <Avatar name={kid.name} size={28} variant="soft" />
                   <span className="text-sm font-semibold">{kid.name}</span>
                   <Badge
-                    color={status === 'done' ? 'success' : status === 'due' ? 'info' : 'secondary'}
+                    color={
+                      status === 'done'
+                        ? 'success'
+                        : status === 'due'
+                          ? 'info'
+                          : 'secondary'
+                    }
                     variant="soft"
                     pill
                   >
-                    {status === 'done' ? 'Done' : status === 'due' ? 'Due' : 'Closed'}
+                    {status === 'done'
+                      ? 'Done'
+                      : status === 'due'
+                        ? 'Due'
+                        : 'Closed'}
                   </Badge>
                 </li>
               ))}
