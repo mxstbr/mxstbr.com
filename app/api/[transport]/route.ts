@@ -1,4 +1,4 @@
-import { choreTools, toChoresTodayMetadata } from 'app/lib/chores'
+import { choreTools } from 'app/lib/chores'
 import { createMcpHandler } from 'mcp-handler'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -122,24 +122,22 @@ const handler = createMcpHandler(
             throw new Error(`Tool "${name}" is missing an execute function`)
           }
 
-          const rawResult = await execute(args)
-          const result = await resolveToolResult(rawResult)
+          // Pass mcp: true to get MCP-style response from tool wrapper
+          const result = await execute(args, {
+            mcp: true,
+            toolCallId:
+              (extra.toolCallId ?? crypto.randomUUID)
+                ? crypto.randomUUID()
+                : `${name}-${Date.now()}`,
+            messages: extra.messages ?? [],
+            abortSignal: extra.signal,
+          } as any)
 
-          // Generate widget metadata for read_chore_board tool
-          const widgetMeta =
-            name === 'read_chore_board'
-              ? toChoresTodayMetadata(result as any)
-              : undefined
-
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: formatChoreMessage(name, result),
-              },
-            ],
-            structuredContent: toStructuredContent(result),
-            _meta: widgetMeta,
+          // The tool wrapper already returns MCP-style response, so return it directly
+          return result as unknown as {
+            content: Array<{ type: 'text'; text: string }>
+            structuredContent: Record<string, unknown> | undefined
+            _meta?: Record<string, unknown>
           }
         },
       )

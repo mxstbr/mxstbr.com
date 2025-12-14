@@ -24,6 +24,7 @@ import {
   sortByTimeOfDay,
   scheduleLabel,
 } from 'app/(os)/chores/utils'
+import { tool } from './tool'
 
 const isoDaySchema = z
   .string()
@@ -205,8 +206,54 @@ function outputTemplateUrl(pathname: string) {
   return new URL(pathname, siteUrl()).toString()
 }
 
+function toStructuredContent(
+  value: unknown,
+): Record<string, unknown> | undefined {
+  if (!value || typeof value !== 'object') return undefined
+  if (Array.isArray(value)) return undefined
+  return value as Record<string, unknown>
+}
+
+function formatCompletionMessage(result: any): string {
+  const choreTitle = result?.choreTitle ?? 'chore'
+  const kidName = result?.kidName ? ` for ${result.kidName}` : ''
+  const awarded =
+    typeof result?.awarded === 'number' && result.awarded > 0
+      ? ` (+${result.awarded} stars)`
+      : ''
+
+  switch (result?.status) {
+    case 'completed':
+      return `Marked "${choreTitle}"${kidName} complete${awarded}`
+    case 'skipped':
+      return `Skipped "${choreTitle}"${kidName} (already handled)`
+    case 'unauthorized':
+      return 'Not authorized to complete this chore'
+    default:
+      return 'Could not complete chore'
+  }
+}
+
+function formatUndoMessage(result: any): string {
+  const choreTitle = result?.choreTitle ?? 'chore'
+  const kidName = result?.kidName ? ` for ${result.kidName}` : ''
+  const stars =
+    typeof result?.delta === 'number' && result.delta !== 0
+      ? ` (${Math.abs(result.delta)} stars restored)`
+      : ''
+
+  switch (result?.status) {
+    case 'undone':
+      return `Undid "${choreTitle}"${kidName}${stars}`
+    case 'not_found':
+      return 'No completion found to undo'
+    default:
+      return 'Could not undo completion'
+  }
+}
+
 export const choreTools = {
-  read_chore_board: {
+  read_chore_board: tool({
     description:
       'Read the current chore board including kids, chores, completions, and rewards.',
     inputSchema: z.object({
@@ -215,15 +262,25 @@ export const choreTools = {
         .describe('Defaults to today in the Pacific timezone'),
     }),
     execute: async ({ day }: { day?: string }) => {
-      return loadChoreSnapshot(day)
+      const snapshot = await loadChoreSnapshot(day)
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Loaded chore board for ${snapshot?.ctx?.todayIso ?? 'today'}`,
+          },
+        ],
+        structuredContent: toStructuredContent(snapshot),
+        _meta: toChoresTodayMetadata(snapshot),
+      }
     },
     _meta: {
       'openai/outputTemplate': outputTemplateUrl('/chores/today'),
       'openai/widgetAccessible': true,
     },
-  },
+  }),
 
-  create_chore: {
+  create_chore: tool({
     description: 'Create a new chore for one or more kids.',
     inputSchema: z.object({
       title: z.string().min(1, 'Title is required'),
@@ -282,14 +339,23 @@ export const choreTools = {
       if (requires_approval) formData.append('requiresApproval', 'true')
 
       await addChore(formData)
+      const snapshot = await loadChoreSnapshot()
       return {
-        message: `Chore "${title}" created`,
-        snapshot: await loadChoreSnapshot(),
+        content: [
+          {
+            type: 'text' as const,
+            text: `Chore "${title}" created`,
+          },
+        ],
+        structuredContent: toStructuredContent({
+          message: `Chore "${title}" created`,
+          snapshot,
+        }),
       }
     },
-  },
+  }),
 
-  complete_chore: {
+  complete_chore: tool({
     description: 'Mark a chore done for a kid and award their stars.',
     inputSchema: z.object({
       chore_id: z.string().min(1),
@@ -307,15 +373,21 @@ export const choreTools = {
       formData.append('choreId', chore_id)
       formData.append('kidId', kid_id)
       const result = await completeChore(formData)
+      const snapshot = await loadChoreSnapshot()
 
       return {
-        ...result,
-        snapshot: await loadChoreSnapshot(),
+        content: [
+          {
+            type: 'text' as const,
+            text: formatCompletionMessage(result),
+          },
+        ],
+        structuredContent: toStructuredContent({ ...result, snapshot }),
       }
     },
-  },
+  }),
 
-  undo_chore_completion: {
+  undo_chore_completion: tool({
     description: 'Undo a chore completion for a kid.',
     inputSchema: z.object({
       chore_id: z.string().min(1),
@@ -338,14 +410,20 @@ export const choreTools = {
       if (completion_id) formData.append('completionId', completion_id)
 
       const result = await undoChore(formData)
+      const snapshot = await loadChoreSnapshot()
       return {
-        ...result,
-        snapshot: await loadChoreSnapshot(),
+        content: [
+          {
+            type: 'text' as const,
+            text: formatUndoMessage(result),
+          },
+        ],
+        structuredContent: toStructuredContent({ ...result, snapshot }),
       }
     },
-  },
+  }),
 
-  set_chore_schedule: {
+  set_chore_schedule: tool({
     description: 'Update the cadence or days of week for a repeated chore.',
     inputSchema: z.object({
       chore_id: z.string().min(1),
@@ -373,23 +451,28 @@ export const choreTools = {
       const snapshot = await loadChoreSnapshot()
       const chore = snapshot.chores.find((entry) => entry.id === chore_id)
 
+      const message =
+        chore?.type === 'repeated'
+          ? `Schedule updated to ${cadence}${
+              cadence === 'weekly'
+                ? ` on days ${(days_of_week ?? []).join(', ') || 'unspecified'}`
+                : ''
+            }`
+          : 'Chore schedule unchanged because it is not repeated'
+
       return {
-        message:
-          chore?.type === 'repeated'
-            ? `Schedule updated to ${cadence}${
-                cadence === 'weekly'
-                  ? ` on days ${
-                      (days_of_week ?? []).join(', ') || 'unspecified'
-                    }`
-                  : ''
-              }`
-            : 'Chore schedule unchanged because it is not repeated',
-        snapshot,
+        content: [
+          {
+            type: 'text' as const,
+            text: message,
+          },
+        ],
+        structuredContent: toStructuredContent({ message, snapshot }),
       }
     },
-  },
+  }),
 
-  pause_chore: {
+  pause_chore: tool({
     description: 'Pause or resume a single chore.',
     inputSchema: z.object({
       chore_id: z.string().min(1),
@@ -412,16 +495,24 @@ export const choreTools = {
       formData.append('pausedUntil', paused_until)
       await setPause(formData)
 
+      const snapshot = await loadChoreSnapshot()
+      const message = paused_until
+        ? `Chore paused until ${paused_until}`
+        : 'Chore resumed'
+
       return {
-        message: paused_until
-          ? `Chore paused until ${paused_until}`
-          : 'Chore resumed',
-        snapshot: await loadChoreSnapshot(),
+        content: [
+          {
+            type: 'text' as const,
+            text: message,
+          },
+        ],
+        structuredContent: toStructuredContent({ message, snapshot }),
       }
     },
-  },
+  }),
 
-  pause_all_chores: {
+  pause_all_chores: tool({
     description: 'Pause or resume every chore at once.',
     inputSchema: z.object({
       paused_until: z
@@ -436,16 +527,24 @@ export const choreTools = {
       formData.append('pausedUntil', paused_until)
       await pauseAllChores(formData)
 
+      const snapshot = await loadChoreSnapshot()
+      const message = paused_until
+        ? `All chores paused until ${paused_until}`
+        : 'All chores resumed'
+
       return {
-        message: paused_until
-          ? `All chores paused until ${paused_until}`
-          : 'All chores resumed',
-        snapshot: await loadChoreSnapshot(),
+        content: [
+          {
+            type: 'text' as const,
+            text: message,
+          },
+        ],
+        structuredContent: toStructuredContent({ message, snapshot }),
       }
     },
-  },
+  }),
 
-  set_chore_assignments: {
+  set_chore_assignments: tool({
     description:
       'Update which kids a chore applies to, whether it needs approval, and its time of day.',
     inputSchema: z.object({
@@ -485,14 +584,23 @@ export const choreTools = {
       }
 
       await setChoreKids(formData)
+      const snapshot = await loadChoreSnapshot()
       return {
-        message: 'Chore assignments saved',
-        snapshot: await loadChoreSnapshot(),
+        content: [
+          {
+            type: 'text' as const,
+            text: 'Chore assignments saved',
+          },
+        ],
+        structuredContent: toStructuredContent({
+          message: 'Chore assignments saved',
+          snapshot,
+        }),
       }
     },
-  },
+  }),
 
-  set_one_off_date: {
+  set_one_off_date: tool({
     description: 'Set the scheduled day for a one-off chore.',
     inputSchema: z.object({
       chore_id: z.string().min(1),
@@ -511,14 +619,21 @@ export const choreTools = {
       formData.append('scheduledFor', scheduled_for)
 
       await setOneOffDate(formData)
+      const snapshot = await loadChoreSnapshot()
+      const message = `One-off scheduled for ${scheduled_for}`
       return {
-        message: `One-off scheduled for ${scheduled_for}`,
-        snapshot: await loadChoreSnapshot(),
+        content: [
+          {
+            type: 'text' as const,
+            text: message,
+          },
+        ],
+        structuredContent: toStructuredContent({ message, snapshot }),
       }
     },
-  },
+  }),
 
-  archive_chore: {
+  archive_chore: tool({
     description: 'Archive a chore so it disappears from the board.',
     inputSchema: z.object({
       chore_id: z.string().min(1),
@@ -529,14 +644,23 @@ export const choreTools = {
       formData.append('choreId', chore_id)
       await archiveChore(formData)
 
+      const snapshot = await loadChoreSnapshot()
       return {
-        message: 'Chore archived',
-        snapshot: await loadChoreSnapshot(),
+        content: [
+          {
+            type: 'text' as const,
+            text: 'Chore archived',
+          },
+        ],
+        structuredContent: toStructuredContent({
+          message: 'Chore archived',
+          snapshot,
+        }),
       }
     },
-  },
+  }),
 
-  rename_kid: {
+  rename_kid: tool({
     description: 'Rename a kid column and optionally update its accent color.',
     inputSchema: z.object({
       kid_id: z.string().min(1),
@@ -559,14 +683,21 @@ export const choreTools = {
       if (color) formData.append('color', color)
 
       await renameKid(formData)
+      const snapshot = await loadChoreSnapshot()
+      const message = `Kid column saved as ${name}`
       return {
-        message: `Kid column saved as ${name}`,
-        snapshot: await loadChoreSnapshot(),
+        content: [
+          {
+            type: 'text' as const,
+            text: message,
+          },
+        ],
+        structuredContent: toStructuredContent({ message, snapshot }),
       }
     },
-  },
+  }),
 
-  adjust_kid_stars: {
+  adjust_kid_stars: tool({
     description: 'Manually add or remove stars from a kid balance.',
     inputSchema: z.object({
       kid_id: z.string().min(1),
@@ -589,14 +720,21 @@ export const choreTools = {
       formData.append('mode', mode)
 
       await adjustKidStars(formData)
+      const snapshot = await loadChoreSnapshot()
+      const message = `Stars ${mode === 'remove' ? 'removed' : 'added'} (${delta})`
       return {
-        message: `Stars ${mode === 'remove' ? 'removed' : 'added'} (${delta})`,
-        snapshot: await loadChoreSnapshot(),
+        content: [
+          {
+            type: 'text' as const,
+            text: message,
+          },
+        ],
+        structuredContent: toStructuredContent({ message, snapshot }),
       }
     },
-  },
+  }),
 
-  add_reward: {
+  add_reward: tool({
     description: 'Create a reward that kids can redeem with their stars.',
     inputSchema: z.object({
       title: z.string().min(1),
@@ -627,14 +765,21 @@ export const choreTools = {
       kid_ids.forEach((kidId) => formData.append('kidIds', kidId))
 
       await addReward(formData)
+      const snapshot = await loadChoreSnapshot()
+      const message = `Reward "${title}" created`
       return {
-        message: `Reward "${title}" created`,
-        snapshot: await loadChoreSnapshot(),
+        content: [
+          {
+            type: 'text' as const,
+            text: message,
+          },
+        ],
+        structuredContent: toStructuredContent({ message, snapshot }),
       }
     },
-  },
+  }),
 
-  set_reward_kids: {
+  set_reward_kids: tool({
     description: 'Assign which kids can see a reward.',
     inputSchema: z.object({
       reward_id: z.string().min(1),
@@ -653,14 +798,23 @@ export const choreTools = {
       kid_ids.forEach((kidId) => formData.append('kidIds', kidId))
 
       await setRewardKids(formData)
+      const snapshot = await loadChoreSnapshot()
       return {
-        message: 'Reward audience updated',
-        snapshot: await loadChoreSnapshot(),
+        content: [
+          {
+            type: 'text' as const,
+            text: 'Reward audience updated',
+          },
+        ],
+        structuredContent: toStructuredContent({
+          message: 'Reward audience updated',
+          snapshot,
+        }),
       }
     },
-  },
+  }),
 
-  archive_reward: {
+  archive_reward: tool({
     description: 'Archive or remove a reward.',
     inputSchema: z.object({
       reward_id: z.string().min(1),
@@ -671,14 +825,23 @@ export const choreTools = {
       formData.append('rewardId', reward_id)
       await archiveReward(formData)
 
+      const snapshot = await loadChoreSnapshot()
       return {
-        message: 'Reward archived',
-        snapshot: await loadChoreSnapshot(),
+        content: [
+          {
+            type: 'text' as const,
+            text: 'Reward archived',
+          },
+        ],
+        structuredContent: toStructuredContent({
+          message: 'Reward archived',
+          snapshot,
+        }),
       }
     },
-  },
+  }),
 
-  redeem_reward: {
+  redeem_reward: tool({
     description: 'Redeem a reward for a kid if they have enough stars.',
     inputSchema: z.object({
       reward_id: z.string().min(1),
@@ -697,10 +860,19 @@ export const choreTools = {
       formData.append('kidId', kid_id)
 
       const result = await redeemReward(formData)
+      const snapshot = await loadChoreSnapshot()
+      const message = result?.success
+        ? 'Reward redeemed'
+        : 'Could not redeem reward'
       return {
-        ...result,
-        snapshot: await loadChoreSnapshot(),
+        content: [
+          {
+            type: 'text' as const,
+            text: message,
+          },
+        ],
+        structuredContent: toStructuredContent({ ...result, snapshot }),
       }
     },
-  },
+  }),
 }
