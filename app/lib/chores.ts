@@ -1,4 +1,3 @@
-import { tool } from 'ai'
 import z from 'zod/v3'
 import {
   addChore,
@@ -23,6 +22,7 @@ import {
   isOpenForKid,
   pacificDateFromTimestamp,
   sortByTimeOfDay,
+  scheduleLabel,
 } from 'app/(os)/chores/utils'
 
 const isoDaySchema = z
@@ -52,7 +52,11 @@ async function loadChoreSnapshot(day?: string) {
   const openChoresByKid: Record<string, typeof state.chores> = {}
   const doneTodayByKid: Record<
     string,
-    { chore: (typeof state.chores)[number]; completionId: string; timestamp: string }[]
+    {
+      chore: (typeof state.chores)[number]
+      completionId: string
+      timestamp: string
+    }[]
   > = {}
 
   for (const kid of state.kids) {
@@ -69,7 +73,8 @@ async function loadChoreSnapshot(day?: string) {
   }
 
   for (const completion of state.completions) {
-    if (pacificDateFromTimestamp(completion.timestamp) !== ctx.todayIso) continue
+    if (pacificDateFromTimestamp(completion.timestamp) !== ctx.todayIso)
+      continue
     const chore = state.chores.find((entry) => entry.id === completion.choreId)
     if (!chore) continue
     if (!chore.kidIds.includes(completion.kidId)) continue
@@ -82,7 +87,10 @@ async function loadChoreSnapshot(day?: string) {
   }
 
   const sortedOpen = Object.fromEntries(
-    Object.entries(openChoresByKid).map(([kidId, chores]) => [kidId, sortByTimeOfDay(chores)]),
+    Object.entries(openChoresByKid).map(([kidId, chores]) => [
+      kidId,
+      sortByTimeOfDay(chores),
+    ]),
   )
 
   const sortedDone = Object.fromEntries(
@@ -110,18 +118,112 @@ async function loadChoreSnapshot(day?: string) {
   }
 }
 
+const timeOfDayLabels = {
+  morning: 'Morning',
+  afternoon: 'Afternoon',
+  evening: 'Evening',
+} as const
+
+export function toChoresTodayMetadata(
+  snapshot: Awaited<ReturnType<typeof loadChoreSnapshot>>,
+) {
+  if (!snapshot || typeof snapshot !== 'object') return undefined
+  if (!Array.isArray(snapshot.kids) || !Array.isArray(snapshot.chores))
+    return undefined
+
+  const openByKid = snapshot.openChoresByKid ?? {}
+  const doneByKid = snapshot.completedTodayByKid ?? {}
+
+  const kidById = new Map(snapshot.kids.map((kid) => [kid.id, kid]))
+
+  const openChoreIds = new Set<string>()
+  for (const chores of Object.values(openByKid)) {
+    for (const chore of chores) {
+      if (chore?.id) openChoreIds.add(chore.id)
+    }
+  }
+
+  const doneChoreIds = new Set<string>()
+  for (const entries of Object.values(doneByKid)) {
+    for (const entry of entries) {
+      if (entry?.chore?.id) doneChoreIds.add(entry.chore.id)
+    }
+  }
+
+  const relevant = snapshot.chores.filter(
+    (chore) =>
+      chore?.id && (openChoreIds.has(chore.id) || doneChoreIds.has(chore.id)),
+  )
+
+  const choresToday = relevant.map((chore) => {
+    const kids = (Array.isArray(chore.kidIds) ? chore.kidIds : [])
+      .map((kidId) => {
+        const kid = kidById.get(kidId)
+        if (!kid) return null
+
+        const isOpen = (openByKid[kidId] ?? []).some(
+          (entry) => entry.id === chore.id,
+        )
+        const isDone = (doneByKid[kidId] ?? []).some(
+          (entry) => entry.chore.id === chore.id,
+        )
+        const status = isDone ? 'done' : isOpen ? 'due' : 'closed'
+        return { kid, status }
+      })
+      .filter(Boolean)
+
+    const timeOfDay =
+      chore?.timeOfDay && chore.timeOfDay in timeOfDayLabels
+        ? timeOfDayLabels[chore.timeOfDay as keyof typeof timeOfDayLabels]
+        : 'Any time'
+
+    return {
+      id: chore.id,
+      title: chore.title,
+      emoji: chore.emoji,
+      stars: chore.stars,
+      schedule: scheduleLabel(chore),
+      timeOfDay,
+      requiresApproval: !!chore.requiresApproval,
+      kids,
+    }
+  })
+
+  return {
+    todayIso: snapshot?.ctx?.todayIso,
+    choresToday,
+  }
+}
+
+function siteUrl() {
+  if (process.env.SITE_URL) return process.env.SITE_URL
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
+  return 'http://localhost:3000'
+}
+
+function outputTemplateUrl(pathname: string) {
+  return new URL(pathname, siteUrl()).toString()
+}
+
 export const choreTools = {
-  read_chore_board: tool({
-    description: 'Read the current chore board including kids, chores, completions, and rewards.',
+  read_chore_board: {
+    description:
+      'Read the current chore board including kids, chores, completions, and rewards.',
     inputSchema: z.object({
-      day: isoDaySchema.optional().describe('Defaults to today in the Pacific timezone'),
+      day: isoDaySchema
+        .optional()
+        .describe('Defaults to today in the Pacific timezone'),
     }),
-    execute: async ({ day }) => {
+    execute: async ({ day }: { day?: string }) => {
       return loadChoreSnapshot(day)
     },
-  }),
+    _meta: {
+      'openai/outputTemplate': outputTemplateUrl('/chores/today'),
+      'openai/widgetAccessible': true,
+    },
+  },
 
-  create_chore: tool({
+  create_chore: {
     description: 'Create a new chore for one or more kids.',
     inputSchema: z.object({
       title: z.string().min(1, 'Title is required'),
@@ -146,6 +248,17 @@ export const choreTools = {
       time_of_day,
       requires_approval,
       scheduled_for,
+    }: {
+      title: string
+      emoji?: string
+      stars: number
+      kid_ids: string[]
+      type: 'one-off' | 'repeated' | 'perpetual'
+      cadence?: 'daily' | 'weekly'
+      days_of_week?: number[]
+      time_of_day?: 'morning' | 'afternoon' | 'evening'
+      requires_approval?: boolean
+      scheduled_for?: string
     }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
@@ -160,7 +273,9 @@ export const choreTools = {
       if (type === 'repeated' && cadence) {
         formData.append('cadence', cadence)
         if (cadence === 'weekly') {
-          ;(days_of_week ?? []).forEach((day) => formData.append('daysOfWeek', day.toString()))
+          ;(days_of_week ?? []).forEach((day) =>
+            formData.append('daysOfWeek', day.toString()),
+          )
         }
       }
       if (time_of_day) formData.append('timeOfDay', time_of_day)
@@ -172,15 +287,21 @@ export const choreTools = {
         snapshot: await loadChoreSnapshot(),
       }
     },
-  }),
+  },
 
-  complete_chore: tool({
+  complete_chore: {
     description: 'Mark a chore done for a kid and award their stars.',
     inputSchema: z.object({
       chore_id: z.string().min(1),
       kid_id: z.string().min(1),
     }),
-    execute: async ({ chore_id, kid_id }) => {
+    execute: async ({
+      chore_id,
+      kid_id,
+    }: {
+      chore_id: string
+      kid_id: string
+    }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('choreId', chore_id)
@@ -192,16 +313,24 @@ export const choreTools = {
         snapshot: await loadChoreSnapshot(),
       }
     },
-  }),
+  },
 
-  undo_chore_completion: tool({
+  undo_chore_completion: {
     description: 'Undo a chore completion for a kid.',
     inputSchema: z.object({
       chore_id: z.string().min(1),
       kid_id: z.string().min(1),
       completion_id: z.string().optional(),
     }),
-    execute: async ({ chore_id, kid_id, completion_id }) => {
+    execute: async ({
+      chore_id,
+      kid_id,
+      completion_id,
+    }: {
+      chore_id: string
+      kid_id: string
+      completion_id?: string
+    }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('choreId', chore_id)
@@ -214,21 +343,31 @@ export const choreTools = {
         snapshot: await loadChoreSnapshot(),
       }
     },
-  }),
+  },
 
-  set_chore_schedule: tool({
+  set_chore_schedule: {
     description: 'Update the cadence or days of week for a repeated chore.',
     inputSchema: z.object({
       chore_id: z.string().min(1),
       cadence: z.enum(['daily', 'weekly']).default('daily'),
       days_of_week: daysOfWeekSchema,
     }),
-    execute: async ({ chore_id, cadence, days_of_week }) => {
+    execute: async ({
+      chore_id,
+      cadence,
+      days_of_week,
+    }: {
+      chore_id: string
+      cadence: 'daily' | 'weekly'
+      days_of_week?: number[]
+    }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('choreId', chore_id)
       formData.append('cadence', cadence)
-      ;(days_of_week ?? []).forEach((day) => formData.append('daysOfWeek', day.toString()))
+      ;(days_of_week ?? []).forEach((day) =>
+        formData.append('daysOfWeek', day.toString()),
+      )
 
       await setChoreSchedule(formData)
       const snapshot = await loadChoreSnapshot()
@@ -237,24 +376,36 @@ export const choreTools = {
       return {
         message:
           chore?.type === 'repeated'
-            ? `Schedule updated to ${cadence}${cadence === 'weekly' ? ` on days ${(
-                days_of_week ?? []
-              ).join(', ') || 'unspecified'}` : ''}`
+            ? `Schedule updated to ${cadence}${
+                cadence === 'weekly'
+                  ? ` on days ${
+                      (days_of_week ?? []).join(', ') || 'unspecified'
+                    }`
+                  : ''
+              }`
             : 'Chore schedule unchanged because it is not repeated',
         snapshot,
       }
     },
-  }),
+  },
 
-  pause_chore: tool({
+  pause_chore: {
     description: 'Pause or resume a single chore.',
     inputSchema: z.object({
       chore_id: z.string().min(1),
-      paused_until: z.union([isoDaySchema, z.literal('')]).describe(
-        'Set a date to pause until (inclusive) or send an empty string to resume',
-      ),
+      paused_until: z
+        .union([isoDaySchema, z.literal('')])
+        .describe(
+          'Set a date to pause until (inclusive) or send an empty string to resume',
+        ),
     }),
-    execute: async ({ chore_id, paused_until }) => {
+    execute: async ({
+      chore_id,
+      paused_until,
+    }: {
+      chore_id: string
+      paused_until: string
+    }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('choreId', chore_id)
@@ -262,33 +413,39 @@ export const choreTools = {
       await setPause(formData)
 
       return {
-        message: paused_until ? `Chore paused until ${paused_until}` : 'Chore resumed',
+        message: paused_until
+          ? `Chore paused until ${paused_until}`
+          : 'Chore resumed',
         snapshot: await loadChoreSnapshot(),
       }
     },
-  }),
+  },
 
-  pause_all_chores: tool({
+  pause_all_chores: {
     description: 'Pause or resume every chore at once.',
     inputSchema: z.object({
-      paused_until: z.union([isoDaySchema, z.literal('')]).describe(
-        'Set a date to pause all chores or send an empty string to resume',
-      ),
+      paused_until: z
+        .union([isoDaySchema, z.literal('')])
+        .describe(
+          'Set a date to pause all chores or send an empty string to resume',
+        ),
     }),
-    execute: async ({ paused_until }) => {
+    execute: async ({ paused_until }: { paused_until: string }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('pausedUntil', paused_until)
       await pauseAllChores(formData)
 
       return {
-        message: paused_until ? `All chores paused until ${paused_until}` : 'All chores resumed',
+        message: paused_until
+          ? `All chores paused until ${paused_until}`
+          : 'All chores resumed',
         snapshot: await loadChoreSnapshot(),
       }
     },
-  }),
+  },
 
-  set_chore_assignments: tool({
+  set_chore_assignments: {
     description:
       'Update which kids a chore applies to, whether it needs approval, and its time of day.',
     inputSchema: z.object({
@@ -304,6 +461,12 @@ export const choreTools = {
       time_of_day,
       clear_time_of_day,
       requires_approval,
+    }: {
+      chore_id: string
+      kid_ids: string[]
+      time_of_day?: 'morning' | 'afternoon' | 'evening'
+      clear_time_of_day?: boolean
+      requires_approval?: boolean
     }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
@@ -315,7 +478,10 @@ export const choreTools = {
         formData.append('timeOfDay', '')
       }
       if (requires_approval !== undefined) {
-        formData.append('requiresApproval', requires_approval ? 'true' : 'false')
+        formData.append(
+          'requiresApproval',
+          requires_approval ? 'true' : 'false',
+        )
       }
 
       await setChoreKids(formData)
@@ -324,15 +490,21 @@ export const choreTools = {
         snapshot: await loadChoreSnapshot(),
       }
     },
-  }),
+  },
 
-  set_one_off_date: tool({
+  set_one_off_date: {
     description: 'Set the scheduled day for a one-off chore.',
     inputSchema: z.object({
       chore_id: z.string().min(1),
       scheduled_for: isoDaySchema,
     }),
-    execute: async ({ chore_id, scheduled_for }) => {
+    execute: async ({
+      chore_id,
+      scheduled_for,
+    }: {
+      chore_id: string
+      scheduled_for: string
+    }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('choreId', chore_id)
@@ -344,14 +516,14 @@ export const choreTools = {
         snapshot: await loadChoreSnapshot(),
       }
     },
-  }),
+  },
 
-  archive_chore: tool({
+  archive_chore: {
     description: 'Archive a chore so it disappears from the board.',
     inputSchema: z.object({
       chore_id: z.string().min(1),
     }),
-    execute: async ({ chore_id }) => {
+    execute: async ({ chore_id }: { chore_id: string }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('choreId', chore_id)
@@ -362,16 +534,24 @@ export const choreTools = {
         snapshot: await loadChoreSnapshot(),
       }
     },
-  }),
+  },
 
-  rename_kid: tool({
+  rename_kid: {
     description: 'Rename a kid column and optionally update its accent color.',
     inputSchema: z.object({
       kid_id: z.string().min(1),
       name: z.string().min(1),
       color: hexColorSchema.optional(),
     }),
-    execute: async ({ kid_id, name, color }) => {
+    execute: async ({
+      kid_id,
+      name,
+      color,
+    }: {
+      kid_id: string
+      name: string
+      color?: string
+    }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('kidId', kid_id)
@@ -384,16 +564,24 @@ export const choreTools = {
         snapshot: await loadChoreSnapshot(),
       }
     },
-  }),
+  },
 
-  adjust_kid_stars: tool({
+  adjust_kid_stars: {
     description: 'Manually add or remove stars from a kid balance.',
     inputSchema: z.object({
       kid_id: z.string().min(1),
       delta: z.number().int().min(1),
       mode: z.enum(['add', 'remove']).default('add'),
     }),
-    execute: async ({ kid_id, delta, mode }) => {
+    execute: async ({
+      kid_id,
+      delta,
+      mode,
+    }: {
+      kid_id: string
+      delta: number
+      mode: 'add' | 'remove'
+    }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('kidId', kid_id)
@@ -406,9 +594,9 @@ export const choreTools = {
         snapshot: await loadChoreSnapshot(),
       }
     },
-  }),
+  },
 
-  add_reward: tool({
+  add_reward: {
     description: 'Create a reward that kids can redeem with their stars.',
     inputSchema: z.object({
       title: z.string().min(1),
@@ -417,7 +605,19 @@ export const choreTools = {
       reward_type: z.enum(['one-off', 'perpetual']).default('perpetual'),
       kid_ids: kidIdsSchema,
     }),
-    execute: async ({ title, emoji, cost, reward_type, kid_ids }) => {
+    execute: async ({
+      title,
+      emoji,
+      cost,
+      reward_type,
+      kid_ids,
+    }: {
+      title: string
+      emoji?: string
+      cost: number
+      reward_type: 'one-off' | 'perpetual'
+      kid_ids: string[]
+    }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('title', title)
@@ -432,15 +632,21 @@ export const choreTools = {
         snapshot: await loadChoreSnapshot(),
       }
     },
-  }),
+  },
 
-  set_reward_kids: tool({
+  set_reward_kids: {
     description: 'Assign which kids can see a reward.',
     inputSchema: z.object({
       reward_id: z.string().min(1),
       kid_ids: kidIdsSchema,
     }),
-    execute: async ({ reward_id, kid_ids }) => {
+    execute: async ({
+      reward_id,
+      kid_ids,
+    }: {
+      reward_id: string
+      kid_ids: string[]
+    }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('rewardId', reward_id)
@@ -452,14 +658,14 @@ export const choreTools = {
         snapshot: await loadChoreSnapshot(),
       }
     },
-  }),
+  },
 
-  archive_reward: tool({
+  archive_reward: {
     description: 'Archive or remove a reward.',
     inputSchema: z.object({
       reward_id: z.string().min(1),
     }),
-    execute: async ({ reward_id }) => {
+    execute: async ({ reward_id }: { reward_id: string }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('rewardId', reward_id)
@@ -470,15 +676,21 @@ export const choreTools = {
         snapshot: await loadChoreSnapshot(),
       }
     },
-  }),
+  },
 
-  redeem_reward: tool({
+  redeem_reward: {
     description: 'Redeem a reward for a kid if they have enough stars.',
     inputSchema: z.object({
       reward_id: z.string().min(1),
       kid_id: z.string().min(1),
     }),
-    execute: async ({ reward_id, kid_id }) => {
+    execute: async ({
+      reward_id,
+      kid_id,
+    }: {
+      reward_id: string
+      kid_id: string
+    }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('rewardId', reward_id)
@@ -490,5 +702,5 @@ export const choreTools = {
         snapshot: await loadChoreSnapshot(),
       }
     },
-  }),
+  },
 }

@@ -1,91 +1,7 @@
-import { choreTools } from 'app/lib/chores'
+import { choreTools, toChoresTodayMetadata } from 'app/lib/chores'
 import { createMcpHandler } from 'mcp-handler'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { scheduleLabel } from 'app/(os)/chores/utils'
-
-const timeOfDayLabels = {
-  morning: 'Morning',
-  afternoon: 'Afternoon',
-  evening: 'Evening',
-} as const
-
-function siteUrl() {
-  if (process.env.SITE_URL) return process.env.SITE_URL
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
-  return 'http://localhost:3000'
-}
-
-function outputTemplateUrl(pathname: string) {
-  return new URL(pathname, siteUrl()).toString()
-}
-
-function toChoresTodayMetadata(snapshot: any) {
-  if (!snapshot || typeof snapshot !== 'object') return undefined
-  if (!Array.isArray(snapshot.kids) || !Array.isArray(snapshot.chores)) return undefined
-
-  const openByKid: Record<string, any[]> = snapshot.openChoresByKid ?? {}
-  const doneByKid: Record<string, any[]> = snapshot.completedTodayByKid ?? {}
-
-  const kidById = new Map(
-    snapshot.kids
-      .filter((kid: any) => kid && typeof kid.id === 'string')
-      .map((kid: any) => [kid.id, kid]),
-  )
-
-  const openChoreIds = new Set<string>()
-  for (const chores of Object.values(openByKid)) {
-    for (const chore of chores ?? []) {
-      if (chore?.id) openChoreIds.add(chore.id)
-    }
-  }
-
-  const doneChoreIds = new Set<string>()
-  for (const entries of Object.values(doneByKid)) {
-    for (const entry of entries ?? []) {
-      if (entry?.chore?.id) doneChoreIds.add(entry.chore.id)
-    }
-  }
-
-  const relevant = snapshot.chores.filter(
-    (chore: any) => chore?.id && (openChoreIds.has(chore.id) || doneChoreIds.has(chore.id)),
-  )
-
-  const choresToday = relevant.map((chore: any) => {
-    const kids = (Array.isArray(chore.kidIds) ? chore.kidIds : [])
-      .map((kidId: any) => {
-        const kid = kidById.get(kidId)
-        if (!kid) return null
-
-        const isOpen = (openByKid[kidId] ?? []).some((entry: any) => entry?.id === chore.id)
-        const isDone = (doneByKid[kidId] ?? []).some((entry: any) => entry?.chore?.id === chore.id)
-        const status = isDone ? 'done' : isOpen ? 'due' : 'closed'
-        return { kid, status }
-      })
-      .filter(Boolean)
-
-    const timeOfDay =
-      chore?.timeOfDay && chore.timeOfDay in timeOfDayLabels
-        ? timeOfDayLabels[chore.timeOfDay as keyof typeof timeOfDayLabels]
-        : 'Any time'
-
-    return {
-      id: chore.id,
-      title: chore.title,
-      emoji: chore.emoji,
-      stars: chore.stars,
-      schedule: scheduleLabel(chore),
-      timeOfDay,
-      requiresApproval: !!chore.requiresApproval,
-      kids,
-    }
-  })
-
-  return {
-    todayIso: snapshot?.ctx?.todayIso,
-    choresToday,
-  }
-}
 
 export const maxDuration = 60
 
@@ -188,6 +104,9 @@ const handler = createMcpHandler(
       const tool = choreTools[name]
       if (!tool) return
 
+      // Extract tool registration metadata if present
+      const toolMeta = (tool as any)._meta
+
       server.registerTool(
         name,
         {
@@ -195,26 +114,22 @@ const handler = createMcpHandler(
           description: tool.description,
           inputSchema: tool.inputSchema as any,
           annotations: options.annotations,
-          _meta:
-            name === 'read_chore_board'
-              ? {
-                  'openai/outputTemplate': outputTemplateUrl('/chores/today'),
-                  'openai/widgetAccessible': true,
-                }
-              : undefined,
+          _meta: toolMeta,
         },
-        async (args, extra) => {
+        async (args: any, extra: any) => {
           const execute = tool.execute
           if (!execute) {
             throw new Error(`Tool "${name}" is missing an execute function`)
           }
 
-          const rawResult = await execute((args ?? {}) as any, {
-            toolCallId: crypto.randomUUID ? crypto.randomUUID() : `${name}-${Date.now()}`,
-            messages: [],
-            abortSignal: extra.signal,
-          })
+          const rawResult = await execute(args)
           const result = await resolveToolResult(rawResult)
+
+          // Generate widget metadata for read_chore_board tool
+          const widgetMeta =
+            name === 'read_chore_board'
+              ? toChoresTodayMetadata(result as any)
+              : undefined
 
           return {
             content: [
@@ -224,7 +139,7 @@ const handler = createMcpHandler(
               },
             ],
             structuredContent: toStructuredContent(result),
-            _meta: name === 'read_chore_board' ? toChoresTodayMetadata(result) : undefined,
+            _meta: widgetMeta,
           }
         },
       )
