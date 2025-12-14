@@ -87,6 +87,7 @@ const handler = createMcpHandler(
 
 const routeWithAuth = (req: NextRequest) => {
   if (
+    process.env.NODE_ENV !== 'development' &&
     !(new URL(req.url).searchParams.get('pwd') === process.env.CAL_PASSWORD)
   ) {
     return new NextResponse('Unauthorized', { status: 401 })
