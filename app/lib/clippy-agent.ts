@@ -5,6 +5,7 @@ import {
   Experimental_Agent as Agent,
 } from 'ai'
 import { Redis } from '@upstash/redis'
+import { headers } from 'next/headers'
 import { colors } from 'app/(os)/cal/data'
 import { PRESETS } from 'app/(os)/cal/presets'
 import { dedent } from './dedent'
@@ -20,6 +21,13 @@ function resolveDeploymentUrl() {
     process.env.NEXT_PUBLIC_VERCEL_URL
 
   if (envUrl) return envUrl.startsWith('http') ? envUrl : `https://${envUrl}`
+
+  try {
+    const hostHeader = headers().get('host') ?? undefined
+    if (hostHeader) return `https://${hostHeader}`
+  } catch (error) {
+    console.warn('Unable to read request headers for MCP origin resolution', error)
+  }
 
   const fallback = siteUrl()
 
