@@ -247,16 +247,28 @@ function formatUndoMessage(result: any): string {
   }
 }
 
-const choreTools = {
-  read_chore_board: {
-    description:
-      'Read the current chore board including kids, chores, completions, and rewards.',
-    inputSchema: z.object({
-      day: isoDaySchema
-        .optional()
-        .describe('Defaults to today in the Pacific timezone'),
-    }),
-    execute: async ({ day }: { day?: string }) => {
+const anyOutputSchema = z.object({}).passthrough()
+
+export function registerChoreTools(server: McpServer) {
+  server.registerTool(
+    'read_chore_board',
+    {
+      title: 'Read Chore Board',
+      description:
+        'Read the current chore board including kids, chores, completions, and rewards.',
+      inputSchema: z.object({
+        day: isoDaySchema
+          .optional()
+          .describe('Defaults to today in the Pacific timezone'),
+      }),
+      outputSchema: anyOutputSchema,
+      annotations: { readOnlyHint: true },
+      _meta: {
+        'openai/outputTemplate': outputTemplateUrl('/chores/today'),
+        'openai/widgetAccessible': true,
+      },
+    },
+    async ({ day }: { day?: string }) => {
       const snapshot = await loadChoreSnapshot(day)
       return {
         content: [
@@ -269,27 +281,28 @@ const choreTools = {
         _meta: toChoresTodayMetadata(snapshot),
       }
     },
-    _meta: {
-      'openai/outputTemplate': outputTemplateUrl('/chores/today'),
-      'openai/widgetAccessible': true,
-    },
-  },
+  )
 
-  create_chore: {
-    description: 'Create a new chore for one or more kids.',
-    inputSchema: z.object({
-      title: z.string().min(1, 'Title is required'),
-      emoji: z.string().optional(),
-      stars: z.number().int().min(0).default(1),
-      kid_ids: kidIdsSchema,
-      type: z.enum(['one-off', 'repeated', 'perpetual']).default('one-off'),
-      cadence: z.enum(['daily', 'weekly']).optional(),
-      days_of_week: daysOfWeekSchema,
-      time_of_day: timeOfDaySchema,
-      requires_approval: z.boolean().optional().default(false),
-      scheduled_for: isoDaySchema.optional(),
-    }),
-    execute: async ({
+  server.registerTool(
+    'create_chore',
+    {
+      title: 'Create Chore',
+      description: 'Create a new chore for one or more kids.',
+      inputSchema: z.object({
+        title: z.string().min(1, 'Title is required'),
+        emoji: z.string().optional(),
+        stars: z.number().int().min(0).default(1),
+        kid_ids: kidIdsSchema,
+        type: z.enum(['one-off', 'repeated', 'perpetual']).default('one-off'),
+        cadence: z.enum(['daily', 'weekly']).optional(),
+        days_of_week: daysOfWeekSchema,
+        time_of_day: timeOfDaySchema,
+        requires_approval: z.boolean().optional().default(false),
+        scheduled_for: isoDaySchema.optional(),
+      }),
+      outputSchema: anyOutputSchema,
+    },
+    async ({
       title,
       emoji,
       stars,
@@ -348,15 +361,20 @@ const choreTools = {
         }),
       }
     },
-  },
+  )
 
-  complete_chore: {
-    description: 'Mark a chore done for a kid and award their stars.',
-    inputSchema: z.object({
-      chore_id: z.string().min(1),
-      kid_id: z.string().min(1),
-    }),
-    execute: async ({
+  server.registerTool(
+    'complete_chore',
+    {
+      title: 'Complete Chore',
+      description: 'Mark a chore done for a kid and award their stars.',
+      inputSchema: z.object({
+        chore_id: z.string().min(1),
+        kid_id: z.string().min(1),
+      }),
+      outputSchema: anyOutputSchema,
+    },
+    async ({
       chore_id,
       kid_id,
     }: {
@@ -380,16 +398,21 @@ const choreTools = {
         structuredContent: toStructuredContent({ ...result, snapshot }),
       }
     },
-  },
+  )
 
-  undo_chore_completion: {
-    description: 'Undo a chore completion for a kid.',
-    inputSchema: z.object({
-      chore_id: z.string().min(1),
-      kid_id: z.string().min(1),
-      completion_id: z.string().optional(),
-    }),
-    execute: async ({
+  server.registerTool(
+    'undo_chore_completion',
+    {
+      title: 'Undo Chore Completion',
+      description: 'Undo a chore completion for a kid.',
+      inputSchema: z.object({
+        chore_id: z.string().min(1),
+        kid_id: z.string().min(1),
+        completion_id: z.string().optional(),
+      }),
+      outputSchema: anyOutputSchema,
+    },
+    async ({
       chore_id,
       kid_id,
       completion_id,
@@ -416,16 +439,21 @@ const choreTools = {
         structuredContent: toStructuredContent({ ...result, snapshot }),
       }
     },
-  },
+  )
 
-  set_chore_schedule: {
-    description: 'Update the cadence or days of week for a repeated chore.',
-    inputSchema: z.object({
-      chore_id: z.string().min(1),
-      cadence: z.enum(['daily', 'weekly']).default('daily'),
-      days_of_week: daysOfWeekSchema,
-    }),
-    execute: async ({
+  server.registerTool(
+    'set_chore_schedule',
+    {
+      title: 'Set Chore Schedule',
+      description: 'Update the cadence or days of week for a repeated chore.',
+      inputSchema: z.object({
+        chore_id: z.string().min(1),
+        cadence: z.enum(['daily', 'weekly']).default('daily'),
+        days_of_week: daysOfWeekSchema,
+      }),
+      outputSchema: anyOutputSchema,
+    },
+    async ({
       chore_id,
       cadence,
       days_of_week,
@@ -465,19 +493,24 @@ const choreTools = {
         structuredContent: toStructuredContent({ message, snapshot }),
       }
     },
-  },
+  )
 
-  pause_chore: {
-    description: 'Pause or resume a single chore.',
-    inputSchema: z.object({
-      chore_id: z.string().min(1),
-      paused_until: z
-        .union([isoDaySchema, z.literal('')])
-        .describe(
-          'Set a date to pause until (inclusive) or send an empty string to resume',
-        ),
-    }),
-    execute: async ({
+  server.registerTool(
+    'pause_chore',
+    {
+      title: 'Pause Chore',
+      description: 'Pause or resume a single chore.',
+      inputSchema: z.object({
+        chore_id: z.string().min(1),
+        paused_until: z
+          .union([isoDaySchema, z.literal('')])
+          .describe(
+            'Set a date to pause until (inclusive) or send an empty string to resume',
+          ),
+      }),
+      outputSchema: anyOutputSchema,
+    },
+    async ({
       chore_id,
       paused_until,
     }: {
@@ -505,18 +538,23 @@ const choreTools = {
         structuredContent: toStructuredContent({ message, snapshot }),
       }
     },
-  },
+  )
 
-  pause_all_chores: {
-    description: 'Pause or resume every chore at once.',
-    inputSchema: z.object({
-      paused_until: z
-        .union([isoDaySchema, z.literal('')])
-        .describe(
-          'Set a date to pause all chores or send an empty string to resume',
-        ),
-    }),
-    execute: async ({ paused_until }: { paused_until: string }) => {
+  server.registerTool(
+    'pause_all_chores',
+    {
+      title: 'Pause All Chores',
+      description: 'Pause or resume every chore at once.',
+      inputSchema: z.object({
+        paused_until: z
+          .union([isoDaySchema, z.literal('')])
+          .describe(
+            'Set a date to pause all chores or send an empty string to resume',
+          ),
+      }),
+      outputSchema: anyOutputSchema,
+    },
+    async ({ paused_until }: { paused_until: string }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('pausedUntil', paused_until)
@@ -537,19 +575,24 @@ const choreTools = {
         structuredContent: toStructuredContent({ message, snapshot }),
       }
     },
-  },
+  )
 
-  set_chore_assignments: {
-    description:
-      'Update which kids a chore applies to, whether it needs approval, and its time of day.',
-    inputSchema: z.object({
-      chore_id: z.string().min(1),
-      kid_ids: kidIdsSchema,
-      time_of_day: timeOfDaySchema,
-      clear_time_of_day: z.boolean().optional(),
-      requires_approval: z.boolean().optional(),
-    }),
-    execute: async ({
+  server.registerTool(
+    'set_chore_assignments',
+    {
+      title: 'Set Chore Assignments',
+      description:
+        'Update which kids a chore applies to, whether it needs approval, and its time of day.',
+      inputSchema: z.object({
+        chore_id: z.string().min(1),
+        kid_ids: kidIdsSchema,
+        time_of_day: timeOfDaySchema,
+        clear_time_of_day: z.boolean().optional(),
+        requires_approval: z.boolean().optional(),
+      }),
+      outputSchema: anyOutputSchema,
+    },
+    async ({
       chore_id,
       kid_ids,
       time_of_day,
@@ -593,15 +636,20 @@ const choreTools = {
         }),
       }
     },
-  },
+  )
 
-  set_one_off_date: {
-    description: 'Set the scheduled day for a one-off chore.',
-    inputSchema: z.object({
-      chore_id: z.string().min(1),
-      scheduled_for: isoDaySchema,
-    }),
-    execute: async ({
+  server.registerTool(
+    'set_one_off_date',
+    {
+      title: 'Set One-Off Date',
+      description: 'Set the scheduled day for a one-off chore.',
+      inputSchema: z.object({
+        chore_id: z.string().min(1),
+        scheduled_for: isoDaySchema,
+      }),
+      outputSchema: anyOutputSchema,
+    },
+    async ({
       chore_id,
       scheduled_for,
     }: {
@@ -626,14 +674,19 @@ const choreTools = {
         structuredContent: toStructuredContent({ message, snapshot }),
       }
     },
-  },
+  )
 
-  archive_chore: {
-    description: 'Archive a chore so it disappears from the board.',
-    inputSchema: z.object({
-      chore_id: z.string().min(1),
-    }),
-    execute: async ({ chore_id }: { chore_id: string }) => {
+  server.registerTool(
+    'archive_chore',
+    {
+      title: 'Archive Chore',
+      description: 'Archive a chore so it disappears from the board.',
+      inputSchema: z.object({
+        chore_id: z.string().min(1),
+      }),
+      outputSchema: anyOutputSchema,
+    },
+    async ({ chore_id }: { chore_id: string }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('choreId', chore_id)
@@ -653,16 +706,21 @@ const choreTools = {
         }),
       }
     },
-  },
+  )
 
-  rename_kid: {
-    description: 'Rename a kid column and optionally update its accent color.',
-    inputSchema: z.object({
-      kid_id: z.string().min(1),
-      name: z.string().min(1),
-      color: hexColorSchema.optional(),
-    }),
-    execute: async ({
+  server.registerTool(
+    'rename_kid',
+    {
+      title: 'Rename Kid',
+      description: 'Rename a kid column and optionally update its accent color.',
+      inputSchema: z.object({
+        kid_id: z.string().min(1),
+        name: z.string().min(1),
+        color: hexColorSchema.optional(),
+      }),
+      outputSchema: anyOutputSchema,
+    },
+    async ({
       kid_id,
       name,
       color,
@@ -690,16 +748,21 @@ const choreTools = {
         structuredContent: toStructuredContent({ message, snapshot }),
       }
     },
-  },
+  )
 
-  adjust_kid_stars: {
-    description: 'Manually add or remove stars from a kid balance.',
-    inputSchema: z.object({
-      kid_id: z.string().min(1),
-      delta: z.number().int().min(1),
-      mode: z.enum(['add', 'remove']).default('add'),
-    }),
-    execute: async ({
+  server.registerTool(
+    'adjust_kid_stars',
+    {
+      title: 'Adjust Kid Stars',
+      description: 'Manually add or remove stars from a kid balance.',
+      inputSchema: z.object({
+        kid_id: z.string().min(1),
+        delta: z.number().int().min(1),
+        mode: z.enum(['add', 'remove']).default('add'),
+      }),
+      outputSchema: anyOutputSchema,
+    },
+    async ({
       kid_id,
       delta,
       mode,
@@ -727,18 +790,23 @@ const choreTools = {
         structuredContent: toStructuredContent({ message, snapshot }),
       }
     },
-  },
+  )
 
-  add_reward: {
-    description: 'Create a reward that kids can redeem with their stars.',
-    inputSchema: z.object({
-      title: z.string().min(1),
-      emoji: z.string().optional(),
-      cost: z.number().int().min(0).default(1),
-      reward_type: z.enum(['one-off', 'perpetual']).default('perpetual'),
-      kid_ids: kidIdsSchema,
-    }),
-    execute: async ({
+  server.registerTool(
+    'add_reward',
+    {
+      title: 'Add Reward',
+      description: 'Create a reward that kids can redeem with their stars.',
+      inputSchema: z.object({
+        title: z.string().min(1),
+        emoji: z.string().optional(),
+        cost: z.number().int().min(0).default(1),
+        reward_type: z.enum(['one-off', 'perpetual']).default('perpetual'),
+        kid_ids: kidIdsSchema,
+      }),
+      outputSchema: anyOutputSchema,
+    },
+    async ({
       title,
       emoji,
       cost,
@@ -772,15 +840,20 @@ const choreTools = {
         structuredContent: toStructuredContent({ message, snapshot }),
       }
     },
-  },
+  )
 
-  set_reward_kids: {
-    description: 'Assign which kids can see a reward.',
-    inputSchema: z.object({
-      reward_id: z.string().min(1),
-      kid_ids: kidIdsSchema,
-    }),
-    execute: async ({
+  server.registerTool(
+    'set_reward_kids',
+    {
+      title: 'Set Reward Kids',
+      description: 'Assign which kids can see a reward.',
+      inputSchema: z.object({
+        reward_id: z.string().min(1),
+        kid_ids: kidIdsSchema,
+      }),
+      outputSchema: anyOutputSchema,
+    },
+    async ({
       reward_id,
       kid_ids,
     }: {
@@ -807,14 +880,19 @@ const choreTools = {
         }),
       }
     },
-  },
+  )
 
-  archive_reward: {
-    description: 'Archive or remove a reward.',
-    inputSchema: z.object({
-      reward_id: z.string().min(1),
-    }),
-    execute: async ({ reward_id }: { reward_id: string }) => {
+  server.registerTool(
+    'archive_reward',
+    {
+      title: 'Archive Reward',
+      description: 'Archive or remove a reward.',
+      inputSchema: z.object({
+        reward_id: z.string().min(1),
+      }),
+      outputSchema: anyOutputSchema,
+    },
+    async ({ reward_id }: { reward_id: string }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('rewardId', reward_id)
@@ -834,15 +912,20 @@ const choreTools = {
         }),
       }
     },
-  },
+  )
 
-  redeem_reward: {
-    description: 'Redeem a reward for a kid if they have enough stars.',
-    inputSchema: z.object({
-      reward_id: z.string().min(1),
-      kid_id: z.string().min(1),
-    }),
-    execute: async ({
+  server.registerTool(
+    'redeem_reward',
+    {
+      title: 'Redeem Reward',
+      description: 'Redeem a reward for a kid if they have enough stars.',
+      inputSchema: z.object({
+        reward_id: z.string().min(1),
+        kid_id: z.string().min(1),
+      }),
+      outputSchema: anyOutputSchema,
+    },
+    async ({
       reward_id,
       kid_id,
     }: {
@@ -869,32 +952,5 @@ const choreTools = {
         structuredContent: toStructuredContent({ ...result, snapshot }),
       }
     },
-  },
-}
-
-function toTitle(name: string) {
-  return name.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())
-}
-
-const anyOutputSchema = z.object({}).passthrough()
-
-export function registerChoreTools(server: McpServer) {
-  for (const [name, def] of Object.entries(choreTools)) {
-    server.registerTool(
-      name,
-      {
-        title: toTitle(name),
-        description: def.description,
-        inputSchema: def.inputSchema as any,
-        outputSchema: anyOutputSchema,
-        annotations:
-          name === 'read_chore_board' ? { readOnlyHint: true } : undefined,
-        _meta: (def as any)._meta,
-      },
-      async (args: any) => {
-        const result = await (def as any).execute(args)
-        return result
-      },
-    )
-  }
+  )
 }
