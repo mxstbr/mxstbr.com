@@ -46,7 +46,7 @@ export async function POST(req: Request) {
   const params = new URLSearchParams(rawBody)
   const messageBody = params.get('Body') || ''
 
-  const clippy = await getClippy()
+  const clippy = await getClippy(req)
   const aiResult = await clippy.generate({
     messages: [
       {

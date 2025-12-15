@@ -11,7 +11,7 @@ import { PRESETS } from 'app/(os)/cal/presets'
 import { dedent } from './dedent'
 import { siteUrl } from './site-url'
 
-async function resolveDeploymentUrl() {
+async function resolveDeploymentUrl(request?: Request) {
   const envUrl =
     process.env.SITE_URL ??
     process.env.VERCEL_URL ??
@@ -22,10 +22,19 @@ async function resolveDeploymentUrl() {
 
   if (envUrl) return envUrl.startsWith('http') ? envUrl : `https://${envUrl}`
 
+  if (request?.url) {
+    try {
+      return new URL(request.url).origin
+    } catch (error) {
+      console.warn('Failed to derive MCP origin from request URL', error)
+    }
+  }
+
   try {
     const requestHeaders = await headers()
-    const hostHeader = requestHeaders.get('host') ?? undefined
-    if (hostHeader) return `https://${hostHeader}`
+    const protoHeader = requestHeaders.get('x-forwarded-proto') ?? 'https'
+    const hostHeader = requestHeaders.get('x-forwarded-host') ?? requestHeaders.get('host') ?? undefined
+    if (hostHeader) return `${protoHeader}://${hostHeader}`
   } catch (error) {
     console.warn('Unable to read request headers for MCP origin resolution', error)
   }
@@ -215,14 +224,14 @@ ${JSON.stringify(
 
 let clippyPromise: Promise<Agent<any, any, any>> | null = null
 
-export async function getClippy() {
+export async function getClippy(request?: Request) {
   if (clippyPromise) return clippyPromise
 
   clippyPromise = (async () => {
     const token =
       process.env.CLIPPY_AUTOMATION_TOKEN ?? process.env.CAL_PASSWORD
 
-    const deploymentUrl = await resolveDeploymentUrl()
+    const deploymentUrl = await resolveDeploymentUrl(request)
 
     const client = await createMCPClient({
       transport: {

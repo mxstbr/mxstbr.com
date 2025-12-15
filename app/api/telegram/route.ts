@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
         ('caption' in message && message.caption) ||
         ''
 
-      const clippy = await getClippy()
+      const clippy = await getClippy(request)
       const stream = await clippy.stream({
         messages: [
           {
