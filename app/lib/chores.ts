@@ -378,10 +378,6 @@ export function registerChoreTools(server: McpServer) {
       }),
       outputSchema: readBoardSchema,
       annotations: { readOnlyHint: true },
-      // _meta: {
-      //   'openai/outputTemplate': outputTemplateUrl('/chores/today'),
-      //   'openai/widgetAccessible': true,
-      // },
     },
     async ({ day }: { day?: string }) => {
       const snapshot = await loadChoreSnapshot(day)
@@ -398,7 +394,7 @@ export function registerChoreTools(server: McpServer) {
         structuredContent: snapshot
           ? toStructuredContent({ message, ...snapshot })
           : undefined,
-        _meta: toChoresTodayMetadata(snapshot),
+        // _meta: toChoresTodayMetadata(snapshot),
       }
     },
   )
