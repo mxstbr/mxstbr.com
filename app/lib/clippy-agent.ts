@@ -10,6 +10,28 @@ import { PRESETS } from 'app/(os)/cal/presets'
 import { dedent } from './dedent'
 import { siteUrl } from './site-url'
 
+function resolveDeploymentUrl() {
+  const envUrl =
+    process.env.SITE_URL ??
+    process.env.VERCEL_URL ??
+    process.env.VERCEL_BRANCH_URL ??
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ??
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    process.env.NEXT_PUBLIC_VERCEL_URL
+
+  if (envUrl) return envUrl.startsWith('http') ? envUrl : `https://${envUrl}`
+
+  const fallback = siteUrl()
+
+  if (process.env.NODE_ENV === 'production') {
+    console.warn(
+      'Falling back to localhost MCP transport URL; set SITE_URL/VERCEL_URL to the deployment origin.',
+    )
+  }
+
+  return fallback
+}
+
 const redis = Redis.fromEnv()
 const CONVERSATION_INDEX_KEY = 'clippy:conversations'
 
@@ -194,7 +216,7 @@ export async function getClippy() {
     const client = await createMCPClient({
       transport: {
         type: 'sse',
-        url: new URL('/api/sse', siteUrl()).toString(),
+        url: new URL('/api/sse', resolveDeploymentUrl()).toString(),
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       },
       name: 'clippy-mcp-client',
