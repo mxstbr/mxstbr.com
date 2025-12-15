@@ -11,7 +11,7 @@ import { PRESETS } from 'app/(os)/cal/presets'
 import { dedent } from './dedent'
 import { siteUrl } from './site-url'
 
-function resolveDeploymentUrl() {
+async function resolveDeploymentUrl() {
   const envUrl =
     process.env.SITE_URL ??
     process.env.VERCEL_URL ??
@@ -23,7 +23,8 @@ function resolveDeploymentUrl() {
   if (envUrl) return envUrl.startsWith('http') ? envUrl : `https://${envUrl}`
 
   try {
-    const hostHeader = headers().get('host') ?? undefined
+    const requestHeaders = await headers()
+    const hostHeader = requestHeaders.get('host') ?? undefined
     if (hostHeader) return `https://${hostHeader}`
   } catch (error) {
     console.warn('Unable to read request headers for MCP origin resolution', error)
@@ -221,10 +222,12 @@ export async function getClippy() {
     const token =
       process.env.CLIPPY_AUTOMATION_TOKEN ?? process.env.CAL_PASSWORD
 
+    const deploymentUrl = await resolveDeploymentUrl()
+
     const client = await createMCPClient({
       transport: {
         type: 'sse',
-        url: new URL('/api/sse', resolveDeploymentUrl()).toString(),
+        url: new URL('/api/sse', deploymentUrl).toString(),
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       },
       name: 'clippy-mcp-client',
