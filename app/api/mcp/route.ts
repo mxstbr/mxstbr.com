@@ -6,7 +6,22 @@ export const maxDuration = 60
 
 const handler = createMcpHandler(
   (server) => {
-    registerAllTools(server)
+    // registerAllTools(server)
+    server.registerTool(
+      'roll_dice',
+      {
+        description: 'Rolls an N-sided die',
+        inputSchema: {
+          sides: z.number().int().min(2),
+        },
+      },
+      async ({ sides }) => {
+        const value = 1 + Math.floor(Math.random() * sides)
+        return {
+          content: [{ type: 'text', text: `🎲 You rolled a ${value}!` }],
+        }
+      },
+    )
   },
   {},
   {
