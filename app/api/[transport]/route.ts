@@ -2,6 +2,19 @@ import { registerAllTools } from 'app/lib/mcp/register-all-tools'
 import { createMcpHandler } from 'mcp-handler'
 import { NextRequest, NextResponse } from 'next/server'
 
+const redisUrl = (() => {
+  const redisRestUrl = process.env.UPSTASH_REDIS_REST_URL
+  const redisRestToken = process.env.UPSTASH_REDIS_REST_TOKEN
+
+  if (redisRestUrl && redisRestToken) {
+    const url = new URL(redisRestUrl)
+    url.searchParams.set('_token', redisRestToken)
+    return url.toString()
+  }
+
+  return process.env.REDIS_URL ?? process.env.KV_URL
+})()
+
 export const maxDuration = 60
 
 const handler = createMcpHandler(
@@ -13,6 +26,7 @@ const handler = createMcpHandler(
     basePath: '/api', // this needs to match where the [transport] is located.
     maxDuration: 60,
     verboseLogs: true,
+    redisUrl,
   },
 )
 
