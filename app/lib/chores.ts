@@ -270,14 +270,20 @@ export function registerChoreTools(server: McpServer) {
     },
     async ({ day }: { day?: string }) => {
       const snapshot = await loadChoreSnapshot(day)
+      const message = `Loaded chore board for ${
+        snapshot?.ctx?.todayIso ?? 'today'
+      } with ${(snapshot?.kids ?? []).length} kids, ${(snapshot?.chores ?? []).length} chores, and ${(snapshot?.rewards ?? []).length} rewards`
+
       return {
         content: [
           {
             type: 'text' as const,
-            text: `Loaded chore board for ${snapshot?.ctx?.todayIso ?? 'today'}`,
+            text: message,
           },
         ],
-        structuredContent: toStructuredContent(snapshot),
+        structuredContent: snapshot
+          ? toStructuredContent({ message, ...snapshot })
+          : undefined,
         _meta: toChoresTodayMetadata(snapshot),
       }
     },
@@ -387,15 +393,16 @@ export function registerChoreTools(server: McpServer) {
       formData.append('kidId', kid_id)
       const result = await completeChore(formData)
       const snapshot = await loadChoreSnapshot()
+      const message = formatCompletionMessage(result)
 
       return {
         content: [
           {
             type: 'text' as const,
-            text: formatCompletionMessage(result),
+            text: message,
           },
         ],
-        structuredContent: toStructuredContent({ ...result, snapshot }),
+        structuredContent: toStructuredContent({ message, ...result, snapshot }),
       }
     },
   )
@@ -429,14 +436,15 @@ export function registerChoreTools(server: McpServer) {
 
       const result = await undoChore(formData)
       const snapshot = await loadChoreSnapshot()
+      const message = formatUndoMessage(result)
       return {
         content: [
           {
             type: 'text' as const,
-            text: formatUndoMessage(result),
+            text: message,
           },
         ],
-        structuredContent: toStructuredContent({ ...result, snapshot }),
+        structuredContent: toStructuredContent({ message, ...result, snapshot }),
       }
     },
   )
@@ -949,7 +957,7 @@ export function registerChoreTools(server: McpServer) {
             text: message,
           },
         ],
-        structuredContent: toStructuredContent({ ...result, snapshot }),
+        structuredContent: toStructuredContent({ message, ...result, snapshot }),
       }
     },
   )
