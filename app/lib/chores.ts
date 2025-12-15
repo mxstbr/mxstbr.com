@@ -378,17 +378,16 @@ export function registerChoreTools(server: McpServer) {
       }),
       outputSchema: readBoardSchema,
       annotations: { readOnlyHint: true },
-      _meta: {
-        'openai/outputTemplate': outputTemplateUrl('/chores/today'),
-        'openai/widgetAccessible': true,
-      },
+      // _meta: {
+      //   'openai/outputTemplate': outputTemplateUrl('/chores/today'),
+      //   'openai/widgetAccessible': true,
+      // },
     },
     async ({ day }: { day?: string }) => {
       const snapshot = await loadChoreSnapshot(day)
       const message = `Loaded chore board for ${
         snapshot?.ctx?.todayIso ?? 'today'
       } with ${(snapshot?.kids ?? []).length} kids, ${(snapshot?.chores ?? []).length} chores, and ${(snapshot?.rewards ?? []).length} rewards`
-
       return {
         content: [
           {
@@ -403,7 +402,6 @@ export function registerChoreTools(server: McpServer) {
       }
     },
   )
-
   server.registerTool(
     'create_chore',
     {
@@ -466,7 +464,6 @@ export function registerChoreTools(server: McpServer) {
       }
       if (time_of_day) formData.append('timeOfDay', time_of_day)
       if (requires_approval) formData.append('requiresApproval', 'true')
-
       await addChore(formData)
       const snapshot = await loadChoreSnapshot()
       return {
@@ -483,7 +480,6 @@ export function registerChoreTools(server: McpServer) {
       }
     },
   )
-
   server.registerTool(
     'complete_chore',
     {
@@ -495,13 +491,7 @@ export function registerChoreTools(server: McpServer) {
       }),
       outputSchema: completionResultSchema,
     },
-    async ({
-      chore_id,
-      kid_id,
-    }: {
-      chore_id: string
-      kid_id: string
-    }) => {
+    async ({ chore_id, kid_id }: { chore_id: string; kid_id: string }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('choreId', chore_id)
@@ -509,7 +499,6 @@ export function registerChoreTools(server: McpServer) {
       const result = await completeChore(formData)
       const snapshot = await loadChoreSnapshot()
       const message = formatCompletionMessage(result)
-
       return {
         content: [
           {
@@ -517,11 +506,14 @@ export function registerChoreTools(server: McpServer) {
             text: message,
           },
         ],
-        structuredContent: toStructuredContent({ message, ...result, snapshot }),
+        structuredContent: toStructuredContent({
+          message,
+          ...result,
+          snapshot,
+        }),
       }
     },
   )
-
   server.registerTool(
     'undo_chore_completion',
     {
@@ -548,7 +540,6 @@ export function registerChoreTools(server: McpServer) {
       formData.append('choreId', chore_id)
       formData.append('kidId', kid_id)
       if (completion_id) formData.append('completionId', completion_id)
-
       const result = await undoChore(formData)
       const snapshot = await loadChoreSnapshot()
       const message = formatUndoMessage(result)
@@ -559,11 +550,14 @@ export function registerChoreTools(server: McpServer) {
             text: message,
           },
         ],
-        structuredContent: toStructuredContent({ message, ...result, snapshot }),
+        structuredContent: toStructuredContent({
+          message,
+          ...result,
+          snapshot,
+        }),
       }
     },
   )
-
   server.registerTool(
     'set_chore_schedule',
     {
@@ -592,11 +586,9 @@ export function registerChoreTools(server: McpServer) {
       ;(days_of_week ?? []).forEach((day) =>
         formData.append('daysOfWeek', day.toString()),
       )
-
       await setChoreSchedule(formData)
       const snapshot = await loadChoreSnapshot()
       const chore = snapshot.chores.find((entry) => entry.id === chore_id)
-
       const message =
         chore?.type === 'repeated'
           ? `Schedule updated to ${cadence}${
@@ -605,7 +597,6 @@ export function registerChoreTools(server: McpServer) {
                 : ''
             }`
           : 'Chore schedule unchanged because it is not repeated'
-
       return {
         content: [
           {
@@ -617,7 +608,6 @@ export function registerChoreTools(server: McpServer) {
       }
     },
   )
-
   server.registerTool(
     'pause_chore',
     {
@@ -645,12 +635,10 @@ export function registerChoreTools(server: McpServer) {
       formData.append('choreId', chore_id)
       formData.append('pausedUntil', paused_until)
       await setPause(formData)
-
       const snapshot = await loadChoreSnapshot()
       const message = paused_until
         ? `Chore paused until ${paused_until}`
         : 'Chore resumed'
-
       return {
         content: [
           {
@@ -662,7 +650,6 @@ export function registerChoreTools(server: McpServer) {
       }
     },
   )
-
   server.registerTool(
     'pause_all_chores',
     {
@@ -682,12 +669,10 @@ export function registerChoreTools(server: McpServer) {
       appendAutomationToken(formData)
       formData.append('pausedUntil', paused_until)
       await pauseAllChores(formData)
-
       const snapshot = await loadChoreSnapshot()
       const message = paused_until
         ? `All chores paused until ${paused_until}`
         : 'All chores resumed'
-
       return {
         content: [
           {
@@ -699,7 +684,6 @@ export function registerChoreTools(server: McpServer) {
       }
     },
   )
-
   server.registerTool(
     'set_chore_assignments',
     {
@@ -743,7 +727,6 @@ export function registerChoreTools(server: McpServer) {
           requires_approval ? 'true' : 'false',
         )
       }
-
       await setChoreKids(formData)
       const snapshot = await loadChoreSnapshot()
       return {
@@ -760,7 +743,6 @@ export function registerChoreTools(server: McpServer) {
       }
     },
   )
-
   server.registerTool(
     'set_one_off_date',
     {
@@ -783,7 +765,6 @@ export function registerChoreTools(server: McpServer) {
       appendAutomationToken(formData)
       formData.append('choreId', chore_id)
       formData.append('scheduledFor', scheduled_for)
-
       await setOneOffDate(formData)
       const snapshot = await loadChoreSnapshot()
       const message = `One-off scheduled for ${scheduled_for}`
@@ -798,7 +779,6 @@ export function registerChoreTools(server: McpServer) {
       }
     },
   )
-
   server.registerTool(
     'archive_chore',
     {
@@ -814,7 +794,6 @@ export function registerChoreTools(server: McpServer) {
       appendAutomationToken(formData)
       formData.append('choreId', chore_id)
       await archiveChore(formData)
-
       const snapshot = await loadChoreSnapshot()
       return {
         content: [
@@ -830,12 +809,12 @@ export function registerChoreTools(server: McpServer) {
       }
     },
   )
-
   server.registerTool(
     'rename_kid',
     {
       title: 'Rename Kid',
-      description: 'Rename a kid column and optionally update its accent color.',
+      description:
+        'Rename a kid column and optionally update its accent color.',
       inputSchema: z.object({
         kid_id: z.string().min(1),
         name: z.string().min(1),
@@ -857,7 +836,6 @@ export function registerChoreTools(server: McpServer) {
       formData.append('kidId', kid_id)
       formData.append('name', name)
       if (color) formData.append('color', color)
-
       await renameKid(formData)
       const snapshot = await loadChoreSnapshot()
       const message = `Kid column saved as ${name}`
@@ -872,7 +850,6 @@ export function registerChoreTools(server: McpServer) {
       }
     },
   )
-
   server.registerTool(
     'adjust_kid_stars',
     {
@@ -899,7 +876,6 @@ export function registerChoreTools(server: McpServer) {
       formData.append('kidId', kid_id)
       formData.append('delta', delta.toString())
       formData.append('mode', mode)
-
       await adjustKidStars(formData)
       const snapshot = await loadChoreSnapshot()
       const message = `Stars ${mode === 'remove' ? 'removed' : 'added'} (${delta})`
@@ -914,7 +890,6 @@ export function registerChoreTools(server: McpServer) {
       }
     },
   )
-
   server.registerTool(
     'add_reward',
     {
@@ -949,7 +924,6 @@ export function registerChoreTools(server: McpServer) {
       formData.append('cost', cost.toString())
       formData.append('rewardType', reward_type)
       kid_ids.forEach((kidId) => formData.append('kidIds', kidId))
-
       await addReward(formData)
       const snapshot = await loadChoreSnapshot()
       const message = `Reward "${title}" created`
@@ -964,7 +938,6 @@ export function registerChoreTools(server: McpServer) {
       }
     },
   )
-
   server.registerTool(
     'set_reward_kids',
     {
@@ -987,7 +960,6 @@ export function registerChoreTools(server: McpServer) {
       appendAutomationToken(formData)
       formData.append('rewardId', reward_id)
       kid_ids.forEach((kidId) => formData.append('kidIds', kidId))
-
       await setRewardKids(formData)
       const snapshot = await loadChoreSnapshot()
       return {
@@ -1004,7 +976,6 @@ export function registerChoreTools(server: McpServer) {
       }
     },
   )
-
   server.registerTool(
     'archive_reward',
     {
@@ -1020,7 +991,6 @@ export function registerChoreTools(server: McpServer) {
       appendAutomationToken(formData)
       formData.append('rewardId', reward_id)
       await archiveReward(formData)
-
       const snapshot = await loadChoreSnapshot()
       return {
         content: [
@@ -1036,7 +1006,6 @@ export function registerChoreTools(server: McpServer) {
       }
     },
   )
-
   server.registerTool(
     'redeem_reward',
     {
@@ -1048,18 +1017,11 @@ export function registerChoreTools(server: McpServer) {
       }),
       outputSchema: redeemResultSchema,
     },
-    async ({
-      reward_id,
-      kid_id,
-    }: {
-      reward_id: string
-      kid_id: string
-    }) => {
+    async ({ reward_id, kid_id }: { reward_id: string; kid_id: string }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('rewardId', reward_id)
       formData.append('kidId', kid_id)
-
       const result = await redeemReward(formData)
       const snapshot = await loadChoreSnapshot()
       const message = result?.success
@@ -1072,7 +1034,11 @@ export function registerChoreTools(server: McpServer) {
             text: message,
           },
         ],
-        structuredContent: toStructuredContent({ message, ...result, snapshot }),
+        structuredContent: toStructuredContent({
+          message,
+          ...result,
+          snapshot,
+        }),
       }
     },
   )

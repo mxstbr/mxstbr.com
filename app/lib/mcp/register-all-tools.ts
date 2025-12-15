@@ -11,5 +11,3 @@ export function registerAllTools(server: McpServer) {
   registerChoreTools(server)
   registerFinanceTools(server)
 }
-
-
