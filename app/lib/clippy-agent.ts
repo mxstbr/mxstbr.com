@@ -182,7 +182,7 @@ ${JSON.stringify(
 )}
 </PRESETS>`
 
-let clippyPromise: Promise<Agent> | null = null
+let clippyPromise: Promise<Agent<any, any, any>> | null = null
 
 export async function getClippy() {
   if (clippyPromise) return clippyPromise
