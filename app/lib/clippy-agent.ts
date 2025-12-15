@@ -1,9 +1,6 @@
 import { openai } from '@ai-sdk/openai'
-import {
-  experimental_createMCPClient as createMCPClient,
-  stepCountIs,
-  Experimental_Agent as Agent,
-} from 'ai'
+import { stepCountIs, Experimental_Agent as Agent } from 'ai'
+import { experimental_createMCPClient as createMCPClient } from '@ai-sdk/mcp'
 import { Redis } from '@upstash/redis'
 import { headers } from 'next/headers'
 import { colors } from 'app/(os)/cal/data'
@@ -33,10 +30,16 @@ async function resolveDeploymentUrl(request?: Request) {
   try {
     const requestHeaders = await headers()
     const protoHeader = requestHeaders.get('x-forwarded-proto') ?? 'https'
-    const hostHeader = requestHeaders.get('x-forwarded-host') ?? requestHeaders.get('host') ?? undefined
+    const hostHeader =
+      requestHeaders.get('x-forwarded-host') ??
+      requestHeaders.get('host') ??
+      undefined
     if (hostHeader) return `${protoHeader}://${hostHeader}`
   } catch (error) {
-    console.warn('Unable to read request headers for MCP origin resolution', error)
+    console.warn(
+      'Unable to read request headers for MCP origin resolution',
+      error,
+    )
   }
 
   const fallback = siteUrl()
@@ -235,8 +238,8 @@ export async function getClippy(request?: Request) {
 
     const client = await createMCPClient({
       transport: {
-        type: 'sse',
-        url: new URL('/api/sse', deploymentUrl).toString(),
+        type: 'http',
+        url: new URL('/api/mcp', deploymentUrl).toString(),
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       },
       name: 'clippy-mcp-client',

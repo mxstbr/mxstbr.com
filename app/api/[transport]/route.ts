@@ -18,6 +18,7 @@ const handler = createMcpHandler(
 )
 
 const routeWithAuth = (req: NextRequest) => {
+  console.log('MCP REQUEST')
   const bearer =
     req.headers.get('authorization') ?? req.headers.get('Authorization')
   const bearerToken = bearer?.startsWith('Bearer ')
@@ -36,6 +37,7 @@ const routeWithAuth = (req: NextRequest) => {
     return new NextResponse('Unauthorized', { status: 401 })
   }
 
+  console.log(req.url, req.body)
   return handler(req)
 }
 
