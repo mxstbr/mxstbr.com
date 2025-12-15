@@ -1,13 +1,57 @@
 import { openai } from '@ai-sdk/openai'
 import { stepCountIs, Experimental_Agent as Agent } from 'ai'
+import { experimental_createMCPClient as createMCPClient } from '@ai-sdk/mcp'
 import { Redis } from '@upstash/redis'
+import { headers } from 'next/headers'
 import { colors } from 'app/(os)/cal/data'
 import { PRESETS } from 'app/(os)/cal/presets'
 import { dedent } from './dedent'
-import { calendarTools } from './calendar'
-import { telegramTools } from './telegram'
-import { choreTools } from './chores'
-import { financeTools } from './finance'
+import { siteUrl } from './site-url'
+
+async function resolveDeploymentUrl(request?: Request) {
+  const envUrl =
+    process.env.SITE_URL ??
+    process.env.VERCEL_URL ??
+    process.env.VERCEL_BRANCH_URL ??
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ??
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    process.env.NEXT_PUBLIC_VERCEL_URL
+
+  if (envUrl) return envUrl.startsWith('http') ? envUrl : `https://${envUrl}`
+
+  if (request?.url) {
+    try {
+      return new URL(request.url).origin
+    } catch (error) {
+      console.warn('Failed to derive MCP origin from request URL', error)
+    }
+  }
+
+  try {
+    const requestHeaders = await headers()
+    const protoHeader = requestHeaders.get('x-forwarded-proto') ?? 'https'
+    const hostHeader =
+      requestHeaders.get('x-forwarded-host') ??
+      requestHeaders.get('host') ??
+      undefined
+    if (hostHeader) return `${protoHeader}://${hostHeader}`
+  } catch (error) {
+    console.warn(
+      'Unable to read request headers for MCP origin resolution',
+      error,
+    )
+  }
+
+  const fallback = siteUrl()
+
+  if (process.env.NODE_ENV === 'production') {
+    console.warn(
+      'Falling back to localhost MCP transport URL; set SITE_URL/VERCEL_URL to the deployment origin.',
+    )
+  }
+
+  return fallback
+}
 
 const redis = Redis.fromEnv()
 const CONVERSATION_INDEX_KEY = 'clippy:conversations'
@@ -181,21 +225,45 @@ ${JSON.stringify(
 )}
 </PRESETS>`
 
-export const clippy = new Agent({
-  model: openai('gpt-5-mini'),
-  system: SYSTEM_PROMPT(new Date()),
-  tools: {
-    ...calendarTools,
-    ...telegramTools,
-    ...choreTools,
-    ...financeTools,
-  },
-  onStepFinish: async (result) => {
-    try {
-      await persistConversationStep(result)
-    } catch (error) {
-      console.error('Failed to persist Clippy step log', error)
-    }
-  },
-  stopWhen: stepCountIs(10),
-})
+let clippyPromise: Promise<Agent<any, any, any>> | null = null
+
+export async function getClippy(request?: Request) {
+  if (clippyPromise) return clippyPromise
+
+  clippyPromise = (async () => {
+    const token =
+      process.env.CLIPPY_AUTOMATION_TOKEN ?? process.env.CAL_PASSWORD
+
+    const deploymentUrl = await resolveDeploymentUrl(request)
+
+    const client = await createMCPClient({
+      transport: {
+        type: 'http',
+        url: new URL('/api/mcp', deploymentUrl).toString(),
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      },
+      name: 'clippy-mcp-client',
+      onUncaughtError: (error) => {
+        console.error('Clippy MCP client error', error)
+      },
+    })
+
+    const tools = await client.tools()
+
+    return new Agent({
+      model: openai('gpt-5-mini'),
+      system: SYSTEM_PROMPT(new Date()),
+      tools,
+      onStepFinish: async (result) => {
+        try {
+          await persistConversationStep(result)
+        } catch (error) {
+          console.error('Failed to persist Clippy step log', error)
+        }
+      },
+      stopWhen: stepCountIs(10),
+    })
+  })()
+
+  return clippyPromise
+}

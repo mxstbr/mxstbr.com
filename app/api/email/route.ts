@@ -1,6 +1,6 @@
 import { verifyBasicAuth } from 'app/auth'
 import { NextRequest, NextResponse } from 'next/server'
-import { clippy } from '../../lib/clippy-agent'
+import { getClippy } from '../../lib/clippy-agent'
 import { dedent } from '../../lib/dedent'
 
 export async function POST(req: NextRequest) {
@@ -13,6 +13,7 @@ export async function POST(req: NextRequest) {
 
   // Call the calendar assistant with the email plaintext
   try {
+    const clippy = await getClippy(req)
     const result = await clippy.generate({
       messages: [
         {
