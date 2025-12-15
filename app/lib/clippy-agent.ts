@@ -1,5 +1,9 @@
 import { openai } from '@ai-sdk/openai'
-import { createMCPClient, stepCountIs, Experimental_Agent as Agent } from 'ai'
+import {
+  experimental_createMCPClient as createMCPClient,
+  stepCountIs,
+  Experimental_Agent as Agent,
+} from 'ai'
 import { Redis } from '@upstash/redis'
 import { colors } from 'app/(os)/cal/data'
 import { PRESETS } from 'app/(os)/cal/presets'
