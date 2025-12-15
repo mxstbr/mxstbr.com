@@ -33,7 +33,18 @@ const eventSchema = z
     }
   })
 
-const anyOutputSchema = z.object({}).passthrough()
+const eventResponseSchema = z.object({
+  message: z.string(),
+  event: eventSchema,
+})
+
+const eventsListSchema = z.object({
+  events: z.array(eventSchema),
+})
+
+const deleteResponseSchema = z.object({
+  message: z.literal('🗑️ Event deleted'),
+})
 
 export function registerCalendarTools(server: McpServer) {
   server.registerTool(
@@ -42,7 +53,7 @@ export function registerCalendarTools(server: McpServer) {
       title: 'Create Event',
       description: 'Create a new calendar event',
       inputSchema: eventSchema,
-      outputSchema: anyOutputSchema,
+      outputSchema: eventResponseSchema,
     },
     async ({ start, end, color, label, border, background }) => {
       // Normalise to YYYY-MM-DD format
@@ -88,7 +99,7 @@ export function registerCalendarTools(server: McpServer) {
         start_date: z.string().optional().default('2024-01-01'),
         end_date: z.string().optional().default('9999-12-31'),
       }),
-      outputSchema: anyOutputSchema,
+      outputSchema: eventsListSchema,
       annotations: { readOnlyHint: true },
     },
     async ({ start_date, end_date }) => {
@@ -124,7 +135,7 @@ export function registerCalendarTools(server: McpServer) {
         oldEvent: eventSchema,
         newEvent: eventSchema,
       }),
-      outputSchema: anyOutputSchema,
+      outputSchema: eventResponseSchema,
     },
     async ({ oldEvent, newEvent }) => {
       const events: Array<Event> | null = await redis.json.get(
@@ -175,7 +186,7 @@ export function registerCalendarTools(server: McpServer) {
       title: 'Delete Event',
       description: 'Delete a calendar event',
       inputSchema: z.object({ event: eventSchema }),
-      outputSchema: anyOutputSchema,
+      outputSchema: deleteResponseSchema,
     },
     async ({ event }) => {
       const events: Array<Event> | null = await redis.json.get(

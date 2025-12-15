@@ -7,7 +7,9 @@ export const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN as string)
 //   secret_token: process.env.TELEGRAM_SECRET_TOKEN,
 // })
 
-const anyOutputSchema = z.object({}).passthrough()
+const telegramResponseSchema = z.object({
+  message: z.string(),
+})
 
 export function registerTelegramTools(server: McpServer) {
   server.registerTool(
@@ -16,7 +18,7 @@ export function registerTelegramTools(server: McpServer) {
       title: 'Send Message',
       description: 'Send a message to Maxie and Minnie via Telegram',
       inputSchema: z.object({ message: z.string() }),
-      outputSchema: anyOutputSchema,
+      outputSchema: telegramResponseSchema,
     },
     async ({ message }) => {
       try {

@@ -13,7 +13,21 @@ const isoDateSchema = z
   .regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)
   .describe('Date formatted as YYYY-MM-DD')
 
-const anyOutputSchema = z.object({}).passthrough()
+const holdingSchema = z.object({
+  ticker: z.string(),
+  shares: z.number(),
+  date: isoDateSchema,
+})
+
+const holdingsResponseSchema = z.object({
+  count: z.number(),
+  holdings: z.array(holdingSchema),
+})
+
+const mutationResponseSchema = z.object({
+  message: z.string(),
+  holdings: z.array(holdingSchema),
+})
 
 export function registerFinanceTools(server: McpServer) {
   server.registerTool(
@@ -22,7 +36,7 @@ export function registerFinanceTools(server: McpServer) {
       title: 'Read Finance Holdings',
       description: 'Read the current stock holdings shown on the /finance page.',
       inputSchema: z.object({}),
-      outputSchema: anyOutputSchema,
+      outputSchema: holdingsResponseSchema,
       annotations: { readOnlyHint: true },
     },
     async () => {
@@ -50,7 +64,7 @@ export function registerFinanceTools(server: McpServer) {
         shares: z.number().positive('Shares must be greater than 0'),
         date: isoDateSchema,
       }),
-      outputSchema: anyOutputSchema,
+      outputSchema: mutationResponseSchema,
     },
     async ({ ticker, shares, date }) => {
       const holding = { ticker, shares, date }
@@ -81,7 +95,7 @@ export function registerFinanceTools(server: McpServer) {
         shares: z.number().positive('Shares must be greater than 0').optional(),
         date: isoDateSchema.optional(),
       }),
-      outputSchema: anyOutputSchema,
+      outputSchema: mutationResponseSchema,
     },
     async ({ index, ticker, shares, date }) => {
       const holdings = await getHoldingsData()
@@ -116,7 +130,7 @@ export function registerFinanceTools(server: McpServer) {
       inputSchema: z.object({
         index: z.number().int().min(0, 'Index must be non-negative'),
       }),
-      outputSchema: anyOutputSchema,
+      outputSchema: mutationResponseSchema,
     },
     async ({ index }) => {
       const holdings = await getHoldingsData()

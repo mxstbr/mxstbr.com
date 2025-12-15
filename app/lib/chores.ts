@@ -48,6 +48,123 @@ const hexColorSchema = z
   .regex(/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/)
   .describe('Hex color such as #0ea5e9 or #0af')
 
+const kidSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  color: hexColorSchema,
+})
+
+const choreScheduleSchema = z.object({
+  cadence: z.enum(['daily', 'weekly']),
+  daysOfWeek: z.array(z.number().int()).optional(),
+})
+
+const choreSchema = z.object({
+  id: z.string(),
+  kidIds: z.array(z.string()),
+  title: z.string(),
+  emoji: z.string(),
+  stars: z.number(),
+  type: z.enum(['one-off', 'repeated', 'perpetual']),
+  requiresApproval: z.boolean().optional(),
+  scheduledFor: z.string().nullable().optional(),
+  schedule: choreScheduleSchema.optional(),
+  pausedUntil: z.string().nullable().optional(),
+  snoozedUntil: z.string().nullable().optional(),
+  snoozedForKids: z.record(z.string(), z.string().nullable()).optional(),
+  createdAt: z.string(),
+  completedAt: z.string().nullable().optional(),
+  timeOfDay: z.enum(['morning', 'afternoon', 'evening']).optional(),
+})
+
+const completionSchema = z.object({
+  id: z.string(),
+  choreId: z.string(),
+  kidId: z.string(),
+  timestamp: z.string(),
+  starsAwarded: z.number(),
+})
+
+const rewardSchema = z.object({
+  id: z.string(),
+  kidIds: z.array(z.string()),
+  title: z.string(),
+  emoji: z.string(),
+  cost: z.number(),
+  type: z.enum(['one-off', 'perpetual']),
+  createdAt: z.string(),
+  archived: z.boolean().optional(),
+})
+
+const rewardRedemptionSchema = z.object({
+  id: z.string(),
+  rewardId: z.string(),
+  kidId: z.string(),
+  timestamp: z.string(),
+  cost: z.number(),
+})
+
+const todayContextSchema = z.object({
+  todayIso: z.string(),
+  weekday: z.number(),
+  nowMs: z.number(),
+})
+
+const completedEntrySchema = z.object({
+  chore: choreSchema,
+  completionId: z.string(),
+  timestamp: z.string(),
+})
+
+const choreSnapshotSchema = z.object({
+  ctx: todayContextSchema,
+  kids: z.array(kidSchema),
+  chores: z.array(choreSchema),
+  completions: z.array(completionSchema),
+  rewards: z.array(rewardSchema),
+  rewardRedemptions: z.array(rewardRedemptionSchema),
+  openChoresByKid: z.record(z.array(choreSchema)),
+  completedTodayByKid: z.record(z.array(completedEntrySchema)),
+})
+
+const messageWithSnapshotSchema = z.object({
+  message: z.string(),
+  snapshot: choreSnapshotSchema.optional(),
+})
+
+const readBoardSchema = choreSnapshotSchema.extend({
+  message: z.string(),
+})
+
+const completionResultSchema = z.object({
+  message: z.string(),
+  awarded: z.number().optional(),
+  completionId: z.string().optional(),
+  choreTitle: z.string().optional(),
+  kidName: z.string().optional(),
+  telegramMessage: z.string().nullable().optional(),
+  undoLink: z.string().nullable().optional(),
+  status: z
+    .enum(['completed', 'skipped', 'invalid', 'unauthorized'])
+    .optional(),
+  snapshot: choreSnapshotSchema.optional(),
+})
+
+const undoResultSchema = z.object({
+  message: z.string(),
+  delta: z.number().optional(),
+  status: z.enum(['undone', 'not_found', 'invalid']).optional(),
+  choreTitle: z.string().optional(),
+  kidName: z.string().optional(),
+  snapshot: choreSnapshotSchema.optional(),
+})
+
+const redeemResultSchema = z.object({
+  message: z.string(),
+  success: z.boolean().optional(),
+  snapshot: choreSnapshotSchema.optional(),
+})
+
 async function loadChoreSnapshot(day?: string) {
   const state = await getChoreState()
   const ctx = getToday(day)
@@ -247,8 +364,6 @@ function formatUndoMessage(result: any): string {
   }
 }
 
-const anyOutputSchema = z.object({}).passthrough()
-
 export function registerChoreTools(server: McpServer) {
   server.registerTool(
     'read_chore_board',
@@ -261,7 +376,7 @@ export function registerChoreTools(server: McpServer) {
           .optional()
           .describe('Defaults to today in the Pacific timezone'),
       }),
-      outputSchema: anyOutputSchema,
+      outputSchema: readBoardSchema,
       annotations: { readOnlyHint: true },
       _meta: {
         'openai/outputTemplate': outputTemplateUrl('/chores/today'),
@@ -306,7 +421,7 @@ export function registerChoreTools(server: McpServer) {
         requires_approval: z.boolean().optional().default(false),
         scheduled_for: isoDaySchema.optional(),
       }),
-      outputSchema: anyOutputSchema,
+      outputSchema: messageWithSnapshotSchema,
     },
     async ({
       title,
@@ -378,7 +493,7 @@ export function registerChoreTools(server: McpServer) {
         chore_id: z.string().min(1),
         kid_id: z.string().min(1),
       }),
-      outputSchema: anyOutputSchema,
+      outputSchema: completionResultSchema,
     },
     async ({
       chore_id,
@@ -417,7 +532,7 @@ export function registerChoreTools(server: McpServer) {
         kid_id: z.string().min(1),
         completion_id: z.string().optional(),
       }),
-      outputSchema: anyOutputSchema,
+      outputSchema: undoResultSchema,
     },
     async ({
       chore_id,
@@ -459,7 +574,7 @@ export function registerChoreTools(server: McpServer) {
         cadence: z.enum(['daily', 'weekly']).default('daily'),
         days_of_week: daysOfWeekSchema,
       }),
-      outputSchema: anyOutputSchema,
+      outputSchema: messageWithSnapshotSchema,
     },
     async ({
       chore_id,
@@ -516,7 +631,7 @@ export function registerChoreTools(server: McpServer) {
             'Set a date to pause until (inclusive) or send an empty string to resume',
           ),
       }),
-      outputSchema: anyOutputSchema,
+      outputSchema: messageWithSnapshotSchema,
     },
     async ({
       chore_id,
@@ -560,7 +675,7 @@ export function registerChoreTools(server: McpServer) {
             'Set a date to pause all chores or send an empty string to resume',
           ),
       }),
-      outputSchema: anyOutputSchema,
+      outputSchema: messageWithSnapshotSchema,
     },
     async ({ paused_until }: { paused_until: string }) => {
       const formData = new FormData()
@@ -598,7 +713,7 @@ export function registerChoreTools(server: McpServer) {
         clear_time_of_day: z.boolean().optional(),
         requires_approval: z.boolean().optional(),
       }),
-      outputSchema: anyOutputSchema,
+      outputSchema: messageWithSnapshotSchema,
     },
     async ({
       chore_id,
@@ -655,7 +770,7 @@ export function registerChoreTools(server: McpServer) {
         chore_id: z.string().min(1),
         scheduled_for: isoDaySchema,
       }),
-      outputSchema: anyOutputSchema,
+      outputSchema: messageWithSnapshotSchema,
     },
     async ({
       chore_id,
@@ -692,7 +807,7 @@ export function registerChoreTools(server: McpServer) {
       inputSchema: z.object({
         chore_id: z.string().min(1),
       }),
-      outputSchema: anyOutputSchema,
+      outputSchema: messageWithSnapshotSchema,
     },
     async ({ chore_id }: { chore_id: string }) => {
       const formData = new FormData()
@@ -726,7 +841,7 @@ export function registerChoreTools(server: McpServer) {
         name: z.string().min(1),
         color: hexColorSchema.optional(),
       }),
-      outputSchema: anyOutputSchema,
+      outputSchema: messageWithSnapshotSchema,
     },
     async ({
       kid_id,
@@ -768,7 +883,7 @@ export function registerChoreTools(server: McpServer) {
         delta: z.number().int().min(1),
         mode: z.enum(['add', 'remove']).default('add'),
       }),
-      outputSchema: anyOutputSchema,
+      outputSchema: messageWithSnapshotSchema,
     },
     async ({
       kid_id,
@@ -812,7 +927,7 @@ export function registerChoreTools(server: McpServer) {
         reward_type: z.enum(['one-off', 'perpetual']).default('perpetual'),
         kid_ids: kidIdsSchema,
       }),
-      outputSchema: anyOutputSchema,
+      outputSchema: messageWithSnapshotSchema,
     },
     async ({
       title,
@@ -859,7 +974,7 @@ export function registerChoreTools(server: McpServer) {
         reward_id: z.string().min(1),
         kid_ids: kidIdsSchema,
       }),
-      outputSchema: anyOutputSchema,
+      outputSchema: messageWithSnapshotSchema,
     },
     async ({
       reward_id,
@@ -898,7 +1013,7 @@ export function registerChoreTools(server: McpServer) {
       inputSchema: z.object({
         reward_id: z.string().min(1),
       }),
-      outputSchema: anyOutputSchema,
+      outputSchema: messageWithSnapshotSchema,
     },
     async ({ reward_id }: { reward_id: string }) => {
       const formData = new FormData()
@@ -931,7 +1046,7 @@ export function registerChoreTools(server: McpServer) {
         reward_id: z.string().min(1),
         kid_id: z.string().min(1),
       }),
-      outputSchema: anyOutputSchema,
+      outputSchema: redeemResultSchema,
     },
     async ({
       reward_id,
