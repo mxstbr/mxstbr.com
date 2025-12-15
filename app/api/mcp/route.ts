@@ -1,6 +1,7 @@
 import { registerAllTools } from 'app/lib/mcp/register-all-tools'
 import { createMcpHandler } from 'mcp-handler'
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod/v4'
 
 export const maxDuration = 60
 
@@ -11,9 +12,9 @@ const handler = createMcpHandler(
       'roll_dice',
       {
         description: 'Rolls an N-sided die',
-        inputSchema: {
+        inputSchema: z.object({
           sides: z.number().int().min(2),
-        },
+        }),
       },
       async ({ sides }) => {
         const value = 1 + Math.floor(Math.random() * sides)
