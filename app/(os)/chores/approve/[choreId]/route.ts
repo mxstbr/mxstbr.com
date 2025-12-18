@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { bot } from 'app/lib/telegram'
 import { approveChoreViaLink, type CompletionResult } from '../../actions'
-import { formatPacificDate } from '../../utils'
+import { formatPacificDate, formatRelativeTargetDay } from '../../utils'
 
 function escapeHtml(value: string) {
   return value
@@ -17,6 +17,7 @@ function renderPage({
   choreId,
   kidId,
   targetDay,
+  targetDayLabel,
   showApproveButton,
 }: {
   heading: string
@@ -24,13 +25,15 @@ function renderPage({
   choreId: string
   kidId?: string | null
   targetDay?: string
+  targetDayLabel?: string
   showApproveButton?: boolean
 }) {
   const safeHeading = escapeHtml(heading)
   const safeDetail = escapeHtml(detail)
   const safeChoreId = escapeHtml(choreId)
   const safeKidId = kidId ? escapeHtml(kidId) : null
-  const safeTargetDay = targetDay ? escapeHtml(targetDay) : null
+  const safeTargetDay = targetDay ? escapeHtml(targetDay) : ''
+  const safeTargetDayLabel = targetDayLabel ? escapeHtml(targetDayLabel) : null
 
   const button =
     showApproveButton && safeKidId
@@ -66,7 +69,7 @@ function renderPage({
           <p>${safeDetail}</p>
           <p class="meta">Chore ID: ${safeChoreId}</p>
           ${safeKidId ? `<p class="meta">Kid ID: ${safeKidId}</p>` : ''}
-          ${safeTargetDay ? `<p class="meta">Target day: ${safeTargetDay}</p>` : ''}
+          ${safeTargetDayLabel ? `<p class="meta">Target day: ${safeTargetDayLabel}</p>` : ''}
           ${button}
         </div>
       </body>
@@ -102,6 +105,7 @@ export async function GET(
   const dayParam = url.searchParams.get('day')
   const todayIso = formatPacificDate(new Date())
   const targetDay = dayParam || todayIso
+  const targetDayLabel = formatRelativeTargetDay(targetDay, todayIso)
 
   if (!kidId) {
     const body = renderPage({
@@ -125,6 +129,7 @@ export async function GET(
     choreId,
     kidId,
     targetDay,
+    targetDayLabel,
     showApproveButton: true,
   })
 
@@ -146,6 +151,7 @@ export async function POST(
   const dayParam = formData.get('day')?.toString()
   const todayIso = formatPacificDate(new Date())
   const targetDay = dayParam || todayIso
+  const targetDayLabel = formatRelativeTargetDay(targetDay, todayIso)
 
   if (!kidId) {
     const body = renderPage({
@@ -182,7 +188,15 @@ export async function POST(
       ? `${result.kidName ?? 'Kid'} earned +${result.awarded} stars for "${result.choreTitle ?? 'Chore'}" (${targetDay}).`
       : responseCopy?.detail ?? 'Updated the chore board.'
 
-  const body = renderPage({ heading, detail, choreId, kidId, targetDay, showApproveButton: false })
+  const body = renderPage({
+    heading,
+    detail,
+    choreId,
+    kidId,
+    targetDay,
+    targetDayLabel,
+    showApproveButton: false,
+  })
 
   return new NextResponse(body, {
     status: 200,
