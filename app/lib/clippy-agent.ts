@@ -1,6 +1,6 @@
 import { openai } from '@ai-sdk/openai'
-import { stepCountIs, Experimental_Agent as Agent } from 'ai'
-import { experimental_createMCPClient as createMCPClient } from '@ai-sdk/mcp'
+import { ToolLoopAgent } from 'ai'
+import { createMCPClient } from '@ai-sdk/mcp'
 import { Redis } from '@upstash/redis'
 import { headers } from 'next/headers'
 import { colors } from 'app/(os)/cal/data'
@@ -178,15 +178,15 @@ Respond in a concise, helpful, and unambiguous way.
 </context>
 
 <calendar-management>
-• Handle: create ▸ update ▸ delete ▸ list events.  
-• Ask follow-up questions when data is missing or unclear.  
+• Handle: create ▸ update ▸ delete ▸ list events.
+• Ask follow-up questions when data is missing or unclear.
 • Don't ask for confirmation. Just do the tool calls.
 • Always finish your message with a single-sentence summary of the result.
 • Never invent facts, colors, owners, or titles.
 
 Event Guidelines:
 • Never ask for times. You only need to know the date.
-• Each event must follow EXACTLY one preset color as defined in <PRESETS>.  
+• Each event must follow EXACTLY one preset color as defined in <PRESETS>.
 • Event data is full-day unless specified otherwise. Full-day events should have a background and border. Shorter events should not have a background or border.
 • If events go for consecutive days, create one event for the whole period with start and end dates. NOT multiple events.
 • If the user specifies a week day, assume it's the next occurence of that week day.
@@ -225,7 +225,7 @@ ${JSON.stringify(
 )}
 </PRESETS>`
 
-let clippyPromise: Promise<Agent<any, any, any>> | null = null
+let clippyPromise: Promise<ToolLoopAgent> | null = null
 
 export async function getClippy(request?: Request) {
   if (clippyPromise) return clippyPromise
@@ -250,9 +250,9 @@ export async function getClippy(request?: Request) {
 
     const tools = await client.tools()
 
-    return new Agent({
+    return new ToolLoopAgent({
       model: openai('gpt-5-mini'),
-      system: SYSTEM_PROMPT(new Date()),
+      instructions: SYSTEM_PROMPT(new Date()),
       tools,
       onStepFinish: async (result) => {
         try {
@@ -261,7 +261,6 @@ export async function getClippy(request?: Request) {
           console.error('Failed to persist Clippy step log', error)
         }
       },
-      stopWhen: stepCountIs(10),
     })
   })()
 

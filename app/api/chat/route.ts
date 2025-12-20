@@ -14,7 +14,7 @@ export async function POST(req: Request) {
   if (!sessionId) throw new Error('Missing session id.')
 
   // Convert UIMessages from frontend to ModelMessages for AI SDK
-  const modelMessages = convertToModelMessages(messages)
+  const modelMessages = await convertToModelMessages(messages)
 
   const clippy = await getClippy(req)
   const result = await clippy.stream({ messages: modelMessages })
