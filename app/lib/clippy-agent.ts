@@ -289,9 +289,19 @@ type ClippyAgentStepResult = StepResult<typeof clippyAgent.tools>
 
 export async function getClippy(request: Request) {
   return {
-    generate: (options: Parameters<typeof clippyAgent.generate>[0]) =>
-      clippyAgent.generate({ ...options, options: { request } }),
-    stream: (options: Parameters<typeof clippyAgent.stream>[0]) =>
-      clippyAgent.stream({ ...options, options: { request } }),
+    generate: (
+      params: Omit<Parameters<typeof clippyAgent.generate>[0], 'options'>,
+    ) =>
+      clippyAgent.generate({
+        ...params,
+        options: { request },
+      } as Parameters<typeof clippyAgent.generate>[0]),
+    stream: (
+      params: Omit<Parameters<typeof clippyAgent.stream>[0], 'options'>,
+    ) =>
+      clippyAgent.stream({
+        ...params,
+        options: { request },
+      } as Parameters<typeof clippyAgent.stream>[0]),
   }
 }

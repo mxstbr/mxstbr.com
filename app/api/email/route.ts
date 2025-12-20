@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
 
   // Call the calendar assistant with the email plaintext
   try {
-    const clippy = await getClippy(req)
+    const clippy = await getClippy(req as Request)
     const result = await clippy.generate({
       messages: [
         {
