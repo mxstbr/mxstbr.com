@@ -11,6 +11,7 @@ import { z } from 'zod'
 
 type ClippyAgentContext = {
   client: MCPClient
+  sessionId?: string
 }
 
 async function resolveDeploymentUrl(request?: Request) {
@@ -84,21 +85,23 @@ function parseTimestamp(value: unknown) {
   return undefined
 }
 
-function extractSessionId(stepResult: ClippyAgentStepResult) {
-  // TODO
-  const headers = stepResult?.request?.headers
-  if (!headers || typeof headers !== 'object') return undefined
+async function extractSessionId(
+  stepResult: ClippyAgentStepResult,
+  context?: ClippyAgentContext,
+) {
+  // Try to get from context first (set in prepareCall)
+  if (context?.sessionId) return context.sessionId
 
-  const rawValue =
-    headers['x-session-id'] ??
-    headers['X-Session-Id'] ??
-    headers['X-SESSION-ID'] ??
-    headers['x-Session-Id']
+  // Fallback: try to read from Next.js headers (server context)
+  try {
+    const requestHeaders = await headers()
+    const sessionId = requestHeaders.get('x-session-id')
+    if (sessionId) return sessionId
+  } catch {
+    // Not in server context
+  }
 
-  if (!rawValue) return undefined
-  if (Array.isArray(rawValue)) return rawValue[0]
-  if (typeof rawValue === 'string') return rawValue
-  return String(rawValue)
+  return undefined
 }
 
 function extractRequestMessages(stepResult: ClippyAgentStepResult) {
@@ -126,13 +129,11 @@ function extractConversationMessages(stepResult: ClippyAgentStepResult) {
   return extractRequestMessages(stepResult)
 }
 
-async function persistConversationStep(stepResult: ClippyAgentStepResult) {
-  // TODO
-  const conversationId =
-    stepResult?.response?.id ??
-    stepResult?.response?.requestId ??
-    stepResult?.request?.id ??
-    `clippy-${Date.now()}`
+async function persistConversationStep(
+  stepResult: ClippyAgentStepResult,
+  context?: ClippyAgentContext,
+) {
+  const conversationId = stepResult?.response?.id ?? `clippy-${Date.now()}`
   const timestamp =
     parseTimestamp(stepResult?.response?.timestamp) ?? Date.now()
 
@@ -150,7 +151,8 @@ async function persistConversationStep(stepResult: ClippyAgentStepResult) {
   const createdAt =
     (typeof parsedMeta?.createdAt === 'number' && parsedMeta.createdAt) ||
     timestamp
-  const sessionId = parsedMeta?.sessionId ?? extractSessionId(stepResult)
+  const sessionId =
+    parsedMeta?.sessionId ?? (await extractSessionId(stepResult, context))
 
   const meta = {
     id: conversationId,
@@ -244,6 +246,9 @@ export const clippyAgent = new ToolLoopAgent({
 
     const deploymentUrl = await resolveDeploymentUrl(options.request)
 
+    // Extract session ID from request headers
+    const sessionId = options.request.headers.get('x-session-id') ?? undefined
+
     const client = await createMCPClient({
       transport: {
         type: 'http',
@@ -260,12 +265,14 @@ export const clippyAgent = new ToolLoopAgent({
     return {
       ...rest,
       tools,
-      experimental_context: { client } as ClippyAgentContext,
+      experimental_context: { client, sessionId } as ClippyAgentContext,
     }
   },
   onStepFinish: async (result) => {
     try {
-      await persistConversationStep(result)
+      // Access context from the agent's internal state if available
+      // For now, extractSessionId will use Next.js headers() as fallback
+      await persistConversationStep(result, undefined)
     } catch (error) {
       console.error('Failed to persist Clippy step log', error)
     }
