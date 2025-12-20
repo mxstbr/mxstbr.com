@@ -64,6 +64,7 @@ type TimeGroupKey = 'morning' | 'afternoon' | 'evening' | 'any'
 const REWARD_TARGET_ID = 'chores-reward-target'
 const RECOLLAPSE_IDLE_MS = 45_000
 const APPROVAL_REQUESTS_KEY = 'chores:approval-requests'
+const PERSISTENT_GROUPS: TimeGroupKey[] = ['evening']
 
 const approvalRequestKey = (kidId: string, choreId: string) => `${kidId}:${choreId}`
 
@@ -83,6 +84,8 @@ function shouldAutoCollapse(
 
   return key !== currentGroup
 }
+
+const shouldPersistExpansion = (key: TimeGroupKey) => PERSISTENT_GROUPS.includes(key)
 
 export function KidBoard({
   columns,
@@ -642,8 +645,8 @@ function KidColumn({
       window.clearTimeout(recollapseTimer.current)
     }
 
-    const needsRecollapse = Array.from(manualExpansions.current).some((key) =>
-      shouldAutoCollapse(mode, pacificMinutes, key),
+    const needsRecollapse = Array.from(manualExpansions.current).some(
+      (key) => !shouldPersistExpansion(key) && shouldAutoCollapse(mode, pacificMinutes, key),
     )
     if (!needsRecollapse) return
 
@@ -651,13 +654,18 @@ function KidColumn({
       setCollapsedGroups((prev) => {
         let changed = false
         const next = { ...prev }
+        const remainingExpansions = new Set<TimeGroupKey>()
         for (const key of Array.from(manualExpansions.current)) {
+          if (shouldPersistExpansion(key)) {
+            remainingExpansions.add(key)
+            continue
+          }
           if (shouldAutoCollapse(mode, pacificMinutes, key) && !next[key]) {
             next[key] = true
             changed = true
           }
         }
-        manualExpansions.current.clear()
+        manualExpansions.current = remainingExpansions
         return changed ? next : prev
       })
     }, RECOLLAPSE_IDLE_MS)
@@ -678,7 +686,9 @@ function KidColumn({
             next[group.key] = false
             changed = true
           }
-          manualExpansions.current.delete(group.key)
+          if (!shouldPersistExpansion(group.key)) {
+            manualExpansions.current.delete(group.key)
+          }
           continue
         }
         if (manualExpansions.current.has(group.key)) continue
@@ -733,7 +743,7 @@ function KidColumn({
     setCollapsedGroups((prev) => {
       const nextCollapsed = !prev[key]
       const next = { ...prev, [key]: nextCollapsed }
-      if (!nextCollapsed && shouldAutoCollapse(mode, pacificMinutes, key)) {
+      if (!nextCollapsed && (shouldAutoCollapse(mode, pacificMinutes, key) || shouldPersistExpansion(key))) {
         manualExpansions.current.add(key)
       } else if (nextCollapsed) {
         manualExpansions.current.delete(key)
