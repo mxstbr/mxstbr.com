@@ -33,6 +33,13 @@ HASHNODE_ACCESS_TOKEN=
 RESEND_API_KEY=
 # Optional: Used on the /cal page for auth. Pick any random string.
 CAL_PASSWORD=
+# Optional: Alexa skill credentials for reminder management. Get from Login with Amazon.
+ALEXA_CLIENT_ID=
+ALEXA_CLIENT_SECRET=
+ALEXA_REFRESH_TOKEN=
+# Optional: Override the default Alexa endpoints (useful for sandboxes)
+ALEXA_TOKEN_URL=
+ALEXA_API_BASE_URL=
 ```
 
 ## License
