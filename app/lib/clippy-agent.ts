@@ -1,5 +1,5 @@
 import { openai } from '@ai-sdk/openai'
-import { ToolLoopAgent } from 'ai'
+import { InferAgentUIMessage, StepResult, ToolLoopAgent } from 'ai'
 import { createMCPClient } from '@ai-sdk/mcp'
 import { Redis } from '@upstash/redis'
 import { headers } from 'next/headers'
@@ -7,6 +7,7 @@ import { colors } from 'app/(os)/cal/data'
 import { PRESETS } from 'app/(os)/cal/presets'
 import { dedent } from './dedent'
 import { siteUrl } from './site-url'
+import { z } from 'zod'
 
 async function resolveDeploymentUrl(request?: Request) {
   const envUrl =
@@ -79,7 +80,7 @@ function parseTimestamp(value: unknown) {
   return undefined
 }
 
-function extractSessionId(stepResult: any) {
+function extractSessionId(stepResult: ClippyAgentStepResult) {
   const headers = stepResult?.request?.headers
   if (!headers || typeof headers !== 'object') return undefined
 
@@ -95,7 +96,7 @@ function extractSessionId(stepResult: any) {
   return String(rawValue)
 }
 
-function extractRequestMessages(stepResult: any) {
+function extractRequestMessages(stepResult: ClippyAgentStepResult) {
   const body = stepResult?.request?.body
   if (!body) return undefined
 
@@ -109,7 +110,7 @@ function extractRequestMessages(stepResult: any) {
   return undefined
 }
 
-function extractConversationMessages(stepResult: any) {
+function extractConversationMessages(stepResult: ClippyAgentStepResult) {
   if (
     stepResult?.response?.messages &&
     Array.isArray(stepResult.response.messages)
@@ -120,7 +121,7 @@ function extractConversationMessages(stepResult: any) {
   return extractRequestMessages(stepResult)
 }
 
-async function persistConversationStep(stepResult: any) {
+async function persistConversationStep(stepResult: ClippyAgentStepResult) {
   const conversationId =
     stepResult?.response?.id ??
     stepResult?.response?.requestId ??
@@ -225,16 +226,17 @@ ${JSON.stringify(
 )}
 </PRESETS>`
 
-let clippyPromise: Promise<ToolLoopAgent> | null = null
-
-export async function getClippy(request?: Request) {
-  if (clippyPromise) return clippyPromise
-
-  clippyPromise = (async () => {
+export const clippyAgent = new ToolLoopAgent({
+  model: openai('gpt-5-mini'),
+  instructions: SYSTEM_PROMPT(new Date()),
+  callOptionsSchema: z.object({
+    request: z.instanceof(Request),
+  }),
+  prepareCall: async ({ options, ...rest }) => {
     const token =
       process.env.CLIPPY_AUTOMATION_TOKEN ?? process.env.CAL_PASSWORD
 
-    const deploymentUrl = await resolveDeploymentUrl(request)
+    const deploymentUrl = await resolveDeploymentUrl(options.request)
 
     const client = await createMCPClient({
       transport: {
@@ -249,20 +251,17 @@ export async function getClippy(request?: Request) {
     })
 
     const tools = await client.tools()
+    return { ...rest, tools }
+  },
+  onStepFinish: async (result) => {
+    try {
+      await persistConversationStep(result)
+    } catch (error) {
+      console.error('Failed to persist Clippy step log', error)
+    }
+  },
+})
 
-    return new ToolLoopAgent({
-      model: openai('gpt-5-mini'),
-      instructions: SYSTEM_PROMPT(new Date()),
-      tools,
-      onStepFinish: async (result) => {
-        try {
-          await persistConversationStep(result)
-        } catch (error) {
-          console.error('Failed to persist Clippy step log', error)
-        }
-      },
-    })
-  })()
+export type ClippyAgentUIMessage = InferAgentUIMessage<typeof clippyAgent>
 
-  return clippyPromise
-}
+type ClippyAgentStepResult = StepResult<typeof clippyAgent.tools>

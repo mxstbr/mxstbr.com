@@ -2,6 +2,7 @@
 
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport, getToolName, isToolUIPart } from 'ai'
+import { ClippyAgentUIMessage } from 'app/lib/clippy-agent'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -10,7 +11,7 @@ export default function Chat() {
   const [input, setInput] = useState<string>('')
   const router = useRouter()
 
-  const { messages, sendMessage, status } = useChat({
+  const { messages, sendMessage, status } = useChat<ClippyAgentUIMessage>({
     transport: new DefaultChatTransport({
       api: '/api/chat',
       headers: {
