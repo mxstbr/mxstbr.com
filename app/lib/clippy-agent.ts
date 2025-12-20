@@ -1,6 +1,6 @@
 import { openai } from '@ai-sdk/openai'
 import { InferAgentUIMessage, StepResult, ToolLoopAgent } from 'ai'
-import { createMCPClient } from '@ai-sdk/mcp'
+import { createMCPClient, MCPClient } from '@ai-sdk/mcp'
 import { Redis } from '@upstash/redis'
 import { headers } from 'next/headers'
 import { colors } from 'app/(os)/cal/data'
@@ -8,6 +8,10 @@ import { PRESETS } from 'app/(os)/cal/presets'
 import { dedent } from './dedent'
 import { siteUrl } from './site-url'
 import { z } from 'zod'
+
+type ClippyAgentContext = {
+  client: MCPClient
+}
 
 async function resolveDeploymentUrl(request?: Request) {
   const envUrl =
@@ -81,6 +85,7 @@ function parseTimestamp(value: unknown) {
 }
 
 function extractSessionId(stepResult: ClippyAgentStepResult) {
+  // TODO
   const headers = stepResult?.request?.headers
   if (!headers || typeof headers !== 'object') return undefined
 
@@ -122,6 +127,7 @@ function extractConversationMessages(stepResult: ClippyAgentStepResult) {
 }
 
 async function persistConversationStep(stepResult: ClippyAgentStepResult) {
+  // TODO
   const conversationId =
     stepResult?.response?.id ??
     stepResult?.response?.requestId ??
@@ -251,7 +257,11 @@ export const clippyAgent = new ToolLoopAgent({
     })
 
     const tools = await client.tools()
-    return { ...rest, tools }
+    return {
+      ...rest,
+      tools,
+      experimental_context: { client } as ClippyAgentContext,
+    }
   },
   onStepFinish: async (result) => {
     try {
@@ -259,6 +269,10 @@ export const clippyAgent = new ToolLoopAgent({
     } catch (error) {
       console.error('Failed to persist Clippy step log', error)
     }
+  },
+  onFinish: async ({ experimental_context }) => {
+    const context = experimental_context as ClippyAgentContext
+    await context.client.close()
   },
 })
 
