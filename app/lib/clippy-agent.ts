@@ -286,3 +286,12 @@ export const clippyAgent = new ToolLoopAgent({
 export type ClippyAgentUIMessage = InferAgentUIMessage<typeof clippyAgent>
 
 type ClippyAgentStepResult = StepResult<typeof clippyAgent.tools>
+
+export async function getClippy(request: Request) {
+  return {
+    generate: (options: Parameters<typeof clippyAgent.generate>[0]) =>
+      clippyAgent.generate({ ...options, options: { request } }),
+    stream: (options: Parameters<typeof clippyAgent.stream>[0]) =>
+      clippyAgent.stream({ ...options, options: { request } }),
+  }
+}
