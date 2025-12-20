@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { bot } from 'app/lib/telegram'
-import { formatPacificDate } from '../../utils'
+import { formatPacificDate, formatRelativeTargetDay } from '../../utils'
 import { undoChoreViaLink } from '../../actions'
 
 type UndoResult = Awaited<ReturnType<typeof undoChoreViaLink>>
@@ -19,6 +19,7 @@ function renderPage({
   choreId,
   kidId,
   targetDay,
+  targetDayLabel,
   showUndoButton,
 }: {
   heading: string
@@ -26,6 +27,7 @@ function renderPage({
   choreId: string
   kidId?: string | null
   targetDay?: string
+  targetDayLabel?: string
   showUndoButton?: boolean
 }) {
   const safeHeading = escapeHtml(heading)
@@ -33,6 +35,7 @@ function renderPage({
   const safeChoreId = escapeHtml(choreId)
   const safeKidId = kidId ? escapeHtml(kidId) : null
   const safeTargetDay = targetDay ? escapeHtml(targetDay) : null
+  const safeTargetDayLabel = targetDayLabel ? escapeHtml(targetDayLabel) : null
 
   const button =
     showUndoButton && safeKidId
@@ -68,7 +71,7 @@ function renderPage({
           <p>${safeDetail}</p>
           <p class="meta">Chore ID: ${safeChoreId}</p>
           ${safeKidId ? `<p class="meta">Kid ID: ${safeKidId}</p>` : ''}
-          ${safeTargetDay ? `<p class="meta">Target day: ${safeTargetDay}</p>` : ''}
+          ${safeTargetDayLabel ? `<p class="meta">Target day: ${safeTargetDayLabel}</p>` : safeTargetDay ? `<p class="meta">Target day: ${safeTargetDay}</p>` : ''}
           ${button}
         </div>
       </body>
@@ -101,6 +104,7 @@ export async function GET(
   const dayParam = url.searchParams.get('day')
   const todayIso = formatPacificDate(new Date())
   const targetDay = dayParam || todayIso
+  const targetDayLabel = formatRelativeTargetDay(targetDay, todayIso)
 
   if (!kidId || !choreId) {
     const body = renderPage({
@@ -124,6 +128,7 @@ export async function GET(
     choreId,
     kidId,
     targetDay,
+    targetDayLabel,
     showUndoButton: true,
   })
 
@@ -147,6 +152,7 @@ export async function POST(
   const choreId = url.searchParams.get('choreId')
   const todayIso = formatPacificDate(new Date())
   const targetDay = dayParam || url.searchParams.get('day') || todayIso
+  const targetDayLabel = formatRelativeTargetDay(targetDay, todayIso)
 
   if (!kidId || !choreId) {
     const body = renderPage({
@@ -176,10 +182,18 @@ export async function POST(
   const heading = responseCopy?.heading ?? 'Undo complete'
   const detail =
     result.status === 'undone'
-      ? `${result.kidName ?? 'Kid'} lost ${Math.abs(result.delta)} stars for "${result.choreTitle ?? 'Chore'}" (${targetDay}).`
+      ? `${result.kidName ?? 'Kid'} lost ${Math.abs(result.delta)} stars for "${result.choreTitle ?? 'Chore'}" ${targetDayLabel}.`
       : responseCopy?.detail ?? 'Updated the chore board.'
 
-  const body = renderPage({ heading, detail, choreId, kidId, targetDay, showUndoButton: false })
+  const body = renderPage({
+    heading,
+    detail,
+    choreId,
+    kidId,
+    targetDay,
+    targetDayLabel,
+    showUndoButton: false,
+  })
 
   return new NextResponse(body, {
     status: 200,

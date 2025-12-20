@@ -72,6 +72,31 @@ export function formatPacificDate(date: Date): string {
   return pacificDateFormatter.format(date)
 }
 
+export function formatRelativeTargetDay(targetDay: string, todayIso: string): string {
+  const targetDate = dateFromIsoDay(targetDay)
+  const todayDate = dateFromIsoDay(todayIso)
+
+  if (!targetDate || !todayDate) {
+    return targetDay === todayIso ? 'today' : `⚠️ ${targetDay}`
+  }
+
+  const diffDays = Math.round((targetDate.getTime() - todayDate.getTime()) / (1000 * 60 * 60 * 24))
+
+  const relative = (() => {
+    if (diffDays === 0) return 'today'
+    if (diffDays === 1) return 'tomorrow'
+    if (diffDays === -1) return 'yesterday'
+    if (diffDays > 1) return `in ${diffDays}d`
+    return `${Math.abs(diffDays)}d ago`
+  })()
+
+  const needsHighlight = diffDays !== 0
+  const prefix = needsHighlight ? '⚠️ ' : ''
+  const dateSuffix = ` (${targetDay})`
+
+  return `${prefix}${relative}${dateSuffix}`
+}
+
 export function pacificWeekdayIndex(date: Date): number {
   const weekday = pacificWeekdayFormatter.format(date)
   const index = DAY_ABBRS.indexOf(weekday)
