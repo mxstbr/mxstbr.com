@@ -4,6 +4,7 @@ import { RewardBoard } from '../reward-board'
 import { getChoreState, type Reward } from '../data'
 import { PasswordForm } from '../../components/password-form'
 import { auth, isMax } from 'app/auth'
+import { InactivityRedirect } from './inactivity-redirect'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -72,6 +73,7 @@ export default async function RewardsPage({ searchParams }: RewardsPageProps) {
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50 p-6 pb-20 md:h-screen md:overflow-y-hidden md:pb-6">
+      <InactivityRedirect href={choresHref} />
       <div className="md:flex-1 md:min-h-0 pb-16 md:pb-12">
         <RewardBoard
           columns={columns}
