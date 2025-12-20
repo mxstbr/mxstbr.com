@@ -1,7 +1,6 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { headers } from 'next/headers'
 import {
   Chore,
   ChoreState,
@@ -11,6 +10,9 @@ import {
   type RewardType,
 } from './data'
 import { formatPacificDate, pacificDateFromTimestamp, shiftIsoDay, starsForKid } from './utils'
+import { BEDTIME_TEMPLATES, type BedtimeTemplateKey } from './bedtime-approval/constants'
+import type { BedtimeCreationResult, BedtimeCreationSummary } from './bedtime-approval/types'
+import { getBaseUrl } from 'app/lib/base-url'
 import { bot } from 'app/lib/telegram'
 import { isMax } from 'app/auth'
 
@@ -62,6 +64,7 @@ async function withUpdatedState(
   revalidatePath('/chores')
   revalidatePath('/chores/admin')
   revalidatePath('/chores/rewards')
+  revalidatePath('/chores/bedtime-approval')
 }
 
 function parseNumber(value: FormDataEntryValue | null): number | null {
@@ -86,22 +89,6 @@ function parseIsoDay(value: FormDataEntryValue | null): string | null {
   const raw = value.toString().trim()
   if (!raw) return null
   return /^\d{4}-\d{2}-\d{2}$/.test(raw) ? raw : null
-}
-
-async function getBaseUrl(): Promise<string> {
-  if (process.env.SITE_URL) return process.env.SITE_URL
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
-
-  const headerList = await headers()
-  const forwardedProto = headerList.get('x-forwarded-proto') ?? 'https'
-  const forwardedHost = headerList.get('x-forwarded-host')
-  if (forwardedHost) return `${forwardedProto}://${forwardedHost}`
-
-  const host = headerList.get('host')
-  const proto = headerList.get('x-forwarded-proto') ?? 'http'
-  if (host) return `${proto}://${host}`
-
-  return 'http://localhost:3000'
 }
 
 async function approvalUrl(choreId: string, kidId: string, dayIso: string): Promise<string> {
@@ -786,6 +773,84 @@ export async function redeemReward(formData: FormData): Promise<{ success: boole
   })
 
   return { success }
+}
+
+export async function createBedtimeChores(
+  formData: FormData,
+): Promise<BedtimeCreationResult> {
+  await requireAuthorization(formData)
+
+  const targetDay = parseIsoDay(formData.get('day')) ?? todayIsoDate()
+  const selections = new Map<BedtimeTemplateKey, Set<string>>()
+  for (const template of BEDTIME_TEMPLATES) {
+    const kidIds = formData
+      .getAll(template.key)
+      .map((value) => value.toString())
+      .filter(Boolean)
+    selections.set(template.key, new Set(kidIds))
+  }
+
+  const selectedKidIds = new Set<string>()
+  selections.forEach((set) => {
+    set.forEach((kidId) => selectedKidIds.add(kidId))
+  })
+
+  const created: BedtimeCreationSummary[] = []
+  const skipped: BedtimeCreationSummary[] = []
+
+  await withUpdatedState((state) => {
+    const now = new Date().toISOString()
+    for (const kidId of Array.from(selectedKidIds)) {
+      const kid = state.kids.find((entry) => entry.id === kidId)
+      if (!kid) continue
+
+      for (const template of BEDTIME_TEMPLATES) {
+        const kidSelection = selections.get(template.key)
+        if (!kidSelection?.has(kid.id)) continue
+
+        const matchesTemplate = (chore: Chore) =>
+          chore.type === 'one-off' &&
+          chore.timeOfDay === 'morning' &&
+          (chore.scheduledFor ?? pacificDateFromTimestamp(chore.createdAt)) === targetDay &&
+          chore.title === template.title &&
+          chore.stars === template.stars &&
+          chore.kidIds.length === 1 &&
+          chore.kidIds.includes(kid.id)
+
+        const exists = state.chores.some(matchesTemplate)
+        const summary: BedtimeCreationSummary = {
+          kidId: kid.id,
+          kidName: kid.name,
+          stars: template.stars,
+          title: template.title,
+          template: template.key,
+        }
+
+        if (exists) {
+          skipped.push(summary)
+          continue
+        }
+
+        const chore: Chore = {
+          id: crypto.randomUUID(),
+          kidIds: [kid.id],
+          title: template.title,
+          emoji: template.emoji,
+          stars: template.stars,
+          type: 'one-off',
+          createdAt: now,
+          timeOfDay: 'morning',
+          requiresApproval: false,
+          scheduledFor: targetDay,
+        }
+
+        state.chores.unshift(chore)
+        created.push(summary)
+      }
+    }
+  })
+
+  return { created, skipped, dayIso: targetDay }
 }
 function parseTimeOfDay(
   value: FormDataEntryValue | null,
