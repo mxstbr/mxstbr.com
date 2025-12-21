@@ -11,22 +11,23 @@ export default function Chat() {
   const [input, setInput] = useState<string>('')
   const router = useRouter()
 
-  const { messages, sendMessage, status, error } = useChat<ClippyAgentUIMessage>({
-    transport: new DefaultChatTransport({
-      api: '/api/chat',
-      headers: {
-        'x-session-id': sessionId,
+  const { messages, sendMessage, status, error } =
+    useChat<ClippyAgentUIMessage>({
+      transport: new DefaultChatTransport({
+        api: '/api/chat',
+        headers: {
+          'x-session-id': sessionId,
+        },
+      }),
+      onFinish: ({ message }) => {
+        if (message.parts.some((part) => part.type.includes('event'))) {
+          router.refresh()
+        }
       },
-    }),
-    onFinish: ({ message }) => {
-      if (message.parts.some((part) => part.type.includes('event'))) {
-        router.refresh()
-      }
-    },
-    onError: (error) => {
-      console.error('Chat error:', error)
-    },
-  })
+      onError: (error) => {
+        console.error('Chat error:', error)
+      },
+    })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -59,7 +60,7 @@ export default function Chat() {
                 {message.parts.map((part, i) => {
                   switch (part.type) {
                     case 'text':
-                      return <div key={`${message.id}-${i}`}>{part.text}</div>'
+                      return <div key={`${message.id}-${i}`}>{part.text}</div>
                     default:
                       // Handle dynamic tool calls (they start with 'tool-')
                       if (isToolUIPart(part)) {
