@@ -1202,10 +1202,21 @@ function ChoreButton({
         )
       : null
 
+  useEffect(() => {
+    if (!detailsOpen) return
+    const timeoutId = window.setTimeout(() => setDetailsOpen(false), 30_000)
+    return () => window.clearTimeout(timeoutId)
+  }, [detailsOpen])
+
   const detailsModal =
     detailsOpen && typeof document !== 'undefined'
       ? createPortal(
-          <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/40 p-4">
+          <div
+            className="fixed inset-0 z-[90] flex items-center justify-center bg-black/40 p-4"
+            onClick={(event) => {
+              if (event.target === event.currentTarget) setDetailsOpen(false)
+            }}
+          >
             <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl dark:bg-slate-900">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">

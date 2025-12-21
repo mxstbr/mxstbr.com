@@ -1,14 +1,13 @@
 import { openai } from '@ai-sdk/openai'
 import {
+  Experimental_Agent as AiAgent,
   UIMessage,
   StepResult,
-  generateText,
-  streamText,
-  type ModelMessage,
+  type ToolSet,
 } from 'ai'
 import {
-  experimental_MCPClient as MCPClient,
   experimental_createMCPClient as createMCPClient,
+  experimental_MCPClient as MCPClient,
 } from '@ai-sdk/mcp'
 import { Redis } from '@upstash/redis'
 import { headers } from 'next/headers'
@@ -16,40 +15,14 @@ import { colors } from 'app/(os)/cal/data'
 import { PRESETS } from 'app/(os)/cal/presets'
 import { dedent } from './dedent'
 import { siteUrl } from './site-url'
+import { z } from 'zod'
 
 type ClippyAgentContext = {
   client: MCPClient
   sessionId?: string
 }
 
-type ClippyToolset = Awaited<ReturnType<typeof createClippyTools>>['tools']
-type ClippyAgentStepResult = StepResult<ClippyToolset>
-
-async function createClippyTools(request?: Request) {
-  const token =
-    process.env.CLIPPY_AUTOMATION_TOKEN ?? process.env.CAL_PASSWORD
-
-  const deploymentUrl = await resolveDeploymentUrl(request)
-
-  // Extract session ID from request headers
-  const sessionId = request?.headers.get('x-session-id') ?? undefined
-
-  const client = await createMCPClient({
-    transport: {
-      type: 'http',
-      url: new URL('/api/mcp', deploymentUrl).toString(),
-      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-    },
-    name: 'clippy-mcp-client',
-    onUncaughtError: (error) => {
-      console.error('Clippy MCP client error', error)
-    },
-  })
-
-  const tools = await client.tools()
-
-  return { tools, client, sessionId }
-}
+class ToolLoopAgent<TOOLS extends ToolSet> extends AiAgent<TOOLS> {}
 
 async function resolveDeploymentUrl(request?: Request) {
   const envUrl =
@@ -271,77 +244,73 @@ ${JSON.stringify(
 )}
 </PRESETS>`
 
+export const clippyAgent = new ToolLoopAgent({
+  model: openai('gpt-5-mini'),
+  instructions: SYSTEM_PROMPT(new Date()),
+  callOptionsSchema: z.object({
+    request: z.instanceof(Request),
+  }),
+  prepareCall: async ({ options, ...rest }) => {
+    const token =
+      process.env.CLIPPY_AUTOMATION_TOKEN ?? process.env.CAL_PASSWORD
+
+    const deploymentUrl = await resolveDeploymentUrl(options.request)
+
+    // Extract session ID from request headers
+    const sessionId = options.request.headers.get('x-session-id') ?? undefined
+
+    const client = await createMCPClient({
+      transport: {
+        type: 'http',
+        url: new URL('/api/mcp', deploymentUrl).toString(),
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      },
+      name: 'clippy-mcp-client',
+      onUncaughtError: (error) => {
+        console.error('Clippy MCP client error', error)
+      },
+    })
+
+    const tools = await client.tools()
+    return {
+      ...rest,
+      tools,
+      experimental_context: { client, sessionId } as ClippyAgentContext,
+    }
+  },
+  onStepFinish: async (result) => {
+    try {
+      // Access context from the agent's internal state if available
+      // For now, extractSessionId will use Next.js headers() as fallback
+      await persistConversationStep(result, undefined)
+    } catch (error) {
+      console.error('Failed to persist Clippy step log', error)
+    }
+  },
+  onFinish: async ({ experimental_context }) => {
+    const context = experimental_context as ClippyAgentContext
+    await context.client.close()
+  },
+} as any) as any
 export type ClippyAgentUIMessage = UIMessage
 
-function withCleanupHandlers(
-  options: {
-    onFinish?: () => Promise<void> | void
-    onError?: (error: unknown) => Promise<void> | void
-    onAbort?: (error: unknown) => Promise<void> | void
-  },
-  cleanup: () => Promise<void>,
-) {
-  return {
-    onFinish: async () => {
-      try {
-        await options.onFinish?.()
-      } finally {
-        await cleanup()
-      }
-    },
-    onError: async (error: unknown) => {
-      try {
-        await options.onError?.(error)
-      } finally {
-        await cleanup()
-      }
-    },
-    onAbort: async (error: unknown) => {
-      try {
-        await options.onAbort?.(error)
-      } finally {
-        await cleanup()
-      }
-    },
-  }
-}
+type ClippyAgentStepResult = StepResult<any>
 
 export async function getClippy(request: Request) {
-  const { tools, client, sessionId } = await createClippyTools(request)
-  const cleanup = () => client.close()
-  const baseOptions = {
-    model: openai('gpt-5-mini'),
-    system: SYSTEM_PROMPT(new Date()),
-    tools,
-    experimental_context: { client, sessionId } as ClippyAgentContext,
-    onStepFinish: async (stepResult: ClippyAgentStepResult) => {
-      try {
-        await persistConversationStep(stepResult, { client, sessionId })
-      } catch (error) {
-        console.error('Failed to persist Clippy step log', error)
-      }
-    },
-  }
-
   return {
-    generate: async (params: { messages: ModelMessage[] }) => {
-      try {
-        const generateParams: Parameters<typeof generateText>[0] = {
-          ...baseOptions,
-          ...params,
-        }
-        return await generateText(generateParams)
-      } finally {
-        await cleanup()
-      }
-    },
-    stream: (params: { messages: ModelMessage[] }) => {
-      const streamParams: Parameters<typeof streamText>[0] = {
-        ...baseOptions,
-        ...withCleanupHandlers({}, cleanup),
+    generate: (
+      params: Omit<Parameters<typeof clippyAgent.generate>[0], 'options'>,
+    ) =>
+      clippyAgent.generate({
         ...params,
-      }
-      return streamText(streamParams)
-    },
+        options: { request },
+      } as Parameters<typeof clippyAgent.generate>[0]),
+    stream: (
+      params: Omit<Parameters<typeof clippyAgent.stream>[0], 'options'>,
+    ) =>
+      clippyAgent.stream({
+        ...params,
+        options: { request },
+      } as Parameters<typeof clippyAgent.stream>[0]),
   }
 }
