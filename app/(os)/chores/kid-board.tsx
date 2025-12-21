@@ -68,17 +68,30 @@ const PERSISTENT_GROUPS: TimeGroupKey[] = ['evening']
 
 const approvalRequestKey = (kidId: string, choreId: string) => `${kidId}:${choreId}`
 
+/**
+ * Time-based auto-collapse behavior for chore groups:
+ *
+ * - Before 12:00 PM: Morning group is open; Afternoon, Evening, and Any time are collapsed
+ * - 12:00 PM - 5:00 PM: Afternoon group is open; Morning, Evening, and Any time are collapsed
+ * - After 5:00 PM: Evening group is open; Morning, Afternoon, and Any time are collapsed
+ *
+ * The "Any time" group is always collapsed by default but can be manually expanded.
+ * Groups automatically expand/collapse when crossing time thresholds (12pm and 5pm).
+ * Manually expanded groups stay open while the user interacts, but non-persistent groups
+ * will auto-recollapse after 45 seconds of inactivity. Persistent groups (like evening)
+ * will remain expanded even after idle time.
+ */
 function shouldAutoCollapse(
   mode: KidBoardProps['mode'],
   minutes: number,
   key: TimeGroupKey,
 ): boolean {
   if (mode !== 'today') return false
-  if (key === 'any') return false
+  if (key === 'any') return true
   const currentGroup: TimeGroupKey =
     minutes < 12 * 60
       ? 'morning'
-      : minutes < 20 * 60
+      : minutes < 17 * 60
         ? 'afternoon'
         : 'evening'
 
