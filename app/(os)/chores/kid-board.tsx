@@ -14,7 +14,13 @@ import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useReward } from 'react-rewards'
 import type { Chore, Completion, Kid } from './data'
-import { completeChore, requestApproval, setKidColor, skipChore, undoChore } from './actions'
+import {
+  completeChore,
+  requestApproval,
+  setKidColor,
+  skipChore,
+  undoChore,
+} from './actions'
 import {
   msUntilNextPacificMidnight,
   pacificTimeInMinutes,
@@ -66,7 +72,8 @@ const RECOLLAPSE_IDLE_MS = 45_000
 const APPROVAL_REQUESTS_KEY = 'chores:approval-requests'
 const PERSISTENT_GROUPS: TimeGroupKey[] = ['evening']
 
-const approvalRequestKey = (kidId: string, choreId: string) => `${kidId}:${choreId}`
+const approvalRequestKey = (kidId: string, choreId: string) =>
+  `${kidId}:${choreId}`
 
 /**
  * Time-based auto-collapse behavior for chore groups:
@@ -89,16 +96,13 @@ function shouldAutoCollapse(
   if (mode !== 'today') return false
   if (key === 'any') return true
   const currentGroup: TimeGroupKey =
-    minutes < 12 * 60
-      ? 'morning'
-      : minutes < 17 * 60
-        ? 'afternoon'
-        : 'evening'
+    minutes < 12 * 60 ? 'morning' : minutes < 17 * 60 ? 'afternoon' : 'evening'
 
   return key !== currentGroup
 }
 
-const shouldPersistExpansion = (key: TimeGroupKey) => PERSISTENT_GROUPS.includes(key)
+const shouldPersistExpansion = (key: TimeGroupKey) =>
+  PERSISTENT_GROUPS.includes(key)
 
 export function KidBoard({
   columns,
@@ -506,9 +510,12 @@ export function KidBoard({
                   Parent approval required
                 </h2>
                 <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
-                  We sent a request to approve &quot;{approvalRequest.chore.title}&quot;
-                  {approvalRequest.reason === 'future' ? ` for ${dayLabel}` : ''}.
-                  Parents can tap the Telegram button to complete it.
+                  We sent a request to approve &quot;
+                  {approvalRequest.chore.title}&quot;
+                  {approvalRequest.reason === 'future'
+                    ? ` for ${dayLabel}`
+                    : ''}
+                  . Parents can tap the Telegram button to complete it.
                 </p>
               </div>
               <button
@@ -526,12 +533,14 @@ export function KidBoard({
               ) : null}
               {approvalStatus === 'sent' ? (
                 <p>
-                  Request sent! Check Telegram for a button to mark this chore as complete.
+                  Request sent! Check Telegram for a button to mark this chore
+                  as complete.
                 </p>
               ) : null}
               {approvalStatus === 'error' ? (
                 <p className="font-semibold text-red-600 dark:text-red-400">
-                  {approvalError || 'We could not send the request. Please try again.'}
+                  {approvalError ||
+                    'We could not send the request. Please try again.'}
                 </p>
               ) : null}
               <div className="flex flex-wrap justify-end gap-2">
@@ -635,11 +644,7 @@ function KidColumn({
       any: false,
     }
     for (const group of timeGroups) {
-      initial[group.key] = shouldAutoCollapse(
-        mode,
-        pacificMinutes,
-        group.key,
-      )
+      initial[group.key] = shouldAutoCollapse(mode, pacificMinutes, group.key)
     }
     return initial
   })
@@ -659,7 +664,9 @@ function KidColumn({
     }
 
     const needsRecollapse = Array.from(manualExpansions.current).some(
-      (key) => !shouldPersistExpansion(key) && shouldAutoCollapse(mode, pacificMinutes, key),
+      (key) =>
+        !shouldPersistExpansion(key) &&
+        shouldAutoCollapse(mode, pacificMinutes, key),
     )
     if (!needsRecollapse) return
 
@@ -689,11 +696,7 @@ function KidColumn({
       let changed = false
       const next = { ...prev }
       for (const group of timeGroups) {
-        const autoCollapse = shouldAutoCollapse(
-          mode,
-          pacificMinutes,
-          group.key,
-        )
+        const autoCollapse = shouldAutoCollapse(mode, pacificMinutes, group.key)
         if (!autoCollapse) {
           if (next[group.key]) {
             next[group.key] = false
@@ -756,7 +759,11 @@ function KidColumn({
     setCollapsedGroups((prev) => {
       const nextCollapsed = !prev[key]
       const next = { ...prev, [key]: nextCollapsed }
-      if (!nextCollapsed && (shouldAutoCollapse(mode, pacificMinutes, key) || shouldPersistExpansion(key))) {
+      if (
+        !nextCollapsed &&
+        (shouldAutoCollapse(mode, pacificMinutes, key) ||
+          shouldPersistExpansion(key))
+      ) {
         manualExpansions.current.add(key)
       } else if (nextCollapsed) {
         manualExpansions.current.delete(key)
@@ -1031,6 +1038,7 @@ function ChoreButton({
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [detailsOpen, setDetailsOpen] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [isSkipping, setIsSkipping] = useState(false)
   const [skipConfirmOpen, setSkipConfirmOpen] = useState(false)
@@ -1168,6 +1176,104 @@ function ChoreButton({
     }
   }
 
+  const detailsModal =
+    detailsOpen && typeof document !== 'undefined'
+      ? createPortal(
+          <div
+            className="fixed inset-0 z-[110] flex items-center justify-center bg-black/40 p-4"
+            onClick={() => setDetailsOpen(false)}
+          >
+            <div
+              className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl dark:bg-slate-900"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex min-w-0 items-start gap-3">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-2 border-slate-200 bg-slate-50 text-2xl dark:border-slate-700 dark:bg-slate-800">
+                    {chore.emoji}
+                  </div>
+                  <div className="min-w-0">
+                    <h2 className="text-base font-semibold leading-tight text-slate-900 dark:text-slate-50">
+                      {chore.title}
+                    </h2>
+                    <div className="mt-1 text-xs font-semibold text-amber-700 dark:text-amber-200">
+                      +{chore.stars} ⭐️
+                      {chore.requiresApproval ? (
+                        <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800 dark:bg-amber-900/50 dark:text-amber-100">
+                          {approvalRequested
+                            ? '⏳ Waiting for approval'
+                            : '🔐 Parent OK'}
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setDetailsOpen(false)}
+                  className="rounded-md p-1 text-slate-500 transition active:bg-slate-100 active:text-slate-700 dark:active:bg-slate-800"
+                  aria-label="Close"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="mt-4 space-y-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    startTransition(() => {
+                      if (completionDisabled || isAnimating) return
+                      setMenuOpen(false)
+                      setDetailsOpen(false)
+                      void onComplete(chore, kidId, accent, reward)
+                    })
+                  }
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-xs transition active:bg-slate-800 disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:active:bg-slate-200"
+                  disabled={completionDisabled || isAnimating}
+                >
+                  ✅ Complete task
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isSkipping) return
+                    setMenuOpen(false)
+                    setDetailsOpen(false)
+                    setSkipConfirmOpen(true)
+                  }}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-xs transition active:bg-slate-50 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:active:bg-slate-700"
+                  disabled={isSkipping}
+                >
+                  ⏩ Skip for today
+                  {isSkipping ? (
+                    <span className="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-300">
+                      …
+                    </span>
+                  ) : null}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    void handleSpeak()
+                  }}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-xs transition active:bg-slate-50 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:active:bg-slate-700"
+                  disabled={isSpeaking}
+                >
+                  🔊 Read title
+                  {isSpeaking ? (
+                    <span className="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-300">
+                      …
+                    </span>
+                  ) : null}
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )
+      : null
+
   const skipConfirmModal =
     skipConfirmOpen && typeof document !== 'undefined'
       ? createPortal(
@@ -1179,7 +1285,8 @@ function ChoreButton({
                     Skip this task?
                   </h2>
                   <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
-                    Are you sure you want to skip &quot;{chore.title}&quot; for now?
+                    Are you sure you want to skip &quot;{chore.title}&quot; for
+                    now?
                   </p>
                 </div>
                 <button
@@ -1222,18 +1329,15 @@ function ChoreButton({
     >
       <button
         type="button"
-        onClick={() =>
-          startTransition(() => {
-            if (completionDisabled || isAnimating) return
-            void onComplete(chore, kidId, accent, reward)
-          })
-        }
+        onClick={() => {
+          setMenuOpen(false)
+          setDetailsOpen(true)
+        }}
         className="group flex w-full items-start gap-3 px-3 py-3 text-left text-slate-900 transition active:bg-[var(--accent-soft)] focus-visible:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:text-slate-50 dark:active:bg-[var(--accent-soft)] dark:focus-visible:bg-[var(--accent-soft)] xl:gap-4 xl:px-4 xl:py-4"
-        disabled={completionDisabled || isAnimating}
         aria-label={
           approvalRequested
-            ? `Waiting for approval on "${chore.title}"`
-            : `Mark "${chore.title}" as done`
+            ? `Open "${chore.title}" actions (waiting for approval)`
+            : `Open "${chore.title}" actions`
         }
       >
         <div className="flex flex-col items-center gap-2">
@@ -1304,6 +1408,7 @@ function ChoreButton({
           ) : null}
         </div>
       </div>
+      {detailsModal}
       {skipConfirmModal}
     </div>
   )
