@@ -1,7 +1,8 @@
 'use client'
 
 import { useChat } from '@ai-sdk/react'
-import { DefaultChatTransport } from 'ai'
+import { DefaultChatTransport, getToolName, isToolUIPart } from 'ai'
+import { ClippyAgentUIMessage } from 'app/lib/clippy-agent'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -10,7 +11,7 @@ export default function Chat() {
   const [input, setInput] = useState<string>('')
   const router = useRouter()
 
-  const { messages, sendMessage, status } = useChat({
+  const { messages, sendMessage, status } = useChat<ClippyAgentUIMessage>({
     transport: new DefaultChatTransport({
       api: '/api/chat',
       headers: {
@@ -58,14 +59,14 @@ export default function Chat() {
                       return <div key={`${message.id}-${i}`}>{part.text}</div>
                     default:
                       // Handle dynamic tool calls (they start with 'tool-')
-                      if (part.type.startsWith('tool-')) {
+                      if (isToolUIPart(part)) {
                         return (
                           <div
                             key={`${message.id}-${i}`}
                             className="my-2 p-2 rounded-sm bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 text-yellow-900 dark:text-yellow-100"
                           >
                             <div className="text-xs font-medium mb-1">
-                              🔧 Tool Call: {part.type.replace('tool-', '')}
+                              🔧 Tool Call: {getToolName(part)}
                             </div>
                             <details>
                               <summary>View details</summary>

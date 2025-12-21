@@ -1,12 +1,18 @@
 import { openai } from '@ai-sdk/openai'
-import { stepCountIs, Experimental_Agent as Agent } from 'ai'
-import { experimental_createMCPClient as createMCPClient } from '@ai-sdk/mcp'
+import { InferAgentUIMessage, StepResult, ToolLoopAgent } from 'ai'
+import { createMCPClient, MCPClient } from '@ai-sdk/mcp'
 import { Redis } from '@upstash/redis'
 import { headers } from 'next/headers'
 import { colors } from 'app/(os)/cal/data'
 import { PRESETS } from 'app/(os)/cal/presets'
 import { dedent } from './dedent'
 import { siteUrl } from './site-url'
+import { z } from 'zod'
+
+type ClippyAgentContext = {
+  client: MCPClient
+  sessionId?: string
+}
 
 async function resolveDeploymentUrl(request?: Request) {
   const envUrl =
@@ -79,23 +85,26 @@ function parseTimestamp(value: unknown) {
   return undefined
 }
 
-function extractSessionId(stepResult: any) {
-  const headers = stepResult?.request?.headers
-  if (!headers || typeof headers !== 'object') return undefined
+async function extractSessionId(
+  stepResult: ClippyAgentStepResult,
+  context?: ClippyAgentContext,
+) {
+  // Try to get from context first (set in prepareCall)
+  if (context?.sessionId) return context.sessionId
 
-  const rawValue =
-    headers['x-session-id'] ??
-    headers['X-Session-Id'] ??
-    headers['X-SESSION-ID'] ??
-    headers['x-Session-Id']
+  // Fallback: try to read from Next.js headers (server context)
+  try {
+    const requestHeaders = await headers()
+    const sessionId = requestHeaders.get('x-session-id')
+    if (sessionId) return sessionId
+  } catch {
+    // Not in server context
+  }
 
-  if (!rawValue) return undefined
-  if (Array.isArray(rawValue)) return rawValue[0]
-  if (typeof rawValue === 'string') return rawValue
-  return String(rawValue)
+  return undefined
 }
 
-function extractRequestMessages(stepResult: any) {
+function extractRequestMessages(stepResult: ClippyAgentStepResult) {
   const body = stepResult?.request?.body
   if (!body) return undefined
 
@@ -109,7 +118,7 @@ function extractRequestMessages(stepResult: any) {
   return undefined
 }
 
-function extractConversationMessages(stepResult: any) {
+function extractConversationMessages(stepResult: ClippyAgentStepResult) {
   if (
     stepResult?.response?.messages &&
     Array.isArray(stepResult.response.messages)
@@ -120,12 +129,11 @@ function extractConversationMessages(stepResult: any) {
   return extractRequestMessages(stepResult)
 }
 
-async function persistConversationStep(stepResult: any) {
-  const conversationId =
-    stepResult?.response?.id ??
-    stepResult?.response?.requestId ??
-    stepResult?.request?.id ??
-    `clippy-${Date.now()}`
+async function persistConversationStep(
+  stepResult: ClippyAgentStepResult,
+  context?: ClippyAgentContext,
+) {
+  const conversationId = stepResult?.response?.id ?? `clippy-${Date.now()}`
   const timestamp =
     parseTimestamp(stepResult?.response?.timestamp) ?? Date.now()
 
@@ -143,7 +151,8 @@ async function persistConversationStep(stepResult: any) {
   const createdAt =
     (typeof parsedMeta?.createdAt === 'number' && parsedMeta.createdAt) ||
     timestamp
-  const sessionId = parsedMeta?.sessionId ?? extractSessionId(stepResult)
+  const sessionId =
+    parsedMeta?.sessionId ?? (await extractSessionId(stepResult, context))
 
   const meta = {
     id: conversationId,
@@ -178,15 +187,15 @@ Respond in a concise, helpful, and unambiguous way.
 </context>
 
 <calendar-management>
-• Handle: create ▸ update ▸ delete ▸ list events.  
-• Ask follow-up questions when data is missing or unclear.  
+• Handle: create ▸ update ▸ delete ▸ list events.
+• Ask follow-up questions when data is missing or unclear.
 • Don't ask for confirmation. Just do the tool calls.
 • Always finish your message with a single-sentence summary of the result.
 • Never invent facts, colors, owners, or titles.
 
 Event Guidelines:
 • Never ask for times. You only need to know the date.
-• Each event must follow EXACTLY one preset color as defined in <PRESETS>.  
+• Each event must follow EXACTLY one preset color as defined in <PRESETS>.
 • Event data is full-day unless specified otherwise. Full-day events should have a background and border. Shorter events should not have a background or border.
 • If events go for consecutive days, create one event for the whole period with start and end dates. NOT multiple events.
 • If the user specifies a week day, assume it's the next occurence of that week day.
@@ -225,16 +234,20 @@ ${JSON.stringify(
 )}
 </PRESETS>`
 
-let clippyPromise: Promise<Agent<any, any, any>> | null = null
-
-export async function getClippy(request?: Request) {
-  if (clippyPromise) return clippyPromise
-
-  clippyPromise = (async () => {
+export const clippyAgent = new ToolLoopAgent({
+  model: openai('gpt-5-mini'),
+  instructions: SYSTEM_PROMPT(new Date()),
+  callOptionsSchema: z.object({
+    request: z.instanceof(Request),
+  }),
+  prepareCall: async ({ options, ...rest }) => {
     const token =
       process.env.CLIPPY_AUTOMATION_TOKEN ?? process.env.CAL_PASSWORD
 
-    const deploymentUrl = await resolveDeploymentUrl(request)
+    const deploymentUrl = await resolveDeploymentUrl(options.request)
+
+    // Extract session ID from request headers
+    const sessionId = options.request.headers.get('x-session-id') ?? undefined
 
     const client = await createMCPClient({
       transport: {
@@ -249,21 +262,46 @@ export async function getClippy(request?: Request) {
     })
 
     const tools = await client.tools()
-
-    return new Agent({
-      model: openai('gpt-5-mini'),
-      system: SYSTEM_PROMPT(new Date()),
+    return {
+      ...rest,
       tools,
-      onStepFinish: async (result) => {
-        try {
-          await persistConversationStep(result)
-        } catch (error) {
-          console.error('Failed to persist Clippy step log', error)
-        }
-      },
-      stopWhen: stepCountIs(10),
-    })
-  })()
+      experimental_context: { client, sessionId } as ClippyAgentContext,
+    }
+  },
+  onStepFinish: async (result) => {
+    try {
+      // Access context from the agent's internal state if available
+      // For now, extractSessionId will use Next.js headers() as fallback
+      await persistConversationStep(result, undefined)
+    } catch (error) {
+      console.error('Failed to persist Clippy step log', error)
+    }
+  },
+  onFinish: async ({ experimental_context }) => {
+    const context = experimental_context as ClippyAgentContext
+    await context.client.close()
+  },
+})
 
-  return clippyPromise
+export type ClippyAgentUIMessage = InferAgentUIMessage<typeof clippyAgent>
+
+type ClippyAgentStepResult = StepResult<typeof clippyAgent.tools>
+
+export async function getClippy(request: Request) {
+  return {
+    generate: (
+      params: Omit<Parameters<typeof clippyAgent.generate>[0], 'options'>,
+    ) =>
+      clippyAgent.generate({
+        ...params,
+        options: { request },
+      } as Parameters<typeof clippyAgent.generate>[0]),
+    stream: (
+      params: Omit<Parameters<typeof clippyAgent.stream>[0], 'options'>,
+    ) =>
+      clippyAgent.stream({
+        ...params,
+        options: { request },
+      } as Parameters<typeof clippyAgent.stream>[0]),
+  }
 }
