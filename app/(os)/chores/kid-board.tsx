@@ -1030,11 +1030,10 @@ function ChoreButton({
 }) {
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
-  const [menuOpen, setMenuOpen] = useState(false)
+  const [detailsOpen, setDetailsOpen] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [isSkipping, setIsSkipping] = useState(false)
   const [skipConfirmOpen, setSkipConfirmOpen] = useState(false)
-  const containerRef = useRef<HTMLDivElement | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const ttsUrlRef = useRef<string | null>(null)
   const prefetchedTitleRef = useRef<string | null>(null)
@@ -1067,7 +1066,6 @@ function ChoreButton({
   const performSkip = () => {
     if (isSkipping) return
     setIsSkipping(true)
-    setMenuOpen(false)
     setSkipConfirmOpen(false)
     const formData = new FormData()
     formData.append('choreId', chore.id)
@@ -1110,36 +1108,9 @@ function ChoreButton({
   }, [chore.title])
 
   useEffect(() => {
-    if (!menuOpen) return
-
-    let timeoutId: number
-    const resetTimer = () => {
-      window.clearTimeout(timeoutId)
-      timeoutId = window.setTimeout(() => setMenuOpen(false), 30_000)
-    }
-
-    const handlePointerDown = (event: PointerEvent) => {
-      if (!containerRef.current) return
-      if (containerRef.current.contains(event.target as Node)) {
-        resetTimer()
-        return
-      }
-      setMenuOpen(false)
-    }
-
-    resetTimer()
-    document.addEventListener('pointerdown', handlePointerDown, true)
-
-    return () => {
-      window.clearTimeout(timeoutId)
-      document.removeEventListener('pointerdown', handlePointerDown, true)
-    }
-  }, [menuOpen])
-
-  useEffect(() => {
-    if (!menuOpen) return
+    if (!detailsOpen) return
     void fetchTtsUrl()
-  }, [menuOpen, fetchTtsUrl])
+  }, [detailsOpen, fetchTtsUrl])
 
   useEffect(() => {
     return () => {
@@ -1149,6 +1120,23 @@ function ChoreButton({
       }
     }
   }, [])
+
+  const handleOpenDetails = () => {
+    setDetailsOpen(true)
+  }
+
+  const handleComplete = () =>
+    startTransition(() => {
+      if (completionDisabled || isAnimating) return
+      void onComplete(chore, kidId, accent, reward)
+      setDetailsOpen(false)
+    })
+
+  const handleSkipRequest = () => {
+    if (isSkipping) return
+    setDetailsOpen(false)
+    setSkipConfirmOpen(true)
+  }
 
   const handleSpeak = async () => {
     if (isSpeaking) return
@@ -1214,27 +1202,89 @@ function ChoreButton({
         )
       : null
 
+  const detailsModal =
+    detailsOpen && typeof document !== 'undefined'
+      ? createPortal(
+          <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/40 p-4">
+            <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl dark:bg-slate-900">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="text-3xl leading-none">{chore.emoji}</div>
+                  <div>
+                    <h2 className="text-base font-semibold leading-tight text-slate-900 dark:text-slate-50">
+                      {chore.title}
+                    </h2>
+                    <div className="mt-1 text-sm font-semibold text-emerald-700 dark:text-emerald-200">
+                      +{chore.stars} stars
+                    </div>
+                    {chore.requiresApproval ? (
+                      <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800 dark:bg-amber-900/50 dark:text-amber-100">
+                        🔐 Parent approval required
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setDetailsOpen(false)}
+                  className="rounded-md p-1 text-slate-500 transition active:bg-slate-100 active:text-slate-700 dark:active:bg-slate-800"
+                  aria-label="Close chore details"
+                >
+                  ×
+                </button>
+              </div>
+              <div className="mt-5 space-y-2">
+                <button
+                  type="button"
+                  onClick={handleComplete}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 py-3 text-sm font-semibold text-white shadow-xs transition active:bg-emerald-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 disabled:opacity-60 dark:active:bg-emerald-400"
+                  disabled={completionDisabled || isAnimating}
+                >
+                  <span>Complete</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSkipRequest}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition active:border-[var(--accent)] active:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:active:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)]"
+                  style={accentVars}
+                  disabled={isSkipping}
+                >
+                  <span>Skip task</span>
+                  {isSkipping ? (
+                    <span className="text-xs text-slate-500">…</span>
+                  ) : null}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    void handleSpeak()
+                  }}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition active:border-[var(--accent)] active:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:active:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)]"
+                  style={accentVars}
+                  disabled={isSpeaking}
+                >
+                  <span>Read task</span>
+                  {isSpeaking ? (
+                    <span className="text-xs text-slate-500">…</span>
+                  ) : null}
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )
+      : null
+
   return (
     <div
-      className={`relative rounded-xl border-2 shadow-sm transition focus-within:-translate-y-0.5 active:-translate-y-0.5 focus-within:border-[var(--accent)] active:border-[var(--accent)] dark:focus-within:border-[var(--accent)] dark:active:border-[var(--accent)] ${cardToneClasses} ${menuOpen ? 'z-20' : ''}`}
+      className={`relative rounded-xl border-2 shadow-sm transition focus-within:-translate-y-0.5 active:-translate-y-0.5 focus-within:border-[var(--accent)] active:border-[var(--accent)] dark:focus-within:border-[var(--accent)] dark:active:border-[var(--accent)] ${cardToneClasses}`}
       style={accentVars}
-      ref={containerRef}
     >
       <button
         type="button"
-        onClick={() =>
-          startTransition(() => {
-            if (completionDisabled || isAnimating) return
-            void onComplete(chore, kidId, accent, reward)
-          })
-        }
+        onClick={handleOpenDetails}
         className="group flex w-full items-start gap-3 px-3 py-3 text-left text-slate-900 transition active:bg-[var(--accent-soft)] focus-visible:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:text-slate-50 dark:active:bg-[var(--accent-soft)] dark:focus-visible:bg-[var(--accent-soft)] xl:gap-4 xl:px-4 xl:py-4"
-        disabled={completionDisabled || isAnimating}
-        aria-label={
-          approvalRequested
-            ? `Waiting for approval on "${chore.title}"`
-            : `Mark "${chore.title}" as done`
-        }
+        aria-label={`View options for "${chore.title}"`}
       >
         <div className="flex flex-col items-center gap-2">
           <span className="text-xl leading-none transition group-active:text-[var(--accent)] group-focus-visible:text-[var(--accent)] xl:text-3xl">
@@ -1248,63 +1298,20 @@ function ChoreButton({
         </div>
       </button>
       <div className="flex items-start justify-between border-t border-slate-200 px-3 py-1.5 text-xs font-semibold text-amber-700 dark:border-slate-700 dark:text-amber-200 xl:px-4">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2 text-sm font-semibold leading-none xl:text-base">
-            <div>+{chore.stars} stars</div>
-            {chore.requiresApproval ? (
-              <div className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800 dark:bg-amber-900/50 dark:text-amber-100">
-                {approvalRequested ? '⏳ Waiting for approval' : '🔐 Parent OK'}
-              </div>
-            ) : null}
-          </div>
-        </div>
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setMenuOpen((open) => !open)}
-            className="flex h-full min-w-[46px] items-center justify-center rounded-lg border-2 border-slate-200 bg-white px-2.5 text-sm transition active:border-[var(--accent)] active:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:active:border-[var(--accent)] dark:active:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)] xl:min-w-[52px] xl:px-3 xl:text-base"
-            aria-expanded={menuOpen}
-            aria-label="More actions"
-          >
-            ⋯
-          </button>
-          {menuOpen ? (
-            <div className="absolute right-0 top-full z-40 mt-2 w-44 rounded-xl border border-slate-200 bg-white p-1 text-xs shadow-lg dark:border-slate-700 dark:bg-slate-800">
-              <button
-                type="button"
-                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-slate-800 transition active:bg-slate-100 focus-visible:bg-slate-100 dark:text-slate-100 dark:active:bg-slate-700 dark:focus-visible:bg-slate-700"
-                onClick={() => {
-                  void handleSpeak()
-                }}
-                disabled={isSpeaking}
-              >
-                <span className="text-base">🔊</span>
-                <span>Read task</span>
-                {isSpeaking ? (
-                  <span className="ml-auto text-xs text-slate-500">…</span>
-                ) : null}
-              </button>
-              <button
-                type="button"
-                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-slate-800 transition active:bg-slate-100 focus-visible:bg-slate-100 dark:text-slate-100 dark:active:bg-slate-700 dark:focus-visible:bg-slate-700"
-                onClick={() => {
-                  if (isSkipping) return
-                  setMenuOpen(false)
-                  setSkipConfirmOpen(true)
-                }}
-                disabled={isSkipping}
-              >
-                <span className="text-base">⏭️</span>
-                <span>Skip task</span>
-                {isSkipping ? (
-                  <span className="ml-auto text-xs text-slate-500">…</span>
-                ) : null}
-              </button>
+        <div className="flex items-center gap-2 text-sm font-semibold leading-none xl:text-base">
+          <div>+{chore.stars} stars</div>
+          {chore.requiresApproval ? (
+            <div className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800 dark:bg-amber-900/50 dark:text-amber-100">
+              {approvalRequested ? '⏳ Waiting for approval' : '🔐 Parent OK'}
             </div>
           ) : null}
         </div>
+        <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">
+          Tap for actions
+        </div>
       </div>
       {skipConfirmModal}
+      {detailsModal}
     </div>
   )
 }
