@@ -1,14 +1,6 @@
 import { openai } from '@ai-sdk/openai'
-import {
-  Experimental_Agent as AiAgent,
-  UIMessage,
-  StepResult,
-  type ToolSet,
-} from 'ai'
-import {
-  experimental_createMCPClient as createMCPClient,
-  experimental_MCPClient as MCPClient,
-} from '@ai-sdk/mcp'
+import { InferAgentUIMessage, StepResult, ToolLoopAgent } from 'ai'
+import { createMCPClient, MCPClient } from '@ai-sdk/mcp'
 import { Redis } from '@upstash/redis'
 import { headers } from 'next/headers'
 import { colors } from 'app/(os)/cal/data'
@@ -21,8 +13,6 @@ type ClippyAgentContext = {
   client: MCPClient
   sessionId?: string
 }
-
-class ToolLoopAgent<TOOLS extends ToolSet> extends AiAgent<TOOLS> {}
 
 async function resolveDeploymentUrl(request?: Request) {
   const envUrl =
@@ -291,10 +281,11 @@ export const clippyAgent = new ToolLoopAgent({
     const context = experimental_context as ClippyAgentContext
     await context.client.close()
   },
-} as any) as any
-export type ClippyAgentUIMessage = UIMessage
+})
 
-type ClippyAgentStepResult = StepResult<any>
+export type ClippyAgentUIMessage = InferAgentUIMessage<typeof clippyAgent>
+
+type ClippyAgentStepResult = StepResult<typeof clippyAgent.tools>
 
 export async function getClippy(request: Request) {
   return {
