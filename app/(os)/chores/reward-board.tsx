@@ -252,7 +252,7 @@ function RewardButton({
         <div className="min-w-0">
           <div className="text-base font-semibold leading-tight">{reward.title}</div>
           <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">
-            Cost {reward.cost} ⭐️ • {reward.type === 'perpetual' ? 'Perpetual' : 'One-off'}
+            Cost {reward.cost} ⭐️
           </div>
         </div>
       </div>
