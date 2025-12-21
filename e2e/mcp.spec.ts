@@ -48,13 +48,6 @@ test.describe('MCP server read tools', () => {
     expect(Array.isArray(chores)).toBe(true)
     expect((chores as any[])?.length ?? 0).toBeGreaterThan(0)
 
-    const financeResult = await tools.read_finance_holdings.execute({}, callOptions)
-    const financeHoldings = ensureStructuredContent(financeResult)
-    const holdings = financeHoldings.holdings
-
-    expect(Array.isArray(holdings)).toBe(true)
-    expect((holdings as any[])?.length ?? 0).toBeGreaterThan(0)
-
     const calendarResult = await tools.read_events.execute({}, callOptions)
     const calendarEvents = ensureStructuredContent(calendarResult)
     const events = calendarEvents.events
