@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState, useTransition, type CSSProperties } from 'react'
 import { useRouter } from 'next/navigation'
+import { createPortal } from 'react-dom'
+import { useReward } from 'react-rewards'
 import type { Completion, Kid, Reward, RewardRedemption } from './data'
 import { redeemReward } from './actions'
 import { msUntilNextPacificMidnight, rewardAvailableForKid, starsForKid, withAlpha } from './utils'
@@ -46,7 +48,12 @@ export function RewardBoard({ columns, completions, redemptions }: RewardBoardPr
     return () => window.clearTimeout(timeoutId)
   }, [router])
 
-  const handleRedeem = async (reward: Reward, kidId: string, accent: string) => {
+  const handleRedeem = async (
+    reward: Reward,
+    kidId: string,
+    accent: string,
+    onCelebrate?: () => void,
+  ) => {
     const formData = new FormData()
     formData.append('rewardId', reward.id)
     formData.append('kidId', kidId)
@@ -57,7 +64,11 @@ export function RewardBoard({ columns, completions, redemptions }: RewardBoardPr
         ...prev,
         [kidId]: (prev[kidId] ?? 0) - reward.cost,
       }))
-      fireConfetti(accent)
+      if (onCelebrate) {
+        onCelebrate()
+      } else {
+        fireConfetti(accent)
+      }
     }
 
     router.refresh()
@@ -91,7 +102,12 @@ function RewardColumn({
   kid: Kid
   rewards: Reward[]
   starTotal: number
-  onRedeem: (reward: Reward, kidId: string, accent: string) => Promise<void>
+  onRedeem: (
+    reward: Reward,
+    kidId: string,
+    accent: string,
+    onCelebrate?: () => void,
+  ) => Promise<void>
   redemptions: RewardRedemption[]
 }) {
   const accent = kid.color ?? '#0ea5e9'
@@ -156,11 +172,17 @@ function RewardButton({
   reward: Reward
   kidId: string
   accent: string
-  onRedeem: (reward: Reward, kidId: string, accent: string) => Promise<void>
+  onRedeem: (
+    reward: Reward,
+    kidId: string,
+    accent: string,
+    onCelebrate?: () => void,
+  ) => Promise<void>
   starTotal: number
   redemptions: RewardRedemption[]
 }) {
   const [isPending, startTransition] = useTransition()
+  const [detailsOpen, setDetailsOpen] = useState(false)
   const available = rewardAvailableForKid(reward, kidId, redemptions)
   const enough = starTotal >= reward.cost
   const accentSoft = withAlpha(accent, 0.12)
@@ -168,6 +190,17 @@ function RewardButton({
     '--accent': accent,
     '--accent-soft': accentSoft,
   } as CSSProperties
+  const rewardTargetId = useMemo(
+    () => `reward-confetti-${kidId}-${reward.id}`,
+    [kidId, reward.id],
+  )
+  const { reward: rewardConfetti, isAnimating } = useReward(rewardTargetId, 'confetti', {
+    spread: 90,
+    startVelocity: 45,
+    lifetime: 320,
+    elementCount: 120,
+    decay: 0.94,
+  })
 
   const statusLabel = !available
     ? 'Taken'
@@ -175,45 +208,116 @@ function RewardButton({
       ? 'Redeem'
       : `${reward.cost - starTotal} more ⭐️`
 
+  const handleRedeem = () =>
+    startTransition(() => {
+      if (!available || !enough) return
+
+      void (async () => {
+        await onRedeem(reward, kidId, accent, rewardConfetti)
+        setDetailsOpen(false)
+      })()
+    })
+
+  const detailsModal =
+    detailsOpen && typeof document !== 'undefined'
+      ? createPortal(
+          <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/40 p-4">
+            <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl dark:bg-slate-900">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="text-3xl leading-none">{reward.emoji}</div>
+                  <div>
+                    <h2 className="text-base font-semibold leading-tight text-slate-900 dark:text-slate-50">
+                      {reward.title}
+                    </h2>
+                    <div className="mt-1 text-sm font-semibold text-emerald-700 dark:text-emerald-200">
+                      Costs {reward.cost} stars
+                    </div>
+                    <div className="mt-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">
+                      {reward.type === 'perpetual' ? 'Perpetual' : 'One-off'}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setDetailsOpen(false)}
+                  className="rounded-md p-1 text-slate-500 transition active:bg-slate-100 active:text-slate-700 dark:active:bg-slate-800"
+                  aria-label="Close reward details"
+                >
+                  ×
+                </button>
+              </div>
+              <div className="mt-5 space-y-2">
+                <button
+                  type="button"
+                  onClick={handleRedeem}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 py-3 text-sm font-semibold text-white shadow-xs transition active:bg-emerald-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 disabled:opacity-60 dark:active:bg-emerald-400"
+                  disabled={isPending || isAnimating || !available || !enough}
+                >
+                  Redeem reward
+                </button>
+                {!available || !enough ? (
+                  <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-center text-xs font-semibold text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                    {!available
+                      ? 'Already redeemed today.'
+                      : `Need ${reward.cost - starTotal} more ⭐️ to redeem.`}
+                  </div>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={() => setDetailsOpen(false)}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition active:border-[var(--accent)] active:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:active:bg-[var(--accent-soft)] dark:focus-visible:outline-[var(--accent)]"
+                  style={accentVars}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )
+      : null
+
   return (
-    <button
-      type="button"
-      onClick={() =>
-        startTransition(() => {
-          if (available && enough) {
-            void onRedeem(reward, kidId, accent)
-          }
-        })
-      }
-      className={`group flex w-full items-center gap-4 rounded-xl border-2 border-slate-200 bg-white px-4 py-4 text-left text-slate-900 shadow-sm transition dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 ${
-        available && enough
-          ? 'focus-within:-translate-y-0.5 active:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:border-[var(--accent)] dark:focus-visible:outline-[var(--accent)]'
-          : 'opacity-70'
-      }`}
-      disabled={isPending || !available || !enough}
-      style={accentVars}
-    >
-      <span className="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-slate-300 bg-slate-50 text-lg font-semibold text-slate-700 transition group-hover:-translate-y-0.5 group-hover:border-[var(--accent)] group-hover:bg-[var(--accent-soft)] group-hover:text-[var(--accent)] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:group-hover:border-[var(--accent)] dark:group-hover:bg-[var(--accent-soft)]">
-        {isPending ? '…' : reward.emoji}
-      </span>
-      <div className="flex min-w-0 flex-1 items-center gap-3">
-        <div className="min-w-0">
-          <div className="text-base font-semibold leading-tight">{reward.title}</div>
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">
-            Cost {reward.cost} ⭐️ • {reward.type === 'perpetual' ? 'Perpetual' : 'One-off'}
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setDetailsOpen(true)}
+        className={`group flex w-full items-center gap-4 rounded-xl border-2 border-slate-200 bg-white px-4 py-4 text-left text-slate-900 shadow-sm transition dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 ${
+          available && enough
+            ? 'focus-within:-translate-y-0.5 active:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:border-[var(--accent)] dark:focus-visible:outline-[var(--accent)]'
+            : 'opacity-70'
+        }`}
+        style={accentVars}
+        aria-label={`View reward details for "${reward.title}"`}
+      >
+        <span className="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-slate-300 bg-slate-50 text-lg font-semibold text-slate-700 transition group-hover:-translate-y-0.5 group-hover:border-[var(--accent)] group-hover:bg-[var(--accent-soft)] group-hover:text-[var(--accent)] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:group-hover:border-[var(--accent)] dark:group-hover:bg-[var(--accent-soft)]">
+          {isPending ? '…' : reward.emoji}
+        </span>
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <div className="min-w-0">
+            <div className="text-base font-semibold leading-tight">{reward.title}</div>
+            <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">
+              Cost {reward.cost} ⭐️ • {reward.type === 'perpetual' ? 'Perpetual' : 'One-off'}
+            </div>
           </div>
         </div>
+        <div
+          className={`rounded-full px-3 py-1 text-xs font-semibold ${
+            available && enough
+              ? 'bg-[var(--accent-soft)] text-[var(--accent)]'
+              : 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-200'
+          }`}
+        >
+          {statusLabel}
+        </div>
+      </button>
+      <div className="absolute inset-x-4 bottom-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">
+        Tap for actions
       </div>
-      <div
-        className={`rounded-full px-3 py-1 text-xs font-semibold ${
-          available && enough
-            ? 'bg-[var(--accent-soft)] text-[var(--accent)]'
-            : 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-200'
-        }`}
-      >
-        {statusLabel}
-      </div>
-    </button>
+      <span id={rewardTargetId} className="pointer-events-none absolute h-px w-px opacity-0" aria-hidden="true" />
+      {detailsModal}
+    </div>
   )
 }
 
