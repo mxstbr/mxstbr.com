@@ -11,7 +11,7 @@ export default function Chat() {
   const [input, setInput] = useState<string>('')
   const router = useRouter()
 
-  const { messages, sendMessage, status } = useChat<ClippyAgentUIMessage>({
+  const { messages, sendMessage, status, error } = useChat<ClippyAgentUIMessage>({
     transport: new DefaultChatTransport({
       api: '/api/chat',
       headers: {
@@ -22,6 +22,9 @@ export default function Chat() {
       if (message.parts.some((part) => part.type.includes('event'))) {
         router.refresh()
       }
+    },
+    onError: (error) => {
+      console.error('Chat error:', error)
     },
   })
 
@@ -57,6 +60,15 @@ export default function Chat() {
                   switch (part.type) {
                     case 'text':
                       return <div key={`${message.id}-${i}`}>{part.text}</div>
+                    case 'error':
+                      return (
+                        <div
+                          key={`${message.id}-${i}`}
+                          className="my-2 p-2 rounded-sm bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-900 dark:text-red-100 text-xs"
+                        >
+                          ⚠️ Error: {(part as any).errorText || 'An error occurred'}
+                        </div>
+                      )
                     default:
                       // Handle dynamic tool calls (they start with 'tool-')
                       if (isToolUIPart(part)) {
@@ -80,6 +92,11 @@ export default function Chat() {
                       return null
                   }
                 })}
+                {error && index === 0 && (
+                  <div className="my-2 p-2 rounded-sm bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-900 dark:text-red-100 text-xs">
+                    ⚠️ Error: {error.message || 'An error occurred'}
+                  </div>
+                )}
                 {index === 0 && !isUser && status === 'streaming' && (
                   <div className="flex space-x-1 mt-2">
                     <div className="w-2 h-2 bg-slate-600 rounded-full animate-bounce"></div>
