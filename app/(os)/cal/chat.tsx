@@ -57,40 +57,40 @@ export default function Chat() {
               >
                 {!isUser && <strong>Clippy</strong>}
                 {message.parts.map((part, i) => {
-                  switch (part.type) {
-                    case 'text':
-                      return <div key={`${message.id}-${i}`}>{part.text}</div>
-                    case 'error':
-                      return (
-                        <div
-                          key={`${message.id}-${i}`}
-                          className="my-2 p-2 rounded-sm bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-900 dark:text-red-100 text-xs"
-                        >
-                          ⚠️ Error: {(part as any).errorText || 'An error occurred'}
-                        </div>
-                      )
-                    default:
-                      // Handle dynamic tool calls (they start with 'tool-')
-                      if (isToolUIPart(part)) {
-                        return (
-                          <div
-                            key={`${message.id}-${i}`}
-                            className="my-2 p-2 rounded-sm bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 text-yellow-900 dark:text-yellow-100"
-                          >
-                            <div className="text-xs font-medium mb-1">
-                              🔧 Tool Call: {getToolName(part)}
-                            </div>
-                            <details>
-                              <summary>View details</summary>
-                              <pre>
-                                <code>{JSON.stringify(part, null, 2)}</code>
-                              </pre>
-                            </details>
-                          </div>
-                        )
-                      }
-                      return null
+                  const partType = (part as { type?: string }).type
+                  if (partType === 'text') {
+                    return <div key={`${message.id}-${i}`}>{(part as any).text}</div>
                   }
+                  if (partType === 'error') {
+                    return (
+                      <div
+                        key={`${message.id}-${i}`}
+                        className="my-2 p-2 rounded-sm bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-900 dark:text-red-100 text-xs"
+                      >
+                        ⚠️ Error: {(part as any).errorText || 'An error occurred'}
+                      </div>
+                    )
+                  }
+                  // Handle dynamic tool calls (they start with 'tool-')
+                  if (isToolUIPart(part)) {
+                    return (
+                      <div
+                        key={`${message.id}-${i}`}
+                        className="my-2 p-2 rounded-sm bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 text-yellow-900 dark:text-yellow-100"
+                      >
+                        <div className="text-xs font-medium mb-1">
+                          🔧 Tool Call: {getToolName(part)}
+                        </div>
+                        <details>
+                          <summary>View details</summary>
+                          <pre>
+                            <code>{JSON.stringify(part, null, 2)}</code>
+                          </pre>
+                        </details>
+                      </div>
+                    )
+                  }
+                  return null
                 })}
                 {error && index === 0 && (
                   <div className="my-2 p-2 rounded-sm bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-900 dark:text-red-100 text-xs">

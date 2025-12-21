@@ -16,7 +16,13 @@ import {
   redeemReward,
   setOneOffDate,
 } from 'app/(os)/chores/actions'
-import { getChoreState } from 'app/(os)/chores/data'
+import {
+  CHORES_KEY,
+  getChoreState,
+  normalizeState,
+  type Chore,
+  type Kid,
+} from 'app/(os)/chores/data'
 import {
   getToday,
   isOpenForKid,
@@ -24,6 +30,7 @@ import {
   sortByTimeOfDay,
   scheduleLabel,
 } from 'app/(os)/chores/utils'
+import { Redis } from '@upstash/redis'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { siteUrl } from './site-url'
 
@@ -34,6 +41,8 @@ const isoDaySchema = z
 
 const automationToken =
   process.env.CLIPPY_AUTOMATION_TOKEN ?? process.env.CAL_PASSWORD
+
+const redis = Redis.fromEnv()
 
 function appendAutomationToken(formData: FormData) {
   if (!automationToken) return
@@ -165,6 +174,28 @@ const redeemResultSchema = z.object({
   snapshot: choreSnapshotSchema.optional(),
 })
 
+const choreSearchResultSchema = z.object({
+  query: z.string(),
+  count: z.number(),
+  results: z.array(
+    z.object({
+      id: z.string(),
+      title: z.string(),
+      emoji: z.string().optional(),
+      stars: z.number(),
+      type: z.enum(['one-off', 'repeated', 'perpetual']),
+      kid_ids: z.array(z.string()),
+      kid_names: z.array(z.string()),
+      requires_approval: z.boolean().optional(),
+      scheduled_for: z.string().nullable().optional(),
+      time_of_day: z.enum(['morning', 'afternoon', 'evening']).optional(),
+      paused_until: z.string().nullable().optional(),
+      snoozed_until: z.string().nullable().optional(),
+      created_at: z.string().optional(),
+    }),
+  ),
+})
+
 async function loadChoreSnapshot(day?: string) {
   const state = await getChoreState()
   const ctx = getToday(day)
@@ -235,6 +266,42 @@ async function loadChoreSnapshot(day?: string) {
     openChoresByKid: sortedOpen,
     completedTodayByKid: sortedDone,
   }
+}
+
+function coerceJsonArray<T>(value: unknown): T[] {
+  if (!value) return []
+  if (Array.isArray(value)) {
+    if (value.length === 1 && Array.isArray(value[0])) {
+      return (value[0] as T[]) ?? []
+    }
+    return value as T[]
+  }
+  return []
+}
+
+async function loadChoresForSearch(): Promise<{
+  chores: Chore[]
+  kids: Kid[]
+}> {
+  try {
+    const [rawChores, rawKids] = await Promise.all([
+      redis.json.get<Chore[] | Chore[][]>(CHORES_KEY, '$.chores'),
+      redis.json.get<Kid[] | Kid[][]>(CHORES_KEY, '$.kids'),
+    ])
+
+    const chores = coerceJsonArray<Chore>(rawChores)
+    const kids = coerceJsonArray<Kid>(rawKids)
+
+    if (chores.length && kids.length) {
+      const normalized = normalizeState({ chores, kids })
+      return { chores: normalized.chores, kids: normalized.kids }
+    }
+  } catch (error) {
+    console.error('Chore search fallback to full state', error)
+  }
+
+  const state = await getChoreState()
+  return { chores: state.chores, kids: state.kids }
 }
 
 const timeOfDayLabels = {
@@ -395,6 +462,87 @@ export function registerChoreTools(server: McpServer) {
           ? toStructuredContent({ message, ...snapshot })
           : undefined,
         // _meta: toChoresTodayMetadata(snapshot),
+      }
+    },
+  )
+  server.registerTool(
+    'search_chores',
+    {
+      title: 'Search Chores',
+      description:
+        'Search chores by title or emoji without loading the entire chore board.',
+      inputSchema: z.object({
+        query: z.string().min(1, 'Query is required'),
+        kid_ids: kidIdsSchema.optional(),
+        limit: z
+          .number()
+          .int()
+          .min(1)
+          .max(50)
+          .default(10)
+          .describe('Number of matches to return (max 50)'),
+      }),
+      outputSchema: choreSearchResultSchema,
+      annotations: { readOnlyHint: true },
+    },
+    async ({ query, kid_ids, limit = 10 }) => {
+      const { chores, kids } = await loadChoresForSearch()
+      const normalizedLimit = Math.min(50, Math.max(1, limit ?? 10))
+      const tokens = query
+        .toLowerCase()
+        .split(/\s+/)
+        .map((token) => token.trim())
+        .filter(Boolean)
+
+      const filtered = chores.filter((chore) => {
+        if (kid_ids?.length) {
+          const matchesKid = kid_ids.some((kidId) =>
+            chore.kidIds.includes(kidId),
+          )
+          if (!matchesKid) return false
+        }
+
+        if (!tokens.length) return true
+        const haystack = `${chore.title} ${chore.emoji ?? ''}`.toLowerCase()
+        return tokens.every((token) => haystack.includes(token))
+      })
+
+      const sorted = filtered.sort((a, b) =>
+        b.createdAt.localeCompare(a.createdAt),
+      )
+      const limitedResults = sorted.slice(0, normalizedLimit)
+
+      const kidNameById = new Map(kids.map((kid) => [kid.id, kid.name]))
+      const results = limitedResults.map((chore) => ({
+        id: chore.id,
+        title: chore.title,
+        emoji: chore.emoji,
+        stars: chore.stars,
+        type: chore.type,
+        kid_ids: chore.kidIds,
+        kid_names: chore.kidIds
+          .map((kidId) => kidNameById.get(kidId))
+          .filter(Boolean) as string[],
+        requires_approval: chore.requiresApproval ?? false,
+        scheduled_for: chore.scheduledFor ?? null,
+        time_of_day: chore.timeOfDay,
+        paused_until: chore.pausedUntil ?? null,
+        snoozed_until: chore.snoozedUntil ?? null,
+        created_at: chore.createdAt,
+      }))
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Found ${filtered.length} chore${filtered.length === 1 ? '' : 's'} matching "${query}"`,
+          },
+        ],
+        structuredContent: {
+          query,
+          count: filtered.length,
+          results,
+        },
       }
     },
   )
