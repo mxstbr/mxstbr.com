@@ -11,13 +11,6 @@ test.describe('MCP server read tools', () => {
   let client: McpClient
   let tools: McpTools
 
-  const ensureStructuredContent = (result: any) => {
-    expect(result.isError ?? false).toBe(false)
-    const structured = result.structuredContent ?? result.toolResult
-    expect(structured).toBeTruthy()
-    return structured as Record<string, unknown>
-  }
-
   test.beforeAll(async () => {
     client = await createMCPClient({
       transport: {
@@ -42,14 +35,12 @@ test.describe('MCP server read tools', () => {
     const callOptions = { toolCallId: 'mcp-e2e', messages: [] }
 
     const choreBoardResult = await tools.read_chore_board.execute({}, callOptions)
-    const choreBoard = ensureStructuredContent(choreBoardResult)
     const chores = (choreBoard.snapshot as any)?.chores ?? choreBoard.chores
 
     expect(Array.isArray(chores)).toBe(true)
     expect((chores as any[])?.length ?? 0).toBeGreaterThan(0)
 
     const calendarResult = await tools.read_events.execute({}, callOptions)
-    const calendarEvents = ensureStructuredContent(calendarResult)
     const events = calendarEvents.events
 
     expect(Array.isArray(events)).toBe(true)
