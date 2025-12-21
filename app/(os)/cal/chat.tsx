@@ -59,16 +59,7 @@ export default function Chat() {
                 {message.parts.map((part, i) => {
                   switch (part.type) {
                     case 'text':
-                      return <div key={`${message.id}-${i}`}>{part.text}</div>
-                    case 'error':
-                      return (
-                        <div
-                          key={`${message.id}-${i}`}
-                          className="my-2 p-2 rounded-sm bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-900 dark:text-red-100 text-xs"
-                        >
-                          ⚠️ Error: {(part as any).errorText || 'An error occurred'}
-                        </div>
-                      )
+                      return <div key={`${message.id}-${i}`}>{part.text}</div>'
                     default:
                       // Handle dynamic tool calls (they start with 'tool-')
                       if (isToolUIPart(part)) {
