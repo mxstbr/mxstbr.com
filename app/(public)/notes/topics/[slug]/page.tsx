@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import ArrowLeft from 'react-feather/dist/icons/arrow-left'
 import Prose from '../../../../components/prose'
-import { getNotes } from '../../hashnode'
+import { getNotes } from '../../utils'
 import type { Metadata } from 'next'
 
 export const dynamic = 'force-static'
@@ -11,7 +11,7 @@ export const revalidate = 60
 
 export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
   const tags = (await getNotes()).flatMap(
-    (note) => note.frontmatter.tags?.map((tag) => tag.slug) ?? [],
+    (note) => note.metadata.tags?.map((tag) => tag.slug) ?? [],
   )
 
   return Array.from(new Set(tags)).map((slug) => ({ slug }))
@@ -26,9 +26,9 @@ export async function generateMetadata({
   const allNotes = await getNotes()
   const tag = allNotes
     .find((note) =>
-      note.frontmatter.tags?.some((tag) => tag.slug === slug),
+      note.metadata.tags?.some((tag) => tag.slug === slug),
     )
-    ?.frontmatter.tags?.find((tag) => tag.slug === slug)
+    ?.metadata.tags?.find((tag) => tag.slug === slug)
 
   return {
     title: `Notes on ${tag?.name || slug}`,
@@ -44,13 +44,13 @@ export default async function Page({
   const { slug } = await params
   const allNotes = await getNotes()
   const notes = allNotes.filter((note) =>
-    note.frontmatter.tags?.some((tag) => tag.slug === slug),
+    note.metadata.tags?.some((tag) => tag.slug === slug),
   )
   const tag = allNotes
     .find((note) =>
-      note.frontmatter.tags?.some((tag) => tag.slug === slug),
+      note.metadata.tags?.some((tag) => tag.slug === slug),
     )
-    ?.frontmatter.tags?.find((tag) => tag.slug === slug)
+    ?.metadata.tags?.find((tag) => tag.slug === slug)
 
   if (!tag) return notFound()
 
@@ -73,25 +73,25 @@ export default async function Page({
           .sort(
             (a, b) =>
               new Date(
-                b.frontmatter.updatedAt || b.frontmatter.publishedAt,
+                b.metadata.updatedAt || b.metadata.publishedAt,
               ).getTime() -
               new Date(
-                a.frontmatter.updatedAt || a.frontmatter.publishedAt,
+                a.metadata.updatedAt || a.metadata.publishedAt,
               ).getTime(),
           )
           .map((note) => (
             <li
-              key={note.frontmatter.slug}
+              key={note.slug}
               className="flex flex-col space-y-2 border-b dark:border-slate-700 last:border-b-0 py-8 first:pt-0 last:pb-0"
             >
               <div className="space-y-2">
                 <Link
-                  href={`/notes/${note.frontmatter.slug}`}
+                  href={`/notes/${note.slug}`}
                   className="font-medium text-lg"
                 >
-                  {note.frontmatter.title}
+                  {note.metadata.title}
                 </Link>
-                <p className="text-slate-500">{note.frontmatter.summary}</p>
+                <p className="text-slate-500">{note.metadata.summary}</p>
               </div>
             </li>
           ))}

@@ -1,12 +1,12 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { Note } from '../hashnode'
+import { Note } from '../utils'
 
 export function ReadingTime({
   readTimeInMinutes,
   domElementId,
 }: {
-  readTimeInMinutes: Note['frontmatter']['readTimeInMinutes']
+  readTimeInMinutes: Note['metadata']['readTimeInMinutes']
   domElementId: string
 }) {
   const [time, setTime] = useState(readTimeInMinutes)

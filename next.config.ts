@@ -1,6 +1,6 @@
 import type { NextConfig } from 'next'
 import createMDX from '@next/mdx'
-import { getNotes } from './app/(public)/notes/hashnode'
+import { getNotes } from './app/(public)/notes/utils'
 
 const nextConfig: NextConfig = {
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
@@ -11,11 +11,11 @@ const nextConfig: NextConfig = {
   async redirects() {
     const notes = await getNotes()
     const previousSlugNotesRedirects = notes
-      .filter((note) => note.frontmatter.previousSlugs.length > 0)
+      .filter((note) => note.metadata.previousSlugs.length > 0)
       .flatMap((note) =>
-        note.frontmatter.previousSlugs.map((previousSlug) => ({
+        note.metadata.previousSlugs.map((previousSlug) => ({
           source: `/notes/${previousSlug}`,
-          destination: `/notes/${note.frontmatter.slug}`,
+          destination: `/notes/${note.slug}`,
           permanent: true,
         })),
       )

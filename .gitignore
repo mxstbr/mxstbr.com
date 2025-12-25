@@ -44,3 +44,4 @@ yarn-error.log*
 # personal
 madison.ts
 .env*.local
+temp/

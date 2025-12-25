@@ -1,12 +1,11 @@
 import React from 'react'
 import Link from 'next/link'
-import { EMOJI_FOR_STATUS, Note, getNotes } from './hashnode'
+import { EMOJI_FOR_STATUS, Note, getNotes } from './utils'
 import Prose from '../../components/prose'
 import Tag from 'react-feather/dist/icons/tag'
 import type { Metadata } from 'next'
 
 export const dynamic = 'force-static'
-export const revalidate = 60
 
 export const metadata: Metadata = {
   title: 'Notes',
@@ -29,7 +28,7 @@ export const metadata: Metadata = {
 export default async function WritingPage() {
   const notes = await getNotes()
 
-  const allTags = notes.flatMap((note) => note.frontmatter.tags)
+  const allTags = notes.flatMap((note) => note.metadata.tags || [])
   const tags = [
     // @ts-ignore
     ...new Map(allTags.map((tag) => [tag.slug, tag])).values(),
@@ -77,14 +76,14 @@ export default async function WritingPage() {
             .sort(
               (a, b) =>
                 new Date(
-                  b.frontmatter.updatedAt || b.frontmatter.publishedAt,
+                  b.metadata.updatedAt || b.metadata.publishedAt,
                 ).getTime() -
                 new Date(
-                  a.frontmatter.updatedAt || a.frontmatter.publishedAt,
+                  a.metadata.updatedAt || a.metadata.publishedAt,
                 ).getTime(),
             )
             .map((note) => (
-              <NoteCard key={note.frontmatter.slug} note={note} />
+              <NoteCard key={note.slug} note={note} />
             ))}
         </div>
       </div>
@@ -96,17 +95,17 @@ function NoteCard({ note }: { note: Note }) {
   return (
     <div className="flex gap-x-4 border rounded-md p-4 break-inside-avoid">
       <div className="text-2xl">
-        {EMOJI_FOR_STATUS[note.frontmatter.status]}
+        {EMOJI_FOR_STATUS[note.metadata.status]}
       </div>
       <div className="flex flex-col gap-2">
         <Link
-          href={`/notes/${note.frontmatter.slug}`}
+          href={`/notes/${note.slug}`}
           className="font-medium text-lg hover:underline"
         >
-          {note.frontmatter.title}
+          {note.metadata.title}
         </Link>
         <div className="flex flex-wrap gap-2 text-slate-500">
-          {note.frontmatter.tags?.map((tag) => (
+          {note.metadata.tags?.map((tag) => (
             <Link
               key={tag.slug}
               href={`/notes/topics/${tag.slug}`}

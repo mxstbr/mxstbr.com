@@ -16,7 +16,7 @@ export async function generateStaticParams() {
 function generateOgImage(post) {
   if (post.metadata.image) return post.metadata.image
 
-  return `${prodUrl}/og?name=${encodeURIComponent("Max Stoiber's Essays")}&title=${encodeURIComponent(
+  return `${prodUrl}/og?name=${encodeURIComponent("Sonjeet Paul's Essays")}&title=${encodeURIComponent(
     post.metadata.title,
   )}&subtitle=${
     post.metadata.views > 0
@@ -96,7 +96,7 @@ export default async function Blog({ meta, children }) {
               author: {
                 '@type': 'Person',
                 '@id': 'mxstbr',
-                name: 'Max Stoiber',
+                name: 'Sonjeet Paul',
               },
             }),
           }}

@@ -44,7 +44,7 @@ export async function GET(request: Request) {
       >
         <div tw="absolute top-0 left-0 right-0 flex flex-row w-full justify-between items-center px-16 pt-8 text-slate-500">
           <h1 tw="font-normal text-3xl">
-            {name || (root ? 'mxstbr.com' : 'Max Stoiber')}
+            {name || (root ? 'mxstbr.com' : 'Sonjeet Paul')}
           </h1>
           <p tw="text-3xl">@mxstbr</p>
         </div>
@@ -53,7 +53,7 @@ export async function GET(request: Request) {
             tw="flex flex-col text-7xl font-bold text-center"
             style={{ textWrap: 'balance' }}
           >
-            {root ? 'Max Stoiber' : title}
+            {root ? 'Sonjeet Paul' : title}
           </h2>
           <div tw={`text-3xl text-slate-500 ${root ? '' : 'mt-2'}`}>
             {root ? 'CEO & Co-Founder, Stellate' : subtitle}

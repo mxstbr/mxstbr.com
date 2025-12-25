@@ -7,7 +7,7 @@ import { submitFeedback } from './send-feedback-action'
 import { usePathname } from 'next/navigation'
 import { ChevronDown, MessageSquare, HelpCircle } from 'react-feather'
 import Link from 'next/link'
-import { Note } from '../hashnode'
+import { Note } from '../utils'
 
 function SubmitButton() {
   const { pending } = useFormStatus()

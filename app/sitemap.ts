@@ -1,8 +1,10 @@
 import { getBlogPosts } from 'app/(public)/thoughts/utils'
 import { navItems } from './components/nav'
-import { getNotes } from './(public)/notes/hashnode'
+import { getNotes } from './(public)/notes/utils'
 
-export const prodUrl = 'https://mxstbr.com'
+export const prodUrl = process.env.NODE_ENV === 'development' 
+  ? 'http://localhost:3000' 
+  : 'https://your-website.vercel.app'
 export const dynamic = 'force-static'
 
 export default async function sitemap() {

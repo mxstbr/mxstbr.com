@@ -1,16 +1,13 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import avatar from '../../public/static/images/headshot.jpeg'
+import avatar from '../../public/static/images/placeholder-avatar.svg'
 
 export const navItems = {
+  '/thoughts': {
+    name: 'Essays',
+  },
   '/notes': {
     name: 'Notes',
-  },
-  '/oss': {
-    name: 'Open Source',
-  },
-  '/investing': {
-    name: 'Investments',
   },
 }
 
@@ -31,7 +28,7 @@ export function Navbar() {
           height={24}
           style={{ borderRadius: 100 }}
         />
-        <h1 className="font-bold">Max Stoiber</h1>
+        <h1 className="font-bold">Sonjeet Paul</h1>
       </Link>
       <div className="flex flex-row space-x-0">
         {Object.entries(navItems).map(([path, { name }]) => {

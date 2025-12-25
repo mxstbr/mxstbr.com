@@ -6,9 +6,9 @@ import remarkSmartypants from 'remark-smartypants'
 import remarkGfm from 'remark-gfm'
 import Prose from 'app/components/prose'
 import { prodUrl } from 'app/sitemap'
-import { formatDate } from 'app/(public)/thoughts/utils'
+import { formatDate } from '../utils'
 import { size } from 'app/og/utils'
-import { EMOJI_FOR_STATUS, getNote, getNotes, type Note } from '../hashnode'
+import { EMOJI_FOR_STATUS, getNote, getNotes, type Note } from '../utils'
 import { useMDXComponents } from 'mdx-components'
 import Link from 'next/link'
 import ArrowLeft from 'react-feather/dist/icons/arrow-left'
@@ -22,7 +22,9 @@ export const dynamic = 'force-static'
 export const revalidate = 60
 
 export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
-  return (await getNotes()).map((note) => ({ slug: note.frontmatter.slug }))
+  const notes = await getNotes()
+  console.log('Notes found:', notes.map(n => ({ slug: n.slug, title: n.metadata.title })))
+  return notes.map((note) => ({ slug: note.slug })).filter(param => param.slug)
 }
 
 export async function generateMetadata({
@@ -39,10 +41,10 @@ export async function generateMetadata({
     title,
     publishedAt: publishedTime,
     summary: description,
-  } = note.frontmatter
+  } = note.metadata
   let ogImage = generateOgImage(note)
 
-  return {
+  const ret = {
     title,
     description,
     openGraph: {
@@ -65,6 +67,31 @@ export async function generateMetadata({
       images: [ogImage],
     },
   }
+  console.log(ret)
+  return ret
+  // return {
+  //   title,
+  //   description,
+  //   openGraph: {
+  //     title,
+  //     description,
+  //     type: 'article',
+  //     publishedTime,
+  //     url: `${prodUrl}/notes/${slug}`,
+  //     images: [
+  //       {
+  //         url: ogImage,
+  //         ...size,
+  //       },
+  //     ],
+  //   },
+  //   twitter: {
+  //     card: 'summary_large_image',
+  //     title,
+  //     description,
+  //     images: [ogImage],
+  //   },
+  // }
 }
 
 const NOTE_CONTENT_ELEMENT_ID = 'note-content'
@@ -76,11 +103,11 @@ export default async function Page({
 }) {
   const { slug } = await params
   const notes = await getNotes()
-  const note = notes.find((note) => note.frontmatter.slug === slug)
+  const note = notes.find((note) => note.slug === slug)
 
   if (!note) return notFound()
 
-  const { content, frontmatter } = note
+  const { content, metadata } = note
 
   const { default: MDXContent } = await evaluate(
     content,
@@ -103,9 +130,9 @@ export default async function Page({
 
   const relatedNotes = notes.filter(
     (maybeRelatedNote) =>
-      maybeRelatedNote.frontmatter.slug !== note.frontmatter.slug &&
-      maybeRelatedNote.frontmatter.tags?.some((tag) =>
-        note.frontmatter.tags?.map((tag) => tag.slug).includes(tag.slug),
+      maybeRelatedNote.slug !== note.slug &&
+      maybeRelatedNote.metadata.tags?.some((tag) =>
+        note.metadata.tags?.map((tag) => tag.slug).includes(tag.slug),
       ),
   )
 
@@ -118,16 +145,16 @@ export default async function Page({
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'BlogPosting',
-            headline: frontmatter.title,
-            datePublished: frontmatter.publishedAt,
-            dateModified: frontmatter.updatedAt || frontmatter.publishedAt,
-            description: frontmatter.summary,
+            headline: metadata.title,
+            datePublished: metadata.publishedAt,
+            dateModified: metadata.updatedAt || metadata.publishedAt,
+            description: metadata.summary,
             image: generateOgImage(note),
             url: `${prodUrl}/notes/${slug}`,
             author: {
               '@type': 'Person',
               '@id': 'mxstbr',
-              name: 'Max Stoiber',
+              name: 'Sonjeeeeet',
             },
           }),
         }}
@@ -141,7 +168,7 @@ export default async function Page({
           <ArrowLeft size="1em" className="text-slate-500" /> All Notes
         </Link>
         <h1 className="title font-bold text-4xl leading-tight my-4 text-balance">
-          {frontmatter.title}
+          {metadata.title}
         </h1>
 
         {(headings.length > 1 ||
@@ -154,7 +181,7 @@ export default async function Page({
                 <p className="uppercase font-bold">Reading time</p>
                 <div>
                   <ReadingTime
-                    readTimeInMinutes={note.frontmatter.readTimeInMinutes}
+                    readTimeInMinutes={note.metadata.readTimeInMinutes}
                     domElementId={NOTE_CONTENT_ELEMENT_ID}
                   />
                 </div>
@@ -182,23 +209,23 @@ export default async function Page({
                   href={`/notes/digital-garden#denoting-the-maturity-of-my-explorations`}
                   className="block"
                 >
-                  {EMOJI_FOR_STATUS[frontmatter.status]}{' '}
+                  {EMOJI_FOR_STATUS[metadata.status]}{' '}
                   {/* Uppercase the status */}
-                  {frontmatter.status[0].toUpperCase() +
-                    frontmatter.status.substring(1)}
+                  {metadata.status[0].toUpperCase() +
+                    metadata.status.substring(1)}
                 </Link>
               </div>
               <div className=" shrink-0 space-y-1 px-6 border-2 border-y-0 dark:border-slate-700 border-l-0">
                 <p className="uppercase font-bold">Last updated</p>
                 <div>
-                  {formatDate(frontmatter.updatedAt || frontmatter.publishedAt)}
+                  {formatDate(metadata.updatedAt || metadata.publishedAt)}
                 </div>
               </div>
-              {frontmatter.tags?.length && frontmatter.tags?.length > 0 ? (
+              {metadata.tags?.length && metadata.tags?.length > 0 ? (
                 <div className="space-y-1 pl-6">
                   <p className="uppercase font-bold">Topics</p>
                   <div className="flex flex-row flex-wrap gap-x-2 gap-y-1">
-                    {frontmatter.tags?.map((tag) => (
+                    {metadata.tags?.map((tag) => (
                       <Link
                         key={tag.slug}
                         href={`/notes/topics/${tag.slug}`}
@@ -233,7 +260,7 @@ export default async function Page({
           <div className="relative">
             <h1 className="text-xl font-bold mt-0 mb-8">
               Other notes about{' '}
-              {note.frontmatter.tags
+              {note.metadata.tags
                 ?.map((tag) => (
                   <Link
                     href={`/notes/topics/${tag.slug}`}
@@ -251,17 +278,17 @@ export default async function Page({
             <ul className="space-y-8 sm:space-y-6 text-lg">
               {relatedNotes.map((note) => (
                 <li
-                  key={note.frontmatter.slug}
+                  key={note.slug}
                   className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-6"
                 >
                   <div className="text-2xl">
-                    {EMOJI_FOR_STATUS[note.frontmatter.status]}
+                    {EMOJI_FOR_STATUS[note.metadata.status]}
                   </div>
                   <div className="space-y-2">
-                    <Link href={`/notes/${note.frontmatter.slug}`}>
-                      {note.frontmatter.title}
+                    <Link href={`/notes/${note.slug}`}>
+                      {note.metadata.title}
                     </Link>
-                    <p className="text-slate-500">{note.frontmatter.summary}</p>
+                    <p className="text-slate-500">{note.metadata.summary}</p>
                   </div>
                 </li>
               ))}
@@ -270,7 +297,7 @@ export default async function Page({
         </div>
       )}
       {/* Admin-only: Edit button */}
-      <EditButton cuid={note.frontmatter.cuid} />
+      <EditButton cuid={note.metadata.cuid} />
       <FeedbackForm note={note} />
     </section>
   )
@@ -297,7 +324,7 @@ function TOCHeading(props: Heading) {
 }
 
 function generateOgImage(note: Note) {
-  return `${prodUrl}/og?name=${encodeURIComponent("Max Stoiber's Notes")}&title=${encodeURIComponent(note.frontmatter.title)}${note.frontmatter.tags && note.frontmatter.tags.length > 0 ? `&subtitle=${encodeURIComponent(`${note.frontmatter.tags?.map((tag) => `🏷️ ${tag.name}`).join(' ')}`)}` : ''}`
+  return `${prodUrl}/og?name=${encodeURIComponent("Sonjeet Paul's Notes")}&title=${encodeURIComponent(note.metadata.title)}${note.metadata.tags && note.metadata.tags.length > 0 ? `&subtitle=${encodeURIComponent(`${note.metadata.tags?.map((tag) => `🏷️ ${tag.name}`).join(' ')}`)}` : ''}`
 }
 
 type Heading = {

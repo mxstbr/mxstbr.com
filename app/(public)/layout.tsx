@@ -3,43 +3,41 @@ import type { Metadata } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import { Navbar } from '../components/nav'
 import { Analytics } from '@vercel/analytics/react'
-import Script from 'next/script'
 import Footer from '../components/footer'
 import { prodUrl } from '../sitemap'
 import { size } from '../og/utils'
-import { ReportView } from '../components/report-view'
 
 export const metadata: Metadata = {
   metadataBase: new URL(prodUrl),
   title: {
-    default: 'Max Stoiber (@mxstbr)',
-    template: '%s | Max Stoiber (@mxstbr)',
+    default: 'Your Name (@yourhandle)',
+    template: '%s | Your Name (@yourhandle)',
   },
   description:
-    'CEO & co-founder of Stellate, creator of styled-components and react-boilerplate and angel investor in early-stage startups.',
+    'Software developer, writer, and digital gardener sharing thoughts on technology and development.',
   openGraph: {
-    title: 'Max Stoiber (@mxstbr)',
+    title: 'Your Name (@yourhandle)',
     description:
-      'CEO & co-founder of Stellate, creator of styled-components and react-boilerplate and angel investor in early-stage startups.',
+      'Software developer, writer, and digital gardener sharing thoughts on technology and development.',
     url: prodUrl,
-    siteName: 'Max Stoiber (@mxstbr)',
+    siteName: 'Your Name (@yourhandle)',
     locale: 'en_US',
     type: 'website',
     images: [
       {
         url: '/og',
-        alt: 'Max Stoiber (@mxstbr)',
+        alt: 'Your Name (@yourhandle)',
         ...size,
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Max Stoiber (@mxstbr)',
+    title: 'Your Name (@yourhandle)',
     description:
-      'CEO & co-founder of Stellate, creator of styled-components and react-boilerplate and angel investor in early-stage startups.',
-    site: '@mxstbr',
-    creator: '@mxstbr',
+      'Software developer, writer, and digital gardener sharing thoughts on technology and development.',
+    site: '@yourhandle',
+    creator: '@yourhandle',
     images: ['/og'],
   },
   robots: {
@@ -76,9 +74,6 @@ export default function RootLayout({
           <Footer />
         </main>
         <Analytics />
-        <ReportView />
-        {/* Splitbee */}
-        <Script async data-api="/_sb" src="/sb.js"></Script>
         <script
           type="application/ld+json"
           suppressHydrationWarning
@@ -86,25 +81,18 @@ export default function RootLayout({
             __html: JSON.stringify({
               '@context': 'http://schema.org',
               '@type': 'Person',
-              id: 'mxstbr',
-              email: 'mailto:contact@mxstbr.com',
-              image: 'https://mxstbr.com/static/images/headshot.jpeg',
-              jobTitle: 'Senior Software Engineer',
-              familyName: 'Stoiber',
-              givenName: 'Max',
-              name: 'Max Stoiber',
-              birthPlace: 'Vienna, Austria',
-              birthDate: '1997-01-04',
-              height: '185 cm',
-              gender: 'male',
-              nationality: 'Austria',
-              url: 'https://mxstbr.com',
+              id: 'yourhandle',
+              email: 'mailto:your.email@example.com',
+              image: `${prodUrl}/static/images/placeholder-avatar.svg`,
+              jobTitle: 'Software Developer',
+              familyName: 'Your Last Name',
+              givenName: 'Your First Name',
+              name: 'Your Full Name',
+              url: prodUrl,
               sameAs: [
-                'https://mxstbr.blog',
-                'https://www.facebook.com/mxstbr',
-                'https://www.linkedin.com/in/max-stoiber-46698678',
-                'http://twitter.com/mxstbr',
-                'http://instagram.com/mxstbr',
+                'https://twitter.com/yourhandle',
+                'https://github.com/yourhandle',
+                'https://linkedin.com/in/yourhandle',
               ],
             }),
           }}

@@ -41,7 +41,7 @@ export default function Footer() {
             className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100 no-underline"
             rel="noopener noreferrer"
             target="_blank"
-            href="https://twitter.com/mxstbr"
+            href="https://twitter.com/yourhandle"
           >
             <Twitter size={16} />
             <p className="ml-2">Twitter</p>
@@ -52,7 +52,7 @@ export default function Footer() {
             className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100 no-underline"
             rel="noopener noreferrer"
             target="_blank"
-            href="https://github.com/mxstbr"
+            href="https://github.com/yourhandle"
           >
             <GitHub size={16} />
             <p className="ml-2">GitHub</p>
@@ -63,21 +63,10 @@ export default function Footer() {
             className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100 no-underline"
             rel="noopener noreferrer"
             target="_blank"
-            href="https://linkedin.com/in/mxstbr"
+            href="https://linkedin.com/in/yourhandle"
           >
             <LinkedIn size={16} />
             <p className="ml-2">LinkedIn</p>
-          </a>
-        </li>
-        <li>
-          <a
-            className="flex items-center transition-all hover:text-slate-800 dark:hover:text-slate-100 no-underline"
-            rel="noopener noreferrer"
-            target="_blank"
-            href="https://instagram.com/mxstbr"
-          >
-            <Instagram size={16} />
-            <p className="ml-2">Instagram</p>
           </a>
         </li>
       </ul>
