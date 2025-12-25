@@ -17,12 +17,29 @@ type Metadata = {
   }>
   previousSlugs: Array<string>
   views: number
+  readTimeInMinutes?: number
 }
 
 export type Note = {
   metadata: Metadata
   slug: string
   content: string
+}
+
+function calculateReadingTime(content: string): number {
+  // Remove MDX/HTML tags and get plain text
+  const plainText = content
+    .replace(/export\s+const\s+meta\s+=\s+\{[\s\S]*?\}/g, '') // Remove meta export
+    .replace(/<[^>]*>/g, '') // Remove HTML tags
+    .replace(/```[\s\S]*?```/g, '') // Remove code blocks
+    .replace(/`[^`]*`/g, '') // Remove inline code
+    .replace(/[#*_~`]/g, '') // Remove markdown formatting
+    .trim()
+
+  const wordsPerMinute = 200 // Average reading speed
+  const wordCount = plainText.split(/\s+/).filter(word => word.length > 0).length
+  
+  return Math.max(1, Math.ceil(wordCount / wordsPerMinute))
 }
 
 function parseFrontmatter(fileContent: string) {
@@ -33,6 +50,9 @@ function parseFrontmatter(fileContent: string) {
   const meta = eval('(' + match[1] + ')')
   let content = fileContent.replace(META, '').trim()
 
+  // Auto-calculate reading time if not provided
+  const readTimeInMinutes = meta.readTimeInMinutes || calculateReadingTime(content)
+
   return {
     metadata: {
       // Default values
@@ -41,6 +61,7 @@ function parseFrontmatter(fileContent: string) {
       previousSlugs: [],
       status: 'seedling',
       ...meta,
+      readTimeInMinutes, // Use calculated or provided value
     } as Metadata,
     content,
   }
