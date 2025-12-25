@@ -6,10 +6,10 @@ export function ReadingTime({
   readTimeInMinutes,
   domElementId,
 }: {
-  readTimeInMinutes: Note['metadata']['readTimeInMinutes']
+  readTimeInMinutes: number | undefined
   domElementId: string
 }) {
-  const [time, setTime] = useState(readTimeInMinutes)
+  const [time, setTime] = useState(readTimeInMinutes || 0)
 
   useEffect(() => {
     function getElementScrollScale(): number {
@@ -24,7 +24,7 @@ export function ReadingTime({
     function scrollListener() {
       const percentage = getElementScrollScale()
 
-      setTime(Math.ceil((readTimeInMinutes * (100 - percentage)) / 100))
+      setTime(Math.ceil(((readTimeInMinutes || 0) * (100 - percentage)) / 100))
     }
 
     window.addEventListener('scroll', scrollListener)

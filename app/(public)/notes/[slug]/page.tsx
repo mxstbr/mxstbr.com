@@ -296,8 +296,8 @@ export default async function Page({
           </div>
         </div>
       )}
-      {/* Admin-only: Edit button */}
-      <EditButton cuid={note.metadata.cuid} />
+      {/* Admin-only: Edit button - disabled for local MDX files */}
+      <EditButton cuid="" />
       <FeedbackForm note={note} />
     </section>
   )

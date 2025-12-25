@@ -36,20 +36,20 @@ export async function GET() {
   const notesXml = notes
     .sort(
       (a, b) =>
-        new Date(b.frontmatter.publishedAt).getTime() -
-        new Date(a.frontmatter.publishedAt).getTime(),
+        new Date(b.metadata.publishedAt).getTime() -
+        new Date(a.metadata.publishedAt).getTime(),
     )
     .map(
       (note) => `<item>
-      <title>${note.frontmatter.title}</title>
-      <link>${prodUrl}/notes/${note.frontmatter.slug}</link>
-      <guid>${prodUrl}/notes/${note.frontmatter.slug}</guid>
+      <title>${note.metadata.title}</title>
+      <link>${prodUrl}/notes/${note.slug}</link>
+      <guid>${prodUrl}/notes/${note.slug}</guid>
       <description>${
         // NOTE: We need to double escape, apparently: https://validator.w3.org/feed/docs/warning/NotHtml.html
-        escapeXml(escapeXml(note.frontmatter.summary || ''))
+        escapeXml(escapeXml(note.metadata.summary || ''))
       }</description>
-      <pubDate>${new Date(note.frontmatter.publishedAt).toUTCString()}</pubDate>
-      ${note.frontmatter.updatedAt ? `<lastBuildDate>${new Date(note.frontmatter.updatedAt).toUTCString()}</lastBuildDate>` : ''}
+      <pubDate>${new Date(note.metadata.publishedAt).toUTCString()}</pubDate>
+      ${note.metadata.updatedAt ? `<lastBuildDate>${new Date(note.metadata.updatedAt).toUTCString()}</lastBuildDate>` : ''}
     </item>`,
     )
     .join('\n')

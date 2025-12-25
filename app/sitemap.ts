@@ -16,8 +16,8 @@ export default async function sitemap() {
   const notes = await getNotes()
 
   let notesPages = notes.map((note) => ({
-    url: `${prodUrl}/notes/${note.frontmatter.slug}`,
-    lastModified: note.frontmatter.updatedAt || note.frontmatter.publishedAt,
+    url: `${prodUrl}/notes/${note.slug}`,
+    lastModified: note.metadata.updatedAt || note.metadata.publishedAt,
   }))
 
   let routes = ['', ...Object.keys(navItems)].map((route) => ({

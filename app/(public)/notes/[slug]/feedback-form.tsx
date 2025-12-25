@@ -38,7 +38,7 @@ export default function FeedbackForm({ note }: { note: Note }) {
   }, [])
 
   async function clientAction(formData: FormData) {
-    const result = await submitFeedback(formData, note)
+    const result = await submitFeedback(formData)
     if (result.success) {
       toast.success('Feedback Submitted')
       setThoughts('')
