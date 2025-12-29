@@ -92,7 +92,7 @@ function DayRow(props: { day: ISODateDayString; events: Array<Event> }) {
 
   return (
     <div
-      className={`flex min-h-[28px] items-start gap-2 border-b border-slate-300 px-2 py-1 text-[11px] text-slate-700 ${
+      className={`flex min-h-[30px] items-stretch gap-2 border-b border-slate-300 px-2 py-1 text-[11px] text-slate-700 ${
         isWeekend ? 'bg-slate-100' : 'bg-white'
       } ${isPast(day) && !isToday(day) ? 'opacity-30' : ''}`}
     >
@@ -102,7 +102,11 @@ function DayRow(props: { day: ISODateDayString; events: Array<Event> }) {
       </div>
       <div className="flex flex-1 flex-col gap-1">
         {dayEvents.map((event) => (
-          <EventBlock key={`${createEventId(event)}-${day}`} day={day} event={event} />
+          <EventBlock
+            key={`${createEventId(event)}-${day}`}
+            day={day}
+            event={event}
+          />
         ))}
       </div>
     </div>
@@ -127,14 +131,14 @@ function EventBlock(props: { day: ISODateDayString; event: Event }) {
 
   return (
     <div
-      className="rounded-sm border px-1 py-0.5 text-[10px] font-semibold leading-tight text-slate-800"
+      className="flex min-h-[22px] w-full items-center rounded-[2px] border px-1 py-0.5 text-[10px] font-semibold leading-tight text-slate-900 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.5)]"
       style={{
         borderColor: event.color,
         background: backgroundPattern,
         backgroundColor,
       }}
     >
-      {event.label}
+      <span className="truncate">{event.label}</span>
     </div>
   )
 }
