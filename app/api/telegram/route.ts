@@ -5,7 +5,7 @@ import { bot } from 'app/lib/telegram'
 import { getClippy } from 'app/lib/clippy-agent'
 import { dedent } from 'app/lib/dedent'
 
-export const maxDuration = 60
+export const maxDuration = 800
 
 export async function POST(request: NextRequest) {
   if (
@@ -56,9 +56,7 @@ export async function POST(request: NextRequest) {
             chatId,
             thinkingMessage.message_id,
             undefined,
-            draftText.trim()
-              ? `${draftText.trim()}\nThinking…`
-              : 'Thinking…',
+            draftText.trim() ? `${draftText.trim()}\nThinking…` : 'Thinking…',
           )
           lastDraftUpdate = now
         }
@@ -86,7 +84,10 @@ export async function POST(request: NextRequest) {
           .catch(() => {})
       } else {
         await bot.telegram
-          .sendMessage(chatId, 'Sorry, something went wrong while generating a response.')
+          .sendMessage(
+            chatId,
+            'Sorry, something went wrong while generating a response.',
+          )
           .catch(() => {})
       }
       // Still return 200 to acknowledge receipt, but log the error
