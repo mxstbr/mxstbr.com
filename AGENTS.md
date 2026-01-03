@@ -35,6 +35,7 @@ Run commands from the repo root. Prefer `pnpm dev` for iterative changes; use `p
 - Follow the existing concise, imperative commit style (`Add feature`, `Fix bug`); keep scope small.
 - PRs should describe intent, major UX changes, and risks; link issues when applicable and add screenshots for visual tweaks.
 - Ensure builds pass locally and note any manual verification steps performed.
+- Husky runs Prettier on pre-commit; keep changes formatted or run `pnpm format` before committing.
 
 ## Security & Configuration Tips
 
