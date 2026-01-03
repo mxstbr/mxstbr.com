@@ -156,6 +156,27 @@ function ensureKids(kids: Kid[] | undefined): Kid[] {
 function ensureChores(chores: Chore[] | undefined, kids: Kid[]): Chore[] {
   if (!Array.isArray(chores)) return createDefaultChores(kids)
   return chores.map((chore) => {
+    const id = typeof chore.id === 'string' && chore.id ? chore.id : crypto.randomUUID()
+    const title =
+      typeof chore.title === 'string' && chore.title.trim()
+        ? chore.title.trim()
+        : 'Untitled chore'
+    const emoji =
+      typeof chore.emoji === 'string' && chore.emoji.trim()
+        ? chore.emoji.trim()
+        : '✨'
+    const stars =
+      typeof chore.stars === 'number' && Number.isFinite(chore.stars)
+        ? Math.max(0, Math.round(chore.stars))
+        : 1
+    const type: ChoreType =
+      chore.type === 'one-off' || chore.type === 'repeated' || chore.type === 'perpetual'
+        ? chore.type
+        : 'one-off'
+    const createdAt =
+      typeof chore.createdAt === 'string' && chore.createdAt
+        ? chore.createdAt
+        : new Date().toISOString()
     const kidIds =
       (chore as any).kidIds && Array.isArray((chore as any).kidIds)
         ? (chore as any).kidIds.filter(Boolean)
@@ -163,8 +184,8 @@ function ensureChores(chores: Chore[] | undefined, kids: Kid[]): Chore[] {
           ? [(chore as any).kidId]
           : [kids[0]?.id ?? 'kid-1']
     const fallbackDay =
-      typeof chore.createdAt === 'string' && chore.createdAt.length >= 10
-        ? chore.createdAt.slice(0, 10)
+      createdAt.length >= 10
+        ? createdAt.slice(0, 10)
         : undefined
 
     const snoozedForKidsEntries = (chore as any).snoozedForKids
@@ -180,6 +201,12 @@ function ensureChores(chores: Chore[] | undefined, kids: Kid[]): Chore[] {
 
     return {
       ...chore,
+      id,
+      title,
+      emoji,
+      stars,
+      type,
+      createdAt,
       kidIds: kidIds.length ? kidIds : [kids[0]?.id ?? 'kid-1'],
       timeOfDay: chore.timeOfDay ?? undefined,
       requiresApproval: chore.requiresApproval ?? false,
