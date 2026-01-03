@@ -7,7 +7,9 @@
     "start": "next start",
     "create-reminder-schedule": "tsm create-reminder-schedule.ts",
     "set-telegram-webhook": "tsm set-telegram-webhook.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "format": "prettier --write .",
+    "prepare": "husky"
   },
   "dependencies": {
     "@ai-sdk/mcp": "1.0.0-beta.43",
@@ -68,6 +70,7 @@
     "@playwright/test": "^1.47.2",
     "@tailwindcss/postcss": "^4.1.17",
     "baseline-browser-mapping": "^2.9.5",
+    "husky": "^9.1.7",
     "postcss": "^8.4.41",
     "tailwindcss": "^4.1.17"
   }
