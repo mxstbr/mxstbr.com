@@ -42,6 +42,9 @@ export default function Chat() {
       <div className="flex-1 overflow-y-auto flex flex-col-reverse space-y-2 space-y-reverse p-3">
         {[...messages].reverse().map((message, index) => {
           const isUser = message.role === 'user'
+          const hasThinkingPart = message.parts.some(
+            (part) => part.type === 'reasoning',
+          )
           return (
             <div
               key={message.id}
@@ -61,6 +64,25 @@ export default function Chat() {
                   switch (part.type) {
                     case 'text':
                       return <div key={`${message.id}-${i}`}>{part.text}</div>
+                    case 'reasoning': {
+                      const thinkingContent =
+                        'text' in part
+                          ? part.text
+                          : JSON.stringify(part, null, 2)
+                      return (
+                        <details
+                          key={`${message.id}-${i}`}
+                          className="my-2 text-xs text-slate-600 dark:text-slate-300"
+                        >
+                          <summary className="cursor-pointer font-medium">
+                            Thinking
+                          </summary>
+                          <pre className="mt-2 whitespace-pre-wrap">
+                            {thinkingContent}
+                          </pre>
+                        </details>
+                      )
+                    }
                     default:
                       // Handle dynamic tool calls (they start with 'tool-')
                       if (isToolUIPart(part)) {
@@ -89,19 +111,17 @@ export default function Chat() {
                     ⚠️ Error: {error.message || 'An error occurred'}
                   </div>
                 )}
-                {index === 0 && !isUser && status === 'streaming' && (
-                  <div className="flex space-x-1 mt-2">
-                    <div className="w-2 h-2 bg-slate-600 rounded-full animate-bounce"></div>
-                    <div
-                      className="w-2 h-2 bg-slate-600 rounded-full animate-bounce"
-                      style={{ animationDelay: '0.1s' }}
-                    ></div>
-                    <div
-                      className="w-2 h-2 bg-slate-600 rounded-full animate-bounce"
-                      style={{ animationDelay: '0.2s' }}
-                    ></div>
-                  </div>
-                )}
+                {index === 0 &&
+                  !isUser &&
+                  status === 'streaming' &&
+                  !hasThinkingPart && (
+                    <details className="my-2 text-xs text-slate-600 dark:text-slate-300">
+                      <summary className="cursor-pointer font-medium">
+                        Thinking
+                      </summary>
+                      <div className="mt-2">Waiting for thinking stream…</div>
+                    </details>
+                  )}
               </div>
             </div>
           )
