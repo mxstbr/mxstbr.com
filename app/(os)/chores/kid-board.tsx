@@ -28,6 +28,7 @@ import {
   starsForKid,
   withAlpha,
 } from './utils'
+import { useRandomAudioCue } from './use-audio-cue'
 
 type FreshChore = Chore & { isNew?: boolean }
 
@@ -1045,6 +1046,8 @@ function ChoreButton({
   const ttsUrlRef = useRef<string | null>(null)
   const prefetchedTitleRef = useRef<string | null>(null)
   const ttsPrefetchingRef = useRef(false)
+  const { play: playCompleteSound, prefetch: prefetchCompleteSound } =
+    useRandomAudioCue({ type: 'choreComplete' })
   const { reward, isAnimating } = useReward(
     REWARD_TARGET_ID,
     chore.emoji ? 'emoji' : 'confetti',
@@ -1059,6 +1062,10 @@ function ChoreButton({
       elementCount: 120,
     },
   )
+  const triggerCelebration = useCallback(() => {
+    playCompleteSound()
+    reward()
+  }, [playCompleteSound, reward])
   const accentSoft = withAlpha(accent, 0.12)
   const isNew = chore.isNew
   const cardToneClasses = isNew
@@ -1190,7 +1197,7 @@ function ChoreButton({
                     startTransition(() => {
                       if (completionDisabled || isAnimating) return
                       setDetailsOpen(false)
-                      void onComplete(chore, kidId, accent, reward)
+                      void onComplete(chore, kidId, accent, triggerCelebration)
                     })
                   }
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-xs transition active:bg-slate-800 disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:active:bg-slate-200"
@@ -1291,10 +1298,11 @@ function ChoreButton({
     >
       <button
         type="button"
-        onClick={() => {
-          setDetailsOpen(true)
-          void fetchTtsUrl()
-        }}
+          onClick={() => {
+            setDetailsOpen(true)
+            prefetchCompleteSound()
+            void fetchTtsUrl()
+          }}
         className="group flex w-full flex-col text-left text-slate-900 transition active:bg-[var(--accent-soft)] focus-visible:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:text-slate-50 dark:active:bg-[var(--accent-soft)] dark:focus-visible:bg-[var(--accent-soft)]"
         aria-label={
           approvalRequested
