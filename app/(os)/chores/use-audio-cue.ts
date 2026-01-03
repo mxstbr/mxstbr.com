@@ -47,9 +47,6 @@ export function useRandomAudioCue(options: RandomAudioCueOptions): AudioCue {
 
     return () => {
       cancelled = true
-      Object.values(cacheRef.current).forEach((audio) => {
-        audio.pause()
-      })
       cacheRef.current = {}
     }
   }, [endpoint, hasWindow])
