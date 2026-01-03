@@ -7,6 +7,7 @@ import { useReward } from 'react-rewards'
 import type { Completion, Kid, Reward, RewardRedemption } from './data'
 import { redeemReward } from './actions'
 import { msUntilNextPacificMidnight, rewardAvailableForKid, starsForKid, withAlpha } from './utils'
+import { useRandomAudioCue } from './use-audio-cue'
 
 type Column = {
   kid: Kid
@@ -53,6 +54,8 @@ export function RewardBoard({ columns, completions, redemptions }: RewardBoardPr
       elementCount: 120,
     },
   )
+  const { play: playRedeemSound, prefetch: prefetchRedeemSound } =
+    useRandomAudioCue({ type: 'rewardRedeem' })
 
   useEffect(() => {
     setTotals(initialTotals)
@@ -82,6 +85,7 @@ export function RewardBoard({ columns, completions, redemptions }: RewardBoardPr
         ...prev,
         [kidId]: (prev[kidId] ?? 0) - reward.cost,
       }))
+      playRedeemSound()
       fireReward()
     }
 
@@ -105,6 +109,7 @@ export function RewardBoard({ columns, completions, redemptions }: RewardBoardPr
             onRedeem={handleRedeem}
             redemptions={redemptions}
             onOpen={(reward, kidId, accent) => {
+              prefetchRedeemSound()
               setSelected({ reward, kidId, accent })
             }}
           />
