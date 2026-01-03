@@ -650,6 +650,7 @@ function KidColumn({
   })
   const [collapsedDone, setCollapsedDone] = useState(true)
   const manualExpansions = useRef<Set<TimeGroupKey>>(new Set())
+  const doneExpansion = useRef(false)
   const recollapseTimer = useRef<number | undefined>(undefined)
   const choresByTime: Record<TimeGroupKey, Chore[]> = {
     morning: [],
@@ -663,11 +664,13 @@ function KidColumn({
       window.clearTimeout(recollapseTimer.current)
     }
 
-    const needsRecollapse = Array.from(manualExpansions.current).some(
-      (key) =>
-        !shouldPersistExpansion(key) &&
-        shouldAutoCollapse(mode, pacificMinutes, key),
-    )
+    const needsRecollapse =
+      Array.from(manualExpansions.current).some(
+        (key) =>
+          !shouldPersistExpansion(key) &&
+          shouldAutoCollapse(mode, pacificMinutes, key),
+      ) ||
+      (doneExpansion.current && !collapsedDone)
     if (!needsRecollapse) return
 
     recollapseTimer.current = window.setTimeout(() => {
@@ -688,8 +691,13 @@ function KidColumn({
         manualExpansions.current = remainingExpansions
         return changed ? next : prev
       })
+      setCollapsedDone((prev) => {
+        if (!doneExpansion.current || prev) return prev
+        doneExpansion.current = false
+        return true
+      })
     }, RECOLLAPSE_IDLE_MS)
-  }, [mode, pacificMinutes])
+  }, [collapsedDone, mode, pacificMinutes])
 
   useEffect(() => {
     setCollapsedGroups((prev) => {
@@ -890,7 +898,13 @@ function KidColumn({
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
             <button
               type="button"
-              onClick={() => setCollapsedDone((prev) => !prev)}
+              onClick={() =>
+                setCollapsedDone((prev) => {
+                  const next = !prev
+                  doneExpansion.current = !next
+                  return next
+                })
+              }
               className="inline-flex items-center gap-2 transition hover:text-slate-900 dark:hover:text-slate-100"
               aria-expanded={!collapsedDone}
             >
