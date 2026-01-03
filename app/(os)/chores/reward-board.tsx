@@ -1,7 +1,9 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState, useTransition, type CSSProperties } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
+import { useReward } from 'react-rewards'
 import type { Completion, Kid, Reward, RewardRedemption } from './data'
 import { redeemReward } from './actions'
 import { msUntilNextPacificMidnight, rewardAvailableForKid, starsForKid, withAlpha } from './utils'
@@ -17,6 +19,8 @@ type RewardBoardProps = {
   redemptions: RewardRedemption[]
 }
 
+const REWARD_TARGET_ID = 'chores-reward-target'
+
 export function RewardBoard({ columns, completions, redemptions }: RewardBoardProps) {
   const router = useRouter()
   const initialTotals = useMemo(() => {
@@ -28,6 +32,27 @@ export function RewardBoard({ columns, completions, redemptions }: RewardBoardPr
   }, [columns, completions])
 
   const [totals, setTotals] = useState(initialTotals)
+  const [selected, setSelected] = useState<{
+    reward: Reward
+    kidId: string
+    accent: string
+  } | null>(null)
+
+  const selectedEmoji = selected?.reward.emoji
+  const { reward: fireReward } = useReward(
+    REWARD_TARGET_ID,
+    selectedEmoji ? 'emoji' : 'confetti',
+    {
+      emoji: selectedEmoji ? [selectedEmoji, '🎉'] : undefined,
+      fps: 60,
+      lifetime: 420,
+      angle: 90,
+      decay: 0.92,
+      spread: 170,
+      startVelocity: 60,
+      elementCount: 120,
+    },
+  )
 
   useEffect(() => {
     setTotals(initialTotals)
@@ -57,7 +82,7 @@ export function RewardBoard({ columns, completions, redemptions }: RewardBoardPr
         ...prev,
         [kidId]: (prev[kidId] ?? 0) - reward.cost,
       }))
-      fireConfetti(accent)
+      fireReward()
     }
 
     router.refresh()
@@ -65,6 +90,11 @@ export function RewardBoard({ columns, completions, redemptions }: RewardBoardPr
 
   return (
     <div className="full-bleed md:h-full md:min-h-0">
+      <span
+        id={REWARD_TARGET_ID}
+        className="pointer-events-none fixed bottom-4 left-1/2 z-40 -translate-x-1/2 text-2xl md:bottom-6"
+        aria-hidden="true"
+      />
       <div className="grid grid-cols-1 gap-4 sm:gap-6 md:h-full md:min-h-0 md:grid-cols-3 md:px-4">
         {columns.map((column) => (
           <RewardColumn
@@ -74,9 +104,28 @@ export function RewardBoard({ columns, completions, redemptions }: RewardBoardPr
             starTotal={totals[column.kid.id] ?? 0}
             onRedeem={handleRedeem}
             redemptions={redemptions}
+            onOpen={(reward, kidId, accent) => {
+              setSelected({ reward, kidId, accent })
+            }}
           />
         ))}
       </div>
+      {selected && typeof document !== 'undefined'
+        ? createPortal(
+            <RewardRedeemModal
+              reward={selected.reward}
+              kidId={selected.kidId}
+              accent={selected.accent}
+              starTotal={totals[selected.kidId] ?? 0}
+              redemptions={redemptions}
+              onClose={() => setSelected(null)}
+              onRedeem={async () => {
+                await handleRedeem(selected.reward, selected.kidId, selected.accent)
+              }}
+            />,
+            document.body,
+          )
+        : null}
     </div>
   )
 }
@@ -87,12 +136,14 @@ function RewardColumn({
   starTotal,
   onRedeem,
   redemptions,
+  onOpen,
 }: {
   kid: Kid
   rewards: Reward[]
   starTotal: number
   onRedeem: (reward: Reward, kidId: string, accent: string) => Promise<void>
   redemptions: RewardRedemption[]
+  onOpen: (reward: Reward, kidId: string, accent: string) => void
 }) {
   const accent = kid.color ?? '#0ea5e9'
   const accentSoft = withAlpha(accent, 0.12)
@@ -137,6 +188,7 @@ function RewardColumn({
               onRedeem={onRedeem}
               starTotal={starTotal}
               redemptions={redemptions}
+              onOpen={onOpen}
             />
           ))
         )}
@@ -152,6 +204,7 @@ function RewardButton({
   onRedeem,
   starTotal,
   redemptions,
+  onOpen,
 }: {
   reward: Reward
   kidId: string
@@ -159,6 +212,7 @@ function RewardButton({
   onRedeem: (reward: Reward, kidId: string, accent: string) => Promise<void>
   starTotal: number
   redemptions: RewardRedemption[]
+  onOpen: (reward: Reward, kidId: string, accent: string) => void
 }) {
   const [isPending, startTransition] = useTransition()
   const available = rewardAvailableForKid(reward, kidId, redemptions)
@@ -180,17 +234,15 @@ function RewardButton({
       type="button"
       onClick={() =>
         startTransition(() => {
-          if (available && enough) {
-            void onRedeem(reward, kidId, accent)
-          }
+          onOpen(reward, kidId, accent)
         })
       }
       className={`group flex w-full items-center gap-4 rounded-xl border-2 border-slate-200 bg-white px-4 py-4 text-left text-slate-900 shadow-sm transition dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 ${
-        available && enough
+        available
           ? 'focus-within:-translate-y-0.5 active:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:border-[var(--accent)] dark:focus-visible:outline-[var(--accent)]'
           : 'opacity-70'
       }`}
-      disabled={isPending || !available || !enough}
+      disabled={isPending || !available}
       style={accentVars}
     >
       <span className="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-slate-300 bg-slate-50 text-lg font-semibold text-slate-700 transition group-hover:-translate-y-0.5 group-hover:border-[var(--accent)] group-hover:bg-[var(--accent-soft)] group-hover:text-[var(--accent)] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:group-hover:border-[var(--accent)] dark:group-hover:bg-[var(--accent-soft)]">
@@ -200,7 +252,7 @@ function RewardButton({
         <div className="min-w-0">
           <div className="text-base font-semibold leading-tight">{reward.title}</div>
           <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">
-            Cost {reward.cost} ⭐️ • {reward.type === 'perpetual' ? 'Perpetual' : 'One-off'}
+            Cost {reward.cost} ⭐️
           </div>
         </div>
       </div>
@@ -217,56 +269,88 @@ function RewardButton({
   )
 }
 
-function fireConfetti(accent: string) {
-  ensureConfettiStyles()
-  const container = document.createElement('div')
-  container.className = 'chores-confetti'
-  container.style.position = 'fixed'
-  container.style.inset = '0'
-  container.style.pointerEvents = 'none'
-  container.style.zIndex = '50'
-  document.body.appendChild(container)
+function RewardRedeemModal({
+  reward,
+  kidId,
+  accent,
+  starTotal,
+  redemptions,
+  onClose,
+  onRedeem,
+}: {
+  reward: Reward
+  kidId: string
+  accent: string
+  starTotal: number
+  redemptions: RewardRedemption[]
+  onClose: () => void
+  onRedeem: () => Promise<void>
+}) {
+  const [isPending, startTransition] = useTransition()
+  const available = rewardAvailableForKid(reward, kidId, redemptions)
+  const enough = starTotal >= reward.cost
+  const accentSoft = withAlpha(accent, 0.12)
+  const accentVars = {
+    '--accent': accent,
+    '--accent-soft': accentSoft,
+  } as CSSProperties
 
-  const colors = [accent, '#f97316', '#22c55e', '#06b6d4', '#f472b6']
-  const pieces = 60
+  return (
+    <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
+      <div
+        className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl dark:bg-slate-900"
+        onClick={(event) => event.stopPropagation()}
+        style={accentVars}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 items-start gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-2 border-slate-200 bg-slate-50 text-2xl dark:border-slate-700 dark:bg-slate-800">
+              {reward.emoji}
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-base font-semibold leading-tight text-slate-900 dark:text-slate-50">
+                {reward.title}
+              </h2>
+              <div className="mt-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
+                Cost {reward.cost} ⭐️ • You have <span className="tabular-nums">{starTotal}</span> ⭐️
+              </div>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md p-1 text-slate-500 transition active:bg-slate-100 active:text-slate-700 dark:active:bg-slate-800"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
 
-  for (let i = 0; i < pieces; i++) {
-    const piece = document.createElement('span')
-    const size = 5 + Math.random() * 6
-    piece.style.position = 'absolute'
-    piece.style.width = `${size}px`
-    piece.style.height = `${size * 0.6}px`
-    piece.style.backgroundColor = colors[i % colors.length]
-    piece.style.left = `${Math.random() * 100}%`
-    piece.style.top = `-10%`
-    piece.style.opacity = '0.9'
-    piece.style.borderRadius = '2px'
-    const fall = 900 + Math.random() * 700
-    const drift = Math.random() * 40 - 20
-    const delay = Math.random() * 150
-    const rotation = 540 + Math.random() * 540
-    piece.style.animation = `chores-confetti-fall ${fall}ms ease-out ${delay}ms forwards`
-    piece.style.setProperty('--drift', `${drift}px`)
-    piece.style.setProperty('--rotation', `${rotation}deg`)
-    container.appendChild(piece)
-  }
-
-  setTimeout(() => {
-    container.remove()
-  }, 1800)
-}
-
-function ensureConfettiStyles() {
-  const id = 'chores-confetti-styles'
-  if (document.getElementById(id)) return
-
-  const style = document.createElement('style')
-  style.id = id
-  style.textContent = `
-    @keyframes chores-confetti-fall {
-      0% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0.9; }
-      100% { transform: translate3d(var(--drift, 0px), 110vh, 0) rotate(var(--rotation, 720deg)); opacity: 0; }
-    }
-  `
-  document.head.appendChild(style)
+        <div className="mt-4 space-y-2">
+          <button
+            type="button"
+            onClick={() =>
+              startTransition(() => {
+                if (!available || !enough) return
+                void onRedeem().finally(() => onClose())
+              })
+            }
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-xs transition active:bg-slate-800 disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:active:bg-slate-200"
+            disabled={isPending || !available || !enough}
+          >
+            Redeem reward
+          </button>
+          {!available ? (
+            <div className="text-center text-xs font-semibold text-slate-500 dark:text-slate-300">
+              This reward has already been taken.
+            </div>
+          ) : !enough ? (
+            <div className="text-center text-xs font-semibold text-slate-500 dark:text-slate-300">
+              You need {reward.cost - starTotal} more ⭐️ to redeem this.
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  )
 }

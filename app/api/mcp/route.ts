@@ -3,7 +3,7 @@ import { createMcpHandler } from 'mcp-handler'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod/v4'
 
-export const maxDuration = 60
+export const maxDuration = 800
 
 const handler = createMcpHandler(
   (server) => {

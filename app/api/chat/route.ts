@@ -3,7 +3,7 @@ import { isMax } from 'app/auth'
 import { convertToModelMessages } from 'ai'
 
 // Allow streaming responses up to 30 seconds
-export const maxDuration = 30
+export const maxDuration = 800
 
 export async function POST(req: Request) {
   if (!(await isMax())) throw new Error('Unauthorized')

@@ -9,7 +9,12 @@ import {
   saveChoreState,
   type RewardType,
 } from './data'
-import { formatPacificDate, pacificDateFromTimestamp, shiftIsoDay, starsForKid } from './utils'
+import {
+  formatPacificDate,
+  pacificDateFromTimestamp,
+  shiftIsoDay,
+  starsForKid,
+} from './utils'
 import { BEDTIME_TEMPLATES, type BedtimeTemplateKey } from './bedtime-approval/constants'
 import type { BedtimeCreationResult, BedtimeCreationSummary } from './bedtime-approval/types'
 import { getBaseUrl } from 'app/lib/base-url'
@@ -488,17 +493,34 @@ export async function skipChore(formData: FormData): Promise<void> {
   const kidId = formData.get('kidId')?.toString()
   if (!choreId || !kidId) return
 
-  const nextDay = shiftIsoDay(todayIsoDate(), 1)
+  const today = todayIsoDate()
+  const nextDay = shiftIsoDay(today, 1)
+  let telegramMessage: string | null = null
 
   await withUpdatedState((state) => {
     const chore = state.chores.find((c) => c.id === choreId)
-    if (!chore || !chore.kidIds.includes(kidId)) return
+    const kid = state.kids.find((k) => k.id === kidId)
+    if (!chore || !kid || !chore.kidIds.includes(kidId)) return
+
+    const alreadySnoozedForDay = chore.snoozedForKids?.[kidId] === nextDay
+    if (alreadySnoozedForDay) return
 
     chore.snoozedForKids = {
       ...chore.snoozedForKids,
       [kidId]: nextDay,
     }
+
+    if (process.env.TELEGRAM_BOT_TOKEN) {
+      const dayLabel = nextDay === today ? 'today' : `tomorrow (${nextDay})`
+      telegramMessage = `${kid.name} skipped "${chore.title}" (snoozed to ${dayLabel})`
+    }
   })
+
+  if (telegramMessage) {
+    bot.telegram
+      .sendMessage('-4904434425', telegramMessage)
+      .catch((err) => console.error('Failed to send Telegram skip message', err))
+  }
 }
 
 export async function setChoreSchedule(formData: FormData): Promise<void> {
