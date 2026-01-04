@@ -3,10 +3,11 @@ import type { Chore, Completion, Reward, RewardRedemption } from './data'
 export const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 export const DAY_ABBRS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 export const PACIFIC_TIMEZONE = 'America/Los_Angeles'
-const TIME_ORDER: Record<'morning' | 'afternoon' | 'evening', number> = {
+const TIME_ORDER: Record<'morning' | 'afternoon' | 'evening' | 'night', number> = {
   morning: 0,
   afternoon: 1,
   evening: 2,
+  night: 3,
 }
 
 const pacificDateFormatter = new Intl.DateTimeFormat('en-CA', {
@@ -355,7 +356,7 @@ function nextScheduledAfter(dayIso: string, daysOfWeek: number[]): string | null
 
 export function sortByTimeOfDay<
   T extends {
-    timeOfDay?: 'morning' | 'afternoon' | 'evening'
+    timeOfDay?: 'morning' | 'afternoon' | 'evening' | 'night'
     createdAt?: string
     type?: 'one-off' | 'repeated' | 'perpetual'
   },

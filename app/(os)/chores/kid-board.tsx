@@ -66,7 +66,7 @@ type ApprovalRequest = {
 
 type ApprovalRequestLookup = Record<string, Record<string, boolean>>
 
-type TimeGroupKey = 'morning' | 'afternoon' | 'evening' | 'any'
+type TimeGroupKey = 'morning' | 'afternoon' | 'evening' | 'night' | 'any'
 
 const REWARD_TARGET_ID = 'chores-reward-target'
 const RECOLLAPSE_IDLE_MS = 45_000
@@ -79,12 +79,14 @@ const approvalRequestKey = (kidId: string, choreId: string) =>
 /**
  * Time-based auto-collapse behavior for chore groups:
  *
- * - Before 12:00 PM: Morning group is open; Afternoon, Evening, and Any time are collapsed
- * - 12:00 PM - 5:00 PM: Afternoon group is open; Morning, Evening, and Any time are collapsed
- * - After 5:00 PM: Evening group is open; Morning, Afternoon, and Any time are collapsed
+ * - Before 12:00 PM: Morning group is open; Afternoon, Evening, Night, and Any time are collapsed
+ * - 12:00 PM - 5:00 PM: Afternoon group is open; Morning, Evening, Night, and Any time are collapsed
+ * - 5:00 PM - 7:00 PM: Evening group is open; Morning, Afternoon, Night, and Any time are collapsed
+ * - 7:00 PM - 10:00 PM: Night group is open; Morning and Afternoon are collapsed
+ * - After 10:00 PM: Morning, Afternoon, Evening, and Night are collapsed
  *
  * The "Any time" group is always collapsed by default but can be manually expanded.
- * Groups automatically expand/collapse when crossing time thresholds (12pm and 5pm).
+ * Groups automatically expand/collapse when crossing time thresholds (12pm, 5pm, 7pm, 10pm).
  * Manually expanded groups stay open while the user interacts, but non-persistent groups
  * will auto-recollapse after 45 seconds of inactivity. Persistent groups (like evening)
  * will remain expanded even after idle time.
@@ -96,10 +98,20 @@ function shouldAutoCollapse(
 ): boolean {
   if (mode !== 'today') return false
   if (key === 'any') return true
-  const currentGroup: TimeGroupKey =
-    minutes < 12 * 60 ? 'morning' : minutes < 17 * 60 ? 'afternoon' : 'evening'
+  if (minutes < 12 * 60) {
+    return key !== 'morning'
+  }
+  if (minutes < 17 * 60) {
+    return key !== 'afternoon'
+  }
+  if (minutes < 19 * 60) {
+    return key !== 'evening'
+  }
+  if (minutes < 22 * 60) {
+    return key !== 'evening' && key !== 'night'
+  }
 
-  return key !== currentGroup
+  return true
 }
 
 const shouldPersistExpansion = (key: TimeGroupKey) =>
@@ -631,6 +643,7 @@ function KidColumn({
       { key: 'morning', label: 'Morning', emoji: '🌅' },
       { key: 'afternoon', label: 'Afternoon', emoji: '☀️' },
       { key: 'evening', label: 'Evening', emoji: '🌙' },
+      { key: 'night', label: 'Night', emoji: '🌌' },
       { key: 'any', label: 'Any time' },
     ],
     [],
@@ -642,6 +655,7 @@ function KidColumn({
       morning: false,
       afternoon: false,
       evening: false,
+      night: false,
       any: false,
     }
     for (const group of timeGroups) {
@@ -657,6 +671,7 @@ function KidColumn({
     morning: [],
     afternoon: [],
     evening: [],
+    night: [],
     any: [],
   }
 
@@ -789,6 +804,8 @@ function KidColumn({
       choresByTime.afternoon.push(chore)
     } else if (chore.timeOfDay === 'evening') {
       choresByTime.evening.push(chore)
+    } else if (chore.timeOfDay === 'night') {
+      choresByTime.night.push(chore)
     } else {
       choresByTime.any.push(chore)
     }

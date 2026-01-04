@@ -29,7 +29,7 @@ export type Chore = {
   snoozedForKids?: Record<string, string | null>
   createdAt: string
   completedAt?: string | null
-  timeOfDay?: 'morning' | 'afternoon' | 'evening'
+  timeOfDay?: 'morning' | 'afternoon' | 'evening' | 'night'
 }
 
 export type Completion = {
