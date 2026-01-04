@@ -72,7 +72,7 @@ type AdminSearchParams = {
   pwd?: string
   kid?: string
   type?: ChoreType
-  timeOfDay?: 'morning' | 'afternoon' | 'evening' | ''
+  timeOfDay?: 'morning' | 'afternoon' | 'evening' | 'night' | ''
   approval?: 'pin' | 'none'
   status?: 'open' | 'paused' | 'completed' | 'scheduled'
   sort?: 'created-desc' | 'created-asc' | 'stars-desc' | 'stars-asc' | 'title'
@@ -392,9 +392,11 @@ function ChoreCard({ chore, kids, completions, ctx }: { chore: Chore; kids: Kid[
       ? 'Afternoon'
       : chore.timeOfDay === 'evening'
         ? 'Evening'
-        : chore.timeOfDay === 'morning'
-          ? 'Morning'
-          : 'Any time'
+        : chore.timeOfDay === 'night'
+          ? 'Night'
+          : chore.timeOfDay === 'morning'
+            ? 'Morning'
+            : 'Any time'
   const createdLabel = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(new Date(chore.createdAt))
   const scheduledDay = chore.scheduledFor ?? pacificDateFromTimestamp(chore.createdAt)
   const kidSelectOptions = assignedKids.length ? assignedKids : kids
@@ -577,6 +579,7 @@ function ChoreCard({ chore, kids, completions, ctx }: { chore: Chore; kids: Kid[
               <option value="morning">Morning</option>
               <option value="afternoon">Afternoon</option>
               <option value="evening">Evening</option>
+              <option value="night">Night</option>
             </select>
             <div className="flex items-center gap-2 rounded-md border border-slate-300 bg-white px-2 py-1 text-[10px] font-semibold uppercase tracking-wide shadow-xs dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
               <input type="hidden" name="requiresApproval" value="false" />
@@ -682,6 +685,7 @@ function ChoreFilters({ kids, filters }: { kids: Kid[]; filters: FilterState }) 
           <option value="morning">Morning</option>
           <option value="afternoon">Afternoon</option>
           <option value="evening">Evening</option>
+          <option value="night">Night</option>
         </select>
       </div>
 

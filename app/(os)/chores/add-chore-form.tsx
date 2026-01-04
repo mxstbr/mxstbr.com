@@ -28,7 +28,7 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
   const [cadence, setCadence] = useState<'daily' | 'weekly'>('daily')
   const [selectedDays, setSelectedDays] = useState<number[]>([pacificWeekday])
   const [timeOfDay, setTimeOfDay] = useState<
-    '' | 'morning' | 'afternoon' | 'evening'
+    '' | 'morning' | 'afternoon' | 'evening' | 'night'
   >('morning')
   const [scheduledFor, setScheduledFor] = useState<string>(
     new Date().toISOString().slice(0, 10),
@@ -147,7 +147,12 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
             value={timeOfDay}
             onChange={(event) =>
               setTimeOfDay(
-                event.target.value as '' | 'morning' | 'afternoon' | 'evening',
+                event.target.value as
+                  | ''
+                  | 'morning'
+                  | 'afternoon'
+                  | 'evening'
+                  | 'night',
               )
             }
             className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-xs outline-hidden transition focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
@@ -156,6 +161,7 @@ export function AddChoreForm({ kids, addChoreAction }: AddChoreFormProps) {
             <option value="morning">Morning</option>
             <option value="afternoon">Afternoon</option>
             <option value="evening">Evening</option>
+            <option value="night">Night</option>
           </select>
         </label>
 

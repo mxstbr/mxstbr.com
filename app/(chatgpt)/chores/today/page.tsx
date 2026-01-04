@@ -47,6 +47,7 @@ const timeOfDayLabels: Record<NonNullable<Chore['timeOfDay']>, string> = {
   morning: 'Morning',
   afternoon: 'Afternoon',
   evening: 'Evening',
+  night: 'Night',
 }
 
 export default function TodaysChoresPage() {
