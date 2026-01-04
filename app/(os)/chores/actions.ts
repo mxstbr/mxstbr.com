@@ -876,10 +876,15 @@ export async function createBedtimeChores(
 }
 function parseTimeOfDay(
   value: FormDataEntryValue | null,
-): 'morning' | 'afternoon' | 'evening' | null {
+): 'morning' | 'afternoon' | 'evening' | 'night' | null {
   if (!value) return null
   const normalized = value.toString()
-  if (normalized === 'morning' || normalized === 'afternoon' || normalized === 'evening') {
+  if (
+    normalized === 'morning' ||
+    normalized === 'afternoon' ||
+    normalized === 'evening' ||
+    normalized === 'night'
+  ) {
     return normalized
   }
   return null
