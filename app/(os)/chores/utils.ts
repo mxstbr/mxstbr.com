@@ -111,7 +111,7 @@ export function pacificDateFromTimestamp(timestamp: string): string {
   return formatPacificDate(date)
 }
 
-const NIGHT_START_MINUTES = 19 * 60 + 45
+const NIGHT_START_MINUTES = 20 * 60
 const MORNING_START_MINUTES = 7 * 60
 
 export function pacificTimeInMinutes(date: Date = new Date()): number {
