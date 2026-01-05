@@ -5,6 +5,7 @@ import { Redis } from '@upstash/redis'
 import { headers } from 'next/headers'
 import { colors } from 'app/(os)/cal/data'
 import { PRESETS } from 'app/(os)/cal/presets'
+import { formatPacificDate } from 'app/(os)/chores/utils'
 import { dedent } from './dedent'
 import { siteUrl } from './site-url'
 import { z } from 'zod'
@@ -224,7 +225,7 @@ Email Events:
 • Apply the parental pin flag when a chore requires approval and keep responses concise with a one-sentence summary of what changed.
 </chores-management>
 
-<date>Today's date is ${today.toISOString().split('T')[0]}</date>
+<date>Today's date is ${formatPacificDate(today)}</date>
 
 <PRESETS>
 ${JSON.stringify(
