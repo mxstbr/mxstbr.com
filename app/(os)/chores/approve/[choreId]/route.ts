@@ -181,6 +181,12 @@ export async function POST(
       .catch((error) => console.error('Failed to send Telegram approval confirmation', error))
   }
 
+  if (result.bonusMessage) {
+    bot.telegram
+      .sendMessage('-4904434425', result.bonusMessage)
+      .catch((error) => console.error('Failed to send Telegram bonus message', error))
+  }
+
   const responseCopy = messages[result.status]
   const heading = responseCopy?.heading ?? 'Approval complete'
   const detail =

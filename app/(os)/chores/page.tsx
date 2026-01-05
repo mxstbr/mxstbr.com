@@ -4,6 +4,7 @@ import { KidBoard } from './kid-board'
 import { type Chore, getChoreState } from './data'
 import {
   getToday,
+  getDailyChoreProgress,
   isOpenForKid,
   pacificDateFromTimestamp,
   shiftIsoDay,
@@ -94,10 +95,17 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
     string,
     { chore: Chore; completionId: string; timestamp: string }[]
   > = {}
+  const progressByKid: Record<string, ReturnType<typeof getDailyChoreProgress>> = {}
 
   for (const kid of state.kids) {
     openChoresByKid[kid.id] = []
     doneChoresByKid[kid.id] = []
+    progressByKid[kid.id] = getDailyChoreProgress(
+      state.chores,
+      state.completions,
+      kid.id,
+      ctx,
+    )
   }
 
   for (const chore of state.chores) {
@@ -134,6 +142,7 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
         createdAt: entry.timestamp ?? entry.chore.createdAt,
       })),
     ).map(({ timeOfDay, createdAt, timestamp, ...rest }) => rest),
+    progress: progressByKid[kid.id],
   }))
 
   const backgroundClass = viewingToday
