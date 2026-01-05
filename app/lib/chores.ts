@@ -433,44 +433,11 @@ function formatUndoMessage(result: any): string {
 
 export function registerChoreTools(server: McpServer) {
   server.registerTool(
-    'read_chore_board',
-    {
-      title: 'Read Chore Board',
-      description:
-        'Read the current chore board including kids, chores, completions, and rewards.',
-      inputSchema: z.object({
-        day: isoDaySchema
-          .optional()
-          .describe('Defaults to today in the Pacific timezone'),
-      }),
-      outputSchema: readBoardSchema,
-      annotations: { readOnlyHint: true },
-    },
-    async ({ day }: { day?: string }) => {
-      const snapshot = await loadChoreSnapshot(day)
-      const message = `Loaded chore board for ${
-        snapshot?.ctx?.todayIso ?? 'today'
-      } with ${(snapshot?.kids ?? []).length} kids, ${(snapshot?.chores ?? []).length} chores, and ${(snapshot?.rewards ?? []).length} rewards`
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: message,
-          },
-        ],
-        structuredContent: snapshot
-          ? toStructuredContent({ message, ...snapshot })
-          : undefined,
-        // _meta: toChoresTodayMetadata(snapshot),
-      }
-    },
-  )
-  server.registerTool(
     'search_chores',
     {
       title: 'Search Chores',
       description:
-        'Search chores by title or emoji without loading the entire chore board.',
+        'Search chores by title or emoji without loading the entire chore board. Use this before reading the full board.',
       inputSchema: z.object({
         query: z.string().min(1, 'Query is required'),
         kid_ids: kidIdsSchema.optional(),
@@ -543,6 +510,39 @@ export function registerChoreTools(server: McpServer) {
           count: filtered.length,
           results,
         },
+      }
+    },
+  )
+  server.registerTool(
+    'read_chore_board',
+    {
+      title: 'Read Chore Board',
+      description:
+        'Read the current chore board including kids, chores, completions, and rewards. Use only if search is insufficient.',
+      inputSchema: z.object({
+        day: isoDaySchema
+          .optional()
+          .describe('Defaults to today in the Pacific timezone'),
+      }),
+      outputSchema: readBoardSchema,
+      annotations: { readOnlyHint: true },
+    },
+    async ({ day }: { day?: string }) => {
+      const snapshot = await loadChoreSnapshot(day)
+      const message = `Loaded chore board for ${
+        snapshot?.ctx?.todayIso ?? 'today'
+      } with ${(snapshot?.kids ?? []).length} kids, ${(snapshot?.chores ?? []).length} chores, and ${(snapshot?.rewards ?? []).length} rewards`
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: message,
+          },
+        ],
+        structuredContent: snapshot
+          ? toStructuredContent({ message, ...snapshot })
+          : undefined,
+        // _meta: toChoresTodayMetadata(snapshot),
       }
     },
   )
