@@ -75,6 +75,8 @@ const PERSISTENT_GROUPS: TimeGroupKey[] = ['evening']
 
 const approvalRequestKey = (kidId: string, choreId: string) =>
   `${kidId}:${choreId}`
+const formatStarLabel = (stars: number) =>
+  `${stars} ${stars === 1 ? 'star' : 'stars'}`
 
 /**
  * Time-based auto-collapse behavior for chore groups:
@@ -1356,7 +1358,7 @@ function ChoreButton({
         <div className="flex items-start justify-between border-t border-slate-200 px-3 py-1.5 text-xs font-semibold text-amber-700 dark:border-slate-700 dark:text-amber-200 xl:px-4">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2 text-sm font-semibold leading-none xl:text-base">
-              <div>+{chore.stars} stars</div>
+              <div>+{formatStarLabel(chore.stars)}</div>
               {chore.requiresApproval ? (
                 <div className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800 dark:bg-amber-900/50 dark:text-amber-100">
                   {approvalRequested ? '⏳ Waiting for approval' : '🔐 Parent OK'}
@@ -1434,7 +1436,7 @@ function CompletedChoreButton({
       </button>
       <div className="flex items-center justify-between border-t border-slate-200 px-3 py-1.5 text-xs font-semibold text-emerald-700 dark:border-slate-700 dark:text-emerald-200 xl:px-4">
         <div className="flex items-center gap-2 text-sm font-semibold leading-none xl:text-base">
-          <div>+{chore.stars} stars</div>
+          <div>+{formatStarLabel(chore.stars)}</div>
         </div>
         <div className="flex items-center gap-2">
           <button
