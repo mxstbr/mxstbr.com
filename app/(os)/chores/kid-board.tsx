@@ -484,13 +484,18 @@ export function KidBoard({
             chores={sortByTimeOfDay(mobileColumn.chores)}
             doneChores={mobileColumn.done}
             starTotal={totals[mobileColumn.kid.id] ?? 0}
-            progress={mobileColumn.progress}
             onComplete={beginCompletion}
             onUndo={handleUndo}
             onBonusAwarded={handleBonusAward}
             mode={mode}
             pacificMinutes={pacificMinutes}
             approvalRequestsForDay={approvalRequestsForDay}
+          />
+        ) : null}
+        {mobileColumn ? (
+          <KidProgressRow
+            columns={[mobileColumn]}
+            className="mt-4"
           />
         ) : null}
       </div>
@@ -502,7 +507,6 @@ export function KidBoard({
             chores={sortByTimeOfDay(column.chores)}
             doneChores={column.done}
             starTotal={totals[column.kid.id] ?? 0}
-            progress={column.progress}
             onComplete={beginCompletion}
             onUndo={handleUndo}
             onBonusAwarded={handleBonusAward}
@@ -511,6 +515,9 @@ export function KidBoard({
             approvalRequestsForDay={approvalRequestsForDay}
           />
         ))}
+      </div>
+      <div className="hidden md:block md:px-4">
+        <KidProgressRow columns={columns} className="mt-4" />
       </div>
       {pending ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
@@ -682,7 +689,6 @@ function KidColumn({
   chores,
   doneChores,
   starTotal,
-  progress,
   onComplete,
   onUndo,
   onBonusAwarded,
@@ -695,7 +701,6 @@ function KidColumn({
   chores: FreshChore[]
   doneChores: { chore: FreshChore; completionId: string }[]
   starTotal: number
-  progress: DailyChoreProgress
   onComplete: (
     chore: FreshChore,
     kidId: string,
@@ -769,10 +774,6 @@ function KidColumn({
     night: [],
     any: [],
   }
-  const completedCount = progress.completed + progress.skipped
-  const progressPercent = progress.total
-    ? Math.min(100, Math.round((completedCount / progress.total) * 100))
-    : 0
 
   const scheduleRecollapse = useCallback(() => {
     if (recollapseTimer.current) {
@@ -1059,30 +1060,6 @@ function KidColumn({
           ) : null}
         </div>
       ) : null}
-
-      <div className="space-y-1">
-        <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-          <span>
-            {progress.total > 0
-              ? `${completedCount}/${progress.total}`
-              : 'No chores today'}
-          </span>
-          {progress.total > 0 ? (
-            <span className="text-amber-700 dark:text-amber-200">
-              +{DAILY_BONUS_STARS} ⭐️ bonus
-            </span>
-          ) : null}
-        </div>
-        <div className="h-2 w-full rounded-full bg-slate-200/70 dark:bg-slate-800">
-          <div
-            className="h-2 rounded-full transition-all duration-500 ease-out"
-            style={{
-              width: `${progressPercent}%`,
-              backgroundColor: accentColor,
-            }}
-          />
-        </div>
-      </div>
 
       {colorModalOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
@@ -1636,5 +1613,65 @@ function SpeakIconButton({ text, accent }: { text: string; accent: string }) {
     >
       {isSpeaking ? '…' : '🔊'}
     </button>
+  )
+}
+
+function KidProgressRow({
+  columns,
+  className,
+}: {
+  columns: Column[]
+  className?: string
+}) {
+  const wrapperClassName = [
+    'grid gap-3 md:grid-cols-3',
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  return (
+    <div className={wrapperClassName}>
+      {columns.map((column) => {
+        const accentColor = column.kid.color ?? '#0ea5e9'
+        const completedCount =
+          column.progress.completed + column.progress.skipped
+        const progressPercent = column.progress.total
+          ? Math.min(
+              100,
+              Math.round((completedCount / column.progress.total) * 100),
+            )
+          : 0
+
+        return (
+          <div
+            key={column.kid.id}
+            className="rounded-xl border border-slate-200/70 bg-white/70 px-3 py-2 shadow-xs dark:border-slate-700 dark:bg-slate-900/70"
+          >
+            <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
+              <span className="text-slate-700 dark:text-slate-200">
+                {column.progress.total > 0
+                  ? `${completedCount}/${column.progress.total}`
+                  : 'No chores today'}
+              </span>
+              {column.progress.total > 0 ? (
+                <span className="text-amber-700 dark:text-amber-200">
+                  +{DAILY_BONUS_STARS} ⭐️ bonus
+                </span>
+              ) : null}
+            </div>
+            <div className="mt-1.5 h-2 w-full rounded-full bg-slate-200/70 dark:bg-slate-800">
+              <div
+                className="h-2 rounded-full transition-all duration-500 ease-out"
+                style={{
+                  width: `${progressPercent}%`,
+                  backgroundColor: accentColor,
+                }}
+              />
+            </div>
+          </div>
+        )
+      })}
+    </div>
   )
 }
