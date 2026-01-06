@@ -945,26 +945,6 @@ function KidColumn({
         <StarBadge value={starTotal} accent={accentColor} />
       </div>
 
-      <div className="space-y-1">
-        <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-          <span>
-            {progress.total > 0
-              ? `${completedCount} of ${progress.total} chores`
-              : 'No chores today'}
-          </span>
-          {progress.total > 0 ? <span>{progressPercent}%</span> : null}
-        </div>
-        <div className="h-2 w-full rounded-full bg-slate-200/70 dark:bg-slate-800">
-          <div
-            className="h-2 rounded-full transition-all duration-500 ease-out"
-            style={{
-              width: `${progressPercent}%`,
-              backgroundColor: accentColor,
-            }}
-          />
-        </div>
-      </div>
-
       <div className="space-y-4">
         {chores.length === 0 ? (
           <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-center text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200">
@@ -1079,6 +1059,30 @@ function KidColumn({
           ) : null}
         </div>
       ) : null}
+
+      <div className="space-y-1">
+        <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
+          <span>
+            {progress.total > 0
+              ? `${completedCount}/${progress.total}`
+              : 'No chores today'}
+          </span>
+          {progress.total > 0 ? (
+            <span className="text-amber-700 dark:text-amber-200">
+              +{DAILY_BONUS_STARS} ⭐️ bonus
+            </span>
+          ) : null}
+        </div>
+        <div className="h-2 w-full rounded-full bg-slate-200/70 dark:bg-slate-800">
+          <div
+            className="h-2 rounded-full transition-all duration-500 ease-out"
+            style={{
+              width: `${progressPercent}%`,
+              backgroundColor: accentColor,
+            }}
+          />
+        </div>
+      </div>
 
       {colorModalOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
