@@ -270,7 +270,7 @@ export function isChoreExpectedForDay(
   ctx: TodayContext,
 ): boolean {
   if (!chore.kidIds.includes(kidId)) return false
-  if (chore.type === 'perpetual') return false
+  if (chore.type === 'perpetual' && !chore.timeOfDay) return false
   const createdDay = pacificDateFromTimestamp(chore.createdAt)
   const scheduledDay = chore.scheduledFor || createdDay
   if (scheduledDay > ctx.todayIso) return false
