@@ -197,7 +197,7 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
           </div>
         </div>
       </ChoresErrorBoundary>
-      <div className="md:flex-1 md:min-h-0 pb-16 md:pb-12">
+      <div className="md:flex-1 md:min-h-0 pb-20 md:pb-16">
         <ChoresErrorBoundary label="the chore board">
           <KidBoard
             columns={columns}

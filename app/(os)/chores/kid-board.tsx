@@ -913,7 +913,7 @@ function KidColumn({
 
   return (
     <div
-      className="flex flex-col gap-4 overflow-hidden rounded-2xl border bg-white p-4 shadow-xs dark:bg-slate-900 md:h-full md:min-h-0 md:overflow-y-auto"
+      className="flex flex-col gap-3 overflow-hidden rounded-2xl border bg-white p-3 shadow-xs dark:bg-slate-900 md:h-full md:min-h-0"
       style={{
         borderColor: accentColor,
         backgroundColor: accentSoft,
@@ -921,7 +921,7 @@ function KidColumn({
       }}
     >
       <div
-        className="sticky -top-4 z-10 -mx-4 -mt-4 flex flex-wrap items-center justify-between gap-3 px-4 py-2"
+        className="sticky -top-3 z-10 -mx-3 -mt-3 flex flex-wrap items-center justify-between gap-3 px-3 py-2"
         style={{
           backgroundColor: accentSoft,
           boxShadow: `0 10px 30px -25px ${accentColor}`,
@@ -946,7 +946,7 @@ function KidColumn({
         <StarBadge value={starTotal} accent={accentColor} />
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {chores.length === 0 ? (
           <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-center text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200">
             All clear! Come back when something new pops up.
@@ -961,7 +961,7 @@ function KidColumn({
             .map((group) => {
               const collapsed = collapsedGroups[group.key]
               return (
-                <div key={group.key} className="space-y-2">
+                <div key={group.key} className="space-y-1.5">
                   <button
                     type="button"
                     onClick={() => toggleGroup(group.key)}
@@ -987,7 +987,7 @@ function KidColumn({
                     ) : null}
                   </button>
                   {!collapsed ? (
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {group.items.map((chore) => (
                         <ChoreButton
                           key={chore.id}
@@ -1013,7 +1013,7 @@ function KidColumn({
       </div>
 
       {doneChores.length ? (
-        <div className="mt-6 space-y-2 md:mt-8">
+        <div className="mt-5 space-y-2 md:mt-6">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
             <button
               type="button"
@@ -1450,7 +1450,7 @@ function ChoreButton({
             : `Open "${chore.title}" actions`
         }
       >
-        <div className="flex items-start gap-3 px-3 py-3 xl:gap-4 xl:px-4 xl:py-4">
+        <div className="flex items-start gap-3 px-3 py-2.5 xl:gap-4 xl:px-4 xl:py-3">
           <div className="flex flex-col items-center gap-2">
             <span className="text-xl leading-none transition group-active:text-[var(--accent)] group-focus-visible:text-[var(--accent)] xl:text-3xl">
               {isPending ? '…' : chore.emoji}
@@ -1462,7 +1462,7 @@ function ChoreButton({
             </div>
           </div>
         </div>
-        <div className="flex items-start justify-between border-t border-slate-200 px-3 py-1.5 text-xs font-semibold text-amber-700 dark:border-slate-700 dark:text-amber-200 xl:px-4">
+        <div className="flex items-start justify-between border-t border-slate-200 px-3 py-1 text-xs font-semibold text-amber-700 dark:border-slate-700 dark:text-amber-200 xl:px-4">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2 text-sm font-semibold leading-none xl:text-base">
               <div>+{formatStarLabel(chore.stars)}</div>
@@ -1523,7 +1523,7 @@ function CompletedChoreButton({
       <button
         type="button"
         onClick={handleUndo}
-        className="group flex w-full items-start gap-3 px-3 py-3 text-left text-slate-900 transition active:bg-[var(--accent-soft)] focus-visible:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:text-slate-50 dark:active:bg-[var(--accent-soft)] dark:focus-visible:bg-[var(--accent-soft)] xl:gap-4 xl:px-4 xl:py-4"
+        className="group flex w-full items-start gap-3 px-3 py-2.5 text-left text-slate-900 transition active:bg-[var(--accent-soft)] focus-visible:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:text-slate-50 dark:active:bg-[var(--accent-soft)] dark:focus-visible:bg-[var(--accent-soft)] xl:gap-4 xl:px-4 xl:py-3"
         disabled={isPending}
         aria-label={`Undo completion for "${chore.title}"`}
       >
@@ -1541,7 +1541,7 @@ function CompletedChoreButton({
           </div>
         </div>
       </button>
-      <div className="flex items-center justify-between border-t border-slate-200 px-3 py-1.5 text-xs font-semibold text-emerald-700 dark:border-slate-700 dark:text-emerald-200 xl:px-4">
+      <div className="flex items-center justify-between border-t border-slate-200 px-3 py-1 text-xs font-semibold text-emerald-700 dark:border-slate-700 dark:text-emerald-200 xl:px-4">
         <div className="flex items-center gap-2 text-sm font-semibold leading-none xl:text-base">
           <div>+{formatStarLabel(chore.stars)}</div>
         </div>
