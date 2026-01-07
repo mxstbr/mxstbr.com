@@ -942,8 +942,8 @@ function KidColumn({
             ›
           </span>
         </button>
-        <div className="min-w-[140px] flex-1">
-          <div className="relative h-6 overflow-hidden rounded-full border border-slate-200/70 bg-slate-100/80 dark:border-slate-700 dark:bg-slate-800/80">
+        <div className="min-w-[120px] flex-1">
+          <div className="relative h-5 overflow-hidden rounded-full border border-slate-200/70 bg-slate-100/80 dark:border-slate-700 dark:bg-slate-800/80">
             <div
               className="h-full rounded-full transition-all duration-500 ease-out"
               style={{
@@ -952,14 +952,14 @@ function KidColumn({
               }}
               aria-hidden="true"
             />
-            <div className="absolute inset-0 flex items-center justify-center text-[11px] font-semibold text-slate-700 dark:text-slate-100">
+            <div className="absolute inset-0 flex items-center justify-center text-[10px] font-semibold text-slate-700 dark:text-slate-100">
               {progress.total > 0 ? (
                 <span className="inline-flex items-center gap-1">
                   <span>{completedCount}</span>
                   <span className="text-slate-400">/</span>
                   <span>{progress.total}</span>
                   <span className="text-slate-400">|</span>
-                  <span className="text-amber-600 dark:text-amber-300">
+                  <span className="text-slate-900 drop-shadow-sm dark:text-slate-50">
                     +{DAILY_BONUS_STARS} ⭐️
                   </span>
                 </span>
