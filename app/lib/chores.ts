@@ -51,7 +51,9 @@ function appendAutomationToken(formData: FormData) {
 
 const kidIdsSchema = z.array(z.string().min(1)).min(1)
 const daysOfWeekSchema = z.array(z.number().int().min(0).max(6)).optional()
-const timeOfDaySchema = z.enum(['morning', 'afternoon', 'evening']).optional()
+const timeOfDaySchema = z
+  .enum(['morning', 'afternoon', 'evening', 'night'])
+  .optional()
 const hexColorSchema = z
   .string()
   .regex(/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/)
@@ -83,7 +85,7 @@ const choreSchema = z.object({
   snoozedForKids: z.record(z.string(), z.string().nullable()).optional(),
   createdAt: z.string(),
   completedAt: z.string().nullable().optional(),
-  timeOfDay: z.enum(['morning', 'afternoon', 'evening']).optional(),
+  timeOfDay: z.enum(['morning', 'afternoon', 'evening', 'night']).optional(),
 })
 
 const completionSchema = z.object({
@@ -188,7 +190,9 @@ const choreSearchResultSchema = z.object({
       kid_names: z.array(z.string()),
       requires_approval: z.boolean().optional(),
       scheduled_for: z.string().nullable().optional(),
-      time_of_day: z.enum(['morning', 'afternoon', 'evening']).optional(),
+      time_of_day: z
+        .enum(['morning', 'afternoon', 'evening', 'night'])
+        .optional(),
       paused_until: z.string().nullable().optional(),
       snoozed_until: z.string().nullable().optional(),
       created_at: z.string().optional(),
@@ -584,7 +588,7 @@ export function registerChoreTools(server: McpServer) {
       type: 'one-off' | 'repeated' | 'perpetual'
       cadence?: 'daily' | 'weekly'
       days_of_week?: number[]
-      time_of_day?: 'morning' | 'afternoon' | 'evening'
+      time_of_day?: 'morning' | 'afternoon' | 'evening' | 'night'
       requires_approval?: boolean
       scheduled_for?: string
     }) => {
@@ -852,7 +856,7 @@ export function registerChoreTools(server: McpServer) {
     }: {
       chore_id: string
       kid_ids: string[]
-      time_of_day?: 'morning' | 'afternoon' | 'evening'
+      time_of_day?: 'morning' | 'afternoon' | 'evening' | 'night'
       clear_time_of_day?: boolean
       requires_approval?: boolean
     }) => {
