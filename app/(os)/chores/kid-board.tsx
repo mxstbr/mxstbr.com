@@ -22,6 +22,8 @@ import {
   undoChore,
 } from './actions'
 import {
+  DAILY_BONUS_STARS,
+  type DailyChoreProgress,
   msUntilNextPacificMidnight,
   pacificTimeInMinutes,
   sortByTimeOfDay,
@@ -36,6 +38,7 @@ type Column = {
   kid: Kid
   chores: FreshChore[]
   done: { chore: FreshChore; completionId: string }[]
+  progress: DailyChoreProgress
 }
 
 type KidBoardProps = {
@@ -69,6 +72,7 @@ type ApprovalRequestLookup = Record<string, Record<string, boolean>>
 type TimeGroupKey = 'morning' | 'afternoon' | 'evening' | 'night' | 'any'
 
 const REWARD_TARGET_ID = 'chores-reward-target'
+const BONUS_REWARD_TARGET_ID = 'chores-bonus-target'
 const RECOLLAPSE_IDLE_MS = 45_000
 const APPROVAL_REQUESTS_KEY = 'chores:approval-requests'
 const PERSISTENT_GROUPS: TimeGroupKey[] = ['evening']
@@ -157,6 +161,28 @@ export function KidBoard({
       ? selectedKidId
       : (columns[0]?.kid.id ?? ''),
   )
+  const [bonusAward, setBonusAward] = useState<{
+    kidId: string
+    kidName: string
+    bonusStars: number
+  } | null>(null)
+  const kidLookup = useMemo(
+    () => new Map(columns.map((column) => [column.kid.id, column.kid.name])),
+    [columns],
+  )
+  const { reward: triggerBonusReward } = useReward(
+    BONUS_REWARD_TARGET_ID,
+    'confetti',
+    {
+      fps: 60,
+      lifetime: 460,
+      angle: 90,
+      decay: 0.92,
+      spread: 170,
+      startVelocity: 64,
+      elementCount: 200,
+    },
+  )
 
   useEffect(() => {
     setTotals(initialTotals)
@@ -209,6 +235,19 @@ export function KidBoard({
     const id = window.setInterval(refresh, 60_000)
     return () => window.clearInterval(id)
   }, [router])
+
+  const handleBonusAward = useCallback(
+    (kidId: string, bonusStars: number = DAILY_BONUS_STARS) => {
+      setTotals((prev) => ({
+        ...prev,
+        [kidId]: (prev[kidId] ?? 0) + bonusStars,
+      }))
+      const kidName = kidLookup.get(kidId) ?? 'Kid'
+      setBonusAward({ kidId, kidName, bonusStars })
+      triggerBonusReward()
+    },
+    [kidLookup, triggerBonusReward],
+  )
 
   const markApprovalRequestSent = useCallback((request: ApprovalRequest) => {
     setApprovalRequests((prev) => {
@@ -296,6 +335,10 @@ export function KidBoard({
         [kidId]: (prev[kidId] ?? 0) + result.awarded,
       }))
       onReward?.()
+    }
+
+    if (result?.bonusAwarded && result.bonusStars) {
+      handleBonusAward(kidId, result.bonusStars)
     }
 
     const refreshDelay = onReward ? 900 : 100
@@ -415,6 +458,11 @@ export function KidBoard({
         className="pointer-events-none fixed bottom-4 left-1/2 z-40 -translate-x-1/2 text-2xl md:bottom-6"
         aria-hidden="true"
       />
+      <span
+        id={BONUS_REWARD_TARGET_ID}
+        className="pointer-events-none fixed top-6 left-1/2 z-40 -translate-x-1/2 text-2xl"
+        aria-hidden="true"
+      />
       <div className="md:hidden">
         <label className="mb-2 block text-xs font-semibold text-slate-700 dark:text-slate-200">
           Select kid
@@ -436,8 +484,10 @@ export function KidBoard({
             chores={sortByTimeOfDay(mobileColumn.chores)}
             doneChores={mobileColumn.done}
             starTotal={totals[mobileColumn.kid.id] ?? 0}
+            progress={mobileColumn.progress}
             onComplete={beginCompletion}
             onUndo={handleUndo}
+            onBonusAwarded={handleBonusAward}
             mode={mode}
             pacificMinutes={pacificMinutes}
             approvalRequestsForDay={approvalRequestsForDay}
@@ -452,8 +502,10 @@ export function KidBoard({
             chores={sortByTimeOfDay(column.chores)}
             doneChores={column.done}
             starTotal={totals[column.kid.id] ?? 0}
+            progress={column.progress}
             onComplete={beginCompletion}
             onUndo={handleUndo}
+            onBonusAwarded={handleBonusAward}
             mode={mode}
             pacificMinutes={pacificMinutes}
             approvalRequestsForDay={approvalRequestsForDay}
@@ -584,6 +636,43 @@ export function KidBoard({
           </div>
         </div>
       ) : null}
+      {bonusAward ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-5 text-center shadow-xl dark:bg-slate-900">
+            <div className="flex items-start justify-between gap-3">
+              <div className="text-left">
+                <h2 className="text-base font-semibold text-slate-900 dark:text-slate-50">
+                  Daily bonus unlocked 🎉
+                </h2>
+                <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
+                  {bonusAward.kidName} finished all chores for today and earned{' '}
+                  <span className="font-semibold text-amber-600 dark:text-amber-300">
+                    +{bonusAward.bonusStars} ⭐️
+                  </span>
+                  .
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setBonusAward(null)}
+                className="rounded-md p-1 text-slate-500 transition active:bg-slate-100 active:text-slate-700 dark:active:bg-slate-800"
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+            <div className="mt-4 flex justify-center">
+              <button
+                type="button"
+                onClick={() => setBonusAward(null)}
+                className="inline-flex items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-xs font-semibold text-white shadow-xs transition active:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:active:bg-slate-200"
+              >
+                Awesome!
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }
@@ -593,8 +682,10 @@ function KidColumn({
   chores,
   doneChores,
   starTotal,
+  progress,
   onComplete,
   onUndo,
+  onBonusAwarded,
   mode,
   pacificMinutes,
   approvalRequestsForDay,
@@ -604,6 +695,7 @@ function KidColumn({
   chores: FreshChore[]
   doneChores: { chore: FreshChore; completionId: string }[]
   starTotal: number
+  progress: DailyChoreProgress
   onComplete: (
     chore: FreshChore,
     kidId: string,
@@ -615,6 +707,7 @@ function KidColumn({
     completionId: string,
     kidId: string,
   ) => Promise<void> | void
+  onBonusAwarded: (kidId: string, bonusStars: number) => void
   mode: KidBoardProps['mode']
   pacificMinutes: number
   approvalRequestsForDay: Record<string, boolean>
@@ -676,6 +769,10 @@ function KidColumn({
     night: [],
     any: [],
   }
+  const completedCount = progress.completed + progress.skipped
+  const progressPercent = progress.total
+    ? Math.min(100, Math.round((completedCount / progress.total) * 100))
+    : 0
 
   const scheduleRecollapse = useCallback(() => {
     if (recollapseTimer.current) {
@@ -815,7 +912,7 @@ function KidColumn({
 
   return (
     <div
-      className="flex flex-col gap-4 overflow-hidden rounded-2xl border bg-white p-4 shadow-xs dark:bg-slate-900 md:h-full md:min-h-0 md:overflow-y-auto"
+      className="flex flex-col gap-3 overflow-hidden rounded-2xl border bg-white p-3 shadow-xs dark:bg-slate-900 md:h-full md:min-h-0"
       style={{
         borderColor: accentColor,
         backgroundColor: accentSoft,
@@ -823,7 +920,7 @@ function KidColumn({
       }}
     >
       <div
-        className="sticky -top-4 z-10 -mx-4 -mt-4 flex flex-wrap items-center justify-between gap-3 px-4 py-2"
+        className="sticky -top-3 z-10 -mx-3 -mt-3 flex flex-wrap items-center gap-3 px-3 py-2"
         style={{
           backgroundColor: accentSoft,
           boxShadow: `0 10px 30px -25px ${accentColor}`,
@@ -845,10 +942,37 @@ function KidColumn({
             ›
           </span>
         </button>
+        <div className="min-w-[140px] flex-1">
+          <div className="relative h-6 overflow-hidden rounded-full border border-slate-200/70 bg-slate-100/80 dark:border-slate-700 dark:bg-slate-800/80">
+            <div
+              className="h-full rounded-full transition-all duration-500 ease-out"
+              style={{
+                width: `${progressPercent}%`,
+                backgroundColor: accentColor,
+              }}
+              aria-hidden="true"
+            />
+            <div className="absolute inset-0 flex items-center justify-center text-[11px] font-semibold text-slate-700 dark:text-slate-100">
+              {progress.total > 0 ? (
+                <span className="inline-flex items-center gap-1">
+                  <span>{completedCount}</span>
+                  <span className="text-slate-400">/</span>
+                  <span>{progress.total}</span>
+                  <span className="text-slate-400">|</span>
+                  <span className="text-amber-600 dark:text-amber-300">
+                    +{DAILY_BONUS_STARS} ⭐️
+                  </span>
+                </span>
+              ) : (
+                <span>No chores today</span>
+              )}
+            </div>
+          </div>
+        </div>
         <StarBadge value={starTotal} accent={accentColor} />
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {chores.length === 0 ? (
           <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-center text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200">
             All clear! Come back when something new pops up.
@@ -863,7 +987,7 @@ function KidColumn({
             .map((group) => {
               const collapsed = collapsedGroups[group.key]
               return (
-                <div key={group.key} className="space-y-2">
+                <div key={group.key} className="space-y-1.5">
                   <button
                     type="button"
                     onClick={() => toggleGroup(group.key)}
@@ -889,7 +1013,7 @@ function KidColumn({
                     ) : null}
                   </button>
                   {!collapsed ? (
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {group.items.map((chore) => (
                         <ChoreButton
                           key={chore.id}
@@ -897,6 +1021,7 @@ function KidColumn({
                           accent={accentColor}
                           kidId={kid.id}
                           onComplete={onComplete}
+                          onBonusAwarded={onBonusAwarded}
                           disabled={disableCompletion}
                           approvalRequested={
                             approvalRequestsForDay[
@@ -914,7 +1039,7 @@ function KidColumn({
       </div>
 
       {doneChores.length ? (
-        <div className="mt-6 space-y-2 md:mt-8">
+        <div className="mt-5 space-y-2 md:mt-6">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
             <button
               type="button"
@@ -1053,6 +1178,7 @@ function ChoreButton({
   chore,
   accent,
   onComplete,
+  onBonusAwarded,
   kidId,
   approvalRequested = false,
   disabled = false,
@@ -1066,6 +1192,7 @@ function ChoreButton({
     accent: string,
     onReward?: () => void,
   ) => Promise<void> | void
+  onBonusAwarded: (kidId: string, bonusStars: number) => void
   approvalRequested?: boolean
   disabled?: boolean
 }) {
@@ -1118,10 +1245,16 @@ function ChoreButton({
     formData.append('choreId', chore.id)
     formData.append('kidId', kidId)
     startTransition(() => {
-      void skipChore(formData).finally(() => {
-        setIsSkipping(false)
-        setTimeout(() => router.refresh(), 50)
-      })
+      void skipChore(formData)
+        .then((result) => {
+          if (result?.bonusAwarded && result.bonusStars) {
+            onBonusAwarded(kidId, result.bonusStars)
+          }
+        })
+        .finally(() => {
+          setIsSkipping(false)
+          setTimeout(() => router.refresh(), 50)
+        })
     })
   }
 
@@ -1343,7 +1476,7 @@ function ChoreButton({
             : `Open "${chore.title}" actions`
         }
       >
-        <div className="flex items-start gap-3 px-3 py-3 xl:gap-4 xl:px-4 xl:py-4">
+        <div className="flex items-start gap-3 px-3 py-2.5 xl:gap-4 xl:px-4 xl:py-3">
           <div className="flex flex-col items-center gap-2">
             <span className="text-xl leading-none transition group-active:text-[var(--accent)] group-focus-visible:text-[var(--accent)] xl:text-3xl">
               {isPending ? '…' : chore.emoji}
@@ -1355,7 +1488,7 @@ function ChoreButton({
             </div>
           </div>
         </div>
-        <div className="flex items-start justify-between border-t border-slate-200 px-3 py-1.5 text-xs font-semibold text-amber-700 dark:border-slate-700 dark:text-amber-200 xl:px-4">
+        <div className="flex items-start justify-between border-t border-slate-200 px-3 py-1 text-xs font-semibold text-amber-700 dark:border-slate-700 dark:text-amber-200 xl:px-4">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2 text-sm font-semibold leading-none xl:text-base">
               <div>+{formatStarLabel(chore.stars)}</div>
@@ -1416,7 +1549,7 @@ function CompletedChoreButton({
       <button
         type="button"
         onClick={handleUndo}
-        className="group flex w-full items-start gap-3 px-3 py-3 text-left text-slate-900 transition active:bg-[var(--accent-soft)] focus-visible:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:text-slate-50 dark:active:bg-[var(--accent-soft)] dark:focus-visible:bg-[var(--accent-soft)] xl:gap-4 xl:px-4 xl:py-4"
+        className="group flex w-full items-start gap-3 px-3 py-2.5 text-left text-slate-900 transition active:bg-[var(--accent-soft)] focus-visible:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:text-slate-50 dark:active:bg-[var(--accent-soft)] dark:focus-visible:bg-[var(--accent-soft)] xl:gap-4 xl:px-4 xl:py-3"
         disabled={isPending}
         aria-label={`Undo completion for "${chore.title}"`}
       >
@@ -1434,7 +1567,7 @@ function CompletedChoreButton({
           </div>
         </div>
       </button>
-      <div className="flex items-center justify-between border-t border-slate-200 px-3 py-1.5 text-xs font-semibold text-emerald-700 dark:border-slate-700 dark:text-emerald-200 xl:px-4">
+      <div className="flex items-center justify-between border-t border-slate-200 px-3 py-1 text-xs font-semibold text-emerald-700 dark:border-slate-700 dark:text-emerald-200 xl:px-4">
         <div className="flex items-center gap-2 text-sm font-semibold leading-none xl:text-base">
           <div>+{formatStarLabel(chore.stars)}</div>
         </div>

@@ -11,6 +11,11 @@ import {
 } from './data'
 import {
   formatPacificDate,
+  getDailyChoreProgress,
+  getToday,
+  dailyBonusChoreId,
+  DAILY_BONUS_STARS,
+  hasDailyBonus,
   pacificDateFromTimestamp,
   shiftIsoDay,
   starsForKid,
@@ -33,9 +38,18 @@ export type CompletionResult = {
   completionId?: string
   choreTitle?: string
   kidName?: string
+  bonusAwarded?: boolean
+  bonusStars?: number
+  bonusMessage?: string | null
   telegramMessage?: string | null
   undoLink?: string | null
   status: 'completed' | 'skipped' | 'invalid' | 'unauthorized'
+}
+
+export type SkipResult = {
+  bonusAwarded?: boolean
+  bonusStars?: number
+  bonusMessage?: string | null
 }
 
 function hasAutomationToken(formData?: FormData | null): boolean {
@@ -96,6 +110,75 @@ function parseIsoDay(value: FormDataEntryValue | null): string | null {
   return /^\d{4}-\d{2}-\d{2}$/.test(raw) ? raw : null
 }
 
+function completionTimestampForDay(dayIso: string): string {
+  return dayIso === todayIsoDate()
+    ? new Date().toISOString()
+    : new Date(`${dayIso}T12:00:00Z`).toISOString()
+}
+
+function maybeAwardDailyBonus({
+  state,
+  kidId,
+  kidName,
+  targetDay,
+}: {
+  state: ChoreState
+  kidId: string
+  kidName: string
+  targetDay: string
+}): { awarded: boolean; bonusStars: number; bonusMessage: string | null } {
+  if (hasDailyBonus(state.completions, kidId, targetDay)) {
+    return { awarded: false, bonusStars: 0, bonusMessage: null }
+  }
+
+  const ctx = getToday(targetDay)
+  const progress = getDailyChoreProgress(state.chores, state.completions, kidId, ctx)
+  if (progress.total === 0 || progress.remaining > 0) {
+    return { awarded: false, bonusStars: 0, bonusMessage: null }
+  }
+
+  state.completions.unshift({
+    id: crypto.randomUUID(),
+    choreId: dailyBonusChoreId(targetDay),
+    kidId,
+    timestamp: completionTimestampForDay(targetDay),
+    starsAwarded: DAILY_BONUS_STARS,
+  })
+
+  const starTotal = starsForKid(state.completions, kidId)
+  const bonusMessage = process.env.TELEGRAM_BOT_TOKEN
+    ? `${kidName} earned the daily bonus (+${DAILY_BONUS_STARS} ⭐️, ${starTotal} ⭐️ total)`
+    : null
+
+  return { awarded: true, bonusStars: DAILY_BONUS_STARS, bonusMessage }
+}
+
+function maybeRevokeDailyBonus({
+  state,
+  kidId,
+  targetDay,
+}: {
+  state: ChoreState
+  kidId: string
+  targetDay: string
+}): number {
+  const bonusId = dailyBonusChoreId(targetDay)
+  const bonusIndex = state.completions.findIndex(
+    (completion) =>
+      completion.kidId === kidId && completion.choreId === bonusId,
+  )
+  if (bonusIndex === -1) return 0
+
+  const ctx = getToday(targetDay)
+  const progress = getDailyChoreProgress(state.chores, state.completions, kidId, ctx)
+  if (progress.total > 0 && progress.remaining === 0) {
+    return 0
+  }
+
+  const [removed] = state.completions.splice(bonusIndex, 1)
+  return -removed.starsAwarded
+}
+
 async function approvalUrl(choreId: string, kidId: string, dayIso: string): Promise<string> {
   const baseUrl = await getBaseUrl()
   const url = new URL(`/chores/approve/${encodeURIComponent(choreId)}`, baseUrl)
@@ -130,14 +213,15 @@ async function applyCompletion({
   targetDay: string
 }): Promise<CompletionResult> {
   const today = todayIsoDate()
-  const completionTimestamp =
-    targetDay === today
-      ? new Date().toISOString()
-      : new Date(`${targetDay}T12:00:00Z`).toISOString()
+  const completionTimestamp = completionTimestampForDay(targetDay)
   let telegramMessage: string | null = null
   let undoLink: string | null = null
+  let bonusMessage: string | null = null
   let result: CompletionResult = {
     awarded: 0,
+    bonusAwarded: false,
+    bonusStars: 0,
+    bonusMessage: null,
     telegramMessage: null,
     undoLink: null,
     status: 'invalid',
@@ -194,12 +278,24 @@ async function applyCompletion({
       telegramMessage = `${kid.name} completed "${chore.title}" (+${awarded} ⭐️, ${starTotal} ⭐️ total)`
     }
 
+    const bonusResult = maybeAwardDailyBonus({
+      state,
+      kidId,
+      kidName: kid.name,
+      targetDay,
+    })
+
+    bonusMessage = bonusResult.bonusMessage
+
     result = {
       awarded,
       choreTitle: chore.title,
       kidName: kid.name,
       completionId,
       status: 'completed',
+      bonusAwarded: bonusResult.awarded,
+      bonusStars: bonusResult.bonusStars,
+      bonusMessage: bonusResult.bonusMessage,
     }
   })
 
@@ -214,6 +310,7 @@ async function applyCompletion({
 
   result.telegramMessage = telegramMessage
   result.undoLink = undoLink
+  result.bonusMessage = bonusMessage
 
   if (telegramMessage && notifyTelegram) {
     const keyboard = undoLink
@@ -223,6 +320,12 @@ async function applyCompletion({
     bot.telegram
       .sendMessage('-4904434425', telegramMessage, keyboard)
       .catch((err) => console.error('Failed to send Telegram completion message', err))
+  }
+
+  if (bonusMessage && notifyTelegram) {
+    bot.telegram
+      .sendMessage('-4904434425', bonusMessage)
+      .catch((err) => console.error('Failed to send Telegram bonus message', err))
   }
 
   return result
@@ -395,7 +498,7 @@ async function applyUndo({
     }
 
     const [removed] = state.completions.splice(index, 1)
-    const delta = -removed.starsAwarded
+    let delta = -removed.starsAwarded
 
     if (chore.type === 'one-off') {
       const allDone = chore.kidIds.every((id) =>
@@ -405,6 +508,8 @@ async function applyUndo({
         chore.completedAt = null
       }
     }
+
+    delta += maybeRevokeDailyBonus({ state, kidId, targetDay })
 
     const starTotal = starsForKid(state.completions, kidId)
 
@@ -486,16 +591,20 @@ export async function pauseAllChores(formData: FormData): Promise<void> {
   })
 }
 
-export async function skipChore(formData: FormData): Promise<void> {
+export async function skipChore(formData: FormData): Promise<SkipResult> {
   await requireAuthorization(formData)
 
   const choreId = formData.get('choreId')?.toString()
   const kidId = formData.get('kidId')?.toString()
-  if (!choreId || !kidId) return
+  if (!choreId || !kidId) {
+    return { bonusAwarded: false, bonusStars: 0, bonusMessage: null }
+  }
 
   const today = todayIsoDate()
   const nextDay = shiftIsoDay(today, 1)
   let telegramMessage: string | null = null
+  let bonusMessage: string | null = null
+  let bonusResult: SkipResult = { bonusAwarded: false, bonusStars: 0, bonusMessage: null }
 
   await withUpdatedState((state) => {
     const chore = state.chores.find((c) => c.id === choreId)
@@ -514,6 +623,19 @@ export async function skipChore(formData: FormData): Promise<void> {
       const dayLabel = nextDay === today ? 'today' : `tomorrow (${nextDay})`
       telegramMessage = `${kid.name} skipped "${chore.title}" (snoozed to ${dayLabel})`
     }
+
+    const dailyBonus = maybeAwardDailyBonus({
+      state,
+      kidId,
+      kidName: kid.name,
+      targetDay: today,
+    })
+    bonusMessage = dailyBonus.bonusMessage
+    bonusResult = {
+      bonusAwarded: dailyBonus.awarded,
+      bonusStars: dailyBonus.bonusStars,
+      bonusMessage: dailyBonus.bonusMessage,
+    }
   })
 
   if (telegramMessage) {
@@ -521,6 +643,14 @@ export async function skipChore(formData: FormData): Promise<void> {
       .sendMessage('-4904434425', telegramMessage)
       .catch((err) => console.error('Failed to send Telegram skip message', err))
   }
+
+  if (bonusMessage) {
+    bot.telegram
+      .sendMessage('-4904434425', bonusMessage)
+      .catch((err) => console.error('Failed to send Telegram bonus message', err))
+  }
+
+  return bonusResult
 }
 
 export async function setChoreSchedule(formData: FormData): Promise<void> {

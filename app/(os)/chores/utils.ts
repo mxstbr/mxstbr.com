@@ -3,6 +3,8 @@ import type { Chore, Completion, Reward, RewardRedemption } from './data'
 export const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 export const DAY_ABBRS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 export const PACIFIC_TIMEZONE = 'America/Los_Angeles'
+export const DAILY_BONUS_STARS = 5
+const DAILY_BONUS_PREFIX = 'daily-bonus'
 const TIME_ORDER: Record<'morning' | 'afternoon' | 'evening' | 'night', number> = {
   morning: 0,
   afternoon: 1,
@@ -41,6 +43,13 @@ export type TodayContext = {
 
 const ISO_DAY_REGEX = /^\d{4}-\d{2}-\d{2}$/
 const ALL_WEEKDAYS = [0, 1, 2, 3, 4, 5, 6]
+
+export type DailyChoreProgress = {
+  total: number
+  completed: number
+  skipped: number
+  remaining: number
+}
 
 function dateFromIsoDay(day: string): Date | null {
   if (!ISO_DAY_REGEX.test(day)) return null
@@ -110,6 +119,21 @@ export function pacificDateFromTimestamp(timestamp: string): string {
     return formatPacificDate(new Date())
   }
   return formatPacificDate(date)
+}
+
+export function dailyBonusChoreId(dayIso: string): string {
+  return `${DAILY_BONUS_PREFIX}:${dayIso}`
+}
+
+export function hasDailyBonus(
+  completions: Completion[],
+  kidId: string,
+  dayIso: string,
+): boolean {
+  const bonusId = dailyBonusChoreId(dayIso)
+  return completions.some(
+    (completion) => completion.kidId === kidId && completion.choreId === bonusId,
+  )
 }
 
 const NIGHT_START_MINUTES = 20 * 60
@@ -237,6 +261,75 @@ export function isOpenForKid(
     ctx,
   )
   return !doneToday
+}
+
+export function isChoreExpectedForDay(
+  chore: Chore,
+  kidId: string,
+  completions: Completion[],
+  ctx: TodayContext,
+): boolean {
+  if (!chore.kidIds.includes(kidId)) return false
+  if (chore.type === 'perpetual' && !chore.timeOfDay) return false
+  const createdDay = pacificDateFromTimestamp(chore.createdAt)
+  const scheduledDay = chore.scheduledFor || createdDay
+  if (scheduledDay > ctx.todayIso) return false
+  if (isPaused(chore, ctx)) return false
+  if (chore.snoozedUntil && chore.snoozedUntil > ctx.todayIso) return false
+
+  if (chore.type === 'one-off') {
+    const completedBeforeDay = completions.some((completion) => {
+      if (completion.choreId !== chore.id || completion.kidId !== kidId)
+        return false
+      const day = pacificDateFromTimestamp(completion.timestamp)
+      return day < ctx.todayIso
+    })
+    return !completedBeforeDay
+  }
+
+  const cadence = chore.schedule?.cadence ?? 'daily'
+  const daysOfWeek = (chore.schedule?.daysOfWeek ?? []).filter(
+    (day) => typeof day === 'number' && day >= 0 && day <= 6,
+  )
+  const allowedDays = daysOfWeek.length ? daysOfWeek : ALL_WEEKDAYS
+  const isScheduledToday = allowedDays.includes(ctx.weekday)
+
+  if (cadence === 'weekly') {
+    return isScheduledToday
+  }
+
+  if (daysOfWeek.length && !isScheduledToday) return false
+  return true
+}
+
+export function getDailyChoreProgress(
+  chores: Chore[],
+  completions: Completion[],
+  kidId: string,
+  ctx: TodayContext,
+): DailyChoreProgress {
+  const progress: DailyChoreProgress = {
+    total: 0,
+    completed: 0,
+    skipped: 0,
+    remaining: 0,
+  }
+
+  for (const chore of chores) {
+    if (!isChoreExpectedForDay(chore, kidId, completions, ctx)) continue
+    progress.total += 1
+    if (isOpenForKid(chore, kidId, completions, ctx)) {
+      progress.remaining += 1
+      continue
+    }
+    if (hasCompletedTodayForKid(chore.id, kidId, completions, ctx)) {
+      progress.completed += 1
+    } else {
+      progress.skipped += 1
+    }
+  }
+
+  return progress
 }
 
 export function scheduleLabel(chore: Chore): string {
