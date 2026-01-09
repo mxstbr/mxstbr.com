@@ -912,180 +912,182 @@ function KidColumn({
 
   return (
     <div
-      className="flex flex-col gap-3 overflow-hidden rounded-2xl border bg-white p-3 shadow-xs dark:bg-slate-900 md:h-full md:min-h-0"
+      className="flex min-h-0 flex-col overflow-hidden rounded-2xl border bg-white p-3 shadow-xs dark:bg-slate-900 md:h-full md:min-h-0"
       style={{
         borderColor: accentColor,
         backgroundColor: accentSoft,
         boxShadow: `0 14px 40px -22px ${accentSoft}, inset 0 1px 0 ${accentSoft}`,
       }}
     >
-      <div
-        className="sticky -top-3 z-10 -mx-3 -mt-3 flex flex-wrap items-center gap-3 px-3 py-2"
-        style={{
-          backgroundColor: accentSoft,
-          boxShadow: `0 10px 30px -25px ${accentColor}`,
-          backdropFilter: 'blur(6px)',
-          WebkitBackdropFilter: 'blur(6px)',
-        }}
-      >
-        <button
-          type="button"
-          onClick={() => {
-            setPendingColor(accentColor)
-            setColorModalOpen(true)
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
+        <div
+          className="sticky -top-3 z-10 -mx-3 -mt-3 flex flex-wrap items-center gap-3 px-3 py-2"
+          style={{
+            backgroundColor: accentSoft,
+            boxShadow: `0 10px 30px -25px ${accentColor}`,
+            backdropFilter: 'blur(6px)',
+            WebkitBackdropFilter: 'blur(6px)',
           }}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-slate-900 transition hover:text-slate-700 dark:text-slate-50 dark:hover:text-slate-200 xl:text-base"
-          aria-label={`Change ${kid.name}'s color`}
         >
-          <span>{kid.name}</span>
-          <span aria-hidden="true" className="text-base text-slate-500">
-            ›
-          </span>
-        </button>
-        <div className="min-w-[120px] flex-1">
-          <div className="relative h-5 overflow-hidden rounded-full border border-slate-200/70 bg-slate-100/80 dark:border-slate-700 dark:bg-slate-800/80">
-            <div
-              className="h-full rounded-full transition-all duration-500 ease-out"
-              style={{
-                width: `${progressPercent}%`,
-                backgroundColor: accentColor,
-              }}
-              aria-hidden="true"
-            />
-            <div className="absolute inset-0 flex items-center justify-center text-[10px] font-semibold text-slate-700 dark:text-slate-100">
-              {progress.total > 0 ? (
-                <span className="inline-flex items-center gap-1">
-                  <span>{completedCount}</span>
-                  <span className="text-slate-400">/</span>
-                  <span>{progress.total}</span>
-                  <span className="text-slate-400">|</span>
-                  <span className="text-slate-900 drop-shadow-sm dark:text-slate-50">
-                    +{DAILY_BONUS_STARS} ⭐️
+          <button
+            type="button"
+            onClick={() => {
+              setPendingColor(accentColor)
+              setColorModalOpen(true)
+            }}
+            className="inline-flex items-center gap-2 text-sm font-semibold text-slate-900 transition hover:text-slate-700 dark:text-slate-50 dark:hover:text-slate-200 xl:text-base"
+            aria-label={`Change ${kid.name}'s color`}
+          >
+            <span>{kid.name}</span>
+            <span aria-hidden="true" className="text-base text-slate-500">
+              ›
+            </span>
+          </button>
+          <div className="min-w-[120px] flex-1">
+            <div className="relative h-5 overflow-hidden rounded-full border border-slate-200/70 bg-slate-100/80 dark:border-slate-700 dark:bg-slate-800/80">
+              <div
+                className="h-full rounded-full transition-all duration-500 ease-out"
+                style={{
+                  width: `${progressPercent}%`,
+                  backgroundColor: accentColor,
+                }}
+                aria-hidden="true"
+              />
+              <div className="absolute inset-0 flex items-center justify-center text-[10px] font-semibold text-slate-700 dark:text-slate-100">
+                {progress.total > 0 ? (
+                  <span className="inline-flex items-center gap-1">
+                    <span>{completedCount}</span>
+                    <span className="text-slate-400">/</span>
+                    <span>{progress.total}</span>
+                    <span className="text-slate-400">|</span>
+                    <span className="text-slate-900 drop-shadow-sm dark:text-slate-50">
+                      +{DAILY_BONUS_STARS} ⭐️
+                    </span>
                   </span>
-                </span>
-              ) : (
-                <span>No chores today</span>
-              )}
+                ) : (
+                  <span>No chores today</span>
+                )}
+              </div>
             </div>
           </div>
+          <StarBadge value={starTotal} accent={accentColor} />
         </div>
-        <StarBadge value={starTotal} accent={accentColor} />
-      </div>
 
-      <div className="space-y-3">
-        {chores.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-center text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200">
-            All clear! Come back when something new pops up.
-          </div>
-        ) : (
-          timeGroups
-            .map((group) => ({
-              ...group,
-              items: choresByTime[group.key],
-            }))
-            .filter((group) => group.items.length > 0)
-            .map((group) => {
-              const collapsed = collapsedGroups[group.key]
-              return (
-                <div key={group.key} className="space-y-1.5">
-                  <button
-                    type="button"
-                    onClick={() => toggleGroup(group.key)}
-                    className="flex w-full items-center gap-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 transition hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100"
-                    aria-expanded={!collapsed}
-                  >
-                    <span
-                      aria-hidden="true"
-                      className={`text-base text-slate-500 transition-transform ${
-                        collapsed ? '' : 'rotate-90'
-                      }`}
+        <div className="space-y-3">
+          {chores.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-center text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200">
+              All clear! Come back when something new pops up.
+            </div>
+          ) : (
+            timeGroups
+              .map((group) => ({
+                ...group,
+                items: choresByTime[group.key],
+              }))
+              .filter((group) => group.items.length > 0)
+              .map((group) => {
+                const collapsed = collapsedGroups[group.key]
+                return (
+                  <div key={group.key} className="space-y-1.5">
+                    <button
+                      type="button"
+                      onClick={() => toggleGroup(group.key)}
+                      className="flex w-full items-center gap-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 transition hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100"
+                      aria-expanded={!collapsed}
                     >
-                      &gt;
-                    </span>
-                    {group.emoji ? (
-                      <span aria-hidden="true">{group.emoji}</span>
-                    ) : null}
-                    <span>{group.label}</span>
-                    {collapsed ? (
-                      <span className="ml-auto rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
-                        {group.items.length} left
+                      <span
+                        aria-hidden="true"
+                        className={`text-base text-slate-500 transition-transform ${
+                          collapsed ? '' : 'rotate-90'
+                        }`}
+                      >
+                        &gt;
                       </span>
+                      {group.emoji ? (
+                        <span aria-hidden="true">{group.emoji}</span>
+                      ) : null}
+                      <span>{group.label}</span>
+                      {collapsed ? (
+                        <span className="ml-auto rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                          {group.items.length} left
+                        </span>
+                      ) : null}
+                    </button>
+                    {!collapsed ? (
+                      <div className="space-y-2">
+                        {group.items.map((chore) => (
+                          <ChoreButton
+                            key={chore.id}
+                            chore={chore}
+                            accent={accentColor}
+                            kidId={kid.id}
+                            onComplete={onComplete}
+                            onBonusAwarded={onBonusAwarded}
+                            disabled={disableCompletion}
+                            approvalRequested={
+                              approvalRequestsForDay[
+                                approvalRequestKey(kid.id, chore.id)
+                              ] ?? false
+                            }
+                          />
+                        ))}
+                      </div>
                     ) : null}
-                  </button>
-                  {!collapsed ? (
-                    <div className="space-y-2">
-                      {group.items.map((chore) => (
-                        <ChoreButton
-                          key={chore.id}
-                          chore={chore}
-                          accent={accentColor}
-                          kidId={kid.id}
-                          onComplete={onComplete}
-                          onBonusAwarded={onBonusAwarded}
-                          disabled={disableCompletion}
-                          approvalRequested={
-                            approvalRequestsForDay[
-                              approvalRequestKey(kid.id, chore.id)
-                            ] ?? false
-                          }
-                        />
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              )
-            })
-        )}
-      </div>
+                  </div>
+                )
+              })
+          )}
+        </div>
 
-      {doneChores.length ? (
-        <div className="mt-5 space-y-2 md:mt-6">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-            <button
-              type="button"
-              onClick={() =>
-                setCollapsedDone((prev) => {
-                  const next = !prev
-                  doneExpansion.current = !next
-                  return next
-                })
-              }
-              className="inline-flex items-center gap-2 transition hover:text-slate-900 dark:hover:text-slate-100"
-              aria-expanded={!collapsedDone}
-            >
-              <span
-                aria-hidden="true"
-                className={`text-base text-slate-500 transition-transform ${
-                  collapsedDone ? '' : 'rotate-90'
-                }`}
+        {doneChores.length ? (
+          <div className="mt-5 space-y-2 md:mt-6">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
+              <button
+                type="button"
+                onClick={() =>
+                  setCollapsedDone((prev) => {
+                    const next = !prev
+                    doneExpansion.current = !next
+                    return next
+                  })
+                }
+                className="inline-flex items-center gap-2 transition hover:text-slate-900 dark:hover:text-slate-100"
+                aria-expanded={!collapsedDone}
               >
-                &gt;
-              </span>
-              <span>Done today</span>
-            </button>
-            <span className="h-px flex-1 rounded-full bg-slate-200 dark:bg-slate-700" />
-            {collapsedDone ? (
-              <span className="rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
-                {doneChores.length} done
-              </span>
+                <span
+                  aria-hidden="true"
+                  className={`text-base text-slate-500 transition-transform ${
+                    collapsedDone ? '' : 'rotate-90'
+                  }`}
+                >
+                  &gt;
+                </span>
+                <span>Done today</span>
+              </button>
+              <span className="h-px flex-1 rounded-full bg-slate-200 dark:bg-slate-700" />
+              {collapsedDone ? (
+                <span className="rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                  {doneChores.length} done
+                </span>
+              ) : null}
+            </div>
+            {!collapsedDone ? (
+              <div className="space-y-2">
+                {doneChores.map((entry) => (
+                  <CompletedChoreButton
+                    key={`${entry.chore.id}-${entry.completionId}`}
+                    chore={entry.chore}
+                    completionId={entry.completionId}
+                    accent={accentColor}
+                    kidId={kid.id}
+                    onUndo={onUndo}
+                  />
+                ))}
+              </div>
             ) : null}
           </div>
-          {!collapsedDone ? (
-            <div className="space-y-2">
-              {doneChores.map((entry) => (
-                <CompletedChoreButton
-                  key={`${entry.chore.id}-${entry.completionId}`}
-                  chore={entry.chore}
-                  completionId={entry.completionId}
-                  accent={accentColor}
-                  kidId={kid.id}
-                  onUndo={onUndo}
-                />
-              ))}
-            </div>
-          ) : null}
-        </div>
-      ) : null}
+        ) : null}
+      </div>
 
       {colorModalOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
