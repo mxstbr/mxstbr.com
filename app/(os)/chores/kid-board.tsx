@@ -919,59 +919,60 @@ function KidColumn({
         boxShadow: `0 14px 40px -22px ${accentSoft}, inset 0 1px 0 ${accentSoft}`,
       }}
     >
-      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
-        <div
-          className="sticky -top-3 z-10 -mx-3 -mt-3 flex flex-wrap items-center gap-3 px-3 py-2"
-          style={{
-            backgroundColor: accentSoft,
-            boxShadow: `0 10px 30px -25px ${accentColor}`,
-            backdropFilter: 'blur(6px)',
-            WebkitBackdropFilter: 'blur(6px)',
+      <div
+        className="-mx-3 -mt-3 flex flex-wrap items-center gap-3 px-3 py-2"
+        style={{
+          backgroundColor: accentSoft,
+          boxShadow: `0 10px 30px -25px ${accentColor}`,
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => {
+            setPendingColor(accentColor)
+            setColorModalOpen(true)
           }}
+          className="inline-flex items-center gap-2 text-sm font-semibold text-slate-900 transition hover:text-slate-700 dark:text-slate-50 dark:hover:text-slate-200 xl:text-base"
+          aria-label={`Change ${kid.name}'s color`}
         >
-          <button
-            type="button"
-            onClick={() => {
-              setPendingColor(accentColor)
-              setColorModalOpen(true)
-            }}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-slate-900 transition hover:text-slate-700 dark:text-slate-50 dark:hover:text-slate-200 xl:text-base"
-            aria-label={`Change ${kid.name}'s color`}
-          >
-            <span>{kid.name}</span>
-            <span aria-hidden="true" className="text-base text-slate-500">
-              ›
-            </span>
-          </button>
-          <div className="min-w-[120px] flex-1">
-            <div className="relative h-5 overflow-hidden rounded-full border border-slate-200/70 bg-slate-100/80 dark:border-slate-700 dark:bg-slate-800/80">
-              <div
-                className="h-full rounded-full transition-all duration-500 ease-out"
-                style={{
-                  width: `${progressPercent}%`,
-                  backgroundColor: accentColor,
-                }}
-                aria-hidden="true"
-              />
-              <div className="absolute inset-0 flex items-center justify-center text-[10px] font-semibold text-slate-700 dark:text-slate-100">
-                {progress.total > 0 ? (
-                  <span className="inline-flex items-center gap-1">
-                    <span>{completedCount}</span>
-                    <span className="text-slate-400">/</span>
-                    <span>{progress.total}</span>
-                    <span className="text-slate-400">|</span>
-                    <span className="text-slate-900 drop-shadow-sm dark:text-slate-50">
-                      +{DAILY_BONUS_STARS} ⭐️
-                    </span>
+          <span>{kid.name}</span>
+          <span aria-hidden="true" className="text-base text-slate-500">
+            ›
+          </span>
+        </button>
+        <div className="min-w-[120px] flex-1">
+          <div className="relative h-5 overflow-hidden rounded-full border border-slate-200/70 bg-slate-100/80 dark:border-slate-700 dark:bg-slate-800/80">
+            <div
+              className="h-full rounded-full transition-all duration-500 ease-out"
+              style={{
+                width: `${progressPercent}%`,
+                backgroundColor: accentColor,
+              }}
+              aria-hidden="true"
+            />
+            <div className="absolute inset-0 flex items-center justify-center text-[10px] font-semibold text-slate-700 dark:text-slate-100">
+              {progress.total > 0 ? (
+                <span className="inline-flex items-center gap-1">
+                  <span>{completedCount}</span>
+                  <span className="text-slate-400">/</span>
+                  <span>{progress.total}</span>
+                  <span className="text-slate-400">|</span>
+                  <span className="text-slate-900 drop-shadow-sm dark:text-slate-50">
+                    +{DAILY_BONUS_STARS} ⭐️
                   </span>
-                ) : (
-                  <span>No chores today</span>
-                )}
-              </div>
+                </span>
+              ) : (
+                <span>No chores today</span>
+              )}
             </div>
           </div>
-          <StarBadge value={starTotal} accent={accentColor} />
         </div>
+        <StarBadge value={starTotal} accent={accentColor} />
+      </div>
+
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pt-3">
 
         <div className="space-y-3">
           {chores.length === 0 ? (
