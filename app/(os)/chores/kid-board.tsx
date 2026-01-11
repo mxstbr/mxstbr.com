@@ -993,13 +993,13 @@ function KidColumn({
                     <button
                       type="button"
                       onClick={() => toggleGroup(group.key)}
-                      className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 transition hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100"
+                      className="-mx-1.5 -my-1 flex w-full items-center gap-2 rounded-md px-1.5 py-1 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 transition hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100"
                       aria-expanded={!collapsed}
                     >
                       <svg
                         aria-hidden="true"
                         viewBox="0 0 20 20"
-                        className={`text-base text-slate-500 transition-transform ${
+                        className={`h-3 w-3 text-slate-500 transition-transform ${
                           collapsed ? '' : 'rotate-90'
                         }`}
                       >
@@ -1060,13 +1060,13 @@ function KidColumn({
                     return next
                   })
                 }
-                className="inline-flex items-center gap-2 rounded-md px-2 py-1.5 transition hover:text-slate-900 dark:hover:text-slate-100"
+                className="-mx-1 -my-1 inline-flex items-center gap-2 rounded-md px-1 py-1 transition hover:text-slate-900 dark:hover:text-slate-100"
                 aria-expanded={!collapsedDone}
               >
                 <svg
                   aria-hidden="true"
                   viewBox="0 0 20 20"
-                  className={`text-base text-slate-500 transition-transform ${
+                  className={`h-3 w-3 text-slate-500 transition-transform ${
                     collapsedDone ? '' : 'rotate-90'
                   }`}
                 >
