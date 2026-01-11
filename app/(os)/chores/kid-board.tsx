@@ -993,19 +993,29 @@ function KidColumn({
                     <button
                       type="button"
                       onClick={() => toggleGroup(group.key)}
-                      className="flex w-full items-center gap-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 transition hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100"
+                      className="-mx-1.5 -my-1 flex w-full items-center gap-2 rounded-md px-1.5 py-1 text-left text-sm font-semibold uppercase tracking-wide text-slate-600 transition hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100"
                       aria-expanded={!collapsed}
                     >
-                      <span
+                      <svg
                         aria-hidden="true"
-                        className={`text-base text-slate-500 transition-transform ${
+                        viewBox="0 0 20 20"
+                        className={`h-4 w-4 text-slate-500 transition-transform ${
                           collapsed ? '' : 'rotate-90'
                         }`}
                       >
-                        &gt;
-                      </span>
+                        <path
+                          d="m7 5 6 5-6 5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                        />
+                      </svg>
                       {group.emoji ? (
-                        <span aria-hidden="true">{group.emoji}</span>
+                        <span aria-hidden="true" className="text-sm">
+                          {group.emoji}
+                        </span>
                       ) : null}
                       <span>{group.label}</span>
                       {collapsed ? (
@@ -1015,7 +1025,7 @@ function KidColumn({
                       ) : null}
                     </button>
                     {!collapsed ? (
-                      <div className="space-y-2">
+                      <div className="mt-1.5 space-y-2">
                         {group.items.map((chore) => (
                           <ChoreButton
                             key={chore.id}
@@ -1042,7 +1052,7 @@ function KidColumn({
 
         {doneChores.length ? (
           <div className="mt-5 space-y-2 md:mt-6">
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
+            <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
               <button
                 type="button"
                 onClick={() =>
@@ -1052,17 +1062,25 @@ function KidColumn({
                     return next
                   })
                 }
-                className="inline-flex items-center gap-2 transition hover:text-slate-900 dark:hover:text-slate-100"
+                className="-mx-1 -my-1 inline-flex items-center gap-2 rounded-md px-1 py-1 transition hover:text-slate-900 dark:hover:text-slate-100"
                 aria-expanded={!collapsedDone}
               >
-                <span
+                <svg
                   aria-hidden="true"
-                  className={`text-base text-slate-500 transition-transform ${
+                  viewBox="0 0 20 20"
+                  className={`h-4 w-4 text-slate-500 transition-transform ${
                     collapsedDone ? '' : 'rotate-90'
                   }`}
                 >
-                  &gt;
-                </span>
+                  <path
+                    d="m7 5 6 5-6 5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                  />
+                </svg>
                 <span>Done today</span>
               </button>
               <span className="h-px flex-1 rounded-full bg-slate-200 dark:bg-slate-700" />
