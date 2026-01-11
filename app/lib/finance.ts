@@ -7,10 +7,11 @@ import {
   getHoldingsData,
   updateHolding,
 } from 'app/(os)/finance/holdings-data'
+import { withToolErrorHandling } from 'app/lib/mcp/tool-errors'
 
 const isoDateSchema = z
   .string()
-  .regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)
+  .regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/, 'Date must be in YYYY-MM-DD format')
   .describe('Date formatted as YYYY-MM-DD')
 
 const holdingSchema = z.object({
@@ -39,7 +40,7 @@ export function registerFinanceTools(server: McpServer) {
       outputSchema: holdingsResponseSchema,
       annotations: { readOnlyHint: true },
     },
-    async () => {
+    withToolErrorHandling('read_finance_holdings', async () => {
       const holdings = await getHoldingsData()
       return {
         content: [],
@@ -48,7 +49,7 @@ export function registerFinanceTools(server: McpServer) {
           holdings,
         },
       }
-    },
+    }),
   )
 
   server.registerTool(
@@ -66,7 +67,7 @@ export function registerFinanceTools(server: McpServer) {
       }),
       outputSchema: mutationResponseSchema,
     },
-    async ({ ticker, shares, date }) => {
+    withToolErrorHandling('add_finance_holding', async ({ ticker, shares, date }) => {
       const holding = { ticker, shares, date }
       await addHolding(holding)
 
@@ -77,7 +78,7 @@ export function registerFinanceTools(server: McpServer) {
           holdings: await getHoldingsData(),
         },
       }
-    },
+    }),
   )
 
   server.registerTool(
@@ -97,10 +98,17 @@ export function registerFinanceTools(server: McpServer) {
       }),
       outputSchema: mutationResponseSchema,
     },
-    async ({ index, ticker, shares, date }) => {
+    withToolErrorHandling(
+      'update_finance_holding',
+      async ({ index, ticker, shares, date }) => {
       const holdings = await getHoldingsData()
       if (index >= holdings.length) {
-        throw new Error(`No holding found at index ${index}`)
+        throw new Error(
+          `No holding found at index ${index}. Valid indices are 0 through ${Math.max(
+            holdings.length - 1,
+            0,
+          )}.`,
+        )
       }
 
       const existing = holdings[index]
@@ -119,7 +127,8 @@ export function registerFinanceTools(server: McpServer) {
           holdings: await getHoldingsData(),
         },
       }
-    },
+      },
+    ),
   )
 
   server.registerTool(
@@ -132,10 +141,15 @@ export function registerFinanceTools(server: McpServer) {
       }),
       outputSchema: mutationResponseSchema,
     },
-    async ({ index }) => {
+    withToolErrorHandling('delete_finance_holding', async ({ index }) => {
       const holdings = await getHoldingsData()
       if (index >= holdings.length) {
-        throw new Error(`No holding found at index ${index}`)
+        throw new Error(
+          `No holding found at index ${index}. Valid indices are 0 through ${Math.max(
+            holdings.length - 1,
+            0,
+          )}.`,
+        )
       }
 
       await deleteHolding(index)
@@ -147,6 +161,6 @@ export function registerFinanceTools(server: McpServer) {
           holdings: await getHoldingsData(),
         },
       }
-    },
+    }),
   )
 }

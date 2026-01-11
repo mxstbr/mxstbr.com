@@ -33,10 +33,11 @@ import {
 import { Redis } from '@upstash/redis'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { siteUrl } from './site-url'
+import { withToolErrorHandling } from 'app/lib/mcp/tool-errors'
 
 const isoDaySchema = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/)
+  .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
   .describe('Pacific date in YYYY-MM-DD format')
 
 const automationToken =
@@ -456,7 +457,7 @@ export function registerChoreTools(server: McpServer) {
       outputSchema: choreSearchResultSchema,
       annotations: { readOnlyHint: true },
     },
-    async ({ query, kid_ids, limit = 10 }) => {
+    withToolErrorHandling('search_chores', async ({ query, kid_ids, limit = 10 }) => {
       const { chores, kids } = await loadChoresForSearch()
       const normalizedLimit = Math.min(50, Math.max(1, limit ?? 10))
       const tokens = query
@@ -515,7 +516,7 @@ export function registerChoreTools(server: McpServer) {
           results,
         },
       }
-    },
+    }),
   )
   server.registerTool(
     'read_chore_board',
@@ -531,7 +532,7 @@ export function registerChoreTools(server: McpServer) {
       outputSchema: readBoardSchema,
       annotations: { readOnlyHint: true },
     },
-    async ({ day }: { day?: string }) => {
+    withToolErrorHandling('read_chore_board', async ({ day }: { day?: string }) => {
       const snapshot = await loadChoreSnapshot(day)
       const message = `Loaded chore board for ${
         snapshot?.ctx?.todayIso ?? 'today'
@@ -548,7 +549,7 @@ export function registerChoreTools(server: McpServer) {
           : undefined,
         // _meta: toChoresTodayMetadata(snapshot),
       }
-    },
+    }),
   )
   server.registerTool(
     'create_chore',
@@ -569,64 +570,67 @@ export function registerChoreTools(server: McpServer) {
       }),
       outputSchema: messageWithSnapshotSchema,
     },
-    async ({
-      title,
-      emoji,
-      stars,
-      kid_ids,
-      type,
-      cadence,
-      days_of_week,
-      time_of_day,
-      requires_approval,
-      scheduled_for,
-    }: {
-      title: string
-      emoji?: string
-      stars: number
-      kid_ids: string[]
-      type: 'one-off' | 'repeated' | 'perpetual'
-      cadence?: 'daily' | 'weekly'
-      days_of_week?: number[]
-      time_of_day?: 'morning' | 'afternoon' | 'evening' | 'night'
-      requires_approval?: boolean
-      scheduled_for?: string
-    }) => {
-      const formData = new FormData()
-      appendAutomationToken(formData)
-      formData.append('title', title)
-      if (emoji) formData.append('emoji', emoji)
-      formData.append('stars', stars.toString())
-      kid_ids.forEach((kidId) => formData.append('kidIds', kidId))
-      formData.append('type', type)
-      if (type === 'one-off' && scheduled_for) {
-        formData.append('scheduledFor', scheduled_for)
-      }
-      if (type === 'repeated' && cadence) {
-        formData.append('cadence', cadence)
-        if (cadence === 'weekly') {
-          ;(days_of_week ?? []).forEach((day) =>
-            formData.append('daysOfWeek', day.toString()),
-          )
+    withToolErrorHandling(
+      'create_chore',
+      async ({
+        title,
+        emoji,
+        stars,
+        kid_ids,
+        type,
+        cadence,
+        days_of_week,
+        time_of_day,
+        requires_approval,
+        scheduled_for,
+      }: {
+        title: string
+        emoji?: string
+        stars: number
+        kid_ids: string[]
+        type: 'one-off' | 'repeated' | 'perpetual'
+        cadence?: 'daily' | 'weekly'
+        days_of_week?: number[]
+        time_of_day?: 'morning' | 'afternoon' | 'evening' | 'night'
+        requires_approval?: boolean
+        scheduled_for?: string
+      }) => {
+        const formData = new FormData()
+        appendAutomationToken(formData)
+        formData.append('title', title)
+        if (emoji) formData.append('emoji', emoji)
+        formData.append('stars', stars.toString())
+        kid_ids.forEach((kidId) => formData.append('kidIds', kidId))
+        formData.append('type', type)
+        if (type === 'one-off' && scheduled_for) {
+          formData.append('scheduledFor', scheduled_for)
         }
-      }
-      if (time_of_day) formData.append('timeOfDay', time_of_day)
-      if (requires_approval) formData.append('requiresApproval', 'true')
-      await addChore(formData)
-      const snapshot = await loadChoreSnapshot()
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: `Chore "${title}" created`,
-          },
-        ],
-        structuredContent: toStructuredContent({
-          message: `Chore "${title}" created`,
-          snapshot,
-        }),
-      }
-    },
+        if (type === 'repeated' && cadence) {
+          formData.append('cadence', cadence)
+          if (cadence === 'weekly') {
+            ;(days_of_week ?? []).forEach((day) =>
+              formData.append('daysOfWeek', day.toString()),
+            )
+          }
+        }
+        if (time_of_day) formData.append('timeOfDay', time_of_day)
+        if (requires_approval) formData.append('requiresApproval', 'true')
+        await addChore(formData)
+        const snapshot = await loadChoreSnapshot()
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: `Chore "${title}" created`,
+            },
+          ],
+          structuredContent: toStructuredContent({
+            message: `Chore "${title}" created`,
+            snapshot,
+          }),
+        }
+      },
+    ),
   )
   server.registerTool(
     'complete_chore',
@@ -639,7 +643,9 @@ export function registerChoreTools(server: McpServer) {
       }),
       outputSchema: completionResultSchema,
     },
-    async ({ chore_id, kid_id }: { chore_id: string; kid_id: string }) => {
+    withToolErrorHandling(
+      'complete_chore',
+      async ({ chore_id, kid_id }: { chore_id: string; kid_id: string }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('choreId', chore_id)
@@ -660,7 +666,8 @@ export function registerChoreTools(server: McpServer) {
           snapshot,
         }),
       }
-    },
+      },
+    ),
   )
   server.registerTool(
     'undo_chore_completion',
@@ -674,15 +681,17 @@ export function registerChoreTools(server: McpServer) {
       }),
       outputSchema: undoResultSchema,
     },
-    async ({
-      chore_id,
-      kid_id,
-      completion_id,
-    }: {
-      chore_id: string
-      kid_id: string
-      completion_id?: string
-    }) => {
+    withToolErrorHandling(
+      'undo_chore_completion',
+      async ({
+        chore_id,
+        kid_id,
+        completion_id,
+      }: {
+        chore_id: string
+        kid_id: string
+        completion_id?: string
+      }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('choreId', chore_id)
@@ -704,7 +713,8 @@ export function registerChoreTools(server: McpServer) {
           snapshot,
         }),
       }
-    },
+      },
+    ),
   )
   server.registerTool(
     'set_chore_schedule',
@@ -718,15 +728,17 @@ export function registerChoreTools(server: McpServer) {
       }),
       outputSchema: messageWithSnapshotSchema,
     },
-    async ({
-      chore_id,
-      cadence,
-      days_of_week,
-    }: {
-      chore_id: string
-      cadence: 'daily' | 'weekly'
-      days_of_week?: number[]
-    }) => {
+    withToolErrorHandling(
+      'set_chore_schedule',
+      async ({
+        chore_id,
+        cadence,
+        days_of_week,
+      }: {
+        chore_id: string
+        cadence: 'daily' | 'weekly'
+        days_of_week?: number[]
+      }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('choreId', chore_id)
@@ -754,7 +766,8 @@ export function registerChoreTools(server: McpServer) {
         ],
         structuredContent: toStructuredContent({ message, snapshot }),
       }
-    },
+      },
+    ),
   )
   server.registerTool(
     'pause_chore',
@@ -771,13 +784,15 @@ export function registerChoreTools(server: McpServer) {
       }),
       outputSchema: messageWithSnapshotSchema,
     },
-    async ({
-      chore_id,
-      paused_until,
-    }: {
-      chore_id: string
-      paused_until: string
-    }) => {
+    withToolErrorHandling(
+      'pause_chore',
+      async ({
+        chore_id,
+        paused_until,
+      }: {
+        chore_id: string
+        paused_until: string
+      }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('choreId', chore_id)
@@ -796,7 +811,8 @@ export function registerChoreTools(server: McpServer) {
         ],
         structuredContent: toStructuredContent({ message, snapshot }),
       }
-    },
+      },
+    ),
   )
   server.registerTool(
     'pause_all_chores',
@@ -812,7 +828,9 @@ export function registerChoreTools(server: McpServer) {
       }),
       outputSchema: messageWithSnapshotSchema,
     },
-    async ({ paused_until }: { paused_until: string }) => {
+    withToolErrorHandling(
+      'pause_all_chores',
+      async ({ paused_until }: { paused_until: string }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('pausedUntil', paused_until)
@@ -830,7 +848,8 @@ export function registerChoreTools(server: McpServer) {
         ],
         structuredContent: toStructuredContent({ message, snapshot }),
       }
-    },
+      },
+    ),
   )
   server.registerTool(
     'set_chore_assignments',
@@ -847,19 +866,21 @@ export function registerChoreTools(server: McpServer) {
       }),
       outputSchema: messageWithSnapshotSchema,
     },
-    async ({
-      chore_id,
-      kid_ids,
-      time_of_day,
-      clear_time_of_day,
-      requires_approval,
-    }: {
-      chore_id: string
-      kid_ids: string[]
-      time_of_day?: 'morning' | 'afternoon' | 'evening' | 'night'
-      clear_time_of_day?: boolean
-      requires_approval?: boolean
-    }) => {
+    withToolErrorHandling(
+      'set_chore_assignments',
+      async ({
+        chore_id,
+        kid_ids,
+        time_of_day,
+        clear_time_of_day,
+        requires_approval,
+      }: {
+        chore_id: string
+        kid_ids: string[]
+        time_of_day?: 'morning' | 'afternoon' | 'evening' | 'night'
+        clear_time_of_day?: boolean
+        requires_approval?: boolean
+      }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('choreId', chore_id)
@@ -889,7 +910,8 @@ export function registerChoreTools(server: McpServer) {
           snapshot,
         }),
       }
-    },
+      },
+    ),
   )
   server.registerTool(
     'set_one_off_date',
@@ -902,13 +924,15 @@ export function registerChoreTools(server: McpServer) {
       }),
       outputSchema: messageWithSnapshotSchema,
     },
-    async ({
-      chore_id,
-      scheduled_for,
-    }: {
-      chore_id: string
-      scheduled_for: string
-    }) => {
+    withToolErrorHandling(
+      'set_one_off_date',
+      async ({
+        chore_id,
+        scheduled_for,
+      }: {
+        chore_id: string
+        scheduled_for: string
+      }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('choreId', chore_id)
@@ -925,7 +949,8 @@ export function registerChoreTools(server: McpServer) {
         ],
         structuredContent: toStructuredContent({ message, snapshot }),
       }
-    },
+      },
+    ),
   )
   server.registerTool(
     'archive_chore',
@@ -937,7 +962,7 @@ export function registerChoreTools(server: McpServer) {
       }),
       outputSchema: messageWithSnapshotSchema,
     },
-    async ({ chore_id }: { chore_id: string }) => {
+    withToolErrorHandling('archive_chore', async ({ chore_id }: { chore_id: string }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('choreId', chore_id)
@@ -955,7 +980,7 @@ export function registerChoreTools(server: McpServer) {
           snapshot,
         }),
       }
-    },
+    }),
   )
   server.registerTool(
     'rename_kid',
@@ -970,15 +995,17 @@ export function registerChoreTools(server: McpServer) {
       }),
       outputSchema: messageWithSnapshotSchema,
     },
-    async ({
-      kid_id,
-      name,
-      color,
-    }: {
-      kid_id: string
-      name: string
-      color?: string
-    }) => {
+    withToolErrorHandling(
+      'rename_kid',
+      async ({
+        kid_id,
+        name,
+        color,
+      }: {
+        kid_id: string
+        name: string
+        color?: string
+      }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('kidId', kid_id)
@@ -996,7 +1023,8 @@ export function registerChoreTools(server: McpServer) {
         ],
         structuredContent: toStructuredContent({ message, snapshot }),
       }
-    },
+      },
+    ),
   )
   server.registerTool(
     'adjust_kid_stars',
@@ -1010,15 +1038,17 @@ export function registerChoreTools(server: McpServer) {
       }),
       outputSchema: messageWithSnapshotSchema,
     },
-    async ({
-      kid_id,
-      delta,
-      mode,
-    }: {
-      kid_id: string
-      delta: number
-      mode: 'add' | 'remove'
-    }) => {
+    withToolErrorHandling(
+      'adjust_kid_stars',
+      async ({
+        kid_id,
+        delta,
+        mode,
+      }: {
+        kid_id: string
+        delta: number
+        mode: 'add' | 'remove'
+      }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('kidId', kid_id)
@@ -1036,7 +1066,8 @@ export function registerChoreTools(server: McpServer) {
         ],
         structuredContent: toStructuredContent({ message, snapshot }),
       }
-    },
+      },
+    ),
   )
   server.registerTool(
     'add_reward',
@@ -1052,19 +1083,21 @@ export function registerChoreTools(server: McpServer) {
       }),
       outputSchema: messageWithSnapshotSchema,
     },
-    async ({
-      title,
-      emoji,
-      cost,
-      reward_type,
-      kid_ids,
-    }: {
-      title: string
-      emoji?: string
-      cost: number
-      reward_type: 'one-off' | 'perpetual'
-      kid_ids: string[]
-    }) => {
+    withToolErrorHandling(
+      'add_reward',
+      async ({
+        title,
+        emoji,
+        cost,
+        reward_type,
+        kid_ids,
+      }: {
+        title: string
+        emoji?: string
+        cost: number
+        reward_type: 'one-off' | 'perpetual'
+        kid_ids: string[]
+      }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('title', title)
@@ -1084,7 +1117,8 @@ export function registerChoreTools(server: McpServer) {
         ],
         structuredContent: toStructuredContent({ message, snapshot }),
       }
-    },
+      },
+    ),
   )
   server.registerTool(
     'set_reward_kids',
@@ -1097,13 +1131,15 @@ export function registerChoreTools(server: McpServer) {
       }),
       outputSchema: messageWithSnapshotSchema,
     },
-    async ({
-      reward_id,
-      kid_ids,
-    }: {
-      reward_id: string
-      kid_ids: string[]
-    }) => {
+    withToolErrorHandling(
+      'set_reward_kids',
+      async ({
+        reward_id,
+        kid_ids,
+      }: {
+        reward_id: string
+        kid_ids: string[]
+      }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('rewardId', reward_id)
@@ -1122,7 +1158,8 @@ export function registerChoreTools(server: McpServer) {
           snapshot,
         }),
       }
-    },
+      },
+    ),
   )
   server.registerTool(
     'archive_reward',
@@ -1134,7 +1171,9 @@ export function registerChoreTools(server: McpServer) {
       }),
       outputSchema: messageWithSnapshotSchema,
     },
-    async ({ reward_id }: { reward_id: string }) => {
+    withToolErrorHandling(
+      'archive_reward',
+      async ({ reward_id }: { reward_id: string }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('rewardId', reward_id)
@@ -1152,7 +1191,8 @@ export function registerChoreTools(server: McpServer) {
           snapshot,
         }),
       }
-    },
+      },
+    ),
   )
   server.registerTool(
     'redeem_reward',
@@ -1165,7 +1205,9 @@ export function registerChoreTools(server: McpServer) {
       }),
       outputSchema: redeemResultSchema,
     },
-    async ({ reward_id, kid_id }: { reward_id: string; kid_id: string }) => {
+    withToolErrorHandling(
+      'redeem_reward',
+      async ({ reward_id, kid_id }: { reward_id: string; kid_id: string }) => {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('rewardId', reward_id)
@@ -1188,6 +1230,7 @@ export function registerChoreTools(server: McpServer) {
           snapshot,
         }),
       }
-    },
+      },
+    ),
   )
 }
