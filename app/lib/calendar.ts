@@ -4,15 +4,21 @@ import { colors, toDayString } from 'app/(os)/cal/data'
 import type { Event } from 'app/(os)/cal/data'
 import { revalidatePath } from 'next/cache'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { withToolErrorHandling } from 'app/lib/mcp/tool-errors'
 
 const redis = Redis.fromEnv()
 
 // Shared schema describing a calendar event
+const isoDateSchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
+  .describe('Date formatted as YYYY-MM-DD')
+
 const eventSchema = z
   .object({
-    start: z.string(),
-    end: z.string(),
-    color: z.string(),
+    start: z.string().min(1, 'Start date is required'),
+    end: z.string().min(1, 'End date is required'),
+    color: z.string().min(1, 'Color is required'),
     label: z.string().optional().nullable(),
     border: z.string().optional().nullable(),
     background: z.string().optional().nullable(),
@@ -46,6 +52,25 @@ const deleteResponseSchema = z.object({
   message: z.literal('🗑️ Event deleted'),
 })
 
+const readEventsSchema = z
+  .object({
+    start_date: isoDateSchema
+      .default('2024-01-01')
+      .describe('Inclusive start date in YYYY-MM-DD format'),
+    end_date: isoDateSchema
+      .default('9999-12-31')
+      .describe('Inclusive end date in YYYY-MM-DD format'),
+  })
+  .superRefine(({ start_date, end_date }, ctx) => {
+    if (start_date > end_date) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: '`start_date` must be on or before `end_date`',
+        path: ['start_date'],
+      })
+    }
+  })
+
 export function registerCalendarTools(server: McpServer) {
   server.registerTool(
     'create_event',
@@ -55,7 +80,9 @@ export function registerCalendarTools(server: McpServer) {
       inputSchema: eventSchema,
       outputSchema: eventResponseSchema,
     },
-    async ({ start, end, color, label, border, background }) => {
+    withToolErrorHandling(
+      'create_event',
+      async ({ start, end, color, label, border, background }) => {
       // Normalise to YYYY-MM-DD format
       const startDay = toDayString(start)
       const endDay = toDayString(end)
@@ -87,7 +114,8 @@ export function registerCalendarTools(server: McpServer) {
           event: newEvent,
         },
       }
-    },
+      },
+    ),
   )
 
   server.registerTool(
@@ -95,14 +123,11 @@ export function registerCalendarTools(server: McpServer) {
     {
       title: 'Read Events',
       description: 'Return all calendar events, optionally filtered by date range',
-      inputSchema: z.object({
-        start_date: z.string().optional().default('2024-01-01'),
-        end_date: z.string().optional().default('9999-12-31'),
-      }),
+      inputSchema: readEventsSchema,
       outputSchema: eventsListSchema,
       annotations: { readOnlyHint: true },
     },
-    async ({ start_date, end_date }) => {
+    withToolErrorHandling('read_events', async ({ start_date, end_date }) => {
       const events: Array<Event> | null = await redis.json.get(
         `cal:${process.env.CAL_PASSWORD}`,
       )
@@ -123,7 +148,7 @@ export function registerCalendarTools(server: McpServer) {
       })
 
       return { content: [], structuredContent: { events: filteredEvents } }
-    },
+    }),
   )
 
   server.registerTool(
@@ -137,12 +162,16 @@ export function registerCalendarTools(server: McpServer) {
       }),
       outputSchema: eventResponseSchema,
     },
-    async ({ oldEvent, newEvent }) => {
+    withToolErrorHandling('update_event', async ({ oldEvent, newEvent }) => {
       const events: Array<Event> | null = await redis.json.get(
         `cal:${process.env.CAL_PASSWORD}`,
       )
 
-      if (!events) throw new Error('No events found')
+      if (!events) {
+        throw new Error(
+          'No events found. Ensure the calendar Redis key is populated before updating events.',
+        )
+      }
 
       const idx = events.findIndex(
         (evt) =>
@@ -155,7 +184,11 @@ export function registerCalendarTools(server: McpServer) {
           evt.labelSize === oldEvent.labelSize,
       )
 
-      if (idx === -1) throw new Error('Event not found')
+      if (idx === -1) {
+        throw new Error(
+          'Event not found. The `oldEvent` payload must exactly match an existing event (start, end, label, color, border, background, labelSize).',
+        )
+      }
 
       // Normalise dates and rebuild event
       const startDay = toDayString(newEvent.start)
@@ -177,7 +210,7 @@ export function registerCalendarTools(server: McpServer) {
         content: [],
         structuredContent: { message: '✏️ Event updated', event: updatedEvent },
       }
-    },
+    }),
   )
 
   server.registerTool(
@@ -188,12 +221,16 @@ export function registerCalendarTools(server: McpServer) {
       inputSchema: z.object({ event: eventSchema }),
       outputSchema: deleteResponseSchema,
     },
-    async ({ event }) => {
+    withToolErrorHandling('delete_event', async ({ event }) => {
       const events: Array<Event> | null = await redis.json.get(
         `cal:${process.env.CAL_PASSWORD}`,
       )
 
-      if (!events) throw new Error('No events found')
+      if (!events) {
+        throw new Error(
+          'No events found. Ensure the calendar Redis key is populated before deleting events.',
+        )
+      }
 
       const idx = events.findIndex(
         (evt) =>
@@ -206,7 +243,11 @@ export function registerCalendarTools(server: McpServer) {
           evt.labelSize === event.labelSize,
       )
 
-      if (idx === -1) throw new Error('Event not found')
+      if (idx === -1) {
+        throw new Error(
+          'Event not found. The `event` payload must exactly match an existing event (start, end, label, color, border, background, labelSize).',
+        )
+      }
 
       events.splice(idx, 1)
 
@@ -214,6 +255,6 @@ export function registerCalendarTools(server: McpServer) {
       revalidatePath('/cal')
 
       return { content: [], structuredContent: { message: '🗑️ Event deleted' } }
-    },
+    }),
   )
 }
