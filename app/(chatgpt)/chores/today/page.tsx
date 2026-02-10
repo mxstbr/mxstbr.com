@@ -18,7 +18,7 @@ import { useOpenAiGlobal, useWidgetState } from 'app/(chatgpt)/openai-hooks'
 
 type KidStatus = {
   kid: Kid
-  status: 'due' | 'done' | 'closed'
+  status: 'due' | 'done' | 'closed' | 'assigned'
 }
 
 type WidgetChore = {
@@ -43,6 +43,24 @@ type ChoreBoardSnapshot = {
   >
 }
 
+type ChoreSearchOutput = {
+  query?: string
+  count?: number
+  ctx?: { todayIso: string }
+  kids?: Kid[]
+  results?: Array<{
+    id: string
+    title: string
+    emoji?: string
+    stars: number
+    schedule_label?: string
+    kid_ids: string[]
+    kid_names?: string[]
+    requires_approval?: boolean
+    time_of_day?: Chore['timeOfDay']
+  }>
+}
+
 const timeOfDayLabels: Record<NonNullable<Chore['timeOfDay']>, string> = {
   morning: 'Morning',
   afternoon: 'Afternoon',
@@ -50,8 +68,16 @@ const timeOfDayLabels: Record<NonNullable<Chore['timeOfDay']>, string> = {
   night: 'Night',
 }
 
+function isSearchOutput(
+  output: ChoreBoardSnapshot | ChoreSearchOutput | null | undefined,
+): output is ChoreSearchOutput {
+  return Array.isArray((output as ChoreSearchOutput | undefined)?.results)
+}
+
 export default function TodaysChoresPage() {
-  const toolOutput = useOpenAiGlobal<ChoreBoardSnapshot>('toolOutput')
+  const toolOutput = useOpenAiGlobal<ChoreBoardSnapshot | ChoreSearchOutput>(
+    'toolOutput',
+  )
   const toolResponseMetadata = useOpenAiGlobal<any>('toolResponseMetadata')
   const callTool = useOpenAiGlobal<
     ((name: string, args?: Record<string, unknown>) => Promise<unknown>) | null
@@ -68,6 +94,36 @@ export default function TodaysChoresPage() {
   const chores: WidgetChore[] = useMemo(() => {
     const fromMeta = toolResponseMetadata?.choresToday
     if (Array.isArray(fromMeta)) return fromMeta as WidgetChore[]
+
+    if (isSearchOutput(toolOutput)) {
+      const kidById = new Map(
+        (toolOutput.kids ?? []).map((kid) => [kid.id, kid]),
+      )
+      return (toolOutput.results ?? []).map((chore) => {
+        const kids = chore.kid_ids.map((kidId, index) => {
+          const fallbackKidName = chore.kid_names?.[index] ?? kidId
+          const kid = kidById.get(kidId) ?? {
+            id: kidId,
+            name: fallbackKidName,
+            color: '#94a3b8',
+          }
+          return { kid, status: 'assigned' as const }
+        })
+
+        return {
+          id: chore.id,
+          title: chore.title,
+          emoji: chore.emoji ?? '⭐️',
+          stars: chore.stars,
+          schedule: chore.schedule_label ?? 'Scheduled',
+          timeOfDay: chore.time_of_day
+            ? timeOfDayLabels[chore.time_of_day]
+            : 'Any time',
+          requiresApproval: !!chore.requires_approval,
+          kids,
+        }
+      })
+    }
 
     const snapshot = toolOutput
     if (!snapshot?.kids?.length || !snapshot?.chores?.length) return []
@@ -132,14 +188,11 @@ export default function TodaysChoresPage() {
     if (!callTool || refreshing) return
     setRefreshing(true)
     try {
-      await callTool(
-        'read_chore_board',
-        todayIso ? { day: todayIso } : undefined,
-      )
+      await callTool('search_chores', { query: '', limit: 100 })
     } finally {
       setRefreshing(false)
     }
-  }, [callTool, refreshing, todayIso])
+  }, [callTool, refreshing])
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50/90 via-white to-slate-100 px-4 py-8 sm:px-6">
@@ -166,11 +219,11 @@ export default function TodaysChoresPage() {
           <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-secondary">
             <span className="inline-flex items-center gap-1 rounded-full bg-surface-secondary px-3 py-1">
               <Calendar className="size-3.5" />
-              Open chores + completions
+              Search-first chores list
             </span>
             <span className="inline-flex items-center gap-1 rounded-full bg-surface-secondary px-3 py-1">
               <Members className="size-3.5" />
-              Status per kid
+              Kid assignment status
             </span>
             <span className="inline-flex items-center gap-1 rounded-full bg-surface-secondary px-3 py-1">
               <Clock className="size-3.5" />
@@ -182,10 +235,10 @@ export default function TodaysChoresPage() {
         {!toolOutput ? (
           <EmptyMessage className="rounded-3xl border border-default bg-surface px-6 py-10 shadow-xl sm:px-8">
             <EmptyMessage.Icon>🧹</EmptyMessage.Icon>
-            <EmptyMessage.Title>No chore board loaded</EmptyMessage.Title>
+            <EmptyMessage.Title>No chores loaded</EmptyMessage.Title>
             <EmptyMessage.Description>
-              Ask ChatGPT to run the <code>read_chore_board</code> tool to
-              populate today&apos;s chores here.
+              Ask ChatGPT to run <code>search_chores</code> with an empty query
+              to populate chores here.
             </EmptyMessage.Description>
           </EmptyMessage>
         ) : chores.length === 0 ? (
@@ -193,7 +246,7 @@ export default function TodaysChoresPage() {
             <EmptyMessage.Icon>🎉</EmptyMessage.Icon>
             <EmptyMessage.Title>All clear</EmptyMessage.Title>
             <EmptyMessage.Description>
-              No open chores found for today.
+              No chores found for the current filters.
             </EmptyMessage.Description>
           </EmptyMessage>
         ) : (
@@ -224,13 +277,18 @@ function ChoreRow({
 }) {
   const dueCount = chore.kids.filter((entry) => entry.status === 'due').length
   const doneCount = chore.kids.filter((entry) => entry.status === 'done').length
+  const assignedCount = chore.kids.filter(
+    (entry) => entry.status === 'assigned',
+  ).length
 
   const summaryBadge: { color: BadgeProps['color']; label: string } =
     dueCount > 0
       ? { color: 'info', label: `${dueCount} due` }
       : doneCount > 0
         ? { color: 'success', label: 'Done' }
-        : { color: 'secondary', label: 'Not due' }
+        : assignedCount > 0
+          ? { color: 'secondary', label: `${assignedCount} assigned` }
+          : { color: 'secondary', label: 'Not due' }
 
   return (
     <button
@@ -314,7 +372,9 @@ function ChoreRow({
                       ? 'Done'
                       : status === 'due'
                         ? 'Due'
-                        : 'Closed'}
+                        : status === 'assigned'
+                          ? 'Assigned'
+                          : 'Closed'}
                   </Badge>
                 </li>
               ))}
