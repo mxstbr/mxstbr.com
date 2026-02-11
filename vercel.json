@@ -1,13 +1,4 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "crons": [
-    {
-      "path": "/api/cron/bedtime-approval",
-      "schedule": "0 12 * * *"
-    },
-    {
-      "path": "/api/cron/bedtime-approval",
-      "schedule": "0 13 * * *"
-    }
-  ]
+  "crons": []
 }
