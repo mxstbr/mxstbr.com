@@ -6,6 +6,32 @@ import { ClippyAgentUIMessage } from 'app/lib/clippy-agent'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
+function parseReasoningSummary(text: string): {
+  heading?: string
+  body: string
+} {
+  const trimmed = text.trim()
+  if (!trimmed) return { body: '' }
+
+  const lines = trimmed.split('\n')
+  const firstNonEmptyLineIndex = lines.findIndex((line) => line.trim().length)
+  if (firstNonEmptyLineIndex === -1) return { body: '' }
+
+  const firstLine = lines[firstNonEmptyLineIndex]!.trim()
+  const boldHeading = firstLine.match(/^\*\*(.+?)\*\*$/)?.[1]?.trim()
+  const markdownHeading = firstLine.match(/^#{1,6}\s+(.+)$/)?.[1]?.trim()
+  const heading = boldHeading || markdownHeading
+
+  if (!heading) return { body: trimmed }
+
+  const body = lines
+    .filter((_, index) => index !== firstNonEmptyLineIndex)
+    .join('\n')
+    .trim()
+
+  return { heading, body }
+}
+
 export default function Chat() {
   const [sessionId] = useState<string>(() => Date.now().toString())
   const [input, setInput] = useState<string>('')
@@ -45,6 +71,12 @@ export default function Chat() {
           const hasThinkingPart = message.parts.some(
             (part) => part.type === 'reasoning',
           )
+          const hasReasoningWithContent = message.parts.some(
+            (part) =>
+              part.type === 'reasoning' &&
+              'text' in part &&
+              part.text.trim().length > 0,
+          )
           return (
             <div
               key={message.id}
@@ -67,6 +99,14 @@ export default function Chat() {
                     case 'reasoning': {
                       const thinkingContent =
                         'text' in part ? part.text.trim() : ''
+                      if (!thinkingContent && hasReasoningWithContent) {
+                        return null
+                      }
+
+                      const { heading, body } =
+                        parseReasoningSummary(thinkingContent)
+                      const detailsLabel = heading || 'Thinking'
+                      const detailsBody = heading ? body : thinkingContent
                       const fallback =
                         'No visible reasoning summary was returned for this step.'
                       return (
@@ -75,11 +115,11 @@ export default function Chat() {
                           className="my-2 text-xs text-slate-600 dark:text-slate-300"
                         >
                           <summary className="cursor-pointer font-medium">
-                            Thinking
+                            {detailsLabel}
                           </summary>
-                          {thinkingContent ? (
+                          {detailsBody ? (
                             <pre className="mt-2 whitespace-pre-wrap">
-                              {thinkingContent}
+                              {detailsBody}
                             </pre>
                           ) : (
                             <div className="mt-2 italic">{fallback}</div>
