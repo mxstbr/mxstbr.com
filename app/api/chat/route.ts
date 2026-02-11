@@ -23,5 +23,6 @@ export async function POST(req: Request) {
 
   return result.toUIMessageStreamResponse({
     originalMessages: messages, // Pass original messages to prevent duplicates
+    sendReasoning: true,
   })
 }

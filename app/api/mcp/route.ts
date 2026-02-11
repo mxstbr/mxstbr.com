@@ -1,7 +1,6 @@
 import { registerAllTools } from 'app/lib/mcp/register-all-tools'
 import { createMcpHandler } from 'mcp-handler'
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod/v4'
 
 export const maxDuration = 800
 
@@ -9,7 +8,14 @@ const handler = createMcpHandler(
   (server) => {
     registerAllTools(server)
   },
-  {},
+  {
+    serverInfo: {
+      name: 'mxstbr-mcp',
+      version: '1.0.0',
+    },
+    instructions:
+      'This MCP server powers Maxie and Minnie workflows. Its chores tools are designed for day-to-day chore operations on a Redis-backed family board: search_kids/search_chores/search_rewards resolve canonical IDs with low context cost, and CRUD tools create/update/delete chores, rewards, assignments, pauses, and kid star balances. Use search tools before any mutation, pass Pacific dates as YYYY-MM-DD, and request include_snapshot only when a full board dump is explicitly needed.',
+  },
   {
     basePath: '/api', // this needs to match where the [transport] is located.
     maxDuration: 60,
