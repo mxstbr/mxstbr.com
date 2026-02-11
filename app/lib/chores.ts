@@ -57,7 +57,7 @@ const kidIdSchema = z
   .string()
   .min(1)
   .describe(
-    'Kid ID from `search_chores.kids[]` or `search_rewards.kids[]` (for example `kid-1`).',
+    'Kid ID from `search_kids.results[]`, `search_chores.kids[]`, or `search_rewards.kids[]` (for example `kid-1`).',
   )
 
 const completionIdSchema = z
@@ -422,6 +422,18 @@ const rewardSearchResultSchema = z.object({
     .describe('Matching rewards sorted by newest first.'),
 })
 
+const kidSearchResultSchema = z.object({
+  query: z
+    .string()
+    .describe('Raw query string that was used for this search request.'),
+  count: z.number().describe('Total matching kids before limit was applied.'),
+  results: z
+    .array(searchKidSchema)
+    .describe(
+      'Matching kids sorted alphabetically by name; use `results[].id` as canonical kid IDs in mutate tools.',
+    ),
+})
+
 async function loadChoreSnapshot(day?: string) {
   const state = await getChoreState()
   const ctx = getToday(day)
@@ -597,6 +609,67 @@ function formatUndoMessage(result: any): string {
 }
 
 export function registerChoreTools(server: McpServer) {
+  server.registerTool(
+    'search_kids',
+    {
+      title: 'Search Kids',
+      description:
+        'Resolve canonical kid IDs for chores and rewards mutations without loading a full chores board snapshot. Use this when a user gives a kid name (for example "Darian"), when you need to disambiguate similar names, or when you only need kid IDs/colors. Empty query returns the full kid roster up to `limit`.',
+      inputSchema: z.object({
+        query: z
+          .string()
+          .default('')
+          .describe(
+            'Free-text search against kid ID and display name. Empty string returns all kids up to `limit`.',
+          ),
+        limit: limitSchema.describe(
+          'Maximum number of matching kids to return. Keep this small unless you explicitly need a larger roster slice.',
+        ),
+      }),
+      outputSchema: kidSearchResultSchema,
+      annotations: { readOnlyHint: true },
+    },
+    async ({ query = '', limit = 25 }: { query?: string; limit?: number }) => {
+      const { kids } = await loadSearchData()
+      const normalizedQuery = query.trim()
+      const normalizedLimit = Math.min(100, Math.max(1, limit ?? 25))
+      const tokens = normalizedQuery
+        .toLowerCase()
+        .split(/\s+/)
+        .map((token) => token.trim())
+        .filter(Boolean)
+
+      const filtered = kids.filter((kid) => {
+        if (!tokens.length) return true
+        const haystack = `${kid.id} ${kid.name}`.toLowerCase()
+        return tokens.every((token) => haystack.includes(token))
+      })
+
+      const sorted = filtered.sort((a, b) => a.name.localeCompare(b.name))
+      const results = sorted.slice(0, normalizedLimit).map((kid) => ({
+        id: kid.id,
+        name: kid.name,
+        color: kid.color,
+      }))
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: normalizedQuery
+              ? `Found ${filtered.length} kid${filtered.length === 1 ? '' : 's'} matching "${normalizedQuery}"`
+              : `Listed ${filtered.length} kid${filtered.length === 1 ? '' : 's'}`,
+          },
+        ],
+        structuredContent: {
+          query: normalizedQuery,
+          count: filtered.length,
+          results,
+        },
+      }
+    },
+  )
+
   server.registerTool(
     'search_chores',
     {

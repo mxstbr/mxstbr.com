@@ -66,9 +66,9 @@ export default function Chat() {
                       return <div key={`${message.id}-${i}`}>{part.text}</div>
                     case 'reasoning': {
                       const thinkingContent =
-                        'text' in part
-                          ? part.text
-                          : JSON.stringify(part, null, 2)
+                        'text' in part ? part.text.trim() : ''
+                      const fallback =
+                        'No visible reasoning summary was returned for this step.'
                       return (
                         <details
                           key={`${message.id}-${i}`}
@@ -77,9 +77,13 @@ export default function Chat() {
                           <summary className="cursor-pointer font-medium">
                             Thinking
                           </summary>
-                          <pre className="mt-2 whitespace-pre-wrap">
-                            {thinkingContent}
-                          </pre>
+                          {thinkingContent ? (
+                            <pre className="mt-2 whitespace-pre-wrap">
+                              {thinkingContent}
+                            </pre>
+                          ) : (
+                            <div className="mt-2 italic">{fallback}</div>
+                          )}
                         </details>
                       )
                     }
