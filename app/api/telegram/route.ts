@@ -10,13 +10,6 @@ export const maxDuration = 800
 const TELEGRAM_MAX_MESSAGE_LENGTH = 4096
 const STREAM_UPDATE_INTERVAL_MS = 700
 
-type ToolTraceEntry = {
-  toolName: string
-  input?: unknown
-  status: 'called' | 'ok' | 'error' | 'denied'
-  outputSummary?: string
-}
-
 function truncateForTelegram(
   value: string,
   limit = TELEGRAM_MAX_MESSAGE_LENGTH,
@@ -26,130 +19,38 @@ function truncateForTelegram(
   return `${value.slice(0, Math.max(0, limit - 1)).trimEnd()}…`
 }
 
-function compactInline(value: unknown, limit = 180) {
-  if (value === null || value === undefined) return ''
-  let text = ''
+function extractReasoningTitle(text: string) {
+  const lines = text
+    .trim()
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+  const firstLine = lines[0]
+  if (!firstLine) return ''
 
-  try {
-    text =
-      typeof value === 'string'
-        ? value
-        : JSON.stringify(value, (_key, nestedValue) =>
-            typeof nestedValue === 'string' && nestedValue.length > 120
-              ? `${nestedValue.slice(0, 117)}...`
-              : nestedValue,
-          )
-  } catch {
-    text = String(value)
-  }
+  const boldHeading = firstLine.match(/^\*\*(.+?)\*\*$/)?.[1]?.trim()
+  const markdownHeading = firstLine.match(/^#{1,6}\s+(.+)$/)?.[1]?.trim()
+  const title = (boldHeading || markdownHeading || firstLine)
+    .replace(/^[-*]\s+/, '')
+    .replace(/\s+/g, ' ')
+    .trim()
 
-  const singleLine = text.replace(/\s+/g, ' ').trim()
-  if (singleLine.length <= limit) return singleLine
-  return `${singleLine.slice(0, Math.max(0, limit - 1)).trimEnd()}…`
+  return title ? truncateForTelegram(title, 120) : ''
 }
 
-function summarizeToolOutput(output: unknown) {
-  if (typeof output === 'string') return compactInline(output, 140)
-  if (output && typeof output === 'object') {
-    const asRecord = output as Record<string, unknown>
-    if (typeof asRecord.message === 'string') {
-      return compactInline(asRecord.message, 140)
+function buildProgressMessage(reasoningTitles: string[]) {
+  const sections: string[] = ['🤔 Thinking']
+
+  if (reasoningTitles.length === 0) {
+    sections.push('• Gathering reasoning summaries…')
+  } else {
+    for (const title of reasoningTitles.slice(0, 8)) {
+      sections.push(`• ${title}`)
     }
-    if (typeof asRecord.status === 'string') {
-      return `status: ${asRecord.status}`
-    }
-    if (typeof asRecord.success === 'boolean') {
-      return asRecord.success ? 'success' : 'failed'
-    }
-    if (typeof asRecord.count === 'number') {
-      return `${asRecord.count} match${asRecord.count === 1 ? '' : 'es'}`
-    }
-  }
-
-  return compactInline(output, 140)
-}
-
-function formatToolTraceLines(entries: ToolTraceEntry[]) {
-  return entries.map((entry, index) => {
-    const input = entry.input ? ` ${compactInline(entry.input)}` : ''
-    const statusPrefix =
-      entry.status === 'ok'
-        ? 'ok'
-        : entry.status === 'error'
-          ? 'error'
-          : entry.status === 'denied'
-            ? 'denied'
-            : 'called'
-    const resultSuffix = entry.outputSummary
-      ? ` -> ${compactInline(entry.outputSummary, 120)}`
-      : ''
-    return `${index + 1}. ${entry.toolName}${input} [${statusPrefix}]${resultSuffix}`
-  })
-}
-
-function buildProgressMessage({
-  draftText,
-  reasoningText,
-  toolEntries,
-}: {
-  draftText: string
-  reasoningText: string
-  toolEntries: ToolTraceEntry[]
-}) {
-  const sections: string[] = []
-  const answerPreview = draftText.trim()
-  const reasoningPreview = reasoningText.trim()
-
-  if (answerPreview) {
-    sections.push(truncateForTelegram(answerPreview, 1500))
-    sections.push('')
-  }
-
-  sections.push('🤔 Thinking')
-  sections.push(
-    reasoningPreview
-      ? truncateForTelegram(reasoningPreview, 900)
-      : 'Gathering reasoning summary…',
-  )
-
-  if (toolEntries.length > 0) {
-    sections.push('')
-    sections.push('🛠 Tool calls')
-    sections.push(...formatToolTraceLines(toolEntries).slice(0, 4))
   }
 
   sections.push('')
   sections.push('⏳ Working…')
-
-  return truncateForTelegram(sections.join('\n'), TELEGRAM_MAX_MESSAGE_LENGTH)
-}
-
-function buildTraceMessage({
-  reasoningText,
-  toolEntries,
-}: {
-  reasoningText: string
-  toolEntries: ToolTraceEntry[]
-}) {
-  if (!reasoningText.trim() && toolEntries.length === 0) return ''
-
-  const sections: string[] = ['🧠 Trace']
-
-  sections.push('')
-  sections.push('Thinking')
-  sections.push(
-    reasoningText.trim()
-      ? truncateForTelegram(reasoningText.trim(), 1800)
-      : 'No visible reasoning summary returned by the model.',
-  )
-
-  sections.push('')
-  sections.push(`Tool calls (${toolEntries.length})`)
-  if (toolEntries.length === 0) {
-    sections.push('None')
-  } else {
-    sections.push(...formatToolTraceLines(toolEntries))
-  }
 
   return truncateForTelegram(sections.join('\n'), TELEGRAM_MAX_MESSAGE_LENGTH)
 }
@@ -185,10 +86,15 @@ export async function POST(request: NextRequest) {
 
     let thinkingMessage
     let draftText = ''
-    let reasoningText = ''
     let lastDraftUpdate = 0
-    const toolTraceById = new Map<string, ToolTraceEntry>()
-    const toolTraceOrder: string[] = []
+    const reasoningOrder: string[] = []
+    const reasoningById = new Map<
+      string,
+      {
+        text: string
+        title: string
+      }
+    >()
 
     try {
       thinkingMessage = await bot.telegram.sendMessage(chatId, 'Thinking…')
@@ -216,96 +122,51 @@ export async function POST(request: NextRequest) {
       for await (const part of stream.fullStream as AsyncIterable<any>) {
         switch (part?.type) {
           case 'text-delta':
-            if (typeof part.text === 'string') {
-              draftText += part.text
+            if (typeof part.delta === 'string') draftText += part.delta
+            else if (typeof part.text === 'string') draftText += part.text
+            break
+          case 'reasoning-start': {
+            const reasoningId =
+              typeof part.id === 'string' ? part.id : undefined
+            if (!reasoningId) break
+            if (!reasoningById.has(reasoningId)) {
+              reasoningOrder.push(reasoningId)
+              reasoningById.set(reasoningId, { text: '', title: '' })
             }
             break
+          }
           case 'reasoning-delta':
-            if (typeof part.text === 'string') {
-              reasoningText += part.text
+            const reasoningId =
+              typeof part.id === 'string' ? part.id : undefined
+            const reasoningDelta =
+              typeof part.delta === 'string'
+                ? part.delta
+                : typeof part.text === 'string'
+                  ? part.text
+                  : undefined
+            if (!reasoningId || !reasoningDelta) break
+            if (!reasoningById.has(reasoningId)) {
+              reasoningOrder.push(reasoningId)
+              reasoningById.set(reasoningId, { text: '', title: '' })
             }
+            const entry = reasoningById.get(reasoningId)!
+            entry.text += reasoningDelta
+            entry.title = extractReasoningTitle(entry.text)
+            reasoningById.set(reasoningId, entry)
             break
-          case 'tool-call': {
-            const toolCallId =
-              typeof part.toolCallId === 'string' ? part.toolCallId : undefined
-            if (!toolCallId) break
-            if (!toolTraceById.has(toolCallId)) {
-              toolTraceById.set(toolCallId, {
-                toolName:
-                  typeof part.toolName === 'string'
-                    ? part.toolName
-                    : 'unknown_tool',
-                input: part.input,
-                status: 'called',
-              })
-              toolTraceOrder.push(toolCallId)
+          case 'reasoning-end': {
+            const reasoningId =
+              typeof part.id === 'string' ? part.id : undefined
+            if (!reasoningId) break
+            if (!reasoningById.has(reasoningId)) {
+              reasoningOrder.push(reasoningId)
+              reasoningById.set(reasoningId, { text: '', title: '' })
             }
-            break
-          }
-          case 'tool-result': {
-            const toolCallId =
-              typeof part.toolCallId === 'string' ? part.toolCallId : undefined
-            if (!toolCallId) break
-            const existing = toolTraceById.get(toolCallId)
-            const nextEntry: ToolTraceEntry = {
-              toolName:
-                (existing?.toolName ||
-                  (typeof part.toolName === 'string'
-                    ? part.toolName
-                    : 'unknown_tool')) ??
-                'unknown_tool',
-              input: existing?.input ?? part.input,
-              status: 'ok',
-              outputSummary: summarizeToolOutput(part.output),
+            const entry = reasoningById.get(reasoningId)!
+            if (!entry.title) {
+              entry.title = `Reasoning step ${reasoningOrder.indexOf(reasoningId) + 1}`
             }
-            if (!existing) {
-              toolTraceOrder.push(toolCallId)
-            }
-            toolTraceById.set(toolCallId, nextEntry)
-            break
-          }
-          case 'tool-error': {
-            const toolCallId =
-              typeof part.toolCallId === 'string' ? part.toolCallId : undefined
-            if (!toolCallId) break
-            const existing = toolTraceById.get(toolCallId)
-            const nextEntry: ToolTraceEntry = {
-              toolName:
-                (existing?.toolName ||
-                  (typeof part.toolName === 'string'
-                    ? part.toolName
-                    : 'unknown_tool')) ??
-                'unknown_tool',
-              input: existing?.input ?? part.input,
-              status: 'error',
-              outputSummary: summarizeToolOutput(part.error),
-            }
-            if (!existing) {
-              toolTraceOrder.push(toolCallId)
-            }
-            toolTraceById.set(toolCallId, nextEntry)
-            break
-          }
-          case 'tool-output-denied': {
-            const toolCallId =
-              typeof part.toolCallId === 'string' ? part.toolCallId : undefined
-            if (!toolCallId) break
-            const existing = toolTraceById.get(toolCallId)
-            const nextEntry: ToolTraceEntry = {
-              toolName:
-                (existing?.toolName ||
-                  (typeof part.toolName === 'string'
-                    ? part.toolName
-                    : 'unknown_tool')) ??
-                'unknown_tool',
-              input: existing?.input ?? part.input,
-              status: 'denied',
-              outputSummary: 'output denied',
-            }
-            if (!existing) {
-              toolTraceOrder.push(toolCallId)
-            }
-            toolTraceById.set(toolCallId, nextEntry)
+            reasoningById.set(reasoningId, entry)
             break
           }
           default:
@@ -314,14 +175,11 @@ export async function POST(request: NextRequest) {
 
         const now = Date.now()
         if (now - lastDraftUpdate >= STREAM_UPDATE_INTERVAL_MS) {
-          const toolEntries = toolTraceOrder
-            .map((id) => toolTraceById.get(id))
-            .filter(Boolean) as ToolTraceEntry[]
-          const progressText = buildProgressMessage({
-            draftText,
-            reasoningText,
-            toolEntries,
+          const reasoningTitles = reasoningOrder.map((id, index) => {
+            const entry = reasoningById.get(id)
+            return entry?.title || `Reasoning step ${index + 1}`
           })
+          const progressText = buildProgressMessage(reasoningTitles)
           await safeEditMessageText(
             chatId,
             thinkingMessage.message_id,
@@ -332,20 +190,12 @@ export async function POST(request: NextRequest) {
       }
 
       const responseText = draftText.trim()
-      const toolEntries = toolTraceOrder
-        .map((id) => toolTraceById.get(id))
-        .filter(Boolean) as ToolTraceEntry[]
-      const traceText = buildTraceMessage({ reasoningText, toolEntries })
 
       await safeEditMessageText(
         chatId,
         thinkingMessage.message_id,
         responseText || 'Sorry, I could not generate a response.',
       )
-
-      if (traceText) {
-        await bot.telegram.sendMessage(chatId, traceText)
-      }
     } catch (error) {
       console.error('Error processing Telegram message:', error)
 
