@@ -1,6 +1,7 @@
 import { Redis } from '@upstash/redis'
 
 const redis = Redis.fromEnv()
+const HASHNODE_GRAPHQL_ENDPOINT = 'https://gql-beta.hashnode.com'
 
 const GET_POSTS_QUERY = /* GraphQL */ `
   {
@@ -31,7 +32,6 @@ const GET_POSTS_QUERY = /* GraphQL */ `
               name
               slug
             }
-            previousSlugs
           }
         }
       }
@@ -74,61 +74,83 @@ export type Note = {
 }
 
 export async function getNotes(): Promise<Array<Note>> {
-  const { data } = await fetch(`https://gql.hashnode.com`, {
+  const response = await fetch(HASHNODE_GRAPHQL_ENDPOINT, {
     method: 'POST',
     headers: {
-      Authorization: process.env.HASHNODE_ACCESS_TOKEN as string,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
       query: GET_POSTS_QUERY,
     }),
   })
-    .then((res) => res.json())
-    .catch(() => ({ data: null }))
 
-  if (!data?.publication?.posts?.edges) return []
+  const body = await response.text()
+  let json
+
+  try {
+    json = JSON.parse(body)
+  } catch {
+    throw new Error(
+      `Hashnode API returned a non-JSON response with ${response.status} ${response.statusText}`,
+    )
+  }
+
+  const errors = json.errors?.map((error) => error.message).join(', ')
+
+  if (!response.ok || errors) {
+    throw new Error(
+      `Hashnode API request failed with ${response.status} ${response.statusText}${errors ? `: ${errors}` : ''}`,
+    )
+  }
+
+  if (!json.data?.publication?.posts?.edges) {
+    throw new Error('Hashnode API response did not include publication posts')
+  }
 
   return await Promise.all(
-    data.publication.posts.edges.map(async ({ node: post }): Promise<Note> => {
-      const views =
-        (await redis.get<number>([
-          'pageviews',
-          `/notes/${post.slug}`,
-        ].join(':'))) ?? 0
+    json.data.publication.posts.edges.map(
+      async ({ node: post }): Promise<Note> => {
+        const views =
+          (await redis.get<number>(
+            ['pageviews', `/notes/${post.slug}`].join(':'),
+          )) ?? 0
 
-      const { status, content } = parseStatusFromContent(post.content.markdown)
+        const { status, content } = parseStatusFromContent(
+          post.content.markdown,
+        )
 
-      return {
-        frontmatter: {
-          cuid: post.cuid,
-          title: post.title,
-          summary: post.seo.description,
-          slug: post.slug,
-          publishedAt: post.publishedAt,
-          readTimeInMinutes: post.readTimeInMinutes,
-          updatedAt: post.updatedAt,
-          status: status,
-          tags: post.tags.map((tag) => ({
-            slug: tag.slug,
-            // Hashnode has inconsistent tag name capitalization, so I manually capitalize each word
-            name: tag.name
-              .trim()
-              .split(' ')
-              .map((word) => word[0].toUpperCase() + word.substring(1))
-              .join(' '),
-          })),
-          previousSlugs: post.previousSlugs,
-          views,
-        },
-        content: content
-          // Hashnode serves images with an odd non-standard markdown syntax that looks like this:
-          // ![alt](url.com align="center")
-          // This is a temporary hack to remove that non-standard syntax and make it render until I
-          // figure out a long-term solution for it. Right now, it'd break if I use different alignment.
-          .replaceAll('align="center")', ')'),
-      }
-    }),
+        return {
+          frontmatter: {
+            cuid: post.cuid,
+            title: post.title,
+            summary: post.seo.description,
+            slug: post.slug,
+            publishedAt: post.publishedAt,
+            readTimeInMinutes: post.readTimeInMinutes,
+            updatedAt: post.updatedAt,
+            status: status,
+            tags: post.tags.map((tag) => ({
+              slug: tag.slug,
+              // Hashnode has inconsistent tag name capitalization, so I manually capitalize each word
+              name: tag.name
+                .trim()
+                .split(' ')
+                .map((word) => word[0].toUpperCase() + word.substring(1))
+                .join(' '),
+            })),
+            // Hashnode's beta API no longer exposes previous slug history.
+            previousSlugs: [],
+            views,
+          },
+          content: content
+            // Hashnode serves images with an odd non-standard markdown syntax that looks like this:
+            // ![alt](url.com align="center")
+            // This is a temporary hack to remove that non-standard syntax and make it render until I
+            // figure out a long-term solution for it. Right now, it'd break if I use different alignment.
+            .replaceAll('align="center")', ')'),
+        }
+      },
+    ),
   ).then((res) => res.sort((a, b) => b.frontmatter.views - a.frontmatter.views))
 }
 
