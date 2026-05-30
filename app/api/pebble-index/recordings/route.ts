@@ -21,6 +21,12 @@ const AUDIO_FIELD_KEYS = [
   'base64',
   'recordingData',
 ]
+const AUTH_TOKEN_HEADER_NAMES = [
+  'x-auth-token',
+  'x-webhook-token',
+  'x-pebble-auth-token',
+  'x-pebble-token',
+]
 
 type PayloadSource = 'raw' | 'multipart' | 'json'
 
@@ -82,14 +88,30 @@ function getAuthorizationDetails(request: NextRequest) {
   const authorization = request.headers.get('authorization') ?? ''
   const match = authorization.match(/^(\S+)\s+(.+)$/)
   const scheme = match?.[1]
-  const token =
+  const authorizationValue = authorization.trim()
+  const bearerToken =
     scheme?.toLowerCase() === 'bearer' ? (match?.[2]?.trim() ?? '') : ''
+  const rawAuthorizationToken = match ? '' : authorizationValue
+  const tokenHeaderName = AUTH_TOKEN_HEADER_NAMES.find((headerName) =>
+    request.headers.get(headerName)?.trim(),
+  )
+  const headerToken = tokenHeaderName
+    ? (request.headers.get(tokenHeaderName)?.trim() ?? '')
+    : ''
+  const queryToken = request.nextUrl.searchParams.get('token')?.trim() ?? ''
 
   return {
     hasAuthorization: Boolean(authorization),
     authorizationLength: authorization.length || undefined,
     scheme,
-    token,
+    tokenCandidates: [
+      bearerToken,
+      rawAuthorizationToken,
+      headerToken,
+      queryToken,
+    ].filter(Boolean),
+    tokenHeaderName,
+    hasQueryToken: Boolean(queryToken),
   }
 }
 
@@ -105,6 +127,8 @@ function getRequestLogContext(request: NextRequest) {
     hasAuthorization: authorization.hasAuthorization,
     authorizationLength: authorization.authorizationLength,
     authorizationScheme: authorization.scheme,
+    tokenHeaderName: authorization.tokenHeaderName,
+    hasQueryToken: authorization.hasQueryToken,
   }
 }
 
@@ -140,7 +164,11 @@ function validateAuthorization(request: NextRequest) {
   }
 
   const authorization = getAuthorizationDetails(request)
-  if (!expectedTokens.includes(authorization.token)) {
+  if (
+    !authorization.tokenCandidates.some((token) =>
+      expectedTokens.includes(token),
+    )
+  ) {
     logWebhookWarning(request, 'unauthorized')
     throw new WebhookPayloadError('Unauthorized', 401)
   }
