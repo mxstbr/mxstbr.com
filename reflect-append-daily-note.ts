@@ -91,47 +91,6 @@ function getDailyNoteDate(date: Date, timeZone: string) {
   return `${parts.year}-${parts.month}-${parts.day}`
 }
 
-function getLocalTime(date: Date, timeZone: string) {
-  return new Intl.DateTimeFormat('en-US', {
-    timeZone,
-    hour: 'numeric',
-    minute: '2-digit',
-  }).format(date)
-}
-
-function parseDate(value: string | undefined, fallback: Date) {
-  if (!value) return fallback
-
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) {
-    throw new Error(`Invalid date: ${value}`)
-  }
-
-  return date
-}
-
-function formatPebbleNote({
-  content,
-  createdAt,
-  recordingId,
-  timeZone,
-}: {
-  content: string
-  createdAt: Date
-  recordingId?: string
-  timeZone: string
-}) {
-  const marker = [
-    'Pebble Index 01',
-    getLocalTime(createdAt, timeZone),
-    recordingId,
-  ]
-    .filter(Boolean)
-    .join(' | ')
-
-  return `[${marker}]\n${content.trim()}`
-}
-
 async function appendToDailyNote({
   accessToken,
   date,
@@ -185,7 +144,6 @@ async function main() {
     process.env.REFLECT_TIME_ZONE?.trim() ??
     DEFAULT_TIME_ZONE
   const now = new Date()
-  const createdAt = parseDate(getStringArg(args, 'created-at'), now)
   const date = getStringArg(args, 'date') ?? getDailyNoteDate(now, timeZone)
   const graphId =
     getStringArg(args, 'graph-id') ?? getRequiredEnv('REFLECT_GRAPH_ID')
@@ -193,13 +151,6 @@ async function main() {
     getStringArg(args, 'list-name') ??
     process.env.REFLECT_DAILY_NOTE_LIST_NAME?.trim() ??
     DEFAULT_LIST_NAME
-  const recordingId = getStringArg(args, 'recording-id')
-  const text = formatPebbleNote({
-    content,
-    createdAt,
-    recordingId,
-    timeZone,
-  })
 
   if (args.has('dry-run')) {
     console.log(
@@ -210,7 +161,7 @@ async function main() {
           date,
           graphId,
           listName,
-          text,
+          text: content,
         },
         null,
         2,
@@ -228,7 +179,7 @@ async function main() {
     date,
     graphId,
     listName,
-    text,
+    text: content,
   })
 
   console.log(

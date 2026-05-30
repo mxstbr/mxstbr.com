@@ -49,7 +49,7 @@ REFLECT_GRAPH_ID=mxstbr
 REFLECT_DAILY_NOTE_LIST_NAME="Pebble Index"
 ```
 
-Append a Pebble-marked note to today's Reflect daily note:
+Append a note under the `Pebble Index` list in today's Reflect daily note:
 
 ```bash
 pnpm reflect-append-daily-note --recording-id idx_example --content "Remember to follow up on the contract."
