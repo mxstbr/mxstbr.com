@@ -6,6 +6,7 @@
     "build": "next build && tsm sync-essays-to-github.ts",
     "start": "next start",
     "create-reminder-schedule": "tsm create-reminder-schedule.ts",
+    "process-index-recordings": "tsm process-index-recordings.ts",
     "set-telegram-webhook": "tsm set-telegram-webhook.ts",
     "test:e2e": "playwright test",
     "format": "prettier --write .",
