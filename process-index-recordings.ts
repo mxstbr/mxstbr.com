@@ -1,12 +1,15 @@
 import env from '@next/env'
 import { Redis } from '@upstash/redis'
-import { promises as fs } from 'fs'
+import { execFile } from 'child_process'
+import { constants as fsConstants, promises as fs } from 'fs'
 import path from 'path'
+import { promisify } from 'util'
 
 const projectDir = process.cwd()
 env.loadEnvConfig(projectDir)
 
 const redis = Redis.fromEnv()
+const execFileAsync = promisify(execFile)
 
 const PENDING_KEY = 'pebble:index:pending'
 const DEBUG_LOG_KEY = 'pebble:index:webhook-debug'
@@ -15,6 +18,8 @@ const AUDIO_KEY_PREFIX = 'pebble:index:audio:'
 const LOCK_KEY_PREFIX = 'pebble:index:lock:'
 const OUTPUT_DIR = '/private/tmp/pebble-index'
 const LOCK_TTL_SECONDS = 5 * 60
+const DEFAULT_TRANSCRIPTION_TIMEOUT_MS = 5 * 60 * 1000
+const MACWHISPER_CLI_CANDIDATES = ['/usr/local/bin/mw', '/opt/homebrew/bin/mw']
 
 type RecordingStatus = 'pending' | 'claimed' | 'thread_created' | 'failed'
 
@@ -36,6 +41,7 @@ type RecordingMetadata = {
   completedAt?: number
   failedAt?: number
   error?: string
+  transcription?: TranscriptionResult
   request?: {
     contentLength?: string
     contentType?: string
@@ -51,6 +57,28 @@ type ClaimedRecording = {
   contentType: string
   createdAt: number
   filename?: string
+  transcription?: TranscriptionResult
+}
+
+type TranscriptionResult =
+  | {
+      status: 'completed'
+      provider: 'macwhisper'
+      transcript: string
+      transcriptPath: string
+      command: string
+    }
+  | {
+      status: 'blocked'
+      provider: 'macwhisper'
+      error: string
+      command?: string
+    }
+
+type ClaimOptions = {
+  transcribe: boolean
+  macwhisperCliPath?: string
+  transcriptionTimeoutMs: number
 }
 
 type DebugEvent = {
@@ -129,6 +157,32 @@ function getLimit(args: Map<string, string | boolean>) {
   return 3
 }
 
+function getNumberArg(
+  args: Map<string, string | boolean>,
+  key: string,
+): number | undefined {
+  const value = Number(getStringArg(args, key))
+  return Number.isFinite(value) && value > 0 ? value : undefined
+}
+
+function getClaimOptions(args: Map<string, string | boolean>): ClaimOptions {
+  const envTimeout = Number(process.env.PEBBLE_INDEX_TRANSCRIPTION_TIMEOUT_MS)
+  const transcriptionTimeoutMs =
+    getNumberArg(args, 'transcription-timeout-ms') ??
+    (Number.isFinite(envTimeout) && envTimeout > 0
+      ? envTimeout
+      : DEFAULT_TRANSCRIPTION_TIMEOUT_MS)
+
+  return {
+    transcribe: args.has('transcribe'),
+    macwhisperCliPath:
+      getStringArg(args, 'macwhisper-cli') ??
+      process.env.MACWHISPER_CLI_PATH?.trim() ??
+      undefined,
+    transcriptionTimeoutMs,
+  }
+}
+
 function getFileExtension(metadata: RecordingMetadata) {
   const filenameExtension = metadata.filename
     ? path.extname(metadata.filename)
@@ -157,7 +211,111 @@ async function writeRecordingFile(
   return outputPath
 }
 
-async function claimRecording(id: string): Promise<ClaimedRecording | null> {
+async function isExecutable(filePath: string) {
+  try {
+    await fs.access(filePath, fsConstants.X_OK)
+    return true
+  } catch {
+    return false
+  }
+}
+
+async function findExecutable(name: string, candidates: string[]) {
+  for (const candidate of candidates) {
+    if (await isExecutable(candidate)) return candidate
+  }
+
+  for (const directory of (process.env.PATH ?? '').split(path.delimiter)) {
+    if (!directory) continue
+
+    const candidate = path.join(directory, name)
+    if (await isExecutable(candidate)) return candidate
+  }
+
+  return undefined
+}
+
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) return error.message
+  return String(error)
+}
+
+async function transcribeWithMacWhisper(
+  id: string,
+  localPath: string,
+  options: ClaimOptions,
+): Promise<TranscriptionResult> {
+  const cliPath =
+    options.macwhisperCliPath ??
+    (await findExecutable('mw', MACWHISPER_CLI_CANDIDATES))
+
+  if (!cliPath) {
+    return {
+      status: 'blocked',
+      provider: 'macwhisper',
+      error:
+        'MacWhisper CLI `mw` was not found. Install it in MacWhisper > Settings > Advanced > Command-Line Tool.',
+    }
+  }
+
+  const command = `${cliPath} transcribe ${localPath}`
+
+  try {
+    const { stdout, stderr } = await execFileAsync(
+      cliPath,
+      ['transcribe', localPath],
+      {
+        timeout: options.transcriptionTimeoutMs,
+        maxBuffer: 10 * 1024 * 1024,
+      },
+    )
+    const transcript = stdout.trim()
+
+    if (!transcript) {
+      return {
+        status: 'blocked',
+        provider: 'macwhisper',
+        command,
+        error: `MacWhisper CLI returned an empty transcript${
+          stderr.trim() ? `: ${stderr.trim()}` : ''
+        }`,
+      }
+    }
+
+    const transcriptPath = path.join(OUTPUT_DIR, `${id}.txt`)
+    await fs.writeFile(transcriptPath, `${transcript}\n`)
+
+    return {
+      status: 'completed',
+      provider: 'macwhisper',
+      transcript,
+      transcriptPath,
+      command,
+    }
+  } catch (error) {
+    return {
+      status: 'blocked',
+      provider: 'macwhisper',
+      command,
+      error: getErrorMessage(error),
+    }
+  }
+}
+
+async function maybeTranscribeRecording(
+  id: string,
+  localPath: string,
+  options: ClaimOptions,
+) {
+  if (!options.transcribe) return undefined
+
+  return transcribeWithMacWhisper(id, localPath, options)
+}
+
+async function claimRecording(
+  id: string,
+  options: ClaimOptions,
+): Promise<ClaimedRecording | null> {
   const lockAcquired = await redis.set(lockKey(id), String(Date.now()), {
     nx: true,
     ex: LOCK_TTL_SECONDS,
@@ -183,6 +341,7 @@ async function claimRecording(id: string): Promise<ClaimedRecording | null> {
 
   const now = Date.now()
   const localPath = await writeRecordingFile(metadata, encodedAudio)
+  const transcription = await maybeTranscribeRecording(id, localPath, options)
   const updatedMetadata: RecordingMetadata = {
     ...metadata,
     status: 'claimed',
@@ -192,6 +351,7 @@ async function claimRecording(id: string): Promise<ClaimedRecording | null> {
     updatedAt: now,
     localPath,
     error: undefined,
+    transcription,
   }
 
   await redis.set(recordingKey(id), updatedMetadata)
@@ -203,10 +363,11 @@ async function claimRecording(id: string): Promise<ClaimedRecording | null> {
     contentType: metadata.contentType,
     createdAt: metadata.createdAt,
     filename: metadata.filename,
+    transcription,
   }
 }
 
-async function claim(limit: number) {
+async function claim(limit: number, options: ClaimOptions) {
   const ids = await redis.zrange<string[]>(
     PENDING_KEY,
     0,
@@ -215,15 +376,15 @@ async function claim(limit: number) {
   const recordings: ClaimedRecording[] = []
 
   for (const id of ids) {
-    const recording = await claimRecording(id)
+    const recording = await claimRecording(id, options)
     if (recording) recordings.push(recording)
   }
 
   console.log(JSON.stringify({ ok: true, recordings }, null, 2))
 }
 
-async function claimId(id: string) {
-  const recording = await claimRecording(id)
+async function claimId(id: string, options: ClaimOptions) {
+  const recording = await claimRecording(id, options)
 
   console.log(
     JSON.stringify(
@@ -280,9 +441,10 @@ async function debugLog(limit: number) {
 
 async function main() {
   const args = parseArgs(process.argv.slice(2))
+  const claimOptions = getClaimOptions(args)
 
   if (args.has('claim')) {
-    await claim(getLimit(args))
+    await claim(getLimit(args), claimOptions)
     return
   }
 
@@ -293,7 +455,7 @@ async function main() {
 
   const claimedId = getStringArg(args, 'claim-id')
   if (claimedId) {
-    await claimId(claimedId)
+    await claimId(claimedId, claimOptions)
     return
   }
 
@@ -313,7 +475,7 @@ async function main() {
   }
 
   throw new Error(
-    'Use --claim, --claim-id <id>, --debug-log, --complete <id> --thread-id <id>, or --fail <id>',
+    'Use --claim [--transcribe], --claim-id <id> [--transcribe], --debug-log, --complete <id> --thread-id <id>, or --fail <id>',
   )
 }
 

@@ -38,6 +38,10 @@ CAL_PASSWORD=
 PEBBLE_INDEX_WEBHOOK_TOKEN=
 # Optional: Max accepted Pebble Index recording payload size in bytes. Defaults to 4000000.
 PEBBLE_INDEX_MAX_BYTES=
+# Optional: Override the MacWhisper CLI used by `pnpm process-index-recordings --transcribe`.
+MACWHISPER_CLI_PATH=/usr/local/bin/mw
+# Optional: Local transcription timeout in milliseconds. Defaults to 300000.
+PEBBLE_INDEX_TRANSCRIPTION_TIMEOUT_MS=
 ```
 
 ## License
