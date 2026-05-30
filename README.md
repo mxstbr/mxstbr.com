@@ -42,6 +42,17 @@ PEBBLE_INDEX_MAX_BYTES=
 MACWHISPER_CLI_PATH=/usr/local/bin/mw
 # Optional: Local transcription timeout in milliseconds. Defaults to 300000.
 PEBBLE_INDEX_TRANSCRIPTION_TIMEOUT_MS=
+# Used by `pnpm reflect-append-daily-note` for Pebble note-to-self captures.
+REFLECT_ACCESS_TOKEN=
+REFLECT_GRAPH_ID=mxstbr
+# Optional: Reflect list name used inside the daily note. Defaults to "Pebble Index".
+REFLECT_DAILY_NOTE_LIST_NAME="Pebble Index"
+```
+
+Append a Pebble-marked note to today's Reflect daily note:
+
+```bash
+pnpm reflect-append-daily-note --recording-id idx_example --content "Remember to follow up on the contract."
 ```
 
 ## License

@@ -7,6 +7,7 @@
     "start": "next start",
     "create-reminder-schedule": "tsm create-reminder-schedule.ts",
     "process-index-recordings": "tsm process-index-recordings.ts",
+    "reflect-append-daily-note": "tsm reflect-append-daily-note.ts",
     "set-telegram-webhook": "tsm set-telegram-webhook.ts",
     "test:e2e": "playwright test",
     "format": "prettier --write .",
