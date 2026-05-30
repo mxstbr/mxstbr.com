@@ -8,11 +8,13 @@ export const dynamic = 'force-dynamic'
 const redis = Redis.fromEnv()
 
 const PENDING_KEY = 'pebble:index:pending'
+const DEBUG_LOG_KEY = 'pebble:index:webhook-debug'
 const RECORDING_KEY_PREFIX = 'pebble:index:recording:'
 const AUDIO_KEY_PREFIX = 'pebble:index:audio:'
 const SHA_KEY_PREFIX = 'pebble:index:sha:'
 const DEFAULT_MAX_BYTES = 4_000_000
 const DEDUPE_TTL_SECONDS = 30 * 24 * 60 * 60
+const DEBUG_LOG_LIMIT = 100
 const AUDIO_FIELD_KEYS = [
   'audio',
   'recording',
@@ -26,6 +28,16 @@ const AUTH_TOKEN_HEADER_NAMES = [
   'x-webhook-token',
   'x-pebble-auth-token',
   'x-pebble-token',
+  'x-api-key',
+  'x-api-token',
+  'x-widget-token',
+]
+const AUTH_TOKEN_QUERY_PARAM_NAMES = [
+  'token',
+  'authToken',
+  'auth_token',
+  'apiKey',
+  'api_key',
 ]
 
 type PayloadSource = 'raw' | 'multipart' | 'json'
@@ -89,29 +101,51 @@ function getAuthorizationDetails(request: NextRequest) {
   const match = authorization.match(/^(\S+)\s+(.+)$/)
   const scheme = match?.[1]
   const authorizationValue = authorization.trim()
-  const bearerToken =
-    scheme?.toLowerCase() === 'bearer' ? (match?.[2]?.trim() ?? '') : ''
+  const schemeToken = match?.[2]?.trim() ?? ''
   const rawAuthorizationToken = match ? '' : authorizationValue
+  const basicAuthorizationTokens =
+    scheme?.toLowerCase() === 'basic'
+      ? getBasicAuthorizationTokens(schemeToken)
+      : []
   const tokenHeaderName = AUTH_TOKEN_HEADER_NAMES.find((headerName) =>
     request.headers.get(headerName)?.trim(),
   )
   const headerToken = tokenHeaderName
     ? (request.headers.get(tokenHeaderName)?.trim() ?? '')
     : ''
-  const queryToken = request.nextUrl.searchParams.get('token')?.trim() ?? ''
+  const queryTokenName = AUTH_TOKEN_QUERY_PARAM_NAMES.find((paramName) =>
+    request.nextUrl.searchParams.get(paramName)?.trim(),
+  )
+  const queryToken = queryTokenName
+    ? (request.nextUrl.searchParams.get(queryTokenName)?.trim() ?? '')
+    : ''
 
   return {
     hasAuthorization: Boolean(authorization),
     authorizationLength: authorization.length || undefined,
     scheme,
-    tokenCandidates: [
-      bearerToken,
-      rawAuthorizationToken,
-      headerToken,
-      queryToken,
-    ].filter(Boolean),
+    tokenCandidates: Array.from(
+      new Set([
+        schemeToken,
+        rawAuthorizationToken,
+        ...basicAuthorizationTokens,
+        headerToken,
+        queryToken,
+      ]),
+    ).filter(Boolean),
     tokenHeaderName,
+    queryTokenName,
     hasQueryToken: Boolean(queryToken),
+  }
+}
+
+function getBasicAuthorizationTokens(value: string) {
+  try {
+    const decoded = Buffer.from(value, 'base64').toString('utf8')
+    const [username, password] = decoded.split(':', 2)
+    return [decoded, username, password].filter(Boolean)
+  } catch {
+    return []
   }
 }
 
@@ -128,7 +162,9 @@ function getRequestLogContext(request: NextRequest) {
     authorizationLength: authorization.authorizationLength,
     authorizationScheme: authorization.scheme,
     tokenHeaderName: authorization.tokenHeaderName,
+    queryTokenName: authorization.queryTokenName,
     hasQueryToken: authorization.hasQueryToken,
+    tokenCandidateCount: authorization.tokenCandidates.length,
   }
 }
 
@@ -142,6 +178,25 @@ function logWebhookWarning(
     ...getRequestLogContext(request),
     ...extra,
   })
+}
+
+async function appendDebugEvent(
+  request: NextRequest,
+  event: Record<string, unknown>,
+) {
+  try {
+    await redis.lpush(DEBUG_LOG_KEY, {
+      at: new Date().toISOString(),
+      path: request.nextUrl.pathname,
+      ...getRequestLogContext(request),
+      ...event,
+    })
+    await redis.ltrim(DEBUG_LOG_KEY, 0, DEBUG_LOG_LIMIT - 1)
+  } catch (error) {
+    console.error('Failed to persist Pebble Index webhook debug event', {
+      error: error instanceof Error ? error.message : String(error),
+    })
+  }
 }
 
 function getExpectedWebhookTokens() {
@@ -385,6 +440,15 @@ export async function POST(request: NextRequest) {
       )
 
       if (existing) {
+        await appendDebugEvent(request, {
+          outcome: 'deduplicated',
+          status: existing.status,
+          recordingId: existingId,
+          byteLength: payload.bytes.length,
+          payloadContentType: payload.contentType,
+          payloadSource: payload.source,
+        })
+
         return NextResponse.json({
           ok: true,
           id: existingId,
@@ -425,6 +489,13 @@ export async function POST(request: NextRequest) {
       contentType: metadata.contentType,
       source: metadata.source,
     })
+    await appendDebugEvent(request, {
+      outcome: 'queued',
+      recordingId: id,
+      byteLength: metadata.byteLength,
+      payloadContentType: metadata.contentType,
+      payloadSource: metadata.source,
+    })
 
     return NextResponse.json({ ok: true, id }, { status: 202 })
   } catch (error) {
@@ -435,6 +506,12 @@ export async function POST(request: NextRequest) {
           ...error.details,
         })
       }
+      await appendDebugEvent(request, {
+        outcome: 'error',
+        status: error.status,
+        error: error.message,
+        details: error.details,
+      })
 
       return NextResponse.json(
         { ok: false, error: error.message },
@@ -446,10 +523,24 @@ export async function POST(request: NextRequest) {
       ...getRequestLogContext(request),
       error: error instanceof Error ? error.message : String(error),
     })
+    await appendDebugEvent(request, {
+      outcome: 'error',
+      status: 500,
+      error: error instanceof Error ? error.message : String(error),
+    })
 
     return NextResponse.json(
       { ok: false, error: 'Failed to queue recording' },
       { status: 500 },
     )
   }
+}
+
+export async function GET(request: NextRequest) {
+  await appendDebugEvent(request, {
+    outcome: 'healthcheck',
+    status: 200,
+  })
+
+  return NextResponse.json({ ok: true })
 }

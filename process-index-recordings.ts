@@ -9,6 +9,7 @@ env.loadEnvConfig(projectDir)
 const redis = Redis.fromEnv()
 
 const PENDING_KEY = 'pebble:index:pending'
+const DEBUG_LOG_KEY = 'pebble:index:webhook-debug'
 const RECORDING_KEY_PREFIX = 'pebble:index:recording:'
 const AUDIO_KEY_PREFIX = 'pebble:index:audio:'
 const LOCK_KEY_PREFIX = 'pebble:index:lock:'
@@ -50,6 +51,31 @@ type ClaimedRecording = {
   contentType: string
   createdAt: number
   filename?: string
+}
+
+type DebugEvent = {
+  at: string
+  path?: string
+  outcome?: string
+  status?: number | string
+  error?: string
+  recordingId?: string
+  method?: string
+  contentType?: string
+  contentLength?: string
+  userAgent?: string
+  headerNames?: string[]
+  hasAuthorization?: boolean
+  authorizationLength?: number
+  authorizationScheme?: string
+  tokenHeaderName?: string
+  queryTokenName?: string
+  hasQueryToken?: boolean
+  tokenCandidateCount?: number
+  byteLength?: number
+  payloadContentType?: string
+  payloadSource?: string
+  details?: Record<string, unknown>
 }
 
 function recordingKey(id: string) {
@@ -247,11 +273,21 @@ async function fail(id: string, message: string) {
   console.log(JSON.stringify({ ok: true, id, status: 'failed' }))
 }
 
+async function debugLog(limit: number) {
+  const events = await redis.lrange<DebugEvent[]>(DEBUG_LOG_KEY, 0, limit - 1)
+  console.log(JSON.stringify({ ok: true, events }, null, 2))
+}
+
 async function main() {
   const args = parseArgs(process.argv.slice(2))
 
   if (args.has('claim')) {
     await claim(getLimit(args))
+    return
+  }
+
+  if (args.has('debug-log')) {
+    await debugLog(getLimit(args))
     return
   }
 
@@ -277,7 +313,7 @@ async function main() {
   }
 
   throw new Error(
-    'Use --claim, --claim-id <id>, --complete <id> --thread-id <id>, or --fail <id>',
+    'Use --claim, --claim-id <id>, --debug-log, --complete <id> --thread-id <id>, or --fail <id>',
   )
 }
 
