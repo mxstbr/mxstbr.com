@@ -33,7 +33,8 @@ HASHNODE_ACCESS_TOKEN=
 RESEND_API_KEY=
 # Optional: Used on the /cal page for auth. Pick any random string.
 CAL_PASSWORD=
-# Used to authenticate Pebble Index recording webhooks.
+# Used to authenticate Pebble Index recording webhooks. If unset, the endpoint
+# derives a stable webhook token from UPSTASH_REDIS_REST_TOKEN.
 PEBBLE_INDEX_WEBHOOK_TOKEN=
 # Optional: Max accepted Pebble Index recording payload size in bytes. Defaults to 4000000.
 PEBBLE_INDEX_MAX_BYTES=

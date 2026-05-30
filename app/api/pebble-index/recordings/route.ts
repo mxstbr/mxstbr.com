@@ -82,7 +82,8 @@ function getAuthorizationDetails(request: NextRequest) {
   const authorization = request.headers.get('authorization') ?? ''
   const match = authorization.match(/^(\S+)\s+(.+)$/)
   const scheme = match?.[1]
-  const token = scheme?.toLowerCase() === 'bearer' ? match?.[2]?.trim() : ''
+  const token =
+    scheme?.toLowerCase() === 'bearer' ? (match?.[2]?.trim() ?? '') : ''
 
   return {
     hasAuthorization: Boolean(authorization),
@@ -119,15 +120,27 @@ function logWebhookWarning(
   })
 }
 
+function getExpectedWebhookTokens() {
+  const explicitToken = process.env.PEBBLE_INDEX_WEBHOOK_TOKEN?.trim()
+  if (explicitToken) return [explicitToken]
+
+  const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN?.trim()
+  if (!redisToken) return []
+
+  return [
+    createHash('sha256').update(`pebble-index:${redisToken}`).digest('hex'),
+  ]
+}
+
 function validateAuthorization(request: NextRequest) {
-  const expectedToken = process.env.PEBBLE_INDEX_WEBHOOK_TOKEN
-  if (!expectedToken) {
+  const expectedTokens = getExpectedWebhookTokens()
+  if (expectedTokens.length === 0) {
     logWebhookWarning(request, 'missing_webhook_token_env')
     throw new WebhookPayloadError('Webhook token is not configured', 500)
   }
 
   const authorization = getAuthorizationDetails(request)
-  if (authorization.token !== expectedToken) {
+  if (!expectedTokens.includes(authorization.token)) {
     logWebhookWarning(request, 'unauthorized')
     throw new WebhookPayloadError('Unauthorized', 401)
   }
