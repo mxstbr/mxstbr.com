@@ -2,9 +2,9 @@ import { investments } from './investing/investments'
 import Link from 'next/link'
 import { BlogPosts } from 'app/components/posts'
 import { ItemList, ItemListItem } from 'app/components/item-list'
+import { OpenAIIcon } from 'app/components/openai-icon'
 import { StellateIcon } from 'app/components/stellate-icon'
 import { Section } from 'app/components/section'
-import { ShopifyIcon } from 'app/components/shopify-icon'
 
 export default async function Home() {
   return (
@@ -14,11 +14,11 @@ export default async function Home() {
           <ItemListItem
             left={
               <>
-                Director of Engineering for Liquid Storefronts at{' '}
-                <a href="https://shopify.com">Shopify</a>
+                Member of Technical Staff at{' '}
+                <a href="https://openai.com">OpenAI</a>
               </>
             }
-            right={<ShopifyIcon height="1em" />}
+            right={<OpenAIIcon height="1em" />}
           ></ItemListItem>
           <ItemListItem
             left={
@@ -104,9 +104,15 @@ export default async function Home() {
 
 const work = [
   {
+    name: 'OpenAI',
+    role: 'Member of Technical Staff',
+    timeframe: '2026–now',
+    href: 'https://openai.com',
+  },
+  {
     name: 'Shopify',
     role: 'Director of Engineering',
-    timeframe: '2024–now',
+    timeframe: '2024–2026',
     href: 'https://shopify.com',
   },
   {
