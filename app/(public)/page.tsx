@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { BlogPosts } from 'app/components/posts'
 import { ItemList, ItemListItem } from 'app/components/item-list'
 import { OpenAIIcon } from 'app/components/openai-icon'
+import { ShopifyIcon } from 'app/components/shopify-icon'
 import { StellateIcon } from 'app/components/stellate-icon'
 import { Section } from 'app/components/section'
 
@@ -19,6 +20,15 @@ export default async function Home() {
               </>
             }
             right={<OpenAIIcon height="1em" />}
+          ></ItemListItem>
+          <ItemListItem
+            left={
+              <>
+                Prev Director of Engineering for Liquid Storefronts at{' '}
+                <a href="https://shopify.com">Shopify</a>
+              </>
+            }
+            right={<ShopifyIcon height="1em" />}
           ></ItemListItem>
           <ItemListItem
             left={
