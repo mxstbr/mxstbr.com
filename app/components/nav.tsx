@@ -1,6 +1,4 @@
-import Image from 'next/image'
 import Link from 'next/link'
-import avatar from '../../public/static/images/headshot.jpeg'
 
 export const navItems = {
   '/notes': {
@@ -24,12 +22,12 @@ export function Navbar() {
         href="/"
         className="transition-all hover:text-slate-800 dark:hover:text-slate-200 flex items-center relative py-1 pr-2 no-underline space-x-2 shrink-0"
       >
-        <Image
-          src={avatar}
+        <img
+          src="/static/images/avatar-48.jpeg"
           alt="avatar"
           width={24}
           height={24}
-          style={{ borderRadius: 100 }}
+          className="rounded-full"
         />
         <h1 className="font-bold">Max Stoiber</h1>
       </Link>

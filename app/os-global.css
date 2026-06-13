@@ -1,9 +1,6 @@
 @import 'tailwindcss' source(none);
-@source "./(public)";
+@source "./(os)";
 @source "./components";
-@source "./global-error.tsx";
-@source "./not-found.tsx";
-@source "../mdx-components.tsx";
 @config "../tailwind.config.js";
 
 @layer base {

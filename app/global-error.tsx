@@ -1,9 +1,6 @@
 'use client'
 
 import './global.css'
-import { Inter } from 'next/font/google'
-
-const inter = Inter({ subsets: ['latin'] })
 
 export default function GlobalError({
   error: _error,
@@ -19,7 +16,7 @@ export default function GlobalError({
   return (
     <html
       lang="en"
-      className={`${inter.className} text-black`}
+      className="text-black"
       style={{ backgroundColor: '#c0c0c0' }}
     >
       <body className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-slate-50/70 via-white to-slate-100/80 px-6 text-center">

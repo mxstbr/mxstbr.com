@@ -1,7 +1,6 @@
-import '../global.css'
+import '../os-global.css'
 import { GeistSans } from 'geist/font/sans'
 import { Analytics } from '@vercel/analytics/react'
-import Script from 'next/script'
 import { ReportView } from '../components/report-view'
 import { PasswordForm } from './components/password-form'
 import { auth } from '../auth'
@@ -40,8 +39,6 @@ export default async function OSRootLayout({
         </main>
         <Analytics />
         <ReportView />
-        {/* Splitbee */}
-        <Script async data-api="/_sb" src="/sb.js"></Script>
         <script
           type="application/ld+json"
           suppressHydrationWarning

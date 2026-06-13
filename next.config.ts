@@ -39,18 +39,6 @@ const nextConfig: NextConfig = {
       ...previousSlugNotesRedirects,
     ]
   },
-  async rewrites() {
-    return [
-      {
-        source: '/sb.js',
-        destination: 'https://cdn.splitbee.io/sb.js',
-      },
-      {
-        source: '/_sb/:slug',
-        destination: 'https://hive.splitbee.io/:slug',
-      },
-    ]
-  },
   outputFileTracingIncludes: {
     '/stats': ['./app/(public)/thoughts/**/*'],
   },
