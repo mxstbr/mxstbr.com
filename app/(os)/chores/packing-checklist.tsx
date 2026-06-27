@@ -16,6 +16,11 @@ const STORAGE_KEY = 'chores:camping-packing-checklist:v1'
 
 const PACKING_ITEMS: PackingItem[] = [
   { id: 'pillow', title: 'Pillow', emoji: '🛏️' },
+  {
+    id: 'electric-heating-blanket',
+    title: 'Electric heating blanket',
+    emoji: '♨️',
+  },
   { id: 'kindle', title: 'Kindle', emoji: '📖' },
   { id: 'headphones', title: 'Headphones', emoji: '🎧' },
   { id: 'underwear', title: '6x pairs of underwear', emoji: '🩲' },
