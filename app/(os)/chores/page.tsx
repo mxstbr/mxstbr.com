@@ -15,6 +15,7 @@ import { RefreshButton } from './refresh-button'
 import { PasswordForm } from '../components/password-form'
 import { auth, isMax } from '../../auth'
 import { ChoresErrorBoundary } from './error-boundary'
+import { ChoresNav } from './chores-nav'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -72,7 +73,9 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
   const osParam = resolvedSearchParams?.os
   const kidParam = resolvedSearchParams?.kid
   const hasOpenChoresToday = state.chores.some((chore) =>
-    state.kids.some((kid) => isOpenForKid(chore, kid.id, state.completions, todayCtx)),
+    state.kids.some((kid) =>
+      isOpenForKid(chore, kid.id, state.completions, todayCtx),
+    ),
   )
 
   const choresHref = (day?: string) => {
@@ -83,19 +86,15 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
     return query ? `/chores?${query}` : '/chores'
   }
 
-  const rewardsHref = () => {
-    const params = new URLSearchParams()
-    if (osParam) params.set('os', osParam)
-    const query = params.toString()
-    return query ? `/chores/rewards?${query}` : '/chores/rewards'
-  }
-
   const openChoresByKid: Record<string, Chore[]> = {}
   const doneChoresByKid: Record<
     string,
     { chore: Chore; completionId: string; timestamp: string }[]
   > = {}
-  const progressByKid: Record<string, ReturnType<typeof getDailyChoreProgress>> = {}
+  const progressByKid: Record<
+    string,
+    ReturnType<typeof getDailyChoreProgress>
+  > = {}
 
   for (const kid of state.kids) {
     openChoresByKid[kid.id] = []
@@ -166,7 +165,9 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
                 ‹
               </Link>
               <Link
-                href={viewingToday ? choresHref() : choresHref(todayCtx.todayIso)}
+                href={
+                  viewingToday ? choresHref() : choresHref(todayCtx.todayIso)
+                }
                 prefetch
                 className={`rounded-sm px-3 py-1 transition ${
                   viewingToday
@@ -214,23 +215,7 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
         <ScreenSaver noChoresToday={!hasOpenChoresToday} />
       </ChoresErrorBoundary>
       <ChoresErrorBoundary label="the navigation bar">
-        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-300 bg-slate-100/95 px-2 backdrop-blur dark:border-slate-700 dark:bg-slate-900/90">
-          <div className="grid grid-cols-2 divide-x divide-slate-300 text-xs font-semibold uppercase tracking-wide text-slate-700 dark:divide-slate-700 dark:text-slate-200">
-            <Link
-              href={choresHref()}
-              className="flex h-11 items-center justify-center text-slate-900 transition hover:text-slate-900 dark:text-white"
-              aria-current="page"
-            >
-              Chores
-            </Link>
-            <Link
-              href={rewardsHref()}
-              className="flex h-11 items-center justify-center transition hover:text-slate-900 dark:hover:text-white"
-            >
-              Rewards
-            </Link>
-          </div>
-        </div>
+        <ChoresNav current="chores" osParam={osParam} />
       </ChoresErrorBoundary>
     </div>
   )
