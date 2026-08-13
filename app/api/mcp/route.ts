@@ -31,15 +31,14 @@ const routeWithAuth = (req: NextRequest) => {
     ? bearer.slice(7)
     : undefined
   const pwd = new URL(req.url).searchParams.get('pwd')
+  const calendarPassword = process.env.CAL_PASSWORD
+  const automationToken = process.env.CLIPPY_AUTOMATION_TOKEN
+  const isAuthorized =
+    (!!calendarPassword &&
+      (pwd === calendarPassword || bearerToken === calendarPassword)) ||
+    (!!automationToken && bearerToken === automationToken)
 
-  if (
-    process.env.NODE_ENV !== 'development' &&
-    !(
-      pwd === process.env.CAL_PASSWORD ||
-      bearerToken === process.env.CAL_PASSWORD ||
-      bearerToken === process.env.CLIPPY_AUTOMATION_TOKEN
-    )
-  ) {
+  if (process.env.NODE_ENV !== 'development' && !isAuthorized) {
     return new NextResponse('Unauthorized', { status: 401 })
   }
 
