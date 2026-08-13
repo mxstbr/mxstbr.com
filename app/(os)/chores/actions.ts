@@ -7,6 +7,10 @@ import {
   ChoreType,
   getChoreState,
   saveChoreState,
+  type Completion,
+  type Kid,
+  type Reward,
+  type RewardRedemption,
   type RewardType,
 } from './data'
 import {
@@ -35,14 +39,18 @@ function todayIsoDate(): string {
 
 export type CompletionResult = {
   awarded: number
+  chore?: Chore
+  completion?: Completion
   completionId?: string
   choreTitle?: string
+  kid?: Kid
   kidName?: string
   bonusAwarded?: boolean
   bonusStars?: number
   bonusMessage?: string | null
   telegramMessage?: string | null
   undoLink?: string | null
+  starBalance?: number
   status: 'completed' | 'skipped' | 'invalid' | 'unauthorized'
 }
 
@@ -58,6 +66,21 @@ export type DetailedUndoResult = {
   kidName?: string
   telegramMessage?: string | null
   status: 'undone' | 'not_found' | 'invalid'
+}
+
+export type DetailedStarAdjustmentResult = {
+  completion: Completion
+  kid: Kid
+  starBalance: number
+}
+
+export type DetailedRewardRedemptionResult = {
+  completion: Completion
+  kid: Kid
+  redemption: RewardRedemption
+  reward: Reward
+  starBalance: number
+  success: true
 }
 
 function hasAutomationToken(formData?: FormData | null): boolean {
@@ -76,22 +99,23 @@ async function requireAuthorization(formData?: FormData | null): Promise<void> {
   throw new Error('Unauthorized')
 }
 
-async function withUpdatedState(
-  updater: (state: ChoreState) => Promise<void> | void,
-): Promise<void> {
+async function withUpdatedState<T>(
+  updater: (state: ChoreState) => Promise<T> | T,
+): Promise<T> {
   const state = await getChoreState()
   const before = JSON.stringify(state)
 
-  await updater(state)
+  const result = await updater(state)
 
   const after = JSON.stringify(state)
-  if (before === after) return
+  if (before === after) return result
 
   await saveChoreState(state)
   revalidatePath('/chores')
   revalidatePath('/chores/admin')
   revalidatePath('/chores/rewards')
   revalidatePath('/chores/bedtime-approval')
+  return result
 }
 
 function parseNumber(value: FormDataEntryValue | null): number | null {
@@ -243,8 +267,11 @@ async function applyCompletion({
 
     result = {
       awarded: 0,
+      chore,
       choreTitle: chore.title,
+      kid,
       kidName: kid.name,
+      starBalance: starsForKid(state.completions, kidId),
       status: 'skipped',
     }
 
@@ -264,13 +291,14 @@ async function applyCompletion({
 
     const completionId = crypto.randomUUID()
 
-    state.completions.unshift({
+    const completion: Completion = {
       id: completionId,
       choreId: chore.id,
       kidId,
       timestamp: completionTimestamp,
       starsAwarded: chore.stars,
-    })
+    }
+    state.completions.unshift(completion)
 
     if (chore.type === 'one-off') {
       const allDone = chore.kidIds.every((id) =>
@@ -297,9 +325,13 @@ async function applyCompletion({
 
     result = {
       awarded,
+      chore,
+      completion,
       choreTitle: chore.title,
+      kid,
       kidName: kid.name,
       completionId,
+      starBalance: starsForKid(state.completions, kidId),
       status: 'completed',
       bonusAwarded: bonusResult.awarded,
       bonusStars: bonusResult.bonusStars,
@@ -339,7 +371,7 @@ async function applyCompletion({
   return result
 }
 
-export async function addChore(formData: FormData): Promise<void> {
+async function createChore(formData: FormData): Promise<Chore | null> {
   await requireAuthorization(formData)
 
   const title = formData.get('title')?.toString().trim()
@@ -367,11 +399,11 @@ export async function addChore(formData: FormData): Promise<void> {
     ? formData.get('requestedId')?.toString()
     : undefined
 
-  if (!title || kidIds.length === 0) return
+  if (!title || kidIds.length === 0) return null
 
-  await withUpdatedState((state) => {
+  return withUpdatedState((state) => {
     const validKidIds = kidIds.filter((id) => state.kids.some((kid) => kid.id === id))
-    if (!validKidIds.length) return
+    if (!validKidIds.length) return null
 
     const createdAt = new Date().toISOString()
     const chore: Chore = {
@@ -395,7 +427,18 @@ export async function addChore(formData: FormData): Promise<void> {
     }
 
     state.chores.unshift(chore)
+    return chore
   })
+}
+
+export async function addChore(formData: FormData): Promise<void> {
+  await createChore(formData)
+}
+
+export async function addChoreDetailed(
+  formData: FormData,
+): Promise<Chore | null> {
+  return createChore(formData)
 }
 
 export async function completeChore(formData: FormData): Promise<CompletionResult> {
@@ -586,18 +629,36 @@ export async function setPause(formData: FormData): Promise<void> {
   })
 }
 
-export async function pauseAllChores(formData: FormData): Promise<void> {
+async function applyPauseAllChores(formData: FormData): Promise<string[]> {
   await requireAuthorization(formData)
 
   const pausedUntil = formData.get('pausedUntil')?.toString() || null
   const snoozedUntil = pausedUntil ? shiftIsoDay(pausedUntil, 1) : null
 
-  await withUpdatedState((state) => {
+  return withUpdatedState((state) => {
+    const affectedChoreIds: string[] = []
     for (const chore of state.chores) {
+      if (
+        (chore.pausedUntil ?? null) !== pausedUntil ||
+        (chore.snoozedUntil ?? null) !== snoozedUntil
+      ) {
+        affectedChoreIds.push(chore.id)
+      }
       chore.pausedUntil = pausedUntil
       chore.snoozedUntil = snoozedUntil
     }
+    return affectedChoreIds
   })
+}
+
+export async function pauseAllChores(formData: FormData): Promise<void> {
+  await applyPauseAllChores(formData)
+}
+
+export async function pauseAllChoresDetailed(
+  formData: FormData,
+): Promise<string[]> {
+  return applyPauseAllChores(formData)
 }
 
 export async function skipChore(formData: FormData): Promise<SkipResult> {
@@ -686,11 +747,13 @@ export async function setChoreSchedule(formData: FormData): Promise<void> {
   })
 }
 
-export async function updateChore(formData: FormData): Promise<void> {
+export async function updateChore(
+  formData: FormData,
+): Promise<Chore | null> {
   await requireAuthorization(formData)
 
   const choreId = formData.get('choreId')?.toString()
-  if (!choreId) return
+  if (!choreId) return null
 
   const hasTitle = formData.has('title')
   const hasEmoji = formData.has('emoji')
@@ -730,9 +793,9 @@ export async function updateChore(formData: FormData): Promise<void> {
     .map((value) => value.toString())
     .filter(Boolean)
 
-  await withUpdatedState((state) => {
+  return withUpdatedState((state) => {
     const chore = state.chores.find((entry) => entry.id === choreId)
-    if (!chore) return
+    if (!chore) return null
 
     if (hasTitle && title) chore.title = title
     if (hasEmoji && emoji) chore.emoji = emoji
@@ -766,25 +829,37 @@ export async function updateChore(formData: FormData): Promise<void> {
             : undefined,
       }
     }
+    return chore
   })
 }
 
-export async function renameKid(formData: FormData): Promise<void> {
+async function applyRenameKid(formData: FormData): Promise<Kid | null> {
   await requireAuthorization(formData)
 
   const kidId = formData.get('kidId')?.toString()
   const name = formData.get('name')?.toString().trim()
   const color = parseColor(formData.get('color'))
-  if (!kidId || !name) return
+  if (!kidId || !name) return null
 
-  await withUpdatedState((state) => {
+  return withUpdatedState((state) => {
     const kid = state.kids.find((k) => k.id === kidId)
-    if (!kid) return
+    if (!kid) return null
     kid.name = name
     if (color) {
       kid.color = color
     }
+    return kid
   })
+}
+
+export async function renameKid(formData: FormData): Promise<void> {
+  await applyRenameKid(formData)
+}
+
+export async function renameKidDetailed(
+  formData: FormData,
+): Promise<Kid | null> {
+  return applyRenameKid(formData)
 }
 
 export async function setKidColor(formData: FormData): Promise<void> {
@@ -801,15 +876,28 @@ export async function setKidColor(formData: FormData): Promise<void> {
   })
 }
 
-export async function archiveChore(formData: FormData): Promise<void> {
+async function applyArchiveChore(formData: FormData): Promise<Chore | null> {
   await requireAuthorization(formData)
 
   const choreId = formData.get('choreId')?.toString()
-  if (!choreId) return
+  if (!choreId) return null
 
-  await withUpdatedState((state) => {
+  return withUpdatedState((state) => {
+    const chore = state.chores.find((entry) => entry.id === choreId)
+    if (!chore) return null
     state.chores = state.chores.filter((chore) => chore.id !== choreId)
+    return chore
   })
+}
+
+export async function archiveChore(formData: FormData): Promise<void> {
+  await applyArchiveChore(formData)
+}
+
+export async function archiveChoreDetailed(
+  formData: FormData,
+): Promise<Chore | null> {
+  return applyArchiveChore(formData)
 }
 
 export async function setTimeOfDay(formData: FormData): Promise<void> {
@@ -826,7 +914,9 @@ export async function setTimeOfDay(formData: FormData): Promise<void> {
   })
 }
 
-export async function adjustKidStars(formData: FormData): Promise<void> {
+async function applyKidStarAdjustment(
+  formData: FormData,
+): Promise<DetailedStarAdjustmentResult | null> {
   await requireAuthorization(formData)
 
   const kidId = formData.get('kidId')?.toString()
@@ -835,23 +925,39 @@ export async function adjustKidStars(formData: FormData): Promise<void> {
   const requestedId = hasAutomationToken(formData)
     ? formData.get('requestedId')?.toString()
     : undefined
-  if (!kidId || rawDelta === null) return
+  if (!kidId || rawDelta === null) return null
 
   const delta = Math.round(Math.abs(rawDelta)) * (mode === 'remove' ? -1 : 1)
-  if (delta === 0) return
+  if (delta === 0) return null
 
-  await withUpdatedState((state) => {
+  return withUpdatedState((state) => {
     const kid = state.kids.find((k) => k.id === kidId)
-    if (!kid) return
+    if (!kid) return null
 
-    state.completions.unshift({
+    const completion: Completion = {
       id: requestedId || crypto.randomUUID(),
       choreId: `manual-${Date.now()}`,
       kidId,
       timestamp: new Date().toISOString(),
       starsAwarded: delta,
-    })
+    }
+    state.completions.unshift(completion)
+    return {
+      completion,
+      kid,
+      starBalance: starsForKid(state.completions, kidId),
+    }
   })
+}
+
+export async function adjustKidStars(formData: FormData): Promise<void> {
+  await applyKidStarAdjustment(formData)
+}
+
+export async function adjustKidStarsDetailed(
+  formData: FormData,
+): Promise<DetailedStarAdjustmentResult | null> {
+  return applyKidStarAdjustment(formData)
 }
 
 export async function setChoreKids(formData: FormData): Promise<void> {
@@ -903,7 +1009,7 @@ export async function setOneOffDate(formData: FormData): Promise<void> {
   })
 }
 
-export async function addReward(formData: FormData): Promise<void> {
+async function createReward(formData: FormData): Promise<Reward | null> {
   await requireAuthorization(formData)
 
   const title = formData.get('title')?.toString().trim()
@@ -918,13 +1024,13 @@ export async function addReward(formData: FormData): Promise<void> {
     ? formData.get('requestedId')?.toString()
     : undefined
 
-  if (!title || kidIds.length === 0) return
+  if (!title || kidIds.length === 0) return null
 
-  await withUpdatedState((state) => {
+  return withUpdatedState((state) => {
     const validKidIds = kidIds.filter((id) => state.kids.some((kid) => kid.id === id))
-    if (!validKidIds.length) return
+    if (!validKidIds.length) return null
 
-    state.rewards.unshift({
+    const reward: Reward = {
       id: requestedId || crypto.randomUUID(),
       kidIds: validKidIds,
       title,
@@ -932,20 +1038,45 @@ export async function addReward(formData: FormData): Promise<void> {
       cost: Math.max(0, Math.round(cost)),
       type,
       createdAt: new Date().toISOString(),
-    })
+    }
+    state.rewards.unshift(reward)
+    return reward
+  })
+}
+
+export async function addReward(formData: FormData): Promise<void> {
+  await createReward(formData)
+}
+
+export async function addRewardDetailed(
+  formData: FormData,
+): Promise<Reward | null> {
+  return createReward(formData)
+}
+
+async function applyArchiveReward(formData: FormData): Promise<Reward | null> {
+  await requireAuthorization(formData)
+
+  const rewardId = formData.get('rewardId')?.toString()
+  if (!rewardId) return null
+
+  return withUpdatedState((state) => {
+    const reward = state.rewards.find((entry) => entry.id === rewardId)
+    if (!reward) return null
+    state.rewards = state.rewards.filter((reward) => reward.id !== rewardId)
+    state.rewardRedemptions = state.rewardRedemptions.filter((entry) => entry.rewardId !== rewardId)
+    return reward
   })
 }
 
 export async function archiveReward(formData: FormData): Promise<void> {
-  await requireAuthorization(formData)
+  await applyArchiveReward(formData)
+}
 
-  const rewardId = formData.get('rewardId')?.toString()
-  if (!rewardId) return
-
-  await withUpdatedState((state) => {
-    state.rewards = state.rewards.filter((reward) => reward.id !== rewardId)
-    state.rewardRedemptions = state.rewardRedemptions.filter((entry) => entry.rewardId !== rewardId)
-  })
+export async function archiveRewardDetailed(
+  formData: FormData,
+): Promise<Reward | null> {
+  return applyArchiveReward(formData)
 }
 
 export async function setRewardKids(formData: FormData): Promise<void> {
@@ -969,11 +1100,13 @@ export async function setRewardKids(formData: FormData): Promise<void> {
   })
 }
 
-export async function updateReward(formData: FormData): Promise<void> {
+export async function updateReward(
+  formData: FormData,
+): Promise<Reward | null> {
   await requireAuthorization(formData)
 
   const rewardId = formData.get('rewardId')?.toString()
-  if (!rewardId) return
+  if (!rewardId) return null
 
   const hasTitle = formData.has('title')
   const hasEmoji = formData.has('emoji')
@@ -991,9 +1124,9 @@ export async function updateReward(formData: FormData): Promise<void> {
     .map((value) => value.toString())
     .filter(Boolean)
 
-  await withUpdatedState((state) => {
+  return withUpdatedState((state) => {
     const reward = state.rewards.find((entry) => entry.id === rewardId)
-    if (!reward) return
+    if (!reward) return null
 
     if (hasTitle && title) reward.title = title
     if (hasEmoji && emoji) reward.emoji = emoji
@@ -1005,10 +1138,13 @@ export async function updateReward(formData: FormData): Promise<void> {
       )
       if (validKidIds.length) reward.kidIds = validKidIds
     }
+    return reward
   })
 }
 
-export async function redeemReward(formData: FormData): Promise<{ success: boolean }> {
+export async function redeemReward(
+  formData: FormData,
+): Promise<{ success: false } | DetailedRewardRedemptionResult> {
   await requireAuthorization(formData)
 
   const rewardId = formData.get('rewardId')?.toString()
@@ -1021,11 +1157,14 @@ export async function redeemReward(formData: FormData): Promise<{ success: boole
     : undefined
   if (!rewardId || !kidId) return { success: false }
 
-  let success = false
+  let result: { success: false } | DetailedRewardRedemptionResult = {
+    success: false,
+  }
 
   await withUpdatedState((state) => {
     const reward = state.rewards.find((r) => r.id === rewardId)
-    if (!reward) return
+    const kid = state.kids.find((entry) => entry.id === kidId)
+    if (!reward || !kid) return
     if (!reward.kidIds.includes(kidId) || reward.archived) return
 
     if (reward.type === 'one-off') {
@@ -1040,26 +1179,33 @@ export async function redeemReward(formData: FormData): Promise<{ success: boole
 
     const timestamp = new Date().toISOString()
 
-    state.completions.unshift({
+    const completion: Completion = {
       id: requestedCompletionId || crypto.randomUUID(),
       choreId: `reward:${reward.id}`,
       kidId,
       timestamp,
       starsAwarded: -Math.max(0, Math.round(reward.cost)),
-    })
+    }
+    state.completions.unshift(completion)
 
-    state.rewardRedemptions.unshift({
+    const redemption: RewardRedemption = {
       id: requestedRedemptionId || crypto.randomUUID(),
       rewardId: reward.id,
       kidId,
       timestamp,
       cost: reward.cost,
-    })
+    }
+    state.rewardRedemptions.unshift(redemption)
 
-    success = true
-
-    const kid = state.kids.find((k) => k.id === kidId)
-    if (kid && process.env.TELEGRAM_BOT_TOKEN) {
+    result = {
+      completion,
+      kid,
+      redemption,
+      reward,
+      starBalance: starsForKid(state.completions, kidId),
+      success: true,
+    }
+    if (process.env.TELEGRAM_BOT_TOKEN) {
       const message = `${kid.name} redeemed "${reward.title}" for ${reward.cost} ⭐️`
       bot.telegram
         .sendMessage('-4904434425', message)
@@ -1067,7 +1213,7 @@ export async function redeemReward(formData: FormData): Promise<{ success: boole
     }
   })
 
-  return { success }
+  return result
 }
 
 export async function createBedtimeChores(

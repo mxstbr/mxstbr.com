@@ -1,14 +1,14 @@
 import z from 'zod/v3'
 import {
-  addChore,
-  addReward,
-  adjustKidStars,
-  archiveChore,
-  archiveReward,
+  addChoreDetailed,
+  addRewardDetailed,
+  adjustKidStarsDetailed,
+  archiveChoreDetailed,
+  archiveRewardDetailed,
   completeChore,
-  pauseAllChores,
+  pauseAllChoresDetailed,
   redeemReward,
-  renameKid,
+  renameKidDetailed,
   undoChoreDetailed,
   updateChore,
   updateReward,
@@ -27,7 +27,6 @@ import {
   isOpenForKid,
   pacificDateFromTimestamp,
   scheduleLabel,
-  shiftIsoDay,
   sortByTimeOfDay,
   starsForKid,
 } from 'app/(os)/chores/utils'
@@ -183,118 +182,142 @@ const businessErrorSchema = z.object({
 
 const changedFieldsSchema = z.array(z.string())
 
-const createChoreResultSchema = z.union([
-  z.object({ status: z.literal('created'), chore: choreSchema }),
-  businessErrorSchema,
-])
+const createChoreResultSchema = z.object({
+  result: z.union([
+    z.object({ status: z.literal('created'), chore: choreSchema }),
+    businessErrorSchema,
+  ]),
+})
 
-const updateChoreResultSchema = z.union([
-  z.object({
-    status: z.enum(['updated', 'unchanged']),
-    chore: choreSchema,
-    changed_fields: changedFieldsSchema,
-  }),
-  businessErrorSchema,
-])
+const updateChoreResultSchema = z.object({
+  result: z.union([
+    z.object({
+      status: z.enum(['updated', 'unchanged']),
+      chore: choreSchema,
+      changed_fields: changedFieldsSchema,
+    }),
+    businessErrorSchema,
+  ]),
+})
 
-const completeChoreResultSchema = z.union([
-  z.object({
-    status: z.enum(['completed', 'skipped']),
-    chore: choreSchema,
-    kid: kidSchema,
-    completion: completionSchema.nullable(),
-    stars_awarded: z.number(),
-    bonus_stars_awarded: z.number(),
-    bonus_message: z.string().nullable(),
-    telegram_message: z.string().nullable(),
-    undo_link: z.string().nullable(),
-  }),
-  businessErrorSchema,
-])
+const completeChoreResultSchema = z.object({
+  result: z.union([
+    z.object({
+      status: z.enum(['completed', 'skipped']),
+      chore: choreSchema,
+      kid: kidSchema,
+      completion: completionSchema.nullable(),
+      stars_awarded: z.number(),
+      bonus_stars_awarded: z.number(),
+      bonus_message: z.string().nullable(),
+      telegram_message: z.string().nullable(),
+      undo_link: z.string().nullable(),
+    }),
+    businessErrorSchema,
+  ]),
+})
 
-const undoChoreResultSchema = z.union([
-  z.object({
-    status: z.literal('undone'),
-    chore: choreSchema,
-    kid: kidSchema,
-    completion_id: completionIdSchema,
-    stars_delta: z.number(),
-    telegram_message: z.string().nullable(),
-  }),
-  businessErrorSchema,
-])
+const undoChoreResultSchema = z.object({
+  result: z.union([
+    z.object({
+      status: z.literal('undone'),
+      chore: choreSchema,
+      kid: kidSchema,
+      completion_id: completionIdSchema,
+      stars_delta: z.number(),
+      telegram_message: z.string().nullable(),
+    }),
+    businessErrorSchema,
+  ]),
+})
 
-const archiveChoreResultSchema = z.union([
-  z.object({
-    status: z.literal('archived'),
-    chore_id: choreIdSchema,
-    chore: choreSchema,
-  }),
-  businessErrorSchema,
-])
+const archiveChoreResultSchema = z.object({
+  result: z.union([
+    z.object({
+      status: z.literal('archived'),
+      chore_id: choreIdSchema,
+      chore: choreSchema,
+    }),
+    businessErrorSchema,
+  ]),
+})
 
-const pauseAllResultSchema = z.union([
-  z.object({
-    status: z.enum(['paused', 'resumed', 'unchanged']),
-    paused_until: isoDaySchema.nullable(),
-    affected_chore_ids: z.array(choreIdSchema),
-  }),
-  businessErrorSchema,
-])
+const pauseAllResultSchema = z.object({
+  result: z.union([
+    z.object({
+      status: z.enum(['paused', 'resumed', 'unchanged']),
+      paused_until: isoDaySchema.nullable(),
+      affected_chore_ids: z.array(choreIdSchema),
+    }),
+    businessErrorSchema,
+  ]),
+})
 
-const updateKidResultSchema = z.union([
-  z.object({
-    status: z.enum(['updated', 'unchanged']),
-    kid: kidSchema,
-    changed_fields: changedFieldsSchema,
-  }),
-  businessErrorSchema,
-])
+const updateKidResultSchema = z.object({
+  result: z.union([
+    z.object({
+      status: z.enum(['updated', 'unchanged']),
+      kid: kidSchema,
+      changed_fields: changedFieldsSchema,
+    }),
+    businessErrorSchema,
+  ]),
+})
 
-const adjustStarsResultSchema = z.union([
-  z.object({
-    status: z.literal('adjusted'),
-    kid: kidSchema,
-    ledger_entry_id: z.string(),
-    stars_delta: z.number(),
-    star_balance: z.number(),
-  }),
-  businessErrorSchema,
-])
+const adjustStarsResultSchema = z.object({
+  result: z.union([
+    z.object({
+      status: z.literal('adjusted'),
+      kid: kidSchema,
+      ledger_entry_id: z.string(),
+      stars_delta: z.number(),
+      star_balance: z.number(),
+    }),
+    businessErrorSchema,
+  ]),
+})
 
-const createRewardResultSchema = z.union([
-  z.object({ status: z.literal('created'), reward: rewardSchema }),
-  businessErrorSchema,
-])
+const createRewardResultSchema = z.object({
+  result: z.union([
+    z.object({ status: z.literal('created'), reward: rewardSchema }),
+    businessErrorSchema,
+  ]),
+})
 
-const updateRewardResultSchema = z.union([
-  z.object({
-    status: z.enum(['updated', 'unchanged']),
-    reward: rewardSchema,
-    changed_fields: changedFieldsSchema,
-  }),
-  businessErrorSchema,
-])
+const updateRewardResultSchema = z.object({
+  result: z.union([
+    z.object({
+      status: z.enum(['updated', 'unchanged']),
+      reward: rewardSchema,
+      changed_fields: changedFieldsSchema,
+    }),
+    businessErrorSchema,
+  ]),
+})
 
-const archiveRewardResultSchema = z.union([
-  z.object({
-    status: z.literal('archived'),
-    reward_id: rewardIdSchema,
-    reward: rewardSchema,
-  }),
-  businessErrorSchema,
-])
+const archiveRewardResultSchema = z.object({
+  result: z.union([
+    z.object({
+      status: z.literal('archived'),
+      reward_id: rewardIdSchema,
+      reward: rewardSchema,
+    }),
+    businessErrorSchema,
+  ]),
+})
 
-const redeemRewardResultSchema = z.union([
-  z.object({
-    status: z.literal('redeemed'),
-    reward: rewardSchema,
-    kid: kidSchema,
-    redemption: rewardRedemptionSchema,
-    star_balance: z.number(),
-  }),
-  businessErrorSchema,
-])
+const redeemRewardResultSchema = z.object({
+  result: z.union([
+    z.object({
+      status: z.literal('redeemed'),
+      reward: rewardSchema,
+      kid: kidSchema,
+      redemption: rewardRedemptionSchema,
+      star_balance: z.number(),
+    }),
+    businessErrorSchema,
+  ]),
+})
 
 const searchKidSchema = z.object({
   id: kidIdSchema,
@@ -437,7 +460,9 @@ function businessError(
 ) {
   return {
     content: [{ type: 'text' as const, text: message }],
-    structuredContent: { status: 'error' as const, code, message },
+    structuredContent: {
+      result: { status: 'error' as const, code, message },
+    },
     isError: true,
   }
 }
@@ -447,6 +472,10 @@ function success(content: string, structuredContent: Record<string, unknown>) {
     content: [{ type: 'text' as const, text: content }],
     structuredContent,
   }
+}
+
+function mutationSuccess(content: string, result: Record<string, unknown>) {
+  return success(content, { result })
 }
 
 function missingKidIds(kids: Kid[], kidIds: string[]): string[] {
@@ -841,16 +870,12 @@ export function registerChoreTools(server: McpServer) {
       if (time_of_day) formData.append('timeOfDay', time_of_day)
       if (requires_approval) formData.append('requiresApproval', 'true')
 
-      await addChore(formData)
-      const updatedState = await getChoreState()
-      const chore = updatedState.chores.find(
-        (entry) => entry.id === requestedId,
-      )
+      const chore = await addChoreDetailed(formData)
       if (!chore) {
         return businessError('mutation_failed', 'Could not create chore')
       }
 
-      return success(`Chore "${title}" created`, {
+      return mutationSuccess(`Chore "${title}" created`, {
         status: 'created',
         chore,
       })
@@ -960,9 +985,7 @@ export function registerChoreTools(server: McpServer) {
         formData.append('pausedUntil', paused_until)
       }
 
-      await updateChore(formData)
-      const updatedState = await getChoreState()
-      const chore = updatedState.chores.find((entry) => entry.id === chore_id)
+      const chore = await updateChore(formData)
       if (!chore) {
         return businessError('mutation_failed', 'Could not update chore')
       }
@@ -980,11 +1003,14 @@ export function registerChoreTools(server: McpServer) {
         'pausedUntil',
       ])
       const status = fields.length ? 'updated' : 'unchanged'
-      return success(fields.length ? 'Chore updated' : 'Chore unchanged', {
-        status,
-        chore,
-        changed_fields: fields,
-      })
+      return mutationSuccess(
+        fields.length ? 'Chore updated' : 'Chore unchanged',
+        {
+          status,
+          chore,
+          changed_fields: fields,
+        },
+      )
     },
   )
 
@@ -1023,21 +1049,13 @@ export function registerChoreTools(server: McpServer) {
         return businessError('mutation_failed', 'Could not complete chore')
       }
 
-      const updatedState = await getChoreState()
-      const updatedChore =
-        updatedState.chores.find((entry) => entry.id === chore_id) ?? chore
-      const completion = result.completionId
-        ? (updatedState.completions.find(
-            (entry) => entry.id === result.completionId,
-          ) ?? null)
-        : null
       const message = formatCompletionMessage(result)
 
-      return success(message, {
+      return mutationSuccess(message, {
         status: result.status,
-        chore: updatedChore,
-        kid,
-        completion,
+        chore: result.chore ?? chore,
+        kid: result.kid ?? kid,
+        completion: result.completion ?? null,
         stars_awarded: result.awarded,
         bonus_stars_awarded: result.bonusStars ?? 0,
         bonus_message: result.bonusMessage ?? null,
@@ -1108,7 +1126,7 @@ export function registerChoreTools(server: McpServer) {
         )
       }
 
-      return success(
+      return mutationSuccess(
         `Undid "${result.choreTitle ?? chore.title}" for ${result.kidName ?? kid.name}`,
         {
           status: 'undone',
@@ -1140,16 +1158,15 @@ export function registerChoreTools(server: McpServer) {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('choreId', chore_id)
-      await archiveChore(formData)
-      const updatedState = await getChoreState()
-      if (updatedState.chores.some((entry) => entry.id === chore_id)) {
+      const archivedChore = await archiveChoreDetailed(formData)
+      if (!archivedChore) {
         return businessError('mutation_failed', 'Could not archive chore')
       }
 
-      return success('Chore archived', {
+      return mutationSuccess('Chore archived', {
         status: 'archived',
         chore_id,
-        chore,
+        chore: archivedChore,
       })
     },
   )
@@ -1165,21 +1182,12 @@ export function registerChoreTools(server: McpServer) {
       outputSchema: pauseAllResultSchema,
     },
     async ({ paused_until }: { paused_until: string }) => {
-      const state = await getChoreState()
       const targetPause = paused_until || null
-      const targetSnooze = paused_until ? shiftIsoDay(paused_until, 1) : null
-      const affectedChoreIds = state.chores
-        .filter(
-          (chore) =>
-            (chore.pausedUntil ?? null) !== targetPause ||
-            (chore.snoozedUntil ?? null) !== targetSnooze,
-        )
-        .map((chore) => chore.id)
 
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('pausedUntil', paused_until)
-      await pauseAllChores(formData)
+      const affectedChoreIds = await pauseAllChoresDetailed(formData)
 
       const status = affectedChoreIds.length
         ? paused_until
@@ -1189,7 +1197,7 @@ export function registerChoreTools(server: McpServer) {
       const message = paused_until
         ? `All chores paused until ${paused_until}`
         : 'All chores resumed'
-      return success(message, {
+      return mutationSuccess(message, {
         status,
         paused_until: targetPause,
         affected_chore_ids: affectedChoreIds,
@@ -1223,16 +1231,13 @@ export function registerChoreTools(server: McpServer) {
       formData.append('kidId', kid_id)
       formData.append('name', name ?? before.name)
       if (color !== undefined) formData.append('color', color)
-      await renameKid(formData)
-
-      const updatedState = await getChoreState()
-      const kid = updatedState.kids.find((entry) => entry.id === kid_id)
+      const kid = await renameKidDetailed(formData)
       if (!kid) {
         return businessError('mutation_failed', 'Could not update kid')
       }
       const fields = changedFields(before, kid, ['name', 'color'])
       const status = fields.length ? 'updated' : 'unchanged'
-      return success(fields.length ? 'Kid updated' : 'Kid unchanged', {
+      return mutationSuccess(fields.length ? 'Kid updated' : 'Kid unchanged', {
         status,
         kid,
         changed_fields: fields,
@@ -1272,24 +1277,19 @@ export function registerChoreTools(server: McpServer) {
       formData.append('kidId', kid_id)
       formData.append('delta', delta.toString())
       formData.append('mode', mode)
-      await adjustKidStars(formData)
-
-      const updatedState = await getChoreState()
-      const ledgerEntry = updatedState.completions.find(
-        (entry) => entry.id === ledgerEntryId,
-      )
-      if (!ledgerEntry) {
+      const adjustment = await adjustKidStarsDetailed(formData)
+      if (!adjustment) {
         return businessError('mutation_failed', 'Could not adjust stars')
       }
 
-      return success(
+      return mutationSuccess(
         `Stars ${mode === 'remove' ? 'removed' : 'added'} (${delta})`,
         {
           status: 'adjusted',
-          kid,
-          ledger_entry_id: ledgerEntryId,
-          stars_delta: ledgerEntry.starsAwarded,
-          star_balance: starsForKid(updatedState.completions, kid_id),
+          kid: adjustment.kid,
+          ledger_entry_id: adjustment.completion.id,
+          stars_delta: adjustment.completion.starsAwarded,
+          star_balance: adjustment.starBalance,
         },
       )
     },
@@ -1340,17 +1340,12 @@ export function registerChoreTools(server: McpServer) {
       formData.append('cost', cost.toString())
       formData.append('rewardType', reward_type)
       kid_ids.forEach((kidId) => formData.append('kidIds', kidId))
-      await addReward(formData)
-
-      const updatedState = await getChoreState()
-      const reward = updatedState.rewards.find(
-        (entry) => entry.id === requestedId,
-      )
+      const reward = await addRewardDetailed(formData)
       if (!reward) {
         return businessError('mutation_failed', 'Could not create reward')
       }
 
-      return success(`Reward "${title}" created`, {
+      return mutationSuccess(`Reward "${title}" created`, {
         status: 'created',
         reward,
       })
@@ -1405,12 +1400,7 @@ export function registerChoreTools(server: McpServer) {
         formData.append('rewardType', reward_type)
       }
       kid_ids?.forEach((kidId) => formData.append('kidIds', kidId))
-      await updateReward(formData)
-
-      const updatedState = await getChoreState()
-      const reward = updatedState.rewards.find(
-        (entry) => entry.id === reward_id,
-      )
+      const reward = await updateReward(formData)
       if (!reward) {
         return businessError('mutation_failed', 'Could not update reward')
       }
@@ -1422,11 +1412,14 @@ export function registerChoreTools(server: McpServer) {
         'kidIds',
       ])
       const status = fields.length ? 'updated' : 'unchanged'
-      return success(fields.length ? 'Reward updated' : 'Reward unchanged', {
-        status,
-        reward,
-        changed_fields: fields,
-      })
+      return mutationSuccess(
+        fields.length ? 'Reward updated' : 'Reward unchanged',
+        {
+          status,
+          reward,
+          changed_fields: fields,
+        },
+      )
     },
   )
 
@@ -1486,20 +1479,12 @@ export function registerChoreTools(server: McpServer) {
         return businessError('mutation_failed', 'Could not redeem reward')
       }
 
-      const updatedState = await getChoreState()
-      const redemption = updatedState.rewardRedemptions.find(
-        (entry) => entry.id === redemptionId,
-      )
-      if (!redemption) {
-        return businessError('mutation_failed', 'Could not load redemption')
-      }
-
-      return success('Reward redeemed', {
+      return mutationSuccess('Reward redeemed', {
         status: 'redeemed',
-        reward,
-        kid,
-        redemption,
-        star_balance: starsForKid(updatedState.completions, kid_id),
+        reward: result.reward,
+        kid: result.kid,
+        redemption: result.redemption,
+        star_balance: result.starBalance,
       })
     },
   )
@@ -1522,16 +1507,15 @@ export function registerChoreTools(server: McpServer) {
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('rewardId', reward_id)
-      await archiveReward(formData)
-      const updatedState = await getChoreState()
-      if (updatedState.rewards.some((entry) => entry.id === reward_id)) {
+      const archivedReward = await archiveRewardDetailed(formData)
+      if (!archivedReward) {
         return businessError('mutation_failed', 'Could not archive reward')
       }
 
-      return success('Reward archived', {
+      return mutationSuccess('Reward archived', {
         status: 'archived',
         reward_id,
-        reward,
+        reward: archivedReward,
       })
     },
   )

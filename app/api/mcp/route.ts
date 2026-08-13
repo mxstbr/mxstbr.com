@@ -23,8 +23,8 @@ Chores workflow:
 - complete_chore and undo_chore_completion operate on today's Pacific date. Use completion IDs from get_chore_board when selecting a specific completion to undo.
 - pause_all_chores uses an inclusive paused_until date; pass an empty string to resume all chores.
 - Use create_reward/update_reward/archive_reward/redeem_reward for rewards, update_kid for kid metadata, and adjust_kid_stars for manual ledger adjustments.
-- Mutations return the affected entity and required machine-readable status fields, but not a board snapshot. Call get_chore_board or a search tool afterward only when refreshed read state is needed.
-- Business-rule failures return isError=true with structured status=error, a stable code, and a message. Treat structuredContent as authoritative; text content is only a concise summary.
+- Mutations return the affected entity and required machine-readable status fields in structuredContent.result, but not a board snapshot. Call get_chore_board or a search tool afterward only when refreshed read state is needed.
+- Business-rule failures return isError=true with structuredContent.result.status=error, a stable code, and a message. Treat structuredContent as authoritative; text content is only a concise summary.
 - All date inputs are Pacific dates in YYYY-MM-DD format.`,
   },
   {
