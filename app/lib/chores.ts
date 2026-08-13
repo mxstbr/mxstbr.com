@@ -1170,12 +1170,12 @@ export function registerChoreTools(server: McpServer) {
     {
       title: 'Pause All Chores',
       description:
-        'Pause or resume every chore at once. This writes a global pause/snooze date onto all chores. Send an empty string to resume everything.',
+        'Pause or resume every chore at once. The pause blocks every chore through `paused_until` (inclusive). Send an empty string to resume everything.',
       inputSchema: z.object({
         paused_until: z
           .union([isoDaySchema, z.literal('')])
           .describe(
-            'Set a date to pause all chores or send an empty string to resume',
+            'Set the final date chores should remain paused (inclusive), or send an empty string to resume',
           ),
         include_snapshot: includeSnapshotSchema,
       }),

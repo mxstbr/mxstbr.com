@@ -582,11 +582,12 @@ export async function pauseAllChores(formData: FormData): Promise<void> {
   await requireAuthorization(formData)
 
   const pausedUntil = formData.get('pausedUntil')?.toString() || null
+  const snoozedUntil = pausedUntil ? shiftIsoDay(pausedUntil, 1) : null
 
   await withUpdatedState((state) => {
     for (const chore of state.chores) {
       chore.pausedUntil = pausedUntil
-      chore.snoozedUntil = pausedUntil
+      chore.snoozedUntil = snoozedUntil
     }
   })
 }
