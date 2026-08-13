@@ -52,6 +52,14 @@ export type SkipResult = {
   bonusMessage?: string | null
 }
 
+export type DetailedUndoResult = {
+  choreTitle?: string
+  delta: number
+  kidName?: string
+  telegramMessage?: string | null
+  status: 'undone' | 'not_found' | 'invalid'
+}
+
 function hasAutomationToken(formData?: FormData | null): boolean {
   if (!AUTOMATION_TOKEN) return false
   const token = formData?.get('automationToken')?.toString()
@@ -355,6 +363,9 @@ export async function addChore(formData: FormData): Promise<void> {
     .getAll('requiresApproval')
     .map((value) => value.toString().toLowerCase())
   const requiresApproval = requiresApprovalValues.includes('on') || requiresApprovalValues.includes('true')
+  const requestedId = hasAutomationToken(formData)
+    ? formData.get('requestedId')?.toString()
+    : undefined
 
   if (!title || kidIds.length === 0) return
 
@@ -364,7 +375,7 @@ export async function addChore(formData: FormData): Promise<void> {
 
     const createdAt = new Date().toISOString()
     const chore: Chore = {
-      id: crypto.randomUUID(),
+      id: requestedId || crypto.randomUUID(),
       kidIds: validKidIds,
       title,
       emoji,
@@ -441,14 +452,6 @@ export async function requestApproval(formData: FormData): Promise<{ ok: boolean
   return { ok: true }
 }
 
-type UndoResult = {
-  choreTitle?: string
-  delta: number
-  kidName?: string
-  telegramMessage?: string | null
-  status: 'undone' | 'not_found' | 'invalid'
-}
-
 async function applyUndo({
   choreId,
   completionId,
@@ -461,9 +464,9 @@ async function applyUndo({
   kidId: string
   notifyTelegram?: boolean
   targetDay: string
-}): Promise<UndoResult> {
+}): Promise<DetailedUndoResult> {
   let telegramMessage: string | null = null
-  let result: UndoResult = { delta: 0, status: 'invalid', telegramMessage: null }
+  let result: DetailedUndoResult = { delta: 0, status: 'invalid', telegramMessage: null }
 
   await withUpdatedState((state) => {
     const chore = state.chores.find((c) => c.id === choreId)
@@ -536,17 +539,22 @@ async function applyUndo({
 }
 
 export async function undoChore(formData: FormData): Promise<{ delta: number }> {
+  const result = await undoChoreDetailed(formData)
+  return { delta: result.delta }
+}
+
+export async function undoChoreDetailed(
+  formData: FormData,
+): Promise<DetailedUndoResult> {
   await requireAuthorization(formData)
 
   const choreId = formData.get('choreId')?.toString()
   const kidId = formData.get('kidId')?.toString()
   const completionId = formData.get('completionId')?.toString()
-  if (!choreId || !kidId) return { delta: 0 }
+  if (!choreId || !kidId) return { delta: 0, status: 'invalid' }
 
   const targetDay = parseIsoDay(formData.get('day')) ?? todayIsoDate()
-  const result = await applyUndo({ choreId, kidId, completionId, targetDay })
-
-  return { delta: result.delta }
+  return applyUndo({ choreId, kidId, completionId, targetDay })
 }
 
 export async function undoChoreViaLink({
@@ -559,7 +567,7 @@ export async function undoChoreViaLink({
   completionId?: string | null
   kidId: string
   targetDay: string
-}): Promise<UndoResult> {
+}): Promise<DetailedUndoResult> {
   return applyUndo({ choreId, kidId, completionId, targetDay, notifyTelegram: false })
 }
 
@@ -678,6 +686,89 @@ export async function setChoreSchedule(formData: FormData): Promise<void> {
   })
 }
 
+export async function updateChore(formData: FormData): Promise<void> {
+  await requireAuthorization(formData)
+
+  const choreId = formData.get('choreId')?.toString()
+  if (!choreId) return
+
+  const hasTitle = formData.has('title')
+  const hasEmoji = formData.has('emoji')
+  const hasStars = formData.has('stars')
+  const hasType = formData.has('type')
+  const hasCadence = formData.has('cadence')
+  const hasDaysOfWeek = formData.has('daysOfWeek')
+  const hasTimeOfDay = formData.has('timeOfDay')
+  const hasRequiresApproval = formData.has('requiresApproval')
+  const hasScheduledFor = formData.has('scheduledFor')
+  const hasPausedUntil = formData.has('pausedUntil')
+  const hasKidIds = formData.has('kidIds')
+
+  const title = formData.get('title')?.toString().trim()
+  const emoji = formData.get('emoji')?.toString().trim()
+  const stars = parseNumber(formData.get('stars'))
+  const type = formData.get('type')?.toString() as ChoreType | undefined
+  const cadence = formData.get('cadence')?.toString() as
+    | 'daily'
+    | 'weekly'
+    | undefined
+  const daysOfWeek = formData
+    .getAll('daysOfWeek')
+    .map((value) => parseNumber(value))
+    .filter(
+      (day): day is number =>
+        typeof day === 'number' && day >= 0 && day <= 6,
+    )
+  const timeOfDay = parseTimeOfDay(formData.get('timeOfDay'))
+  const requiresApproval = ['true', 'on'].includes(
+    formData.get('requiresApproval')?.toString().toLowerCase() ?? '',
+  )
+  const scheduledFor = parseIsoDay(formData.get('scheduledFor'))
+  const pausedUntil = formData.get('pausedUntil')?.toString() || null
+  const kidIds = formData
+    .getAll('kidIds')
+    .map((value) => value.toString())
+    .filter(Boolean)
+
+  await withUpdatedState((state) => {
+    const chore = state.chores.find((entry) => entry.id === choreId)
+    if (!chore) return
+
+    if (hasTitle && title) chore.title = title
+    if (hasEmoji && emoji) chore.emoji = emoji
+    if (hasStars && stars !== null) chore.stars = Math.max(0, Math.round(stars))
+    if (hasType && type) chore.type = type
+    if (hasKidIds) {
+      const validKidIds = kidIds.filter((id) =>
+        state.kids.some((kid) => kid.id === id),
+      )
+      if (validKidIds.length) chore.kidIds = validKidIds
+    }
+    if (hasTimeOfDay) chore.timeOfDay = timeOfDay ?? undefined
+    if (hasRequiresApproval) chore.requiresApproval = requiresApproval
+    if (hasScheduledFor && scheduledFor) chore.scheduledFor = scheduledFor
+    if (hasPausedUntil) chore.pausedUntil = pausedUntil
+
+    if (
+      chore.type === 'repeated' &&
+      (hasType || hasCadence || hasDaysOfWeek)
+    ) {
+      const nextCadence = cadence ?? chore.schedule?.cadence ?? 'daily'
+      chore.schedule = {
+        cadence: nextCadence,
+        daysOfWeek:
+          nextCadence === 'weekly'
+            ? hasDaysOfWeek
+              ? daysOfWeek.length
+                ? daysOfWeek
+                : undefined
+              : chore.schedule?.daysOfWeek
+            : undefined,
+      }
+    }
+  })
+}
+
 export async function renameKid(formData: FormData): Promise<void> {
   await requireAuthorization(formData)
 
@@ -741,6 +832,9 @@ export async function adjustKidStars(formData: FormData): Promise<void> {
   const kidId = formData.get('kidId')?.toString()
   const rawDelta = parseNumber(formData.get('delta'))
   const mode = formData.get('mode')?.toString()
+  const requestedId = hasAutomationToken(formData)
+    ? formData.get('requestedId')?.toString()
+    : undefined
   if (!kidId || rawDelta === null) return
 
   const delta = Math.round(Math.abs(rawDelta)) * (mode === 'remove' ? -1 : 1)
@@ -751,7 +845,7 @@ export async function adjustKidStars(formData: FormData): Promise<void> {
     if (!kid) return
 
     state.completions.unshift({
-      id: crypto.randomUUID(),
+      id: requestedId || crypto.randomUUID(),
       choreId: `manual-${Date.now()}`,
       kidId,
       timestamp: new Date().toISOString(),
@@ -820,6 +914,9 @@ export async function addReward(formData: FormData): Promise<void> {
     .getAll('kidIds')
     .map((value) => value.toString())
     .filter(Boolean)
+  const requestedId = hasAutomationToken(formData)
+    ? formData.get('requestedId')?.toString()
+    : undefined
 
   if (!title || kidIds.length === 0) return
 
@@ -828,7 +925,7 @@ export async function addReward(formData: FormData): Promise<void> {
     if (!validKidIds.length) return
 
     state.rewards.unshift({
-      id: crypto.randomUUID(),
+      id: requestedId || crypto.randomUUID(),
       kidIds: validKidIds,
       title,
       emoji,
@@ -872,11 +969,56 @@ export async function setRewardKids(formData: FormData): Promise<void> {
   })
 }
 
+export async function updateReward(formData: FormData): Promise<void> {
+  await requireAuthorization(formData)
+
+  const rewardId = formData.get('rewardId')?.toString()
+  if (!rewardId) return
+
+  const hasTitle = formData.has('title')
+  const hasEmoji = formData.has('emoji')
+  const hasCost = formData.has('cost')
+  const hasType = formData.has('rewardType')
+  const hasKidIds = formData.has('kidIds')
+  const title = formData.get('title')?.toString().trim()
+  const emoji = formData.get('emoji')?.toString().trim()
+  const cost = parseNumber(formData.get('cost'))
+  const type = formData.get('rewardType')?.toString() as
+    | RewardType
+    | undefined
+  const kidIds = formData
+    .getAll('kidIds')
+    .map((value) => value.toString())
+    .filter(Boolean)
+
+  await withUpdatedState((state) => {
+    const reward = state.rewards.find((entry) => entry.id === rewardId)
+    if (!reward) return
+
+    if (hasTitle && title) reward.title = title
+    if (hasEmoji && emoji) reward.emoji = emoji
+    if (hasCost && cost !== null) reward.cost = Math.max(0, Math.round(cost))
+    if (hasType && type) reward.type = type
+    if (hasKidIds) {
+      const validKidIds = kidIds.filter((id) =>
+        state.kids.some((kid) => kid.id === id),
+      )
+      if (validKidIds.length) reward.kidIds = validKidIds
+    }
+  })
+}
+
 export async function redeemReward(formData: FormData): Promise<{ success: boolean }> {
   await requireAuthorization(formData)
 
   const rewardId = formData.get('rewardId')?.toString()
   const kidId = formData.get('kidId')?.toString()
+  const requestedCompletionId = hasAutomationToken(formData)
+    ? formData.get('requestedCompletionId')?.toString()
+    : undefined
+  const requestedRedemptionId = hasAutomationToken(formData)
+    ? formData.get('requestedRedemptionId')?.toString()
+    : undefined
   if (!rewardId || !kidId) return { success: false }
 
   let success = false
@@ -899,7 +1041,7 @@ export async function redeemReward(formData: FormData): Promise<{ success: boole
     const timestamp = new Date().toISOString()
 
     state.completions.unshift({
-      id: crypto.randomUUID(),
+      id: requestedCompletionId || crypto.randomUUID(),
       choreId: `reward:${reward.id}`,
       kidId,
       timestamp,
@@ -907,7 +1049,7 @@ export async function redeemReward(formData: FormData): Promise<{ success: boole
     })
 
     state.rewardRedemptions.unshift({
-      id: crypto.randomUUID(),
+      id: requestedRedemptionId || crypto.randomUUID(),
       rewardId: reward.id,
       kidId,
       timestamp,

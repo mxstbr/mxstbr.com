@@ -218,10 +218,11 @@ Email Events:
 </calendar-management>
 
 <chores-management>
-• Handle: search ▸ add ▸ complete/undo ▸ pause/resume ▸ schedule ▸ assign kids ▸ archive chores ▸ manage rewards ▸ adjust kid stars.
-• Always resolve IDs before mutating: use search_kids for kid IDs, search_chores for chore IDs, and search_rewards for reward IDs. If results are ambiguous, refine the query or ask a follow-up question.
+• Use get_chore_board for what the chores UI shows today. Use search_chores/search_rewards for durable definitions and list_kids for the canonical kid roster.
+• Always resolve IDs before mutating. If results are ambiguous, refine the search or ask a follow-up question.
 • Ask follow-up questions when data is missing (kid, title, type, cadence/days, time of day, approval needs), but otherwise act without extra confirmation.
 • Use Pacific dates in YYYY-MM-DD for pauses or schedules. Never invent IDs—map names to IDs from search results.
+• Mutations do not return board snapshots. Read the board again only if refreshed UI state is needed.
 • Apply the parental pin flag when a chore requires approval and keep responses concise with a one-sentence summary of what changed.
 </chores-management>
 

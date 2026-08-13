@@ -2,19 +2,16 @@ import z from 'zod/v3'
 import {
   addChore,
   addReward,
+  adjustKidStars,
   archiveChore,
   archiveReward,
   completeChore,
-  undoChore,
-  setPause,
   pauseAllChores,
-  setChoreSchedule,
-  adjustKidStars,
-  renameKid,
-  setChoreKids,
-  setRewardKids,
   redeemReward,
-  setOneOffDate,
+  renameKid,
+  undoChoreDetailed,
+  updateChore,
+  updateReward,
 } from 'app/(os)/chores/actions'
 import {
   CHORES_KEY,
@@ -25,11 +22,14 @@ import {
   type Reward,
 } from 'app/(os)/chores/data'
 import {
+  getDailyChoreProgress,
   getToday,
   isOpenForKid,
   pacificDateFromTimestamp,
-  sortByTimeOfDay,
   scheduleLabel,
+  shiftIsoDay,
+  sortByTimeOfDay,
+  starsForKid,
 } from 'app/(os)/chores/utils'
 import { Redis } from '@upstash/redis'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
@@ -37,79 +37,50 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 const isoDaySchema = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/)
-  .describe('Pacific date in YYYY-MM-DD format')
+  .describe('Pacific date in YYYY-MM-DD format.')
 
 const choreIdSchema = z
   .string()
   .min(1)
-  .describe(
-    'Chore ID from `search_chores.results[].id`. Never invent IDs manually.',
-  )
+  .describe('Chore ID returned by get_chore_board or search_chores.')
 
 const rewardIdSchema = z
   .string()
   .min(1)
-  .describe(
-    'Reward ID from `search_rewards.results[].id`. Never invent IDs manually.',
-  )
+  .describe('Reward ID returned by search_rewards.')
 
 const kidIdSchema = z
   .string()
   .min(1)
-  .describe(
-    'Kid ID from `search_kids.results[]`, `search_chores.kids[]`, or `search_rewards.kids[]` (for example `kid-1`).',
-  )
+  .describe('Kid ID returned by list_kids, get_chore_board, or a search tool.')
 
 const completionIdSchema = z
   .string()
   .min(1)
-  .describe(
-    'Optional completion ID to undo a specific completion instead of the latest match.',
-  )
-
-const includeSnapshotSchema = z
-  .boolean()
-  .optional()
-  .default(false)
-  .describe(
-    'Set true only when you need the full board snapshot in the response. Defaults to false to keep context small.',
-  )
-
-const automationToken =
-  process.env.CLIPPY_AUTOMATION_TOKEN ?? process.env.CAL_PASSWORD
-
-const redis = Redis.fromEnv()
-
-function appendAutomationToken(formData: FormData) {
-  if (!automationToken) return
-  formData.append('automationToken', automationToken)
-}
+  .describe('Completion ledger entry ID.')
 
 const kidIdsSchema = z
   .array(kidIdSchema)
-  .min(1, 'At least one kid ID is required')
-  .describe('One or more kid IDs that should be assigned to the item.')
+  .min(1, 'At least one kid ID is required.')
+  .describe('Canonical IDs of the kids assigned to the item.')
 
 const dayOfWeekSchema = z
   .number()
   .int()
   .min(0)
   .max(6)
-  .describe('Weekday index where 0=Sunday, 1=Monday, ..., 6=Saturday.')
+  .describe('Weekday index where 0=Sunday and 6=Saturday.')
 
 const daysOfWeekSchema = z
   .array(dayOfWeekSchema)
   .optional()
-  .describe(
-    'Used with weekly cadence. If omitted for a weekly chore, the server keeps/uses its own defaults.',
-  )
+  .describe('Weekdays used by a weekly repeated chore.')
 
-const timeOfDaySchema = z
+const timeOfDayValueSchema = z
   .enum(['morning', 'afternoon', 'evening', 'night'])
-  .describe(
-    'Optional time bucket used for display and ordering (morning/afternoon/evening/night).',
-  )
-  .optional()
+  .describe('Display and ordering time bucket.')
+
+const timeOfDaySchema = timeOfDayValueSchema.optional()
 
 const limitSchema = z
   .number()
@@ -117,31 +88,27 @@ const limitSchema = z
   .min(1)
   .max(100)
   .default(25)
-  .describe(
-    'Maximum number of matching rows to return. Keep this small unless you really need a large list.',
-  )
+  .describe('Maximum rows to return, from 1 through 100.')
 
 const hexColorSchema = z
   .string()
   .regex(/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/)
-  .describe('Hex color such as #0ea5e9 or #0af')
+  .describe('Three- or six-digit hex color.')
 
 const cadenceSchema = z
   .enum(['daily', 'weekly'])
-  .describe('How often a repeated chore should recur.')
-
+  .describe('Recurrence cadence for a repeated chore.')
 const choreTypeSchema = z
   .enum(['one-off', 'repeated', 'perpetual'])
-  .describe('Chore type: one-off, repeated, or perpetual.')
-
+  .describe('Lifecycle type for a chore.')
 const rewardTypeSchema = z
   .enum(['one-off', 'perpetual'])
-  .describe('Reward type: redeem once (one-off) or repeatedly (perpetual).')
+  .describe('Whether a reward can be redeemed once or repeatedly.')
 
 const kidSchema = z.object({
   id: kidIdSchema,
-  name: z.string().describe('Display name shown on the chores board.'),
-  color: hexColorSchema.describe('Accent color for the kid column.'),
+  name: z.string(),
+  color: hexColorSchema,
 })
 
 const choreScheduleSchema = z.object({
@@ -151,42 +118,19 @@ const choreScheduleSchema = z.object({
 
 const choreSchema = z.object({
   id: choreIdSchema,
-  kidIds: z.array(kidIdSchema).describe('Kids assigned to this chore.'),
-  title: z.string().describe('Chore title shown to kids.'),
-  emoji: z.string().describe('Emoji shown with the chore title.'),
-  stars: z.number().describe('Stars awarded per completion.'),
+  kidIds: z.array(kidIdSchema),
+  title: z.string(),
+  emoji: z.string(),
+  stars: z.number(),
   type: choreTypeSchema,
-  requiresApproval: z
-    .boolean()
-    .optional()
-    .describe('Whether this chore requires parental approval.'),
-  scheduledFor: isoDaySchema
-    .nullable()
-    .optional()
-    .describe('For one-off chores: the day it becomes available.'),
-  schedule: choreScheduleSchema
-    .optional()
-    .describe('For repeated chores: cadence and optional weekday settings.'),
-  pausedUntil: isoDaySchema
-    .nullable()
-    .optional()
-    .describe('If set, repeated chore is paused through this day (inclusive).'),
-  snoozedUntil: isoDaySchema
-    .nullable()
-    .optional()
-    .describe('Optional global snooze day for the chore.'),
-  snoozedForKids: z
-    .record(kidIdSchema, isoDaySchema.nullable())
-    .optional()
-    .describe('Optional per-kid snooze days.'),
-  createdAt: z.string().describe('ISO timestamp when the chore was created.'),
-  completedAt: z
-    .string()
-    .nullable()
-    .optional()
-    .describe(
-      'For one-off chores: completion timestamp once all kids are done.',
-    ),
+  requiresApproval: z.boolean().optional(),
+  scheduledFor: isoDaySchema.nullable().optional(),
+  schedule: choreScheduleSchema.optional(),
+  pausedUntil: isoDaySchema.nullable().optional(),
+  snoozedUntil: isoDaySchema.nullable().optional(),
+  snoozedForKids: z.record(kidIdSchema, isoDaySchema.nullable()).optional(),
+  createdAt: z.string(),
+  completedAt: z.string().nullable().optional(),
   timeOfDay: timeOfDaySchema,
 })
 
@@ -194,316 +138,332 @@ const completionSchema = z.object({
   id: completionIdSchema,
   choreId: choreIdSchema,
   kidId: kidIdSchema,
-  timestamp: z.string().describe('ISO timestamp when completion was recorded.'),
-  starsAwarded: z.number().describe('Star delta applied for this entry.'),
+  timestamp: z.string(),
+  starsAwarded: z.number(),
 })
 
 const rewardSchema = z.object({
   id: rewardIdSchema,
-  kidIds: z.array(kidIdSchema).describe('Kids allowed to redeem this reward.'),
-  title: z.string().describe('Reward title shown on the board.'),
-  emoji: z.string().describe('Emoji shown with the reward title.'),
-  cost: z.number().describe('Stars removed when redeemed.'),
+  kidIds: z.array(kidIdSchema),
+  title: z.string(),
+  emoji: z.string(),
+  cost: z.number(),
   type: rewardTypeSchema,
-  createdAt: z.string().describe('ISO timestamp when reward was created.'),
-  archived: z
-    .boolean()
-    .optional()
-    .describe('Whether the reward has been archived.'),
+  createdAt: z.string(),
+  archived: z.boolean().optional(),
 })
 
 const rewardRedemptionSchema = z.object({
-  id: z.string().describe('Reward redemption entry ID.'),
+  id: z.string(),
   rewardId: rewardIdSchema,
   kidId: kidIdSchema,
-  timestamp: z.string().describe('ISO timestamp when the reward was redeemed.'),
-  cost: z.number().describe('Cost charged at redemption time.'),
+  timestamp: z.string(),
+  cost: z.number(),
 })
 
-const todayContextSchema = z.object({
-  todayIso: isoDaySchema.describe(
-    'Effective Pacific day used for this snapshot.',
-  ),
-  weekday: dayOfWeekSchema,
-  nowMs: z
-    .number()
-    .describe('Unix timestamp in milliseconds for server "now".'),
+const businessErrorCodeSchema = z.enum([
+  'chore_not_found',
+  'chore_not_one_off',
+  'chore_not_repeated',
+  'completion_not_found',
+  'insufficient_stars',
+  'kid_not_assigned',
+  'kid_not_found',
+  'mutation_failed',
+  'reward_already_redeemed',
+  'reward_not_available',
+  'reward_not_found',
+])
+
+const businessErrorSchema = z.object({
+  status: z.literal('error'),
+  code: businessErrorCodeSchema,
+  message: z.string(),
 })
 
-const completedEntrySchema = z.object({
-  chore: choreSchema.describe('Chore associated with the completion.'),
-  completionId: completionIdSchema,
-  timestamp: z
-    .string()
-    .describe('ISO timestamp when this completion was recorded.'),
-})
+const changedFieldsSchema = z.array(z.string())
 
-const choreSnapshotSchema = z.object({
-  ctx: todayContextSchema,
-  kids: z.array(kidSchema).describe('All kids on the chores board.'),
-  chores: z.array(choreSchema).describe('All chores currently on the board.'),
-  completions: z
-    .array(completionSchema)
-    .describe(
-      'Completion ledger including manual adjustments and redemptions.',
-    ),
-  rewards: z
-    .array(rewardSchema)
-    .describe('All rewards currently on the board.'),
-  rewardRedemptions: z
-    .array(rewardRedemptionSchema)
-    .describe('Reward redemption ledger.'),
-  openChoresByKid: z
-    .record(kidIdSchema, z.array(choreSchema))
-    .describe(
-      'For each kid ID, chores that are currently open for the selected day.',
-    ),
-  completedTodayByKid: z
-    .record(kidIdSchema, z.array(completedEntrySchema))
-    .describe('For each kid ID, chores completed on the selected day.'),
-})
+const createChoreResultSchema = z.union([
+  z.object({ status: z.literal('created'), chore: choreSchema }),
+  businessErrorSchema,
+])
 
-const messageWithSnapshotSchema = z.object({
-  message: z
-    .string()
-    .describe('Human-readable summary of what changed (or was attempted).'),
-  snapshot: choreSnapshotSchema
-    .optional()
-    .describe('Optional full board snapshot when `include_snapshot=true`.'),
-})
+const updateChoreResultSchema = z.union([
+  z.object({
+    status: z.enum(['updated', 'unchanged']),
+    chore: choreSchema,
+    changed_fields: changedFieldsSchema,
+  }),
+  businessErrorSchema,
+])
 
-const completionResultSchema = z.object({
-  message: z
-    .string()
-    .describe('Human-readable result summary for the completion attempt.'),
-  awarded: z.number().optional().describe('Stars awarded for this completion.'),
-  completionId: completionIdSchema.optional(),
-  choreTitle: z
-    .string()
-    .optional()
-    .describe('Resolved chore title if available.'),
-  kidName: z.string().optional().describe('Resolved kid name if available.'),
-  telegramMessage: z
-    .string()
-    .nullable()
-    .optional()
-    .describe('Telegram message text generated by the action, if any.'),
-  undoLink: z
-    .string()
-    .nullable()
-    .optional()
-    .describe('Undo link generated for Telegram flows, if any.'),
-  status: z
-    .enum(['completed', 'skipped', 'invalid', 'unauthorized'])
-    .optional()
-    .describe('Machine-friendly status for this completion call.'),
-  snapshot: choreSnapshotSchema
-    .optional()
-    .describe('Optional full board snapshot when `include_snapshot=true`.'),
-})
+const completeChoreResultSchema = z.union([
+  z.object({
+    status: z.enum(['completed', 'skipped']),
+    chore: choreSchema,
+    kid: kidSchema,
+    completion: completionSchema.nullable(),
+    stars_awarded: z.number(),
+    bonus_stars_awarded: z.number(),
+    bonus_message: z.string().nullable(),
+    telegram_message: z.string().nullable(),
+    undo_link: z.string().nullable(),
+  }),
+  businessErrorSchema,
+])
 
-const undoResultSchema = z.object({
-  message: z
-    .string()
-    .describe('Human-readable result summary for the undo attempt.'),
-  delta: z
-    .number()
-    .optional()
-    .describe(
-      'Net star change after undo (negative means stars were removed).',
-    ),
-  status: z
-    .enum(['undone', 'not_found', 'invalid'])
-    .optional()
-    .describe('Machine-friendly status for this undo call.'),
-  choreTitle: z
-    .string()
-    .optional()
-    .describe('Resolved chore title if available.'),
-  kidName: z.string().optional().describe('Resolved kid name if available.'),
-  snapshot: choreSnapshotSchema
-    .optional()
-    .describe('Optional full board snapshot when `include_snapshot=true`.'),
-})
+const undoChoreResultSchema = z.union([
+  z.object({
+    status: z.literal('undone'),
+    chore: choreSchema,
+    kid: kidSchema,
+    completion_id: completionIdSchema,
+    stars_delta: z.number(),
+    telegram_message: z.string().nullable(),
+  }),
+  businessErrorSchema,
+])
 
-const redeemResultSchema = z.object({
-  message: z.string().describe('Human-readable result summary.'),
-  success: z
-    .boolean()
-    .optional()
-    .describe('True if redemption succeeded and stars were deducted.'),
-  snapshot: choreSnapshotSchema
-    .optional()
-    .describe('Optional full board snapshot when `include_snapshot=true`.'),
-})
+const archiveChoreResultSchema = z.union([
+  z.object({
+    status: z.literal('archived'),
+    chore_id: choreIdSchema,
+    chore: choreSchema,
+  }),
+  businessErrorSchema,
+])
+
+const pauseAllResultSchema = z.union([
+  z.object({
+    status: z.enum(['paused', 'resumed', 'unchanged']),
+    paused_until: isoDaySchema.nullable(),
+    affected_chore_ids: z.array(choreIdSchema),
+  }),
+  businessErrorSchema,
+])
+
+const updateKidResultSchema = z.union([
+  z.object({
+    status: z.enum(['updated', 'unchanged']),
+    kid: kidSchema,
+    changed_fields: changedFieldsSchema,
+  }),
+  businessErrorSchema,
+])
+
+const adjustStarsResultSchema = z.union([
+  z.object({
+    status: z.literal('adjusted'),
+    kid: kidSchema,
+    ledger_entry_id: z.string(),
+    stars_delta: z.number(),
+    star_balance: z.number(),
+  }),
+  businessErrorSchema,
+])
+
+const createRewardResultSchema = z.union([
+  z.object({ status: z.literal('created'), reward: rewardSchema }),
+  businessErrorSchema,
+])
+
+const updateRewardResultSchema = z.union([
+  z.object({
+    status: z.enum(['updated', 'unchanged']),
+    reward: rewardSchema,
+    changed_fields: changedFieldsSchema,
+  }),
+  businessErrorSchema,
+])
+
+const archiveRewardResultSchema = z.union([
+  z.object({
+    status: z.literal('archived'),
+    reward_id: rewardIdSchema,
+    reward: rewardSchema,
+  }),
+  businessErrorSchema,
+])
+
+const redeemRewardResultSchema = z.union([
+  z.object({
+    status: z.literal('redeemed'),
+    reward: rewardSchema,
+    kid: kidSchema,
+    redemption: rewardRedemptionSchema,
+    star_balance: z.number(),
+  }),
+  businessErrorSchema,
+])
 
 const searchKidSchema = z.object({
   id: kidIdSchema,
-  name: z.string().describe('Kid display name.'),
-  color: hexColorSchema.describe('Kid accent color.'),
+  name: z.string(),
+  color: hexColorSchema,
 })
 
 const choreSearchRowSchema = z.object({
   id: choreIdSchema,
-  title: z.string().describe('Chore title.'),
-  emoji: z.string().optional().describe('Chore emoji.'),
-  stars: z.number().describe('Stars awarded when completed.'),
+  title: z.string(),
+  emoji: z.string().optional(),
+  stars: z.number(),
   type: choreTypeSchema,
-  schedule_label: z
-    .string()
-    .describe(
-      'Human-readable schedule label for display (for example `Daily`).',
-    ),
-  kid_ids: z.array(kidIdSchema).describe('Assigned kid IDs.'),
-  kid_names: z
-    .array(z.string())
-    .describe('Assigned kid names, aligned to kid_ids.'),
-  requires_approval: z
-    .boolean()
-    .optional()
-    .describe('Whether this chore requires parental approval.'),
-  scheduled_for: isoDaySchema
-    .nullable()
-    .optional()
-    .describe('One-off scheduled day, when relevant.'),
+  schedule_label: z.string(),
+  kid_ids: z.array(kidIdSchema),
+  kid_names: z.array(z.string()),
+  requires_approval: z.boolean().optional(),
+  scheduled_for: isoDaySchema.nullable().optional(),
   time_of_day: timeOfDaySchema,
-  paused_until: isoDaySchema
-    .nullable()
-    .optional()
-    .describe('Pause date for repeated chores, if present.'),
-  snoozed_until: isoDaySchema
-    .nullable()
-    .optional()
-    .describe('Global snooze-until date, if present.'),
-  created_at: z.string().optional().describe('Creation timestamp (ISO).'),
+  paused_until: isoDaySchema.nullable().optional(),
+  snoozed_until: isoDaySchema.nullable().optional(),
+  created_at: z.string().optional(),
 })
 
 const rewardSearchRowSchema = z.object({
   id: rewardIdSchema,
-  title: z.string().describe('Reward title.'),
-  emoji: z.string().optional().describe('Reward emoji.'),
-  cost: z.number().describe('Stars required to redeem.'),
+  title: z.string(),
+  emoji: z.string().optional(),
+  cost: z.number(),
   type: rewardTypeSchema,
-  kid_ids: z.array(kidIdSchema).describe('Kid IDs who can redeem this reward.'),
-  kid_names: z.array(z.string()).describe('Kid names aligned to kid_ids.'),
-  created_at: z.string().describe('Creation timestamp (ISO).'),
-  archived: z.boolean().optional().describe('Whether the reward is archived.'),
+  kid_ids: z.array(kidIdSchema),
+  kid_names: z.array(z.string()),
+  created_at: z.string(),
+  archived: z.boolean().optional(),
 })
 
 const choreSearchResultSchema = z.object({
-  query: z
-    .string()
-    .describe('Raw query string that was used for this search request.'),
-  count: z.number().describe('Total matching chores before limit was applied.'),
-  kids: z
-    .array(searchKidSchema)
-    .describe(
-      'Current kid roster so future calls can reuse canonical kid IDs.',
-    ),
-  results: z
-    .array(choreSearchRowSchema)
-    .describe('Matching chores sorted by newest first.'),
+  query: z.string(),
+  count: z.number(),
+  kids: z.array(searchKidSchema),
+  results: z.array(choreSearchRowSchema),
 })
 
 const rewardSearchResultSchema = z.object({
-  query: z
-    .string()
-    .describe('Raw query string that was used for this search request.'),
-  count: z
-    .number()
-    .describe('Total matching rewards before limit was applied.'),
-  kids: z
-    .array(searchKidSchema)
-    .describe(
-      'Current kid roster so future calls can reuse canonical kid IDs.',
-    ),
-  results: z
-    .array(rewardSearchRowSchema)
-    .describe('Matching rewards sorted by newest first.'),
+  query: z.string(),
+  count: z.number(),
+  kids: z.array(searchKidSchema),
+  results: z.array(rewardSearchRowSchema),
 })
 
-const kidSearchResultSchema = z.object({
-  query: z
-    .string()
-    .describe('Raw query string that was used for this search request.'),
-  count: z.number().describe('Total matching kids before limit was applied.'),
-  results: z
-    .array(searchKidSchema)
-    .describe(
-      'Matching kids sorted alphabetically by name; use `results[].id` as canonical kid IDs in mutate tools.',
-    ),
+const listKidsResultSchema = z.object({
+  kids: z.array(searchKidSchema),
 })
 
-async function loadChoreSnapshot(day?: string) {
-  const state = await getChoreState()
-  const ctx = getToday(day)
-  const openChoresByKid: Record<string, typeof state.chores> = {}
-  const doneTodayByKid: Record<
-    string,
-    {
-      chore: (typeof state.chores)[number]
-      completionId: string
-      timestamp: string
-    }[]
-  > = {}
+const progressSchema = z.object({
+  total: z.number(),
+  completed: z.number(),
+  skipped: z.number(),
+  remaining: z.number(),
+})
 
-  for (const kid of state.kids) {
-    openChoresByKid[kid.id] = []
-    doneTodayByKid[kid.id] = []
-  }
+const completedBoardChoreSchema = z.object({
+  chore: choreSchema,
+  completion_id: completionIdSchema,
+  timestamp: z.string(),
+})
 
-  for (const chore of state.chores) {
-    for (const kid of state.kids) {
-      if (isOpenForKid(chore, kid.id, state.completions, ctx)) {
-        openChoresByKid[kid.id]?.push(chore)
-      }
-    }
-  }
+const choreBoardResultSchema = z.object({
+  day: isoDaySchema,
+  columns: z.array(
+    z.object({
+      kid: kidSchema,
+      star_balance: z.number(),
+      open_chores: z.array(choreSchema),
+      completed_chores: z.array(completedBoardChoreSchema),
+      progress: progressSchema,
+    }),
+  ),
+})
 
-  for (const completion of state.completions) {
-    if (pacificDateFromTimestamp(completion.timestamp) !== ctx.todayIso)
-      continue
-    const chore = state.chores.find((entry) => entry.id === completion.choreId)
-    if (!chore) continue
-    if (!chore.kidIds.includes(completion.kidId)) continue
-
-    doneTodayByKid[completion.kidId]?.push({
-      chore,
-      completionId: completion.id,
-      timestamp: completion.timestamp,
-    })
-  }
-
-  const sortedOpen = Object.fromEntries(
-    Object.entries(openChoresByKid).map(([kidId, chores]) => [
-      kidId,
-      sortByTimeOfDay(chores),
-    ]),
+const updateChoreInputSchema = z
+  .object({
+    chore_id: choreIdSchema,
+    title: z.string().min(1).optional(),
+    emoji: z.string().min(1).optional(),
+    stars: z.number().int().min(0).optional(),
+    type: choreTypeSchema.optional(),
+    kid_ids: kidIdsSchema.optional(),
+    cadence: cadenceSchema.optional(),
+    days_of_week: daysOfWeekSchema,
+    time_of_day: timeOfDayValueSchema.optional(),
+    clear_time_of_day: z.boolean().optional(),
+    requires_approval: z.boolean().optional(),
+    scheduled_for: isoDaySchema.optional(),
+    paused_until: z.union([isoDaySchema, z.literal('')]).optional(),
+  })
+  .refine(
+    ({ chore_id: _choreId, ...updates }) =>
+      Object.values(updates).some((value) => value !== undefined),
+    { message: 'At least one field to update is required.' },
   )
 
-  const sortedDone = Object.fromEntries(
-    Object.entries(doneTodayByKid).map(([kidId, entries]) => [
-      kidId,
-      sortByTimeOfDay(
-        entries.map((entry) => ({
-          ...entry,
-          timeOfDay: entry.chore.timeOfDay,
-          createdAt: entry.chore.createdAt,
-        })),
-      ).map(({ timeOfDay, createdAt, ...rest }) => rest),
-    ]),
+const updateKidInputSchema = z
+  .object({
+    kid_id: kidIdSchema,
+    name: z.string().min(1).optional(),
+    color: hexColorSchema.optional(),
+  })
+  .refine(({ name, color }) => name !== undefined || color !== undefined, {
+    message: 'Provide name, color, or both.',
+  })
+
+const updateRewardInputSchema = z
+  .object({
+    reward_id: rewardIdSchema,
+    title: z.string().min(1).optional(),
+    emoji: z.string().min(1).optional(),
+    cost: z.number().int().min(0).optional(),
+    reward_type: rewardTypeSchema.optional(),
+    kid_ids: kidIdsSchema.optional(),
+  })
+  .refine(
+    ({ reward_id: _rewardId, ...updates }) =>
+      Object.values(updates).some((value) => value !== undefined),
+    { message: 'At least one field to update is required.' },
   )
 
+const automationToken =
+  process.env.CLIPPY_AUTOMATION_TOKEN ?? process.env.CAL_PASSWORD
+
+const redis = Redis.fromEnv()
+
+function appendAutomationToken(formData: FormData) {
+  if (automationToken) formData.append('automationToken', automationToken)
+}
+
+function businessError(
+  code: z.infer<typeof businessErrorCodeSchema>,
+  message: string,
+) {
   return {
-    ctx,
-    kids: state.kids,
-    chores: state.chores,
-    completions: state.completions,
-    rewards: state.rewards,
-    rewardRedemptions: state.rewardRedemptions,
-    openChoresByKid: sortedOpen,
-    completedTodayByKid: sortedDone,
+    content: [{ type: 'text' as const, text: message }],
+    structuredContent: { status: 'error' as const, code, message },
+    isError: true,
   }
+}
+
+function success(content: string, structuredContent: Record<string, unknown>) {
+  return {
+    content: [{ type: 'text' as const, text: content }],
+    structuredContent,
+  }
+}
+
+function missingKidIds(kids: Kid[], kidIds: string[]): string[] {
+  const knownIds = new Set(kids.map((kid) => kid.id))
+  return kidIds.filter((kidId) => !knownIds.has(kidId))
+}
+
+function changedFields<T extends object>(
+  before: T,
+  after: T,
+  fields: (keyof T)[],
+): string[] {
+  return fields
+    .filter(
+      (field) => JSON.stringify(before[field]) !== JSON.stringify(after[field]),
+    )
+    .map(String)
 }
 
 function coerceJsonArray<T>(value: unknown): T[] {
@@ -549,124 +509,108 @@ async function loadSearchData(): Promise<{
   return { chores: state.chores, rewards: state.rewards, kids: state.kids }
 }
 
-function toStructuredContent(
-  value: unknown,
-): Record<string, unknown> | undefined {
-  if (!value || typeof value !== 'object') return undefined
-  if (Array.isArray(value)) return undefined
-  return value as Record<string, unknown>
-}
+function formatCompletionMessage(result: {
+  awarded: number
+  choreTitle?: string
+  kidName?: string
+  status: string
+}): string {
+  const choreTitle = result.choreTitle ?? 'chore'
+  const kidName = result.kidName ? ` for ${result.kidName}` : ''
+  const awarded = result.awarded > 0 ? ` (+${result.awarded} stars)` : ''
 
-async function maybeLoadSnapshot(
-  includeSnapshot?: boolean,
-): Promise<Awaited<ReturnType<typeof loadChoreSnapshot>> | undefined> {
-  if (!includeSnapshot) return undefined
-  return loadChoreSnapshot()
-}
-
-function formatCompletionMessage(result: any): string {
-  const choreTitle = result?.choreTitle ?? 'chore'
-  const kidName = result?.kidName ? ` for ${result.kidName}` : ''
-  const awarded =
-    typeof result?.awarded === 'number' && result.awarded > 0
-      ? ` (+${result.awarded} stars)`
-      : ''
-
-  switch (result?.status) {
-    case 'completed':
-      return `Marked "${choreTitle}"${kidName} complete${awarded}`
-    case 'skipped':
-      return `Skipped "${choreTitle}"${kidName} (already handled)`
-    case 'unauthorized':
-      return 'Not authorized to complete this chore'
-    default:
-      return 'Could not complete chore'
+  if (result.status === 'completed') {
+    return `Marked "${choreTitle}"${kidName} complete${awarded}`
   }
-}
-
-function formatUndoMessage(result: any): string {
-  const choreTitle = result?.choreTitle ?? 'chore'
-  const kidName = result?.kidName ? ` for ${result.kidName}` : ''
-  const stars =
-    typeof result?.delta === 'number' && result.delta !== 0
-      ? ` (${Math.abs(result.delta)} stars restored)`
-      : ''
-
-  if (
-    result?.status === 'undone' ||
-    (result?.status === undefined &&
-      typeof result?.delta === 'number' &&
-      result.delta !== 0)
-  ) {
-    return `Undid "${choreTitle}"${kidName}${stars}`
+  if (result.status === 'skipped') {
+    return `Skipped "${choreTitle}"${kidName} (already handled)`
   }
-
-  if (result?.status === 'not_found' || result?.delta === 0) {
-    return 'No completion found to undo'
-  }
-
-  return 'Could not undo completion'
+  return 'Could not complete chore'
 }
 
 export function registerChoreTools(server: McpServer) {
   server.registerTool(
-    'search_kids',
+    'list_kids',
     {
-      title: 'Search Kids',
-      description:
-        'Resolve canonical kid IDs for chores and rewards mutations without loading a full chores board snapshot. Use this when a user gives a kid name (for example "Darian"), when you need to disambiguate similar names, or when you only need kid IDs/colors. Empty query returns the full kid roster up to `limit`.',
-      inputSchema: z.object({
-        query: z
-          .string()
-          .default('')
-          .describe(
-            'Free-text search against kid ID and display name. Empty string returns all kids up to `limit`.',
-          ),
-        limit: limitSchema.describe(
-          'Maximum number of matching kids to return. Keep this small unless you explicitly need a larger roster slice.',
-        ),
-      }),
-      outputSchema: kidSearchResultSchema,
+      title: 'List Kids',
+      description: 'List the kids and their canonical IDs.',
+      inputSchema: z.object({}),
+      outputSchema: listKidsResultSchema,
       annotations: { readOnlyHint: true },
     },
-    async ({ query = '', limit = 25 }: { query?: string; limit?: number }) => {
+    async () => {
       const { kids } = await loadSearchData()
-      const normalizedQuery = query.trim()
-      const normalizedLimit = Math.min(100, Math.max(1, limit ?? 25))
-      const tokens = normalizedQuery
-        .toLowerCase()
-        .split(/\s+/)
-        .map((token) => token.trim())
-        .filter(Boolean)
+      const sortedKids = kids
+        .map(({ id, name, color }) => ({ id, name, color }))
+        .sort((a, b) => a.name.localeCompare(b.name))
+      return success(
+        `Listed ${sortedKids.length} kid${sortedKids.length === 1 ? '' : 's'}`,
+        { kids: sortedKids },
+      )
+    },
+  )
 
-      const filtered = kids.filter((kid) => {
-        if (!tokens.length) return true
-        const haystack = `${kid.id} ${kid.name}`.toLowerCase()
-        return tokens.every((token) => haystack.includes(token))
+  server.registerTool(
+    'get_chore_board',
+    {
+      title: 'Get Chore Board',
+      description: 'Get the UI-shaped chore board for a Pacific day.',
+      inputSchema: z.object({ day: isoDaySchema.optional() }),
+      outputSchema: choreBoardResultSchema,
+      annotations: { readOnlyHint: true },
+    },
+    async ({ day }: { day?: string }) => {
+      const state = await getChoreState()
+      const ctx = getToday(day)
+
+      const columns = state.kids.map((kid) => {
+        const openChores = sortByTimeOfDay(
+          state.chores.filter((chore) =>
+            isOpenForKid(chore, kid.id, state.completions, ctx),
+          ),
+        )
+        const completedChores = sortByTimeOfDay(
+          state.completions
+            .filter(
+              (completion) =>
+                completion.kidId === kid.id &&
+                pacificDateFromTimestamp(completion.timestamp) === ctx.todayIso,
+            )
+            .map((completion) => {
+              const chore = state.chores.find(
+                (entry) => entry.id === completion.choreId,
+              )
+              return chore && chore.kidIds.includes(kid.id)
+                ? {
+                    chore,
+                    completion_id: completion.id,
+                    timestamp: completion.timestamp,
+                    timeOfDay: chore.timeOfDay,
+                    createdAt: completion.timestamp,
+                  }
+                : null
+            })
+            .filter((entry): entry is NonNullable<typeof entry> => !!entry),
+        ).map(({ timeOfDay, createdAt, ...entry }) => entry)
+
+        return {
+          kid,
+          star_balance: starsForKid(state.completions, kid.id),
+          open_chores: openChores,
+          completed_chores: completedChores,
+          progress: getDailyChoreProgress(
+            state.chores,
+            state.completions,
+            kid.id,
+            ctx,
+          ),
+        }
       })
 
-      const sorted = filtered.sort((a, b) => a.name.localeCompare(b.name))
-      const results = sorted.slice(0, normalizedLimit).map((kid) => ({
-        id: kid.id,
-        name: kid.name,
-        color: kid.color,
-      }))
-
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: normalizedQuery
-              ? `Found ${filtered.length} kid${filtered.length === 1 ? '' : 's'} matching "${normalizedQuery}"`
-              : `Listed ${filtered.length} kid${filtered.length === 1 ? '' : 's'}`,
-          },
-        ],
-        structuredContent: {
-          query: normalizedQuery,
-          count: filtered.length,
-          results,
-        },
-      }
+      return success(`Loaded chore board for ${ctx.todayIso}`, {
+        day: ctx.todayIso,
+        columns,
+      })
     },
   )
 
@@ -674,15 +618,9 @@ export function registerChoreTools(server: McpServer) {
     'search_chores',
     {
       title: 'Search Chores',
-      description:
-        'Primary lookup tool for chores. Use this before any chore mutation to resolve canonical chore IDs and kid IDs without loading the entire board snapshot. Pass an empty query to browse chores; pass text to filter by title/emoji.',
+      description: 'Search the durable chore catalog.',
       inputSchema: z.object({
-        query: z
-          .string()
-          .default('')
-          .describe(
-            'Free-text search for chore title/emoji. Empty string returns all chores up to `limit`.',
-          ),
+        query: z.string().default(''),
         kid_ids: kidIdsSchema.optional(),
         limit: limitSchema,
       }),
@@ -708,64 +646,51 @@ export function registerChoreTools(server: McpServer) {
         .filter(Boolean)
 
       const filtered = chores.filter((chore) => {
-        if (kid_ids?.length) {
-          const matchesKid = kid_ids.some((kidId) =>
-            chore.kidIds.includes(kidId),
-          )
-          if (!matchesKid) return false
+        if (
+          kid_ids?.length &&
+          !kid_ids.some((kidId) => chore.kidIds.includes(kidId))
+        ) {
+          return false
         }
-
         if (!tokens.length) return true
         const haystack = `${chore.title} ${chore.emoji ?? ''}`.toLowerCase()
         return tokens.every((token) => haystack.includes(token))
       })
 
-      const sorted = filtered.sort((a, b) =>
-        b.createdAt.localeCompare(a.createdAt),
-      )
-      const limitedResults = sorted.slice(0, normalizedLimit)
-
       const kidNameById = new Map(kids.map((kid) => [kid.id, kid.name]))
-      const kidRows = kids.map((kid) => ({
-        id: kid.id,
-        name: kid.name,
-        color: kid.color,
-      }))
-      const results = limitedResults.map((chore) => ({
-        id: chore.id,
-        title: chore.title,
-        emoji: chore.emoji,
-        stars: chore.stars,
-        type: chore.type,
-        schedule_label: scheduleLabel(chore),
-        kid_ids: chore.kidIds,
-        kid_names: chore.kidIds
-          .map((kidId) => kidNameById.get(kidId))
-          .filter(Boolean) as string[],
-        requires_approval: chore.requiresApproval ?? false,
-        scheduled_for: chore.scheduledFor ?? null,
-        time_of_day: chore.timeOfDay,
-        paused_until: chore.pausedUntil ?? null,
-        snoozed_until: chore.snoozedUntil ?? null,
-        created_at: chore.createdAt,
-      }))
+      const results = filtered
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+        .slice(0, normalizedLimit)
+        .map((chore) => ({
+          id: chore.id,
+          title: chore.title,
+          emoji: chore.emoji,
+          stars: chore.stars,
+          type: chore.type,
+          schedule_label: scheduleLabel(chore),
+          kid_ids: chore.kidIds,
+          kid_names: chore.kidIds
+            .map((kidId) => kidNameById.get(kidId))
+            .filter(Boolean) as string[],
+          requires_approval: chore.requiresApproval ?? false,
+          scheduled_for: chore.scheduledFor ?? null,
+          time_of_day: chore.timeOfDay,
+          paused_until: chore.pausedUntil ?? null,
+          snoozed_until: chore.snoozedUntil ?? null,
+          created_at: chore.createdAt,
+        }))
 
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: normalizedQuery
-              ? `Found ${filtered.length} chore${filtered.length === 1 ? '' : 's'} matching "${normalizedQuery}"`
-              : `Listed ${filtered.length} chore${filtered.length === 1 ? '' : 's'}`,
-          },
-        ],
-        structuredContent: {
+      return success(
+        normalizedQuery
+          ? `Found ${filtered.length} chore${filtered.length === 1 ? '' : 's'} matching "${normalizedQuery}"`
+          : `Listed ${filtered.length} chore${filtered.length === 1 ? '' : 's'}`,
+        {
           query: normalizedQuery,
           count: filtered.length,
-          kids: kidRows,
+          kids: kids.map(({ id, name, color }) => ({ id, name, color })),
           results,
         },
-      }
+      )
     },
   )
 
@@ -773,20 +698,10 @@ export function registerChoreTools(server: McpServer) {
     'search_rewards',
     {
       title: 'Search Rewards',
-      description:
-        'Primary lookup tool for rewards. Use this before reward mutations to resolve canonical reward IDs and kid IDs without loading the full board snapshot. Pass an empty query to browse rewards; pass text to filter by title/emoji.',
+      description: 'Search the durable reward catalog.',
       inputSchema: z.object({
-        query: z
-          .string()
-          .default('')
-          .describe(
-            'Free-text search for reward title/emoji. Empty string returns all rewards up to `limit`.',
-          ),
-        kid_ids: kidIdsSchema
-          .optional()
-          .describe(
-            'Optional filter to rewards available to one or more kids.',
-          ),
+        query: z.string().default(''),
+        kid_ids: kidIdsSchema.optional(),
         limit: limitSchema,
       }),
       outputSchema: rewardSearchResultSchema,
@@ -811,59 +726,46 @@ export function registerChoreTools(server: McpServer) {
         .filter(Boolean)
 
       const filtered = rewards.filter((reward) => {
-        if (kid_ids?.length) {
-          const matchesKid = kid_ids.some((kidId) =>
-            reward.kidIds.includes(kidId),
-          )
-          if (!matchesKid) return false
+        if (
+          kid_ids?.length &&
+          !kid_ids.some((kidId) => reward.kidIds.includes(kidId))
+        ) {
+          return false
         }
-
         if (!tokens.length) return true
         const haystack = `${reward.title} ${reward.emoji ?? ''}`.toLowerCase()
         return tokens.every((token) => haystack.includes(token))
       })
 
-      const sorted = filtered.sort((a, b) =>
-        b.createdAt.localeCompare(a.createdAt),
-      )
-      const limitedResults = sorted.slice(0, normalizedLimit)
-
       const kidNameById = new Map(kids.map((kid) => [kid.id, kid.name]))
-      const kidRows = kids.map((kid) => ({
-        id: kid.id,
-        name: kid.name,
-        color: kid.color,
-      }))
-      const results = limitedResults.map((reward) => ({
-        id: reward.id,
-        title: reward.title,
-        emoji: reward.emoji,
-        cost: reward.cost,
-        type: reward.type,
-        kid_ids: reward.kidIds,
-        kid_names: reward.kidIds
-          .map((kidId) => kidNameById.get(kidId))
-          .filter(Boolean) as string[],
-        created_at: reward.createdAt,
-        archived: reward.archived ?? false,
-      }))
+      const results = filtered
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+        .slice(0, normalizedLimit)
+        .map((reward) => ({
+          id: reward.id,
+          title: reward.title,
+          emoji: reward.emoji,
+          cost: reward.cost,
+          type: reward.type,
+          kid_ids: reward.kidIds,
+          kid_names: reward.kidIds
+            .map((kidId) => kidNameById.get(kidId))
+            .filter(Boolean) as string[],
+          created_at: reward.createdAt,
+          archived: reward.archived ?? false,
+        }))
 
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: normalizedQuery
-              ? `Found ${filtered.length} reward${filtered.length === 1 ? '' : 's'} matching "${normalizedQuery}"`
-              : `Listed ${filtered.length} reward${filtered.length === 1 ? '' : 's'}`,
-          },
-        ],
-        structuredContent: {
+      return success(
+        normalizedQuery
+          ? `Found ${filtered.length} reward${filtered.length === 1 ? '' : 's'} matching "${normalizedQuery}"`
+          : `Listed ${filtered.length} reward${filtered.length === 1 ? '' : 's'}`,
+        {
           query: normalizedQuery,
           count: filtered.length,
-          kids: kidRows,
+          kids: kids.map(({ id, name, color }) => ({ id, name, color })),
           results,
         },
-      }
+      )
     },
   )
 
@@ -871,40 +773,20 @@ export function registerChoreTools(server: McpServer) {
     'create_chore',
     {
       title: 'Create Chore',
-      description:
-        'Create a chore and assign it to one or more kids. This writes directly to the chores board. Use `search_chores` first so you pass real kid IDs and avoid duplicate chores.',
+      description: 'Create and assign a chore.',
       inputSchema: z.object({
-        title: z.string().min(1, 'Title is required').describe('Chore title.'),
-        emoji: z
-          .string()
-          .optional()
-          .describe('Optional emoji. Defaults to ⭐️ when omitted.'),
-        stars: z
-          .number()
-          .int()
-          .min(0)
-          .default(1)
-          .describe('Stars awarded when this chore is completed.'),
+        title: z.string().min(1),
+        emoji: z.string().min(1).optional(),
+        stars: z.number().int().min(0).default(1),
         kid_ids: kidIdsSchema,
         type: choreTypeSchema.default('one-off'),
-        cadence: cadenceSchema
-          .optional()
-          .describe('Only used when type is `repeated`.'),
+        cadence: cadenceSchema.optional(),
         days_of_week: daysOfWeekSchema,
-        time_of_day: timeOfDaySchema,
-        requires_approval: z
-          .boolean()
-          .optional()
-          .default(false)
-          .describe(
-            'Set true to require parent approval before completion is confirmed.',
-          ),
-        scheduled_for: isoDaySchema
-          .optional()
-          .describe('Only used when type is `one-off`.'),
-        include_snapshot: includeSnapshotSchema,
+        time_of_day: timeOfDayValueSchema.optional(),
+        requires_approval: z.boolean().default(false),
+        scheduled_for: isoDaySchema.optional(),
       }),
-      outputSchema: messageWithSnapshotSchema,
+      outputSchema: createChoreResultSchema,
     },
     async ({
       title,
@@ -917,7 +799,6 @@ export function registerChoreTools(server: McpServer) {
       time_of_day,
       requires_approval,
       scheduled_for,
-      include_snapshot,
     }: {
       title: string
       emoji?: string
@@ -927,12 +808,22 @@ export function registerChoreTools(server: McpServer) {
       cadence?: 'daily' | 'weekly'
       days_of_week?: number[]
       time_of_day?: 'morning' | 'afternoon' | 'evening' | 'night'
-      requires_approval?: boolean
+      requires_approval: boolean
       scheduled_for?: string
-      include_snapshot?: boolean
     }) => {
+      const state = await getChoreState()
+      const missingIds = missingKidIds(state.kids, kid_ids)
+      if (missingIds.length) {
+        return businessError(
+          'kid_not_found',
+          `Unknown kid ID${missingIds.length === 1 ? '' : 's'}: ${missingIds.join(', ')}`,
+        )
+      }
+
+      const requestedId = crypto.randomUUID()
       const formData = new FormData()
       appendAutomationToken(formData)
+      formData.append('requestedId', requestedId)
       formData.append('title', title)
       if (emoji) formData.append('emoji', emoji)
       formData.append('stars', stars.toString())
@@ -941,318 +832,117 @@ export function registerChoreTools(server: McpServer) {
       if (type === 'one-off' && scheduled_for) {
         formData.append('scheduledFor', scheduled_for)
       }
-      if (type === 'repeated' && cadence) {
-        formData.append('cadence', cadence)
-        if (cadence === 'weekly') {
-          ;(days_of_week ?? []).forEach((day) =>
-            formData.append('daysOfWeek', day.toString()),
-          )
-        }
+      if (type === 'repeated') {
+        if (cadence) formData.append('cadence', cadence)
+        ;(days_of_week ?? []).forEach((day) =>
+          formData.append('daysOfWeek', day.toString()),
+        )
       }
       if (time_of_day) formData.append('timeOfDay', time_of_day)
       if (requires_approval) formData.append('requiresApproval', 'true')
+
       await addChore(formData)
-      const snapshot = await maybeLoadSnapshot(include_snapshot)
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: `Chore "${title}" created`,
-          },
-        ],
-        structuredContent: toStructuredContent({
-          message: `Chore "${title}" created`,
-          snapshot,
-        }),
+      const updatedState = await getChoreState()
+      const chore = updatedState.chores.find(
+        (entry) => entry.id === requestedId,
+      )
+      if (!chore) {
+        return businessError('mutation_failed', 'Could not create chore')
       }
+
+      return success(`Chore "${title}" created`, {
+        status: 'created',
+        chore,
+      })
     },
   )
+
   server.registerTool(
-    'complete_chore',
+    'update_chore',
     {
-      title: 'Complete Chore',
+      title: 'Update Chore',
       description:
-        "Mark a chore complete for a specific kid on today's Pacific date and award stars. This can trigger bonus stars when all expected chores are done for the day.",
-      inputSchema: z.object({
-        chore_id: choreIdSchema,
-        kid_id: kidIdSchema,
-        include_snapshot: includeSnapshotSchema,
-      }),
-      outputSchema: completionResultSchema,
+        'Update a chore definition, assignments, schedule, or pause.',
+      inputSchema: updateChoreInputSchema,
+      outputSchema: updateChoreResultSchema,
     },
     async ({
       chore_id,
-      kid_id,
-      include_snapshot,
-    }: {
-      chore_id: string
-      kid_id: string
-      include_snapshot?: boolean
-    }) => {
-      const formData = new FormData()
-      appendAutomationToken(formData)
-      formData.append('choreId', chore_id)
-      formData.append('kidId', kid_id)
-      const result = await completeChore(formData)
-      const snapshot = await maybeLoadSnapshot(include_snapshot)
-      const message = formatCompletionMessage(result)
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: message,
-          },
-        ],
-        structuredContent: toStructuredContent({
-          message,
-          ...result,
-          snapshot,
-        }),
-      }
-    },
-  )
-  server.registerTool(
-    'undo_chore_completion',
-    {
-      title: 'Undo Chore Completion',
-      description:
-        "Undo a chore completion for a specific kid on today's Pacific date. If `completion_id` is omitted, the server undoes the latest matching completion for that kid/chore/day.",
-      inputSchema: z.object({
-        chore_id: choreIdSchema,
-        kid_id: kidIdSchema,
-        completion_id: completionIdSchema.optional(),
-        include_snapshot: includeSnapshotSchema,
-      }),
-      outputSchema: undoResultSchema,
-    },
-    async ({
-      chore_id,
-      kid_id,
-      completion_id,
-      include_snapshot,
-    }: {
-      chore_id: string
-      kid_id: string
-      completion_id?: string
-      include_snapshot?: boolean
-    }) => {
-      const formData = new FormData()
-      appendAutomationToken(formData)
-      formData.append('choreId', chore_id)
-      formData.append('kidId', kid_id)
-      if (completion_id) formData.append('completionId', completion_id)
-      const result = await undoChore(formData)
-      const snapshot = await maybeLoadSnapshot(include_snapshot)
-      const status =
-        typeof result?.delta === 'number' && result.delta !== 0
-          ? 'undone'
-          : 'not_found'
-      const message = formatUndoMessage({ ...result, status })
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: message,
-          },
-        ],
-        structuredContent: toStructuredContent({
-          message,
-          ...result,
-          status,
-          snapshot,
-        }),
-      }
-    },
-  )
-  server.registerTool(
-    'set_chore_schedule',
-    {
-      title: 'Set Chore Schedule',
-      description:
-        'Update the recurrence schedule for a repeated chore. This only affects chores of type `repeated`; other types are left unchanged.',
-      inputSchema: z.object({
-        chore_id: choreIdSchema,
-        cadence: cadenceSchema.default('daily'),
-        days_of_week: daysOfWeekSchema,
-        include_snapshot: includeSnapshotSchema,
-      }),
-      outputSchema: messageWithSnapshotSchema,
-    },
-    async ({
-      chore_id,
+      title,
+      emoji,
+      stars,
+      type,
+      kid_ids,
       cadence,
       days_of_week,
-      include_snapshot,
-    }: {
-      chore_id: string
-      cadence: 'daily' | 'weekly'
-      days_of_week?: number[]
-      include_snapshot?: boolean
-    }) => {
-      const formData = new FormData()
-      appendAutomationToken(formData)
-      formData.append('choreId', chore_id)
-      formData.append('cadence', cadence)
-      ;(days_of_week ?? []).forEach((day) =>
-        formData.append('daysOfWeek', day.toString()),
-      )
-      await setChoreSchedule(formData)
-      const state = await getChoreState()
-      const chore = state.chores.find((entry) => entry.id === chore_id)
-      const snapshot = await maybeLoadSnapshot(include_snapshot)
-      const message =
-        chore?.type === 'repeated'
-          ? `Schedule updated to ${cadence}${
-              cadence === 'weekly'
-                ? ` on days ${(days_of_week ?? []).join(', ') || 'unspecified'}`
-                : ''
-            }`
-          : 'Chore schedule unchanged because it is not repeated'
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: message,
-          },
-        ],
-        structuredContent: toStructuredContent({ message, snapshot }),
-      }
-    },
-  )
-  server.registerTool(
-    'pause_chore',
-    {
-      title: 'Pause Chore',
-      description:
-        'Pause or resume a single chore. For repeated chores, a pause blocks openings through `paused_until` (inclusive). Send an empty string to resume.',
-      inputSchema: z.object({
-        chore_id: choreIdSchema,
-        paused_until: z
-          .union([isoDaySchema, z.literal('')])
-          .describe(
-            'Set a date to pause until (inclusive) or send an empty string to resume',
-          ),
-        include_snapshot: includeSnapshotSchema,
-      }),
-      outputSchema: messageWithSnapshotSchema,
-    },
-    async ({
-      chore_id,
-      paused_until,
-      include_snapshot,
-    }: {
-      chore_id: string
-      paused_until: string
-      include_snapshot?: boolean
-    }) => {
-      const formData = new FormData()
-      appendAutomationToken(formData)
-      formData.append('choreId', chore_id)
-      formData.append('pausedUntil', paused_until)
-      await setPause(formData)
-      const snapshot = await maybeLoadSnapshot(include_snapshot)
-      const message = paused_until
-        ? `Chore paused until ${paused_until}`
-        : 'Chore resumed'
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: message,
-          },
-        ],
-        structuredContent: toStructuredContent({ message, snapshot }),
-      }
-    },
-  )
-  server.registerTool(
-    'pause_all_chores',
-    {
-      title: 'Pause All Chores',
-      description:
-        'Pause or resume every chore at once. The pause blocks every chore through `paused_until` (inclusive). Send an empty string to resume everything.',
-      inputSchema: z.object({
-        paused_until: z
-          .union([isoDaySchema, z.literal('')])
-          .describe(
-            'Set the final date chores should remain paused (inclusive), or send an empty string to resume',
-          ),
-        include_snapshot: includeSnapshotSchema,
-      }),
-      outputSchema: messageWithSnapshotSchema,
-    },
-    async ({
-      paused_until,
-      include_snapshot,
-    }: {
-      paused_until: string
-      include_snapshot?: boolean
-    }) => {
-      const formData = new FormData()
-      appendAutomationToken(formData)
-      formData.append('pausedUntil', paused_until)
-      await pauseAllChores(formData)
-      const snapshot = await maybeLoadSnapshot(include_snapshot)
-      const message = paused_until
-        ? `All chores paused until ${paused_until}`
-        : 'All chores resumed'
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: message,
-          },
-        ],
-        structuredContent: toStructuredContent({ message, snapshot }),
-      }
-    },
-  )
-  server.registerTool(
-    'set_chore_assignments',
-    {
-      title: 'Set Chore Assignments',
-      description:
-        'Update which kids a chore applies to, and optionally update approval/time-of-day settings. This overwrites kid assignments with the provided list.',
-      inputSchema: z.object({
-        chore_id: choreIdSchema,
-        kid_ids: kidIdsSchema,
-        time_of_day: timeOfDaySchema,
-        clear_time_of_day: z
-          .boolean()
-          .optional()
-          .describe(
-            'Set true to clear time_of_day when no new time_of_day is provided.',
-          ),
-        requires_approval: z
-          .boolean()
-          .optional()
-          .describe(
-            'Optional approval flag. If omitted, existing approval setting is left as-is.',
-          ),
-        include_snapshot: includeSnapshotSchema,
-      }),
-      outputSchema: messageWithSnapshotSchema,
-    },
-    async ({
-      chore_id,
-      kid_ids,
       time_of_day,
       clear_time_of_day,
       requires_approval,
-      include_snapshot,
+      scheduled_for,
+      paused_until,
     }: {
       chore_id: string
-      kid_ids: string[]
+      title?: string
+      emoji?: string
+      stars?: number
+      type?: 'one-off' | 'repeated' | 'perpetual'
+      kid_ids?: string[]
+      cadence?: 'daily' | 'weekly'
+      days_of_week?: number[]
       time_of_day?: 'morning' | 'afternoon' | 'evening' | 'night'
       clear_time_of_day?: boolean
       requires_approval?: boolean
-      include_snapshot?: boolean
+      scheduled_for?: string
+      paused_until?: string
     }) => {
+      const state = await getChoreState()
+      const before = state.chores.find((chore) => chore.id === chore_id)
+      if (!before) {
+        return businessError('chore_not_found', 'Chore not found')
+      }
+
+      if (kid_ids) {
+        const missingIds = missingKidIds(state.kids, kid_ids)
+        if (missingIds.length) {
+          return businessError(
+            'kid_not_found',
+            `Unknown kid ID${missingIds.length === 1 ? '' : 's'}: ${missingIds.join(', ')}`,
+          )
+        }
+      }
+
+      const effectiveType = type ?? before.type
+      if (
+        effectiveType !== 'repeated' &&
+        (cadence !== undefined ||
+          days_of_week !== undefined ||
+          paused_until !== undefined)
+      ) {
+        return businessError(
+          'chore_not_repeated',
+          'Schedules and pauses only apply to repeated chores',
+        )
+      }
+      if (effectiveType !== 'one-off' && scheduled_for !== undefined) {
+        return businessError(
+          'chore_not_one_off',
+          'scheduled_for only applies to one-off chores',
+        )
+      }
+
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('choreId', chore_id)
-      kid_ids.forEach((kidId) => formData.append('kidIds', kidId))
-      if (time_of_day) {
+      if (title !== undefined) formData.append('title', title)
+      if (emoji !== undefined) formData.append('emoji', emoji)
+      if (stars !== undefined) formData.append('stars', stars.toString())
+      if (type !== undefined) formData.append('type', type)
+      kid_ids?.forEach((kidId) => formData.append('kidIds', kidId))
+      if (cadence !== undefined) formData.append('cadence', cadence)
+      days_of_week?.forEach((day) =>
+        formData.append('daysOfWeek', day.toString()),
+      )
+      if (time_of_day !== undefined) {
         formData.append('timeOfDay', time_of_day)
       } else if (clear_time_of_day) {
         formData.append('timeOfDay', '')
@@ -1263,221 +953,361 @@ export function registerChoreTools(server: McpServer) {
           requires_approval ? 'true' : 'false',
         )
       }
-      await setChoreKids(formData)
-      const snapshot = await maybeLoadSnapshot(include_snapshot)
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: 'Chore assignments saved',
-          },
-        ],
-        structuredContent: toStructuredContent({
-          message: 'Chore assignments saved',
-          snapshot,
-        }),
+      if (scheduled_for !== undefined) {
+        formData.append('scheduledFor', scheduled_for)
       }
+      if (paused_until !== undefined) {
+        formData.append('pausedUntil', paused_until)
+      }
+
+      await updateChore(formData)
+      const updatedState = await getChoreState()
+      const chore = updatedState.chores.find((entry) => entry.id === chore_id)
+      if (!chore) {
+        return businessError('mutation_failed', 'Could not update chore')
+      }
+
+      const fields = changedFields(before, chore, [
+        'title',
+        'emoji',
+        'stars',
+        'type',
+        'kidIds',
+        'schedule',
+        'timeOfDay',
+        'requiresApproval',
+        'scheduledFor',
+        'pausedUntil',
+      ])
+      const status = fields.length ? 'updated' : 'unchanged'
+      return success(fields.length ? 'Chore updated' : 'Chore unchanged', {
+        status,
+        chore,
+        changed_fields: fields,
+      })
     },
   )
+
   server.registerTool(
-    'set_one_off_date',
+    'complete_chore',
     {
-      title: 'Set One-Off Date',
-      description:
-        'Set the scheduled day for a one-off chore. Non-one-off chores are left unchanged.',
+      title: 'Complete Chore',
+      description: 'Complete a chore for one kid today.',
       inputSchema: z.object({
         chore_id: choreIdSchema,
-        scheduled_for: isoDaySchema,
-        include_snapshot: includeSnapshotSchema,
+        kid_id: kidIdSchema,
       }),
-      outputSchema: messageWithSnapshotSchema,
+      outputSchema: completeChoreResultSchema,
     },
-    async ({
-      chore_id,
-      scheduled_for,
-      include_snapshot,
-    }: {
-      chore_id: string
-      scheduled_for: string
-      include_snapshot?: boolean
-    }) => {
+    async ({ chore_id, kid_id }: { chore_id: string; kid_id: string }) => {
+      const state = await getChoreState()
+      const chore = state.chores.find((entry) => entry.id === chore_id)
+      if (!chore) {
+        return businessError('chore_not_found', 'Chore not found')
+      }
+      const kid = state.kids.find((entry) => entry.id === kid_id)
+      if (!kid) return businessError('kid_not_found', 'Kid not found')
+      if (!chore.kidIds.includes(kid_id)) {
+        return businessError(
+          'kid_not_assigned',
+          'This chore is not assigned to that kid',
+        )
+      }
+
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('choreId', chore_id)
-      formData.append('scheduledFor', scheduled_for)
-      await setOneOffDate(formData)
-      const snapshot = await maybeLoadSnapshot(include_snapshot)
-      const message = `One-off scheduled for ${scheduled_for}`
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: message,
-          },
-        ],
-        structuredContent: toStructuredContent({ message, snapshot }),
+      formData.append('kidId', kid_id)
+      const result = await completeChore(formData)
+      if (result.status === 'invalid' || result.status === 'unauthorized') {
+        return businessError('mutation_failed', 'Could not complete chore')
       }
+
+      const updatedState = await getChoreState()
+      const updatedChore =
+        updatedState.chores.find((entry) => entry.id === chore_id) ?? chore
+      const completion = result.completionId
+        ? (updatedState.completions.find(
+            (entry) => entry.id === result.completionId,
+          ) ?? null)
+        : null
+      const message = formatCompletionMessage(result)
+
+      return success(message, {
+        status: result.status,
+        chore: updatedChore,
+        kid,
+        completion,
+        stars_awarded: result.awarded,
+        bonus_stars_awarded: result.bonusStars ?? 0,
+        bonus_message: result.bonusMessage ?? null,
+        telegram_message: result.telegramMessage ?? null,
+        undo_link: result.undoLink ?? null,
+      })
     },
   )
+
+  server.registerTool(
+    'undo_chore_completion',
+    {
+      title: 'Undo Chore Completion',
+      description: 'Undo a completion for one kid today.',
+      inputSchema: z.object({
+        chore_id: choreIdSchema,
+        kid_id: kidIdSchema,
+        completion_id: completionIdSchema.optional(),
+      }),
+      outputSchema: undoChoreResultSchema,
+    },
+    async ({
+      chore_id,
+      kid_id,
+      completion_id,
+    }: {
+      chore_id: string
+      kid_id: string
+      completion_id?: string
+    }) => {
+      const state = await getChoreState()
+      const chore = state.chores.find((entry) => entry.id === chore_id)
+      if (!chore) {
+        return businessError('chore_not_found', 'Chore not found')
+      }
+      const kid = state.kids.find((entry) => entry.id === kid_id)
+      if (!kid) return businessError('kid_not_found', 'Kid not found')
+
+      const today = getToday().todayIso
+      const matchesCompletion = (entry: (typeof state.completions)[number]) =>
+        entry.choreId === chore_id &&
+        entry.kidId === kid_id &&
+        pacificDateFromTimestamp(entry.timestamp) === today
+      const targetCompletion =
+        (completion_id
+          ? state.completions.find(
+              (entry) => entry.id === completion_id && matchesCompletion(entry),
+            )
+          : undefined) ?? state.completions.find(matchesCompletion)
+
+      if (!targetCompletion) {
+        return businessError(
+          'completion_not_found',
+          'No completion found to undo',
+        )
+      }
+
+      const formData = new FormData()
+      appendAutomationToken(formData)
+      formData.append('choreId', chore_id)
+      formData.append('kidId', kid_id)
+      if (completion_id) formData.append('completionId', completion_id)
+      const result = await undoChoreDetailed(formData)
+      if (result.status !== 'undone') {
+        return businessError(
+          'completion_not_found',
+          'No completion found to undo',
+        )
+      }
+
+      return success(
+        `Undid "${result.choreTitle ?? chore.title}" for ${result.kidName ?? kid.name}`,
+        {
+          status: 'undone',
+          chore,
+          kid,
+          completion_id: targetCompletion.id,
+          stars_delta: result.delta,
+          telegram_message: result.telegramMessage ?? null,
+        },
+      )
+    },
+  )
+
   server.registerTool(
     'archive_chore',
     {
       title: 'Archive Chore',
-      description:
-        'Archive (remove) a chore from the board. This is a delete operation for the selected chore ID.',
-      inputSchema: z.object({
-        chore_id: choreIdSchema,
-        include_snapshot: includeSnapshotSchema,
-      }),
-      outputSchema: messageWithSnapshotSchema,
+      description: 'Remove a chore from the catalog.',
+      inputSchema: z.object({ chore_id: choreIdSchema }),
+      outputSchema: archiveChoreResultSchema,
     },
-    async ({
-      chore_id,
-      include_snapshot,
-    }: {
-      chore_id: string
-      include_snapshot?: boolean
-    }) => {
+    async ({ chore_id }: { chore_id: string }) => {
+      const state = await getChoreState()
+      const chore = state.chores.find((entry) => entry.id === chore_id)
+      if (!chore) {
+        return businessError('chore_not_found', 'Chore not found')
+      }
+
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('choreId', chore_id)
       await archiveChore(formData)
-      const snapshot = await maybeLoadSnapshot(include_snapshot)
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: 'Chore archived',
-          },
-        ],
-        structuredContent: toStructuredContent({
-          message: 'Chore archived',
-          snapshot,
-        }),
+      const updatedState = await getChoreState()
+      if (updatedState.chores.some((entry) => entry.id === chore_id)) {
+        return businessError('mutation_failed', 'Could not archive chore')
       }
+
+      return success('Chore archived', {
+        status: 'archived',
+        chore_id,
+        chore,
+      })
     },
   )
+
   server.registerTool(
-    'rename_kid',
+    'pause_all_chores',
     {
-      title: 'Rename Kid',
-      description:
-        'Rename a kid column and optionally update its accent color. This updates kid metadata used across chores and rewards.',
+      title: 'Pause All Chores',
+      description: 'Pause every chore through a date, or resume all chores.',
       inputSchema: z.object({
-        kid_id: kidIdSchema,
-        name: z
-          .string()
-          .min(1)
-          .describe('New display name for the kid column.'),
-        color: hexColorSchema.optional(),
-        include_snapshot: includeSnapshotSchema,
+        paused_until: z.union([isoDaySchema, z.literal('')]),
       }),
-      outputSchema: messageWithSnapshotSchema,
+      outputSchema: pauseAllResultSchema,
+    },
+    async ({ paused_until }: { paused_until: string }) => {
+      const state = await getChoreState()
+      const targetPause = paused_until || null
+      const targetSnooze = paused_until ? shiftIsoDay(paused_until, 1) : null
+      const affectedChoreIds = state.chores
+        .filter(
+          (chore) =>
+            (chore.pausedUntil ?? null) !== targetPause ||
+            (chore.snoozedUntil ?? null) !== targetSnooze,
+        )
+        .map((chore) => chore.id)
+
+      const formData = new FormData()
+      appendAutomationToken(formData)
+      formData.append('pausedUntil', paused_until)
+      await pauseAllChores(formData)
+
+      const status = affectedChoreIds.length
+        ? paused_until
+          ? 'paused'
+          : 'resumed'
+        : 'unchanged'
+      const message = paused_until
+        ? `All chores paused until ${paused_until}`
+        : 'All chores resumed'
+      return success(message, {
+        status,
+        paused_until: targetPause,
+        affected_chore_ids: affectedChoreIds,
+      })
+    },
+  )
+
+  server.registerTool(
+    'update_kid',
+    {
+      title: 'Update Kid',
+      description: 'Update a kid name or color.',
+      inputSchema: updateKidInputSchema,
+      outputSchema: updateKidResultSchema,
     },
     async ({
       kid_id,
       name,
       color,
-      include_snapshot,
     }: {
       kid_id: string
-      name: string
+      name?: string
       color?: string
-      include_snapshot?: boolean
     }) => {
+      const state = await getChoreState()
+      const before = state.kids.find((kid) => kid.id === kid_id)
+      if (!before) return businessError('kid_not_found', 'Kid not found')
+
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('kidId', kid_id)
-      formData.append('name', name)
-      if (color) formData.append('color', color)
+      formData.append('name', name ?? before.name)
+      if (color !== undefined) formData.append('color', color)
       await renameKid(formData)
-      const snapshot = await maybeLoadSnapshot(include_snapshot)
-      const message = `Kid column saved as ${name}`
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: message,
-          },
-        ],
-        structuredContent: toStructuredContent({ message, snapshot }),
+
+      const updatedState = await getChoreState()
+      const kid = updatedState.kids.find((entry) => entry.id === kid_id)
+      if (!kid) {
+        return businessError('mutation_failed', 'Could not update kid')
       }
+      const fields = changedFields(before, kid, ['name', 'color'])
+      const status = fields.length ? 'updated' : 'unchanged'
+      return success(fields.length ? 'Kid updated' : 'Kid unchanged', {
+        status,
+        kid,
+        changed_fields: fields,
+      })
     },
   )
+
   server.registerTool(
     'adjust_kid_stars',
     {
       title: 'Adjust Kid Stars',
-      description:
-        'Manually add or remove stars from a kid balance by writing a ledger entry. Use positive `delta`; `mode` controls add/remove.',
+      description: 'Add or remove stars with a ledger entry.',
       inputSchema: z.object({
         kid_id: kidIdSchema,
-        delta: z
-          .number()
-          .int()
-          .min(1)
-          .describe('Number of stars to add/remove (absolute value).'),
-        mode: z
-          .enum(['add', 'remove'])
-          .default('add')
-          .describe('Choose whether to add or remove the provided delta.'),
-        include_snapshot: includeSnapshotSchema,
+        delta: z.number().int().min(1),
+        mode: z.enum(['add', 'remove']).default('add'),
       }),
-      outputSchema: messageWithSnapshotSchema,
+      outputSchema: adjustStarsResultSchema,
     },
     async ({
       kid_id,
       delta,
       mode,
-      include_snapshot,
     }: {
       kid_id: string
       delta: number
       mode: 'add' | 'remove'
-      include_snapshot?: boolean
     }) => {
+      const state = await getChoreState()
+      const kid = state.kids.find((entry) => entry.id === kid_id)
+      if (!kid) return businessError('kid_not_found', 'Kid not found')
+
+      const ledgerEntryId = crypto.randomUUID()
       const formData = new FormData()
       appendAutomationToken(formData)
+      formData.append('requestedId', ledgerEntryId)
       formData.append('kidId', kid_id)
       formData.append('delta', delta.toString())
       formData.append('mode', mode)
       await adjustKidStars(formData)
-      const snapshot = await maybeLoadSnapshot(include_snapshot)
-      const message = `Stars ${mode === 'remove' ? 'removed' : 'added'} (${delta})`
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: message,
-          },
-        ],
-        structuredContent: toStructuredContent({ message, snapshot }),
+
+      const updatedState = await getChoreState()
+      const ledgerEntry = updatedState.completions.find(
+        (entry) => entry.id === ledgerEntryId,
+      )
+      if (!ledgerEntry) {
+        return businessError('mutation_failed', 'Could not adjust stars')
       }
+
+      return success(
+        `Stars ${mode === 'remove' ? 'removed' : 'added'} (${delta})`,
+        {
+          status: 'adjusted',
+          kid,
+          ledger_entry_id: ledgerEntryId,
+          stars_delta: ledgerEntry.starsAwarded,
+          star_balance: starsForKid(updatedState.completions, kid_id),
+        },
+      )
     },
   )
+
   server.registerTool(
-    'add_reward',
+    'create_reward',
     {
-      title: 'Add Reward',
-      description:
-        'Create a reward that assigned kids can redeem with stars. Use `search_rewards` first to avoid accidental duplicates and to confirm kid IDs.',
+      title: 'Create Reward',
+      description: 'Create a reward for one or more kids.',
       inputSchema: z.object({
-        title: z.string().min(1).describe('Reward title.'),
-        emoji: z
-          .string()
-          .optional()
-          .describe('Optional emoji. Defaults to 🎁 when omitted.'),
-        cost: z
-          .number()
-          .int()
-          .min(0)
-          .default(1)
-          .describe('Stars required to redeem this reward.'),
+        title: z.string().min(1),
+        emoji: z.string().min(1).optional(),
+        cost: z.number().int().min(0).default(1),
         reward_type: rewardTypeSchema.default('perpetual'),
         kid_ids: kidIdsSchema,
-        include_snapshot: includeSnapshotSchema,
       }),
-      outputSchema: messageWithSnapshotSchema,
+      outputSchema: createRewardResultSchema,
     },
     async ({
       title,
@@ -1485,160 +1315,224 @@ export function registerChoreTools(server: McpServer) {
       cost,
       reward_type,
       kid_ids,
-      include_snapshot,
     }: {
       title: string
       emoji?: string
       cost: number
       reward_type: 'one-off' | 'perpetual'
       kid_ids: string[]
-      include_snapshot?: boolean
     }) => {
+      const state = await getChoreState()
+      const missingIds = missingKidIds(state.kids, kid_ids)
+      if (missingIds.length) {
+        return businessError(
+          'kid_not_found',
+          `Unknown kid ID${missingIds.length === 1 ? '' : 's'}: ${missingIds.join(', ')}`,
+        )
+      }
+
+      const requestedId = crypto.randomUUID()
       const formData = new FormData()
       appendAutomationToken(formData)
+      formData.append('requestedId', requestedId)
       formData.append('title', title)
       if (emoji) formData.append('emoji', emoji)
       formData.append('cost', cost.toString())
       formData.append('rewardType', reward_type)
       kid_ids.forEach((kidId) => formData.append('kidIds', kidId))
       await addReward(formData)
-      const snapshot = await maybeLoadSnapshot(include_snapshot)
-      const message = `Reward "${title}" created`
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: message,
-          },
-        ],
-        structuredContent: toStructuredContent({ message, snapshot }),
+
+      const updatedState = await getChoreState()
+      const reward = updatedState.rewards.find(
+        (entry) => entry.id === requestedId,
+      )
+      if (!reward) {
+        return businessError('mutation_failed', 'Could not create reward')
       }
+
+      return success(`Reward "${title}" created`, {
+        status: 'created',
+        reward,
+      })
     },
   )
+
   server.registerTool(
-    'set_reward_kids',
+    'update_reward',
     {
-      title: 'Set Reward Kids',
-      description:
-        'Overwrite which kids can see/redeem a reward. Use `search_rewards` to resolve the reward ID first.',
-      inputSchema: z.object({
-        reward_id: rewardIdSchema,
-        kid_ids: kidIdsSchema,
-        include_snapshot: includeSnapshotSchema,
-      }),
-      outputSchema: messageWithSnapshotSchema,
+      title: 'Update Reward',
+      description: 'Update a reward definition or audience.',
+      inputSchema: updateRewardInputSchema,
+      outputSchema: updateRewardResultSchema,
     },
     async ({
       reward_id,
+      title,
+      emoji,
+      cost,
+      reward_type,
       kid_ids,
-      include_snapshot,
     }: {
       reward_id: string
-      kid_ids: string[]
-      include_snapshot?: boolean
+      title?: string
+      emoji?: string
+      cost?: number
+      reward_type?: 'one-off' | 'perpetual'
+      kid_ids?: string[]
     }) => {
+      const state = await getChoreState()
+      const before = state.rewards.find((reward) => reward.id === reward_id)
+      if (!before) {
+        return businessError('reward_not_found', 'Reward not found')
+      }
+      if (kid_ids) {
+        const missingIds = missingKidIds(state.kids, kid_ids)
+        if (missingIds.length) {
+          return businessError(
+            'kid_not_found',
+            `Unknown kid ID${missingIds.length === 1 ? '' : 's'}: ${missingIds.join(', ')}`,
+          )
+        }
+      }
+
       const formData = new FormData()
       appendAutomationToken(formData)
       formData.append('rewardId', reward_id)
-      kid_ids.forEach((kidId) => formData.append('kidIds', kidId))
-      await setRewardKids(formData)
-      const snapshot = await maybeLoadSnapshot(include_snapshot)
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: 'Reward audience updated',
-          },
-        ],
-        structuredContent: toStructuredContent({
-          message: 'Reward audience updated',
-          snapshot,
-        }),
+      if (title !== undefined) formData.append('title', title)
+      if (emoji !== undefined) formData.append('emoji', emoji)
+      if (cost !== undefined) formData.append('cost', cost.toString())
+      if (reward_type !== undefined) {
+        formData.append('rewardType', reward_type)
       }
+      kid_ids?.forEach((kidId) => formData.append('kidIds', kidId))
+      await updateReward(formData)
+
+      const updatedState = await getChoreState()
+      const reward = updatedState.rewards.find(
+        (entry) => entry.id === reward_id,
+      )
+      if (!reward) {
+        return businessError('mutation_failed', 'Could not update reward')
+      }
+      const fields = changedFields(before, reward, [
+        'title',
+        'emoji',
+        'cost',
+        'type',
+        'kidIds',
+      ])
+      const status = fields.length ? 'updated' : 'unchanged'
+      return success(fields.length ? 'Reward updated' : 'Reward unchanged', {
+        status,
+        reward,
+        changed_fields: fields,
+      })
     },
   )
-  server.registerTool(
-    'archive_reward',
-    {
-      title: 'Archive Reward',
-      description:
-        'Archive (remove) a reward from the board. This is a delete operation for the selected reward ID.',
-      inputSchema: z.object({
-        reward_id: rewardIdSchema,
-        include_snapshot: includeSnapshotSchema,
-      }),
-      outputSchema: messageWithSnapshotSchema,
-    },
-    async ({
-      reward_id,
-      include_snapshot,
-    }: {
-      reward_id: string
-      include_snapshot?: boolean
-    }) => {
-      const formData = new FormData()
-      appendAutomationToken(formData)
-      formData.append('rewardId', reward_id)
-      await archiveReward(formData)
-      const snapshot = await maybeLoadSnapshot(include_snapshot)
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: 'Reward archived',
-          },
-        ],
-        structuredContent: toStructuredContent({
-          message: 'Reward archived',
-          snapshot,
-        }),
-      }
-    },
-  )
+
   server.registerTool(
     'redeem_reward',
     {
       title: 'Redeem Reward',
-      description:
-        'Redeem a reward for a kid if they have enough stars and are allowed to redeem it. This deducts stars and records a redemption entry.',
+      description: 'Redeem a reward for one kid.',
       inputSchema: z.object({
         reward_id: rewardIdSchema,
         kid_id: kidIdSchema,
-        include_snapshot: includeSnapshotSchema,
       }),
-      outputSchema: redeemResultSchema,
+      outputSchema: redeemRewardResultSchema,
     },
-    async ({
-      reward_id,
-      kid_id,
-      include_snapshot,
-    }: {
-      reward_id: string
-      kid_id: string
-      include_snapshot?: boolean
-    }) => {
+    async ({ reward_id, kid_id }: { reward_id: string; kid_id: string }) => {
+      const state = await getChoreState()
+      const reward = state.rewards.find((entry) => entry.id === reward_id)
+      if (!reward) {
+        return businessError('reward_not_found', 'Reward not found')
+      }
+      const kid = state.kids.find((entry) => entry.id === kid_id)
+      if (!kid) return businessError('kid_not_found', 'Kid not found')
+      if (reward.archived || !reward.kidIds.includes(kid_id)) {
+        return businessError(
+          'reward_not_available',
+          'This reward is not available to that kid',
+        )
+      }
+      if (
+        reward.type === 'one-off' &&
+        state.rewardRedemptions.some(
+          (entry) => entry.rewardId === reward_id && entry.kidId === kid_id,
+        )
+      ) {
+        return businessError(
+          'reward_already_redeemed',
+          'This one-off reward was already redeemed',
+        )
+      }
+      if (starsForKid(state.completions, kid_id) < reward.cost) {
+        return businessError(
+          'insufficient_stars',
+          'Kid does not have enough stars for this reward',
+        )
+      }
+
+      const completionId = crypto.randomUUID()
+      const redemptionId = crypto.randomUUID()
       const formData = new FormData()
       appendAutomationToken(formData)
+      formData.append('requestedCompletionId', completionId)
+      formData.append('requestedRedemptionId', redemptionId)
       formData.append('rewardId', reward_id)
       formData.append('kidId', kid_id)
       const result = await redeemReward(formData)
-      const snapshot = await maybeLoadSnapshot(include_snapshot)
-      const message = result?.success
-        ? 'Reward redeemed'
-        : 'Could not redeem reward'
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: message,
-          },
-        ],
-        structuredContent: toStructuredContent({
-          message,
-          ...result,
-          snapshot,
-        }),
+      if (!result.success) {
+        return businessError('mutation_failed', 'Could not redeem reward')
       }
+
+      const updatedState = await getChoreState()
+      const redemption = updatedState.rewardRedemptions.find(
+        (entry) => entry.id === redemptionId,
+      )
+      if (!redemption) {
+        return businessError('mutation_failed', 'Could not load redemption')
+      }
+
+      return success('Reward redeemed', {
+        status: 'redeemed',
+        reward,
+        kid,
+        redemption,
+        star_balance: starsForKid(updatedState.completions, kid_id),
+      })
+    },
+  )
+
+  server.registerTool(
+    'archive_reward',
+    {
+      title: 'Archive Reward',
+      description: 'Remove a reward from the catalog.',
+      inputSchema: z.object({ reward_id: rewardIdSchema }),
+      outputSchema: archiveRewardResultSchema,
+    },
+    async ({ reward_id }: { reward_id: string }) => {
+      const state = await getChoreState()
+      const reward = state.rewards.find((entry) => entry.id === reward_id)
+      if (!reward) {
+        return businessError('reward_not_found', 'Reward not found')
+      }
+
+      const formData = new FormData()
+      appendAutomationToken(formData)
+      formData.append('rewardId', reward_id)
+      await archiveReward(formData)
+      const updatedState = await getChoreState()
+      if (updatedState.rewards.some((entry) => entry.id === reward_id)) {
+        return businessError('mutation_failed', 'Could not archive reward')
+      }
+
+      return success('Reward archived', {
+        status: 'archived',
+        reward_id,
+        reward,
+      })
     },
   )
 }
