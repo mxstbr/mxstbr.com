@@ -14,8 +14,6 @@ export default function Home() {
       <section aria-labelledby="about-me">
         <h2 id="about-me">Some things about me:</h2>
         <ul>
-          <li>Grew up in Vienna, Austria</li>
-          <li>Live in San Francisco</li>
           <li>
             Member of Technical Staff at <a href="https://openai.com">OpenAI</a>
           </li>
@@ -46,6 +44,8 @@ export default function Home() {
             <a href="https://www.youtube.com/watch?v=19kDOIwzTfE">skiing</a>,
             and music
           </li>
+          <li>Grew up in Vienna, Austria</li>
+          <li>Live in San Francisco</li>
         </ul>
       </section>
 
