@@ -18,7 +18,7 @@ export default async function sitemap() {
     lastModified: note.frontmatter.updatedAt || note.frontmatter.publishedAt,
   }))
 
-  let routes = ['', ...Object.keys(navItems)].map((route) => ({
+  let routes = ['', '/thoughts', ...Object.keys(navItems)].map((route) => ({
     url: `${prodUrl}${route}`,
     lastModified: new Date().toISOString().split('T')[0],
   }))

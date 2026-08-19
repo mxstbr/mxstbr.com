@@ -1,0 +1,9 @@
+.plain-page {
+  max-width: 640px;
+}
+
+@media (min-width: 800px) {
+  .plain-page {
+    margin-inline: auto;
+  }
+}

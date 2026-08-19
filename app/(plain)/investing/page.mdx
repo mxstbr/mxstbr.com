@@ -1,6 +1,4 @@
-import { investments } from './investments'
-import { ItemList, ItemListItem } from '../../components/item-list'
-import Prose from '../../components/prose'
+import { investments } from '../../(public)/investing/investments'
 import { size } from 'app/og/utils'
 import { prodUrl } from 'app/sitemap'
 
@@ -35,9 +33,11 @@ export const metadata = {
   },
 }
 
-<Prose>
+<article className="plain-page">
 
 # Angel Investing
+
+<section>
 
 Together with [Sue Odio](https://www.linkedin.com/in/sueodio/), I angel invest in early-stage startups we're excited about. Think of us as advisors with skin in the game — we love helping with tricky, ambiguous problems, providing access to our networks and audiences, or even just lending an ear.
 
@@ -47,6 +47,10 @@ Together with [Sue Odio](https://www.linkedin.com/in/sueodio/), I angel invest i
 
 If you're founding a startup and think this could be a good fit, we'd love to meet you through a warm intro (check [my X](https://x.com/mxstbr), [my LinkedIn](https://linkedin.com/in/mxstbr), or [Sue's LinkedIn](https://www.linkedin.com/in/sueodio/) for mutual connections!).<sup id="warm-intros-ref"><a href="#warm-intros">1</a></sup>
 
+</section>
+
+<section>
+
 ## What we invest in
 
 We invest first-and-foremost in the people. Our main filter is "Do we believe these founders can go through the one-of-a-kind challenge of building a company that can change the world?"
@@ -55,40 +59,38 @@ We love investing early to make the most of the limited amount of money we have.
 
 I personally love investing in products that I (would) use myself, even more so if they're products aimed at developers.
 
+</section>
+
+<section>
+
 ## Investments
 
 So far, I have invested in:
 
-<ItemList>
+<ul>
   {investments.map((investment) => (
-    <li
-      className="pl-0 list-none"
-      key={investment.href}
-    >
-      <div className="flex flex-1 items-center space-x-4 pl-0">
-        <div className="text-slate-900 dark:text-slate-100 shrink-0">
-          <a target="_blank" href={investment.href}>
-            {investment.name}
-          </a>
-        </div>
-        <span
-          className="w-full border-t border-slate-300 border-dashed dark:border-slate-500 min-w-4"
-        />
-        <div className="text-slate-600 text-right dark:text-slate-400 tabular-nums">
-          {investment.description}
-        </div>
-      </div>
-      <div className="text-sm text-slate-600 dark:text-slate-500">
-        {investment.subtext}
-      </div>
+    <li key={investment.href}>
+      <a href={investment.href}>{investment.name}</a> — {investment.description}{' '}
+      ({investment.subtext})
     </li>
+  ))}
+</ul>
 
-))}
-
-</ItemList>
-
-<div id="warm-intros" className="text-sm">
-  <sup><a href="#warm-intros-ref">1</a></sup> We do this on the side and really try to help the startups we back, so we don't have time to talk to everybody. Somebody we respect and trust vouching for you is an important signal in our process.
+<div id="warm-intros">
+  <sup>
+    <a href="#warm-intros-ref">1</a>
+  </sup>{' '}
+  We do this on the side and really try to help the startups we back, so we
+  don't have time to talk to everybody. Somebody we respect and trust vouching
+  for you is an important signal in our process.
 </div>
 
-</Prose>
+</section>
+
+<section>
+
+[← Max Stoiber](/)
+
+</section>
+
+</article>

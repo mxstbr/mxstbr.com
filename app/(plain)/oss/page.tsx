@@ -1,9 +1,9 @@
 import { getRepos } from '../../github'
-import ossProjects from './data'
-import Prose from 'app/components/prose'
+import ossProjects from '../../(public)/oss/data'
 import { Metadata } from 'next'
 import { size } from 'app/og/utils'
 import { prodUrl } from 'app/sitemap'
+import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: 'Open Source Projects',
@@ -53,9 +53,10 @@ export default async function OSS() {
   )
 
   return (
-    <div className="space-y-12">
-      <Prose>
-        <h1>Open Source Projects</h1>
+    <article className="plain-page">
+      <h1>Open Source Projects</h1>
+
+      <section>
         <p>
           <a href="https://npmtrends.com/styled-components">
             Millions of developers
@@ -75,51 +76,51 @@ export default async function OSS() {
             .toLocaleString()}{' '}
           stars on GitHub:
         </p>
-      </Prose>
-      <ul className="space-y-4">
-        {repos
-          .filter((repo) => repo.owner !== false)
-          .sort((a, b) => b.stargazerCount - a.stargazerCount)
-          .map((repo) => (
-            <Repo repo={repo} key={repo.nameWithOwner} />
-          ))}
-      </ul>
-      <ul className="space-y-4">
-        {repos
-          .filter((repo) => repo.owner === false)
-          .sort((a, b) => b.stargazerCount - a.stargazerCount)
-          .map((repo) => (
-            <Repo repo={repo} key={repo.nameWithOwner} />
-          ))}
-      </ul>
-    </div>
+      </section>
+
+      <section aria-labelledby="created-projects">
+        <h2 id="created-projects">Projects I created:</h2>
+        <ul>
+          {repos
+            .filter((repo) => repo.owner !== false)
+            .sort((a, b) => b.stargazerCount - a.stargazerCount)
+            .map((repo) => (
+              <Repo repo={repo} key={repo.nameWithOwner} />
+            ))}
+        </ul>
+      </section>
+
+      <section aria-labelledby="maintained-projects">
+        <h2 id="maintained-projects">Projects I maintained:</h2>
+        <ul>
+          {repos
+            .filter((repo) => repo.owner === false)
+            .sort((a, b) => b.stargazerCount - a.stargazerCount)
+            .map((repo) => (
+              <Repo repo={repo} key={repo.nameWithOwner} />
+            ))}
+        </ul>
+      </section>
+
+      <section>
+        <Link href="/">← Max Stoiber</Link>
+      </section>
+    </article>
   )
 }
 
 function Repo({ repo }) {
+  const stars = repo.stargazerCount.toLocaleString(undefined, {
+    maximumFractionDigits: 0,
+  })
+
   return (
-    <li
-      key={repo.nameWithOwner}
-      className="w-full flex flex-col md:flex-row space-x-0 md:space-x-2"
-    >
-      <div className="text-slate-600 shrink-0 dark:text-slate-400 w-[120px] tabular-nums">
-        {repo.stargazerCount.toLocaleString(undefined, {
-          maximumFractionDigits: 0,
-        })}{' '}
-        stars
-      </div>
-      <div>
-        <p className="text-slate-900 dark:text-slate-100 ">
-          <a
-            className="underline"
-            href={`https://github.com/${repo.nameWithOwner}`}
-          >
-            {repo.nameWithOwner}
-          </a>
-          {repo.owner === false ? ` (maintainer)` : null}
-        </p>
-        <p className="text-slate-600 dark:text-slate-400">{repo.description}</p>
-      </div>
+    <li>
+      <a href={`https://github.com/${repo.nameWithOwner}`}>
+        {repo.nameWithOwner}
+      </a>
+      {repo.owner === false ? ` (maintainer)` : null} — {repo.description} (
+      {stars} stars)
     </li>
   )
 }
