@@ -22,11 +22,6 @@ const nextConfig: NextConfig = {
 
     return [
       {
-        source: '/thoughts',
-        destination: '/',
-        permanent: true,
-      },
-      {
         source: '/investments',
         destination: '/investing',
         permanent: true,
