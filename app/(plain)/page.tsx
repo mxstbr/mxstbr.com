@@ -12,7 +12,7 @@ export default function Home() {
       <h1>Max Stoiber</h1>
 
       <section aria-labelledby="about-me">
-        <h2 id="about-me">Some things about me:</h2>
+        <p id="about-me">Some things about me:</p>
         <ul>
           <li>
             Member of Technical Staff at <a href="https://openai.com">OpenAI</a>
@@ -50,7 +50,7 @@ export default function Home() {
       </section>
 
       <section aria-labelledby="beliefs">
-        <h2 id="beliefs">Some things I believe:</h2>
+        <p id="beliefs">Some things I believe:</p>
         <ul>
           <li>
             What you tolerate becomes the standard
@@ -94,7 +94,7 @@ export default function Home() {
       </section>
 
       <section aria-labelledby="elsewhere">
-        <h2 id="elsewhere">Elsewhere:</h2>
+        <p id="elsewhere">Elsewhere:</p>
         <ul>
           <li>
             <Link href="/thoughts">Essays</Link>
