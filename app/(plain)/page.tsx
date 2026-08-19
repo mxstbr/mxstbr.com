@@ -108,9 +108,6 @@ export default function Home() {
           <li>
             <a href="https://github.com/mxstbr">GitHub</a>
           </li>
-          <li>
-            <a href="mailto:contact@mxstbr.com">Email</a>
-          </li>
         </ul>
       </section>
     </article>
