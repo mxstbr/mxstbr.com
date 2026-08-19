@@ -2,6 +2,10 @@
   max-width: 640px;
 }
 
+.plain-page a {
+  color: inherit;
+}
+
 @media (min-width: 800px) {
   .plain-page {
     margin-inline: auto;
