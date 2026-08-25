@@ -59,6 +59,9 @@ type Frontmatter = {
   publishedAt: string
   readTimeInMinutes: number
   status: Status
+  sourceUrl?: string
+  sourceTitle?: string
+  sourceAuthor?: string
   updatedAt?: string
   tags?: Array<{
     name: string
@@ -115,9 +118,8 @@ export async function getNotes(): Promise<Array<Note>> {
             ['pageviews', `/notes/${post.slug}`].join(':'),
           )) ?? 0
 
-        const { status, content } = parseStatusFromContent(
-          post.content.markdown,
-        )
+        const { status, sourceUrl, sourceTitle, sourceAuthor, content } =
+          parseNoteMetadata(post.content.markdown)
 
         return {
           frontmatter: {
@@ -129,6 +131,9 @@ export async function getNotes(): Promise<Array<Note>> {
             readTimeInMinutes: post.readTimeInMinutes,
             updatedAt: post.updatedAt,
             status: status,
+            sourceUrl,
+            sourceTitle,
+            sourceAuthor,
             tags: post.tags.map((tag) => ({
               slug: tag.slug,
               // Hashnode has inconsistent tag name capitalization, so I manually capitalize each word
@@ -163,6 +168,9 @@ export async function getNote(
 }
 
 const STATUS_REGEX = /^status-(\w+)$/m
+const SOURCE_URL_REGEX = /^source:\s*(https?:\/\/\S+)\s*$/m
+const SOURCE_TITLE_REGEX = /^source-title:\s*(.+)\s*$/m
+const SOURCE_AUTHOR_REGEX = /^source-author:\s*(.+)\s*$/m
 
 const OLD_STATUSES = {
   sketch: 'seedling',
@@ -177,16 +185,32 @@ export const EMOJI_FOR_STATUS: Record<Status, string> = {
   link: '🔗',
 }
 
-function parseStatusFromContent(markdown: string): {
+export function parseNoteMetadata(markdown: string): {
   content: string
   status: Status
+  sourceUrl?: string
+  sourceTitle?: string
+  sourceAuthor?: string
 } {
   let status
-  const result = markdown.match(STATUS_REGEX)
-  if (result) status = result[1]
+  const statusResult = markdown.match(STATUS_REGEX)
+  const sourceUrlResult = markdown.match(SOURCE_URL_REGEX)
+  const sourceTitleResult = markdown.match(SOURCE_TITLE_REGEX)
+  const sourceAuthorResult = markdown.match(SOURCE_AUTHOR_REGEX)
+
+  if (statusResult) status = statusResult[1]
   if (status) status = OLD_STATUSES[status] || status
+
   return {
-    content: markdown.replace(STATUS_REGEX, ''),
+    content: markdown
+      .replace(STATUS_REGEX, '')
+      .replace(SOURCE_URL_REGEX, '')
+      .replace(SOURCE_TITLE_REGEX, '')
+      .replace(SOURCE_AUTHOR_REGEX, '')
+      .trimStart(),
     status: status || 'seedling',
+    sourceUrl: sourceUrlResult?.[1],
+    sourceTitle: sourceTitleResult?.[1],
+    sourceAuthor: sourceAuthorResult?.[1],
   }
 }

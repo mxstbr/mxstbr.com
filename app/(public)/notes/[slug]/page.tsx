@@ -124,6 +124,9 @@ export default async function Page({
             description: frontmatter.summary,
             image: generateOgImage(note),
             url: `${prodUrl}/notes/${slug}`,
+            ...(frontmatter.sourceUrl
+              ? { citation: frontmatter.sourceUrl }
+              : {}),
             author: {
               '@type': 'Person',
               '@id': 'mxstbr',
@@ -143,6 +146,8 @@ export default async function Page({
         <h1 className="title font-bold text-4xl leading-tight my-4 text-balance">
           {frontmatter.title}
         </h1>
+
+        {frontmatter.sourceUrl && <OriginalArticleLink note={note} />}
 
         {(headings.length > 1 ||
           (!!headings[0] &&
@@ -273,6 +278,34 @@ export default async function Page({
       <EditButton cuid={note.frontmatter.cuid} />
       <FeedbackForm note={note} />
     </section>
+  )
+}
+
+function OriginalArticleLink({ note }: { note: Note }) {
+  const { sourceUrl, sourceTitle, sourceAuthor, title } = note.frontmatter
+
+  if (!sourceUrl) return null
+
+  let domain = sourceUrl
+  try {
+    domain = new URL(sourceUrl).hostname.replace(/^www\./, '')
+  } catch {}
+
+  return (
+    <a
+      href={sourceUrl}
+      className="group my-6 block rounded-md border border-slate-300 p-4 no-underline transition-colors hover:border-slate-500 dark:border-slate-700 dark:hover:border-slate-500"
+    >
+      <span className="block font-mono text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+        Original article
+      </span>
+      <span className="mt-2 block text-lg font-semibold text-slate-900 underline decoration-slate-400 underline-offset-2 group-hover:decoration-current dark:text-slate-100 dark:decoration-slate-600">
+        {sourceTitle || title} <span aria-hidden="true">↗</span>
+      </span>
+      <span className="mt-1 block text-sm text-slate-500 dark:text-slate-400">
+        {[sourceAuthor, domain].filter(Boolean).join(' · ')}
+      </span>
+    </a>
   )
 }
 
