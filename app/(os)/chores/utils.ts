@@ -160,6 +160,17 @@ export function hasChoreTimePassed(
   return minutes >= TIME_END_MINUTES[timeOfDay]
 }
 
+export function choreTimeDeadlineLabel(
+  timeOfDay: keyof typeof TIME_END_MINUTES,
+): string {
+  const minutes = TIME_END_MINUTES[timeOfDay]
+  const hour24 = Math.floor(minutes / 60)
+  const minute = minutes % 60
+  const hour12 = hour24 % 12 || 12
+  const minuteLabel = minute ? `:${minute.toString().padStart(2, '0')}` : ''
+  return `${hour12}${minuteLabel}${hour24 >= 12 ? 'pm' : 'am'}`
+}
+
 export function choreNeedsApproval(
   chore: Pick<Chore, 'requiresApproval' | 'timeOfDay'>,
   targetDay: string,

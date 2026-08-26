@@ -24,6 +24,7 @@ import {
 import {
   DAILY_BONUS_STARS,
   type DailyChoreProgress,
+  choreTimeDeadlineLabel,
   hasChoreTimePassed,
   msUntilNextPacificMidnight,
   pacificTimeInMinutes,
@@ -86,13 +87,13 @@ const formatStarLabel = (stars: number) =>
 /**
  * Time-based auto-collapse behavior for chore groups:
  *
- * - Before 12:00 PM: Morning group is open; Afternoon, Evening, Night, and Any time are collapsed
- * - 12:00 PM - 5:00 PM: Afternoon group is open; Morning, Evening, Night, and Any time are collapsed
- * - 5:00 PM - 7:00 PM: Evening group is open; Morning, Afternoon, Night, and Any time are collapsed
+ * - Before 12:00 PM: Morning group is open; Afternoon, Evening, Night, and Bonus are collapsed
+ * - 12:00 PM - 5:00 PM: Afternoon group is open; Morning, Evening, Night, and Bonus are collapsed
+ * - 5:00 PM - 7:00 PM: Evening group is open; Morning, Afternoon, Night, and Bonus are collapsed
  * - 7:00 PM - 10:00 PM: Night group is open; Morning and Afternoon are collapsed
  * - After 10:00 PM: Morning, Afternoon, Evening, and Night are collapsed
  *
- * The "Any time" group is always collapsed by default but can be manually expanded.
+ * The "Bonus" group is always collapsed by default but can be manually expanded.
  * Groups automatically expand/collapse when crossing time thresholds (12pm, 5pm, 7pm, 10pm).
  * Manually expanded groups stay open while the user interacts, but non-persistent groups
  * will auto-recollapse after 45 seconds of inactivity. Persistent groups (like evening)
@@ -755,11 +756,27 @@ function KidColumn({
     { key: TimeGroupKey; label: string; emoji?: string }[]
   >(
     () => [
-      { key: 'morning', label: 'Morning', emoji: '🌅' },
-      { key: 'afternoon', label: 'Afternoon', emoji: '☀️' },
-      { key: 'evening', label: 'Evening', emoji: '🌙' },
-      { key: 'night', label: 'Night', emoji: '🌌' },
-      { key: 'any', label: 'Any time' },
+      {
+        key: 'morning',
+        label: `Morning (by ${choreTimeDeadlineLabel('morning')})`,
+        emoji: '🌅',
+      },
+      {
+        key: 'afternoon',
+        label: `Afternoon (by ${choreTimeDeadlineLabel('afternoon')})`,
+        emoji: '☀️',
+      },
+      {
+        key: 'evening',
+        label: `Evening (by ${choreTimeDeadlineLabel('evening')})`,
+        emoji: '🌙',
+      },
+      {
+        key: 'night',
+        label: `Night (by ${choreTimeDeadlineLabel('night')})`,
+        emoji: '🌌',
+      },
+      { key: 'any', label: 'Bonus' },
     ],
     [],
   )
