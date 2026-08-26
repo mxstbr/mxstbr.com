@@ -14,9 +14,15 @@ pnpm dev               # run Next.js in dev mode with hot reload
 pnpm build             # production build and sync essays to GitHub
 pnpm start             # serve the production build locally
 pnpm update-essay-views# refresh Upstash-backed essay view counts
+pnpm chores help       # manage Redis-backed kids chores/rewards
 ```
 
 Run commands from the repo root. Prefer `pnpm dev` for iterative changes; use `pnpm build` before shipping to ensure MDX and dynamic routes compile.
+
+## Kids Chores
+
+- Chores live in Upstash RedisJSON at `chores:mxstbr:family-board` as `{ kids, chores, completions, rewards, rewardRedemptions }`; use `pnpm chores ...` for agent-managed reads and mutations.
+- `snoozedUntil` and `snoozedForKids[kidId]` are exclusive reappear dates, not inclusive hidden-through dates: the app hides a chore only when the stored snooze date is greater than the viewed Pacific date. To skip chores for June 21 and have them back on June 22, set the snooze date to `2026-06-22`, then verify both the skipped day and the reappear day.
 
 ## Coding Style & Naming Conventions
 

@@ -7,7 +7,7 @@ import {
   addReward,
   archiveChore,
   archiveReward,
-  completeChore,
+  completeChoreAsParent,
   renameKid,
   setPause,
   setChoreSchedule,
@@ -48,7 +48,7 @@ import { ClippyChoresChat } from './clippy-chat'
 
 async function handleCompleteChore(formData: FormData): Promise<void> {
   'use server'
-  await completeChore(formData)
+  await completeChoreAsParent(formData)
 }
 
 export const dynamic = 'force-dynamic'

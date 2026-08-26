@@ -20,6 +20,7 @@ import {
   dailyBonusChoreId,
   DAILY_BONUS_STARS,
   hasDailyBonus,
+  choreNeedsApproval,
   pacificDateFromTimestamp,
   shiftIsoDay,
   starsForKid,
@@ -238,7 +239,9 @@ async function applyCompletion({
   kidId,
   targetDay,
   notifyTelegram = true,
+  approvalGranted = false,
 }: {
+  approvalGranted?: boolean
   choreId: string
   kidId: string
   notifyTelegram?: boolean
@@ -264,6 +267,19 @@ async function applyCompletion({
     const kid = state.kids.find((k) => k.id === kidId)
     if (!chore || !kid) return
     if (!chore.kidIds.includes(kidId)) return
+
+    if (!approvalGranted && choreNeedsApproval(chore, targetDay)) {
+      result = {
+        awarded: 0,
+        chore,
+        choreTitle: chore.title,
+        kid,
+        kidName: kid.name,
+        starBalance: starsForKid(state.completions, kidId),
+        status: 'unauthorized',
+      }
+      return
+    }
 
     result = {
       awarded: 0,
@@ -449,7 +465,25 @@ export async function completeChore(formData: FormData): Promise<CompletionResul
   if (!choreId || !kidId) return { awarded: 0, status: 'invalid' }
 
   const targetDay = parseIsoDay(formData.get('day')) ?? todayIsoDate()
-  return applyCompletion({ choreId, kidId, targetDay })
+  return applyCompletion({
+    choreId,
+    kidId,
+    targetDay,
+    approvalGranted: hasAutomationToken(formData),
+  })
+}
+
+export async function completeChoreAsParent(
+  formData: FormData,
+): Promise<CompletionResult> {
+  await requireAuthorization(formData)
+
+  const choreId = formData.get('choreId')?.toString()
+  const kidId = formData.get('kidId')?.toString()
+  if (!choreId || !kidId) return { awarded: 0, status: 'invalid' }
+
+  const targetDay = parseIsoDay(formData.get('day')) ?? todayIsoDate()
+  return applyCompletion({ choreId, kidId, targetDay, approvalGranted: true })
 }
 
 export async function approveChoreViaLink(
@@ -457,7 +491,13 @@ export async function approveChoreViaLink(
   kidId: string,
   targetDay: string,
 ): Promise<CompletionResult> {
-  return applyCompletion({ choreId, kidId, targetDay, notifyTelegram: false })
+  return applyCompletion({
+    choreId,
+    kidId,
+    targetDay,
+    notifyTelegram: false,
+    approvalGranted: true,
+  })
 }
 
 export async function requestApproval(formData: FormData): Promise<{ ok: boolean; error?: string }> {

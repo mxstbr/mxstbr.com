@@ -11,6 +11,12 @@ const TIME_ORDER: Record<'morning' | 'afternoon' | 'evening' | 'night', number> 
   evening: 2,
   night: 3,
 }
+const TIME_END_MINUTES: Record<keyof typeof TIME_ORDER, number> = {
+  morning: 12 * 60,
+  afternoon: 17 * 60,
+  evening: 19 * 60,
+  night: 22 * 60,
+}
 
 const pacificDateFormatter = new Intl.DateTimeFormat('en-CA', {
   timeZone: PACIFIC_TIMEZONE,
@@ -144,6 +150,24 @@ export function pacificTimeInMinutes(date: Date = new Date()): number {
   const hour = Number(parts.find((part) => part.type === 'hour')?.value ?? '0')
   const minute = Number(parts.find((part) => part.type === 'minute')?.value ?? '0')
   return hour * 60 + minute
+}
+
+export function hasChoreTimePassed(
+  timeOfDay: Chore['timeOfDay'],
+  minutes: number,
+): boolean {
+  if (!timeOfDay) return false
+  return minutes >= TIME_END_MINUTES[timeOfDay]
+}
+
+export function choreNeedsApproval(
+  chore: Pick<Chore, 'requiresApproval' | 'timeOfDay'>,
+  targetDay: string,
+  date: Date = new Date(),
+): boolean {
+  if (chore.requiresApproval) return true
+  if (targetDay !== formatPacificDate(date)) return true
+  return hasChoreTimePassed(chore.timeOfDay, pacificTimeInMinutes(date))
 }
 
 export function isPacificNighttime(date: Date = new Date()): boolean {

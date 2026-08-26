@@ -24,6 +24,7 @@ import {
 import {
   DAILY_BONUS_STARS,
   type DailyChoreProgress,
+  hasChoreTimePassed,
   msUntilNextPacificMidnight,
   pacificTimeInMinutes,
   sortByTimeOfDay,
@@ -63,7 +64,7 @@ type ApprovalRequest = {
   kidId: string
   accent: string
   dayIso: string
-  reason: 'future' | 'requiresApproval'
+  reason: 'elapsed' | 'future' | 'past' | 'requiresApproval'
   onReward?: () => void
 }
 
@@ -118,6 +119,18 @@ function shouldAutoCollapse(
   }
 
   return true
+}
+
+function approvalReasonFor(
+  chore: FreshChore,
+  mode: KidBoardProps['mode'],
+  minutes: number,
+): ApprovalRequest['reason'] | null {
+  if (mode === 'future') return 'future'
+  if (mode === 'past') return 'past'
+  if (chore.requiresApproval) return 'requiresApproval'
+  if (hasChoreTimePassed(chore.timeOfDay, minutes)) return 'elapsed'
+  return null
 }
 
 const shouldPersistExpansion = (key: TimeGroupKey) =>
@@ -382,15 +395,19 @@ export function KidBoard({
       setPending({ chore, kidId, accent, onReward })
       return
     }
-    const needsApproval = chore.requiresApproval || mode === 'future'
-    if (needsApproval) {
+    const approvalReason = approvalReasonFor(
+      chore,
+      mode,
+      pacificTimeInMinutes(),
+    )
+    if (approvalReason) {
       if (approvalRequestedForDay(chore.id, kidId, targetDay)) {
         setApprovalRequest({
           chore,
           kidId,
           accent,
           dayIso: targetDay,
-          reason: mode === 'future' ? 'future' : 'requiresApproval',
+          reason: approvalReason,
           onReward,
         })
         setApprovalStatus('sent')
@@ -401,7 +418,7 @@ export function KidBoard({
         kidId,
         accent,
         dayIso: targetDay,
-        reason: mode === 'future' ? 'future' : 'requiresApproval',
+        reason: approvalReason,
         onReward,
       }
       setApprovalRequest(request)
@@ -522,7 +539,7 @@ export function KidBoard({
                 </h2>
                 <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
                   You&apos;re viewing {dayLabel}. Go to today to record chores,
-                  or complete this task for {dayLabel}.
+                  or request parent approval for this task.
                 </p>
               </div>
               <button
@@ -555,7 +572,7 @@ export function KidBoard({
                 }}
                 className="inline-flex items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-800 shadow-xs transition active:border-slate-500 dark:border-slate-700 dark:text-slate-100"
               >
-                Complete for {dayLabel}
+                Request approval
               </button>
               <button
                 type="button"
@@ -579,9 +596,12 @@ export function KidBoard({
                 <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
                   We sent a request to approve &quot;
                   {approvalRequest.chore.title}&quot;
-                  {approvalRequest.reason === 'future'
+                  {approvalRequest.reason === 'future' ||
+                  approvalRequest.reason === 'past'
                     ? ` for ${dayLabel}`
-                    : ''}
+                    : approvalRequest.reason === 'elapsed'
+                      ? ' because its time window has passed'
+                      : ''}
                   . Parents can tap the Telegram button to complete it.
                 </p>
               </div>
@@ -973,7 +993,6 @@ function KidColumn({
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pt-3">
-
         <div className="space-y-3">
           {chores.length === 0 ? (
             <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-center text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200">
@@ -1018,7 +1037,7 @@ function KidColumn({
                         </span>
                       ) : null}
                       <span>{group.label}</span>
-                      {collapsed ? (
+                      {collapsed && group.key !== 'any' ? (
                         <span className="ml-auto rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
                           {group.items.length} left
                         </span>
@@ -1040,6 +1059,9 @@ function KidColumn({
                                 approvalRequestKey(kid.id, chore.id)
                               ] ?? false
                             }
+                            approvalRequired={Boolean(
+                              approvalReasonFor(chore, mode, pacificMinutes),
+                            )}
                           />
                         ))}
                       </div>
@@ -1202,6 +1224,7 @@ function ChoreButton({
   onBonusAwarded,
   kidId,
   approvalRequested = false,
+  approvalRequired = false,
   disabled = false,
 }: {
   chore: FreshChore
@@ -1215,6 +1238,7 @@ function ChoreButton({
   ) => Promise<void> | void
   onBonusAwarded: (kidId: string, bonusStars: number) => void
   approvalRequested?: boolean
+  approvalRequired?: boolean
   disabled?: boolean
 }) {
   const [isPending, startTransition] = useTransition()
@@ -1357,7 +1381,7 @@ function ChoreButton({
                     </h2>
                     <div className="mt-1 text-xs font-semibold text-amber-700 dark:text-amber-200">
                       +{chore.stars} ⭐️
-                      {chore.requiresApproval ? (
+                      {approvalRequired ? (
                         <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800 dark:bg-amber-900/50 dark:text-amber-100">
                           {approvalRequested
                             ? '⏳ Waiting for approval'
@@ -1390,7 +1414,9 @@ function ChoreButton({
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-xs transition active:bg-slate-800 disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:active:bg-slate-200"
                   disabled={completionDisabled || isAnimating}
                 >
-                  ✅ Complete task
+                  {approvalRequired
+                    ? '🔐 Request parent approval'
+                    : '✅ Complete task'}
                 </button>
                 <button
                   type="button"
@@ -1485,11 +1511,11 @@ function ChoreButton({
     >
       <button
         type="button"
-          onClick={() => {
-            setDetailsOpen(true)
-            prefetchCompleteSound()
-            void fetchTtsUrl()
-          }}
+        onClick={() => {
+          setDetailsOpen(true)
+          prefetchCompleteSound()
+          void fetchTtsUrl()
+        }}
         className="group flex w-full flex-col text-left text-slate-900 transition active:bg-[var(--accent-soft)] focus-visible:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:text-slate-50 dark:active:bg-[var(--accent-soft)] dark:focus-visible:bg-[var(--accent-soft)]"
         aria-label={
           approvalRequested
@@ -1513,9 +1539,11 @@ function ChoreButton({
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2 text-sm font-semibold leading-none xl:text-base">
               <div>+{formatStarLabel(chore.stars)}</div>
-              {chore.requiresApproval ? (
+              {approvalRequired ? (
                 <div className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800 dark:bg-amber-900/50 dark:text-amber-100">
-                  {approvalRequested ? '⏳ Waiting for approval' : '🔐 Parent OK'}
+                  {approvalRequested
+                    ? '⏳ Waiting for approval'
+                    : '🔐 Parent OK'}
                 </div>
               ) : null}
             </div>
