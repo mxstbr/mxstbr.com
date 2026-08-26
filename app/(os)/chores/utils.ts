@@ -3,7 +3,7 @@ import type { Chore, Completion, Reward, RewardRedemption } from './data'
 export const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 export const DAY_ABBRS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 export const PACIFIC_TIMEZONE = 'America/Los_Angeles'
-export const DAILY_BONUS_STARS = 5
+export const DAILY_BONUS_STARS = 10
 const DAILY_BONUS_PREFIX = 'daily-bonus'
 const TIME_ORDER: Record<'morning' | 'afternoon' | 'evening' | 'night', number> = {
   morning: 0,

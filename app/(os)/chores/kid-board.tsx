@@ -1062,6 +1062,13 @@ function KidColumn({
                             approvalRequired={Boolean(
                               approvalReasonFor(chore, mode, pacificMinutes),
                             )}
+                            skipDisabled={
+                              mode !== 'today' ||
+                              hasChoreTimePassed(
+                                chore.timeOfDay,
+                                pacificMinutes,
+                              )
+                            }
                           />
                         ))}
                       </div>
@@ -1225,6 +1232,7 @@ function ChoreButton({
   kidId,
   approvalRequested = false,
   approvalRequired = false,
+  skipDisabled = false,
   disabled = false,
 }: {
   chore: FreshChore
@@ -1239,6 +1247,7 @@ function ChoreButton({
   onBonusAwarded: (kidId: string, bonusStars: number) => void
   approvalRequested?: boolean
   approvalRequired?: boolean
+  skipDisabled?: boolean
   disabled?: boolean
 }) {
   const [isPending, startTransition] = useTransition()
@@ -1283,7 +1292,7 @@ function ChoreButton({
   const completionDisabled = isPending || disabled || approvalRequested
 
   const performSkip = () => {
-    if (isSkipping) return
+    if (isSkipping || skipDisabled) return
     setIsSkipping(true)
     setSkipConfirmOpen(false)
     const formData = new FormData()
@@ -1421,12 +1430,12 @@ function ChoreButton({
                 <button
                   type="button"
                   onClick={() => {
-                    if (isSkipping) return
+                    if (isSkipping || skipDisabled) return
                     setDetailsOpen(false)
                     setSkipConfirmOpen(true)
                   }}
                   className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-xs transition active:bg-slate-50 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:active:bg-slate-700"
-                  disabled={isSkipping}
+                  disabled={isSkipping || skipDisabled}
                 >
                   ⏩ Skip for today
                   {isSkipping ? (
@@ -1493,7 +1502,7 @@ function ChoreButton({
                   type="button"
                   onClick={performSkip}
                   className="inline-flex items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-xs transition active:bg-slate-800 disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:active:bg-slate-200"
-                  disabled={isSkipping}
+                  disabled={isSkipping || skipDisabled}
                 >
                   Skip task
                 </button>

@@ -21,7 +21,9 @@ import {
   DAILY_BONUS_STARS,
   hasDailyBonus,
   choreNeedsApproval,
+  hasChoreTimePassed,
   pacificDateFromTimestamp,
+  pacificTimeInMinutes,
   shiftIsoDay,
   starsForKid,
 } from './utils'
@@ -710,8 +712,10 @@ export async function skipChore(formData: FormData): Promise<SkipResult> {
     return { bonusAwarded: false, bonusStars: 0, bonusMessage: null }
   }
 
-  const today = todayIsoDate()
+  const now = new Date()
+  const today = formatPacificDate(now)
   const nextDay = shiftIsoDay(today, 1)
+  const currentMinutes = pacificTimeInMinutes(now)
   let telegramMessage: string | null = null
   let bonusMessage: string | null = null
   let bonusResult: SkipResult = { bonusAwarded: false, bonusStars: 0, bonusMessage: null }
@@ -720,6 +724,7 @@ export async function skipChore(formData: FormData): Promise<SkipResult> {
     const chore = state.chores.find((c) => c.id === choreId)
     const kid = state.kids.find((k) => k.id === kidId)
     if (!chore || !kid || !chore.kidIds.includes(kidId)) return
+    if (hasChoreTimePassed(chore.timeOfDay, currentMinutes)) return
 
     const alreadySnoozedForDay = chore.snoozedForKids?.[kidId] === nextDay
     if (alreadySnoozedForDay) return
