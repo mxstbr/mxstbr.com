@@ -54,14 +54,6 @@ export function subDays(
   return addDays(date, -days)
 }
 
-// Add weeks to a date
-export function addWeeks(
-  date: ISODateDayString,
-  weeks: number,
-): ISODateDayString {
-  return addDays(date, weeks * 7)
-}
-
 // Add months to a date
 export function addMonths(
   date: ISODateDayString,
@@ -94,11 +86,6 @@ export function getDate(date: ISODateDayString): number {
 export function getDay(date: ISODateDayString): number {
   const { year, month, day } = parseISODateDay(date)
   return new Date(year, month - 1, day).getDay()
-}
-
-// Get the year
-export function getYear(date: ISODateDayString): number {
-  return parseISODateDay(date).year
 }
 
 // Check if a date is in the past
@@ -277,20 +264,6 @@ export function differenceInCalendarDays(
 
   const diffTime = date1.getTime() - date2.getTime()
   return Math.round(diffTime / (1000 * 60 * 60 * 24))
-}
-
-// Find the closest date from a list of dates
-export function closestTo(
-  targetDate: ISODateDayString,
-  datesArray: ISODateDayString[],
-): ISODateDayString | undefined {
-  if (datesArray.length === 0) return undefined
-
-  return datesArray.reduce((closest, date) => {
-    const closestDiff = Math.abs(differenceInCalendarDays(targetDate, closest))
-    const currentDiff = Math.abs(differenceInCalendarDays(targetDate, date))
-    return currentDiff < closestDiff ? date : closest
-  }, datesArray[0])
 }
 
 // Define an Interval type

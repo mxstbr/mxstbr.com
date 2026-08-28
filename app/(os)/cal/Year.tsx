@@ -1,7 +1,6 @@
 import React from 'react'
 import {
   addDays,
-  addWeeks,
   format,
   getDate,
   isFirstDayOfMonth,
@@ -12,12 +11,10 @@ import {
   isMonday,
   isToday,
   isLastDayOfMonth,
-  getYear,
   isFuture,
   subYears,
   differenceInCalendarWeeks,
   lastDayOfMonth,
-  closestTo,
   addMonths,
   startOfWeek,
   differenceInCalendarDays,
