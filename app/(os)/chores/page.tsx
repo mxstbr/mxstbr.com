@@ -15,7 +15,7 @@ import { RefreshButton } from './refresh-button'
 import { PasswordForm } from '../components/password-form'
 import { auth, isMax } from '../../auth'
 import { ChoresErrorBoundary } from './error-boundary'
-import { ChoresNav } from './chores-nav'
+import { choresViewHref } from './chores-nav'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -144,61 +144,84 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
     progress: progressByKid[kid.id],
   }))
 
-  const backgroundClass = viewingToday
-    ? 'bg-slate-50 dark:bg-slate-900'
-    : 'bg-slate-200 dark:bg-slate-950'
-
   return (
     <div
-      className={`flex min-h-screen flex-col p-6 pb-20 md:h-screen md:overflow-y-hidden md:pb-6 ${backgroundClass}`}
+      className={`relative flex min-h-screen flex-col bg-cover bg-center bg-fixed md:h-screen md:overflow-hidden ${
+        viewingToday ? '' : 'grayscale-[0.35]'
+      }`}
+      style={{
+        backgroundColor: '#dfe8e4',
+        backgroundImage: "url('/chores/daybreak-preview.webp')",
+      }}
     >
+      <div
+        className="pointer-events-none absolute inset-0 bg-white/10 dark:bg-slate-950/45"
+        aria-hidden="true"
+      />
       <ChoresErrorBoundary label="the toolbar">
-        <div className="mb-5 text-sm md:mb-6">
-          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
-            <div className="inline-flex w-fit justify-self-start items-center gap-2 rounded-md border border-slate-300 bg-white p-1 pr-3 text-xs font-semibold text-slate-800 shadow-xs dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
+        <header className="relative z-20 shrink-0 border-b border-white/70 bg-white/75 px-3 py-2 shadow-[0_1px_12px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-slate-700 dark:bg-slate-950/75 sm:px-5">
+          <div className="mx-auto grid max-w-[1800px] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 sm:gap-4">
+            <nav className="flex items-center gap-1 text-[11px] font-bold text-slate-500 sm:gap-3 sm:text-xs dark:text-slate-300">
+              <Link
+                href={choresViewHref('/chores', osParam)}
+                className="rounded-lg bg-slate-950 px-2 py-1.5 text-white shadow-sm dark:bg-white dark:text-slate-950 sm:px-3"
+                aria-current="page"
+              >
+                Chores
+              </Link>
+              <Link
+                href={choresViewHref('/chores/rewards', osParam)}
+                className="rounded-lg px-1.5 py-1.5 transition hover:bg-white/70 hover:text-slate-950 dark:hover:bg-slate-800 dark:hover:text-white sm:px-2"
+              >
+                Rewards
+              </Link>
+              <Link
+                href={choresViewHref('/chores/packing', osParam)}
+                className="rounded-lg px-1.5 py-1.5 transition hover:bg-white/70 hover:text-slate-950 dark:hover:bg-slate-800 dark:hover:text-white sm:px-2"
+              >
+                Packing
+              </Link>
+            </nav>
+
+            <div className="flex min-w-0 items-center justify-center gap-0.5 text-xs font-bold text-slate-800 dark:text-slate-100 sm:gap-1 sm:text-sm">
               <Link
                 href={choresHref(prevDay)}
                 prefetch
                 aria-label="Previous day"
-                className="rounded-sm px-2 py-1 transition hover:bg-slate-100 dark:hover:bg-slate-700"
+                className="flex h-8 w-7 shrink-0 items-center justify-center rounded-lg text-lg transition hover:bg-white/80 dark:hover:bg-slate-800"
               >
                 ‹
               </Link>
-              <Link
-                href={
-                  viewingToday ? choresHref() : choresHref(todayCtx.todayIso)
-                }
-                prefetch
-                className={`rounded-sm px-3 py-1 transition ${
-                  viewingToday
-                    ? 'bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200'
-                    : 'hover:bg-slate-100 dark:hover:bg-slate-700'
-                }`}
-              >
-                Today
-              </Link>
+              <h1 className="truncate text-center">
+                <span className="hidden sm:inline">
+                  {viewingToday ? 'Today · ' : ''}
+                </span>
+                {readableDay}
+              </h1>
               <Link
                 href={choresHref(nextDay)}
                 prefetch
                 aria-label="Next day"
-                className="rounded-sm px-2 py-1 transition hover:bg-slate-100 dark:hover:bg-slate-700"
+                className="flex h-8 w-7 shrink-0 items-center justify-center rounded-lg text-lg transition hover:bg-white/80 dark:hover:bg-slate-800"
               >
                 ›
               </Link>
+              {!viewingToday ? (
+                <Link
+                  href={choresHref()}
+                  prefetch
+                  className="ml-1 hidden rounded-lg bg-white/80 px-2 py-1 text-[11px] shadow-sm transition hover:bg-white sm:inline-flex dark:bg-slate-800 dark:hover:bg-slate-700"
+                >
+                  Today
+                </Link>
+              ) : null}
             </div>
-            <div className="flex justify-center text-base font-semibold text-slate-900 dark:text-slate-100">
-              <h1>
-                {readableDay}
-                {viewingToday ? ' ✅' : ''}
-              </h1>
-            </div>
-            <div className="flex justify-end">
-              <RefreshButton />
-            </div>
+            <RefreshButton />
           </div>
-        </div>
+        </header>
       </ChoresErrorBoundary>
-      <div className="md:flex-1 md:min-h-0 pb-20 md:pb-16">
+
+      <main className="relative z-10 mx-auto flex w-full max-w-[1800px] flex-1 flex-col px-3 py-4 sm:px-5 md:min-h-0 md:px-6 md:py-5 xl:px-8">
         <ChoresErrorBoundary label="the chore board">
           <KidBoard
             columns={columns}
@@ -210,12 +233,9 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
             selectedKidId={kidParam}
           />
         </ChoresErrorBoundary>
-      </div>
+      </main>
       <ChoresErrorBoundary label="the screen saver">
         <ScreenSaver noChoresToday={!hasOpenChoresToday} />
-      </ChoresErrorBoundary>
-      <ChoresErrorBoundary label="the navigation bar">
-        <ChoresNav current="chores" osParam={osParam} />
       </ChoresErrorBoundary>
     </div>
   )
