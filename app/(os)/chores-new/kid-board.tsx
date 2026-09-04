@@ -17,7 +17,6 @@ import type { Chore, Completion, Kid } from '../chores/data'
 import {
   completeChore,
   requestApproval,
-  setKidColor,
   skipChore,
   undoChore,
 } from '../chores/actions'
@@ -738,27 +737,11 @@ function KidColumn({
   currentPeriod: ScheduledPeriod
   disableCompletion?: boolean
 }) {
-  const router = useRouter()
-  const accent = kid.color ?? '#0ea5e9'
-  const [accentOverride, setAccentOverride] = useState(accent)
-  const [colorModalOpen, setColorModalOpen] = useState(false)
-  const [pendingColor, setPendingColor] = useState(accent)
-  const [isSavingColor, setIsSavingColor] = useState(false)
   const [bonusOpen, setBonusOpen] = useState(false)
   const [doneOpen, setDoneOpen] = useState(false)
-  const accentColor = accentOverride ?? accent
+  const accentColor = kid.color ?? '#0ea5e9'
   const accentSoft = withAlpha(accentColor, 0.1)
   const accentMid = withAlpha(accentColor, 0.22)
-  const swatches = [
-    '#0ea5e9',
-    '#8b5cf6',
-    '#f59e0b',
-    '#22c55e',
-    '#f97316',
-    '#14b8a6',
-    '#f472b6',
-    '#6366f1',
-  ]
   const currentChores = chores.filter(
     (chore) => chore.timeOfDay === currentPeriod,
   )
@@ -776,34 +759,8 @@ function KidColumn({
     SCHEDULED_PERIODS.find(({ key }) => key === currentPeriod)?.label ??
     'Current'
 
-  useEffect(() => {
-    setAccentOverride(accent)
-    setPendingColor(accent)
-  }, [accent])
-
-  const handleSaveColor = async () => {
-    if (!pendingColor) return
-    setIsSavingColor(true)
-    const formData = new FormData()
-    formData.append('kidId', kid.id)
-    formData.append('color', pendingColor)
-    try {
-      await setKidColor(formData)
-      setAccentOverride(pendingColor)
-      setColorModalOpen(false)
-      router.refresh()
-    } finally {
-      setIsSavingColor(false)
-    }
-  }
-
   return (
-    <div
-      className="flex min-h-[34rem] flex-col overflow-hidden rounded-[1.75rem] border bg-white/95 shadow-[0_22px_70px_-36px_rgba(15,23,42,0.45)] backdrop-blur-xl dark:bg-slate-950/95 md:h-full md:min-h-0"
-      style={{
-        borderColor: accentMid,
-      }}
-    >
+    <div className="flex min-h-[34rem] flex-col overflow-hidden rounded-[1.5rem] border border-slate-200/90 bg-white/95 shadow-[0_20px_60px_-34px_rgba(15,23,42,0.42)] backdrop-blur-xl dark:border-slate-700 dark:bg-slate-950/95 md:h-full md:min-h-0">
       <div
         className="flex items-center justify-between gap-3 border-b px-4 py-3.5 md:px-5"
         style={{
@@ -811,29 +768,18 @@ function KidColumn({
           backgroundColor: accentSoft,
         }}
       >
-        <button
-          type="button"
-          onClick={() => {
-            setPendingColor(accentColor)
-            setColorModalOpen(true)
-          }}
-          className="group inline-flex items-center gap-2 rounded-lg text-left text-xl font-black tracking-tight text-slate-950 transition hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 dark:text-white md:text-2xl"
-          aria-label={`Change ${kid.name}'s color`}
-        >
-          <span>{kid.name}</span>
-          <span
-            aria-hidden="true"
-            className="text-lg font-semibold text-slate-400 transition-transform group-hover:translate-x-0.5"
-          >
-            ›
-          </span>
-        </button>
+        <h3 className="text-xl font-black tracking-tight text-slate-950 dark:text-white md:text-2xl">
+          {kid.name}
+        </h3>
         <StarBadge value={starTotal} accent={accentColor} />
       </div>
 
-      <div className="border-b border-slate-200/80 px-3 py-3 dark:border-slate-800 md:px-4">
-        <div className="grid grid-cols-4" aria-label="Today's chore periods">
-          {SCHEDULED_PERIODS.map((period, index) => {
+      <div className="border-b border-slate-200/80 px-3 py-2.5 dark:border-slate-800 md:px-4">
+        <div
+          className="grid grid-cols-4 gap-1 rounded-xl bg-slate-100/80 p-1 dark:bg-slate-900"
+          aria-label="Today's chore periods"
+        >
+          {SCHEDULED_PERIODS.map((period) => {
             const openCount = chores.filter(
               (chore) => chore.timeOfDay === period.key,
             ).length
@@ -846,36 +792,19 @@ function KidColumn({
             return (
               <div
                 key={period.key}
-                className="relative flex min-w-0 flex-col items-center gap-1"
+                className={`flex min-w-0 flex-col items-center justify-center gap-0.5 rounded-lg px-1 py-1.5 transition ${
+                  isCurrent
+                    ? 'bg-white text-slate-950 shadow-sm dark:bg-slate-800 dark:text-white'
+                    : isComplete
+                      ? 'text-slate-700 dark:text-slate-200'
+                      : 'text-slate-400 dark:text-slate-500'
+                }`}
                 title={`${period.label}: ${doneCount} done, ${openCount} left`}
               >
-                {index > 0 ? (
-                  <span
-                    aria-hidden="true"
-                    className="absolute right-1/2 top-3 h-px w-full bg-slate-200 dark:bg-slate-700"
-                  />
-                ) : null}
                 <span
-                  className={`relative z-10 flex h-6 w-6 items-center justify-center rounded-full border text-[11px] font-black transition ${
-                    isComplete
-                      ? 'text-white'
-                      : isCurrent
-                        ? 'bg-white text-slate-950 dark:bg-slate-900 dark:text-white'
-                        : 'border-slate-200 bg-slate-100 text-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-500'
+                  className={`flex h-4 items-center justify-center text-[11px] font-black ${
+                    isComplete ? 'text-emerald-600 dark:text-emerald-400' : ''
                   }`}
-                  style={
-                    isComplete
-                      ? {
-                          backgroundColor: accentColor,
-                          borderColor: accentColor,
-                        }
-                      : isCurrent
-                        ? {
-                            borderColor: accentColor,
-                            boxShadow: `0 0 0 3px ${accentSoft}`,
-                          }
-                        : undefined
-                  }
                   aria-label={
                     isComplete
                       ? `${period.label} complete`
@@ -884,15 +813,9 @@ function KidColumn({
                         : period.label
                   }
                 >
-                  {isComplete ? '✓' : isCurrent ? period.emoji : ''}
+                  {isComplete ? '✓' : isCurrent ? period.emoji : '·'}
                 </span>
-                <span
-                  className={`truncate text-[9px] font-bold uppercase tracking-wide sm:text-[10px] ${
-                    isCurrent
-                      ? 'text-slate-900 dark:text-slate-100'
-                      : 'text-slate-400 dark:text-slate-500'
-                  }`}
-                >
+                <span className="truncate text-[9px] font-bold uppercase tracking-[0.04em] sm:text-[10px]">
                   {period.label}
                 </span>
               </div>
@@ -933,8 +856,11 @@ function KidColumn({
               style={{ borderColor: accentMid, backgroundColor: accentSoft }}
             >
               <span
-                className="flex h-16 w-16 items-center justify-center rounded-full text-3xl font-black text-white shadow-sm"
-                style={{ backgroundColor: accentColor }}
+                className={`text-5xl font-black leading-none ${
+                  currentDone.length
+                    ? 'text-emerald-500'
+                    : 'text-slate-300 dark:text-slate-700'
+                }`}
                 aria-hidden="true"
               >
                 {currentDone.length ? '✓' : '—'}
@@ -1049,88 +975,18 @@ function KidColumn({
           ) : null}
         </div>
       </div>
-
-      {colorModalOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl dark:bg-slate-900">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <h2 className="text-base font-semibold text-slate-900 dark:text-slate-50">
-                  Choose a color
-                </h2>
-                <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
-                  Pick the color for {kid.name}&apos;s column.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setColorModalOpen(false)}
-                className="rounded-md p-1 text-slate-500 transition active:bg-slate-100 active:text-slate-700 dark:active:bg-slate-800"
-                aria-label="Close"
-              >
-                ×
-              </button>
-            </div>
-            <div className="mt-4 space-y-4">
-              <div className="grid grid-cols-4 gap-2">
-                {swatches.map((swatch) => (
-                  <button
-                    key={swatch}
-                    type="button"
-                    onClick={() => setPendingColor(swatch)}
-                    className={`h-10 rounded-lg border-2 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
-                      pendingColor === swatch
-                        ? 'border-slate-900 shadow-xs dark:border-slate-100'
-                        : 'border-transparent shadow-sm'
-                    }`}
-                    style={{ backgroundColor: swatch }}
-                    aria-label={`Select color ${swatch}`}
-                  />
-                ))}
-              </div>
-              <label className="flex items-center gap-3 text-xs font-semibold text-slate-700 dark:text-slate-200">
-                <span>Custom</span>
-                <input
-                  type="color"
-                  value={pendingColor}
-                  onChange={(event) => setPendingColor(event.target.value)}
-                  className="h-9 w-16 cursor-pointer rounded-md border border-slate-300 bg-white p-1 shadow-xs dark:border-slate-700 dark:bg-slate-800"
-                  aria-label="Pick a custom color"
-                />
-              </label>
-            </div>
-            <div className="mt-4 flex flex-wrap justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setColorModalOpen(false)}
-                className="inline-flex items-center justify-center rounded-md border border-transparent px-3 py-2 text-xs font-semibold text-slate-600 transition active:text-slate-900 dark:text-slate-300"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleSaveColor}
-                className="inline-flex items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-xs transition active:bg-slate-800 disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:active:bg-slate-200"
-                disabled={isSavingColor}
-              >
-                {isSavingColor ? 'Saving…' : 'Save color'}
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
     </div>
   )
 }
 
 function StarBadge({ value, accent }: { value: number; accent: string }) {
-  const accentSoft = withAlpha(accent, 0.26)
-  const accentStrong = `color-mix(in srgb, ${accent} 82%, #0f172a)`
+  const accentSoft = withAlpha(accent, 0.14)
+  const accentMid = withAlpha(accent, 0.24)
 
   return (
     <div
-      className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-black shadow-xs"
-      style={{ backgroundColor: accentSoft, color: accentStrong }}
+      className="flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-black text-slate-700 shadow-xs dark:text-slate-100"
+      style={{ backgroundColor: accentSoft, borderColor: accentMid }}
       aria-label={`${value} ${value === 1 ? 'star' : 'stars'}`}
     >
       <span aria-hidden="true">⭐️</span>
@@ -1447,114 +1303,83 @@ function ChoreButton({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-[1.35rem] border-2 shadow-[0_12px_28px_-22px_rgba(15,23,42,0.7)] transition focus-within:border-[var(--accent)] dark:focus-within:border-[var(--accent)] ${cardToneClasses}`}
+      className={`relative overflow-hidden rounded-2xl border shadow-[0_10px_24px_-18px_rgba(15,23,42,0.65)] transition focus-within:border-[var(--accent)] dark:focus-within:border-[var(--accent)] ${cardToneClasses}`}
       style={accentVars}
     >
-      <div
-        className={`grid grid-cols-[auto_minmax(0,1fr)_auto] items-stretch ${
-          compact ? 'min-h-24' : 'min-h-[clamp(8.5rem,16vh,11rem)]'
+      <button
+        type="button"
+        onClick={handlePrimaryAction}
+        className={`group flex w-full flex-col justify-center pr-12 text-left text-slate-950 transition active:bg-[var(--accent-soft)] focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-[var(--accent)] disabled:cursor-wait disabled:opacity-55 dark:text-white ${
+          compact
+            ? 'min-h-20 px-3 py-3'
+            : 'min-h-[clamp(7rem,14vh,9rem)] px-4 py-4'
         }`}
+        disabled={completionDisabled || isAnimating}
+        aria-label={
+          approvalRequired
+            ? `Request approval for ${chore.title}`
+            : `Complete ${chore.title}`
+        }
       >
-        <button
-          type="button"
-          onClick={handlePrimaryAction}
-          className={`group flex items-center justify-center border-r border-slate-200 bg-[var(--accent-soft)] transition active:bg-white focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-[var(--accent)] disabled:cursor-wait disabled:opacity-55 dark:border-slate-700 dark:active:bg-slate-800 ${
-            compact ? 'w-16' : 'w-[4.75rem] sm:w-[5.25rem]'
-          }`}
-          disabled={completionDisabled || isAnimating}
-          aria-label={
-            approvalRequired
-              ? `Request approval for ${chore.title}`
-              : `Complete ${chore.title}`
-          }
-        >
+        <span className="flex items-start gap-3">
           <span
-            className={`flex items-center justify-center rounded-full border-[3px] bg-white text-[var(--accent)] shadow-sm transition group-active:scale-90 dark:bg-slate-900 ${
-              compact ? 'h-9 w-9' : 'h-12 w-12 sm:h-14 sm:w-14'
-            }`}
-            style={{ borderColor: accent }}
             aria-hidden="true"
+            className={`flex shrink-0 items-center justify-center rounded-xl bg-[var(--accent-soft)] leading-none transition group-active:scale-95 ${
+              compact ? 'h-9 w-9 text-xl' : 'h-11 w-11 text-2xl'
+            }`}
           >
-            {isPending || isAnimating ? (
-              <span className="text-lg">…</span>
-            ) : approvalRequested ? (
-              <span className="text-base">⏳</span>
-            ) : approvalRequired ? (
-              <span className="text-base">🔐</span>
-            ) : (
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                className={compact ? 'h-5 w-5' : 'h-6 w-6'}
-              >
-                <path
-                  d="m6.5 12.5 3.3 3.3 7.7-8"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2.5"
-                />
-              </svg>
-            )}
+            {chore.emoji}
           </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={handlePrimaryAction}
-          className={`flex min-w-0 flex-col justify-center px-3 text-left text-slate-950 transition active:bg-[var(--accent-soft)] focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-[var(--accent)] disabled:cursor-wait disabled:opacity-55 dark:text-white sm:px-4 ${
-            compact ? 'py-3' : 'py-4'
-          }`}
-          disabled={completionDisabled || isAnimating}
-        >
-          <span className="flex items-start gap-2.5">
-            <span
-              aria-hidden="true"
-              className={
-                compact ? 'text-xl leading-none' : 'text-3xl leading-none'
-              }
-            >
-              {chore.emoji}
+          <span
+            className={`min-w-0 pt-0.5 font-black leading-[1.08] tracking-[-0.025em] ${
+              compact
+                ? 'text-base sm:text-lg'
+                : 'text-[clamp(1.15rem,1.35vw,1.6rem)]'
+            }`}
+          >
+            {chore.title}
+          </span>
+        </span>
+        <span className="mt-3 flex flex-wrap items-center gap-1.5 pl-14 text-xs font-bold">
+          <span className="text-amber-700 dark:text-amber-300">
+            +{formatStarLabel(chore.stars)}
+          </span>
+          <span
+            aria-hidden="true"
+            className="text-slate-300 dark:text-slate-600"
+          >
+            ·
+          </span>
+          <span className="text-[10px] uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">
+            {isPending || isAnimating
+              ? 'Finishing…'
+              : approvalRequested
+                ? 'Waiting for parent'
+                : approvalRequired
+                  ? 'Parent approval'
+                  : 'Tap when done'}
+          </span>
+          {isNew ? (
+            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] uppercase tracking-wide text-amber-800 dark:bg-amber-900/60 dark:text-amber-100">
+              New
             </span>
-            <span
-              className={`min-w-0 font-black leading-[1.08] tracking-[-0.025em] ${
-                compact
-                  ? 'text-base sm:text-lg'
-                  : 'text-[clamp(1.15rem,1.35vw,1.7rem)]'
-              }`}
-            >
-              {chore.title}
-            </span>
-          </span>
-          <span className="mt-2.5 flex flex-wrap items-center gap-1.5 text-xs font-bold text-amber-700 dark:text-amber-300">
-            <span>+{formatStarLabel(chore.stars)}</span>
-            {isNew ? (
-              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] uppercase tracking-wide text-amber-800 dark:bg-amber-900/60 dark:text-amber-100">
-                New
-              </span>
-            ) : null}
-            {approvalRequired ? (
-              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] uppercase tracking-wide text-amber-800 dark:bg-amber-900/60 dark:text-amber-100">
-                {approvalRequested ? 'Waiting for parent' : 'Parent OK'}
-              </span>
-            ) : null}
-          </span>
-        </button>
+          ) : null}
+        </span>
+      </button>
 
-        <button
-          type="button"
-          onClick={openDetails}
-          className="flex w-11 items-center justify-center border-l border-slate-200 text-xl font-black tracking-widest text-slate-400 transition active:bg-[var(--accent-soft)] active:text-slate-900 focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-[var(--accent)] dark:border-slate-700 dark:text-slate-500 dark:active:text-white sm:w-12"
-          aria-label={`More options for ${chore.title}`}
-        >
-          <span aria-hidden="true" className="-translate-y-1">
-            …
-          </span>
-        </button>
-        {approvalRequested ? (
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1 bg-amber-300" />
-        ) : null}
-      </div>
+      <button
+        type="button"
+        onClick={openDetails}
+        className="absolute right-2 top-2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/80 text-lg font-black tracking-widest text-slate-400 shadow-sm ring-1 ring-slate-200/80 backdrop-blur transition active:bg-[var(--accent-soft)] active:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] dark:bg-slate-800/90 dark:text-slate-400 dark:ring-slate-700 dark:active:text-white"
+        aria-label={`More options for ${chore.title}`}
+      >
+        <span aria-hidden="true" className="-translate-y-1">
+          …
+        </span>
+      </button>
+      {approvalRequested ? (
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1 bg-amber-300" />
+      ) : null}
       {detailsModal}
       {skipConfirmModal}
     </div>
