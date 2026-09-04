@@ -472,8 +472,11 @@ export function KidBoard({
             {periodDetails.label} chores
           </h2>
         </div>
-        <div className="hidden rounded-full border border-white/70 bg-white/70 px-3 py-1.5 text-xs font-bold text-slate-600 shadow-sm backdrop-blur-md dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 sm:block">
-          by {choreTimeDeadlineLabel(currentPeriod)}
+        <div className="hidden items-center gap-2 rounded-full border border-amber-200/80 bg-amber-50/90 px-3 py-1.5 text-xs font-bold text-slate-700 shadow-sm backdrop-blur-md dark:border-amber-700/60 dark:bg-amber-950/80 dark:text-amber-50 sm:flex">
+          <span>Finish by {choreTimeDeadlineLabel(currentPeriod)}</span>
+          <span className="text-amber-700 dark:text-amber-300">
+            +1 ⭐ this period
+          </span>
         </div>
       </div>
 
@@ -775,6 +778,12 @@ function KidColumn({
       </div>
 
       <div className="border-b border-slate-200/80 px-3 py-2.5 dark:border-slate-800 md:px-4">
+        <div className="mb-2 flex items-center justify-between gap-3 px-1 text-[10px] font-bold uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">
+          <span>Each finished period earns</span>
+          <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-amber-800 dark:bg-amber-900/60 dark:text-amber-200">
+            +1 star ⭐
+          </span>
+        </div>
         <div
           className="grid grid-cols-4 gap-1 rounded-xl bg-slate-100/80 p-1 dark:bg-slate-900"
           aria-label="Today's chore periods"
@@ -872,7 +881,7 @@ function KidColumn({
               </h3>
               <p className="mt-1 max-w-64 text-sm font-medium leading-snug text-slate-500 dark:text-slate-300">
                 {currentDone.length
-                  ? 'Nice work. This time is yours now.'
+                  ? 'You finished the period and earned 1 star. Nice work!'
                   : 'Nothing is due right now. Check bonus chores if you want to earn more stars.'}
               </p>
             </div>
