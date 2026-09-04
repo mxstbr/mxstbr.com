@@ -13,14 +13,14 @@ import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useReward } from 'react-rewards'
-import type { Chore, Completion, Kid } from './data'
+import type { Chore, Completion, Kid } from '../chores/data'
 import {
   completeChore,
   requestApproval,
   setKidColor,
   skipChore,
   undoChore,
-} from './actions'
+} from '../chores/actions'
 import {
   DAILY_BONUS_STARS,
   type DailyChoreProgress,
@@ -31,8 +31,8 @@ import {
   sortByTimeOfDay,
   starsForKid,
   withAlpha,
-} from './utils'
-import { useRandomAudioCue } from './use-audio-cue'
+} from '../chores/utils'
+import { useRandomAudioCue } from '../chores/use-audio-cue'
 
 type FreshChore = Chore & { isNew?: boolean }
 
@@ -72,54 +72,33 @@ type ApprovalRequest = {
 type ApprovalRequestLookup = Record<string, Record<string, boolean>>
 
 type TimeGroupKey = 'morning' | 'afternoon' | 'evening' | 'night' | 'any'
+type ScheduledPeriod = Exclude<TimeGroupKey, 'any'>
 
 const REWARD_TARGET_ID = 'chores-reward-target'
 const BONUS_REWARD_TARGET_ID = 'chores-bonus-target'
-const RECOLLAPSE_IDLE_MS = 45_000
 const APPROVAL_REQUESTS_KEY = 'chores:approval-requests'
-const PERSISTENT_GROUPS: TimeGroupKey[] = ['evening']
+
+const SCHEDULED_PERIODS: {
+  key: ScheduledPeriod
+  label: string
+  emoji: string
+}[] = [
+  { key: 'morning', label: 'Morning', emoji: '🌅' },
+  { key: 'afternoon', label: 'Afternoon', emoji: '☀️' },
+  { key: 'evening', label: 'Evening', emoji: '🌙' },
+  { key: 'night', label: 'Night', emoji: '🌌' },
+]
 
 const approvalRequestKey = (kidId: string, choreId: string) =>
   `${kidId}:${choreId}`
 const formatStarLabel = (stars: number) =>
   `${stars} ${stars === 1 ? 'star' : 'stars'}`
 
-/**
- * Time-based auto-collapse behavior for chore groups:
- *
- * - Before 12:00 PM: Morning group is open; Afternoon, Evening, Night, and Bonus are collapsed
- * - 12:00 PM - 5:00 PM: Afternoon group is open; Morning, Evening, Night, and Bonus are collapsed
- * - 5:00 PM - 7:00 PM: Evening group is open; Morning, Afternoon, Night, and Bonus are collapsed
- * - 7:00 PM - 10:00 PM: Night group is open; Morning and Afternoon are collapsed
- * - After 10:00 PM: Morning, Afternoon, Evening, and Night are collapsed
- *
- * The "Bonus" group is always collapsed by default but can be manually expanded.
- * Groups automatically expand/collapse when crossing time thresholds (12pm, 5pm, 7pm, 10pm).
- * Manually expanded groups stay open while the user interacts, but non-persistent groups
- * will auto-recollapse after 45 seconds of inactivity. Persistent groups (like evening)
- * will remain expanded even after idle time.
- */
-function shouldAutoCollapse(
-  mode: KidBoardProps['mode'],
-  minutes: number,
-  key: TimeGroupKey,
-): boolean {
-  if (mode !== 'today') return false
-  if (key === 'any') return true
-  if (minutes < 12 * 60) {
-    return key !== 'morning'
-  }
-  if (minutes < 17 * 60) {
-    return key !== 'afternoon'
-  }
-  if (minutes < 19 * 60) {
-    return key !== 'evening'
-  }
-  if (minutes < 22 * 60) {
-    return key !== 'evening' && key !== 'night'
-  }
-
-  return true
+function currentPeriodFor(minutes: number): ScheduledPeriod {
+  if (minutes < 12 * 60) return 'morning'
+  if (minutes < 17 * 60) return 'afternoon'
+  if (minutes < 19 * 60) return 'evening'
+  return 'night'
 }
 
 function approvalReasonFor(
@@ -133,9 +112,6 @@ function approvalReasonFor(
   if (hasChoreTimePassed(chore.timeOfDay, minutes)) return 'elapsed'
   return null
 }
-
-const shouldPersistExpansion = (key: TimeGroupKey) =>
-  PERSISTENT_GROUPS.includes(key)
 
 export function KidBoard({
   columns,
@@ -468,9 +444,13 @@ export function KidBoard({
   const approvalRequestsForDay = approvalRequests[dayIso] ?? {}
   const mobileColumn =
     columns.find((col) => col.kid.id === activeKidId) ?? columns[0]
+  const currentPeriod = currentPeriodFor(pacificMinutes)
+  const periodDetails =
+    SCHEDULED_PERIODS.find((period) => period.key === currentPeriod) ??
+    SCHEDULED_PERIODS[0]
 
   return (
-    <div className="full-bleed md:h-full md:min-h-0">
+    <div className="flex min-h-0 flex-col md:h-full">
       <span
         id={REWARD_TARGET_ID}
         className="pointer-events-none fixed bottom-4 left-1/2 z-40 -translate-x-1/2 text-2xl md:bottom-6"
@@ -481,38 +461,62 @@ export function KidBoard({
         className="pointer-events-none fixed top-6 left-1/2 z-40 -translate-x-1/2 text-2xl"
         aria-hidden="true"
       />
-      <div className="md:hidden">
-        <label className="mb-2 block text-xs font-semibold text-slate-700 dark:text-slate-200">
-          Select kid
-        </label>
-        <select
-          value={mobileColumn?.kid.id}
-          onChange={(event) => handleKidChange(event.target.value)}
-          className="mb-4 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-900 shadow-xs dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
-        >
-          {columns.map((col) => (
-            <option key={col.kid.id} value={col.kid.id}>
-              {col.kid.name}
-            </option>
-          ))}
-        </select>
+      <div className="mb-4 flex shrink-0 items-end justify-between gap-4 px-1 md:mb-5">
+        <div>
+          <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-300">
+            Right now
+          </div>
+          <h2 className="mt-0.5 flex items-center gap-2 text-2xl font-black tracking-tight text-slate-950 dark:text-white md:text-3xl">
+            <span aria-hidden="true" className="text-xl md:text-2xl">
+              {periodDetails.emoji}
+            </span>
+            {periodDetails.label} chores
+          </h2>
+        </div>
+        <div className="hidden rounded-full border border-white/70 bg-white/70 px-3 py-1.5 text-xs font-bold text-slate-600 shadow-sm backdrop-blur-md dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 sm:block">
+          by {choreTimeDeadlineLabel(currentPeriod)}
+        </div>
+      </div>
+
+      <div className="mb-3 grid grid-cols-3 gap-1 rounded-2xl border border-white/70 bg-white/65 p-1 shadow-sm backdrop-blur-md dark:border-slate-700 dark:bg-slate-900/70 md:hidden">
+        {columns.map((column) => {
+          const isActive = column.kid.id === mobileColumn?.kid.id
+          return (
+            <button
+              key={column.kid.id}
+              type="button"
+              onClick={() => handleKidChange(column.kid.id)}
+              className={`rounded-xl px-3 py-2 text-sm font-bold transition ${
+                isActive
+                  ? 'bg-slate-950 text-white shadow-sm dark:bg-white dark:text-slate-950'
+                  : 'text-slate-600 active:bg-white/80 dark:text-slate-300 dark:active:bg-slate-800'
+              }`}
+              aria-pressed={isActive}
+            >
+              {column.kid.name}
+            </button>
+          )
+        })}
+      </div>
+
+      <div className="min-h-0 flex-1 md:hidden">
         {mobileColumn ? (
           <KidColumn
             kid={mobileColumn.kid}
             chores={sortByTimeOfDay(mobileColumn.chores)}
             doneChores={mobileColumn.done}
             starTotal={totals[mobileColumn.kid.id] ?? 0}
-            progress={mobileColumn.progress}
             onComplete={beginCompletion}
             onUndo={handleUndo}
             onBonusAwarded={handleBonusAward}
             mode={mode}
             pacificMinutes={pacificMinutes}
             approvalRequestsForDay={approvalRequestsForDay}
+            currentPeriod={currentPeriod}
           />
         ) : null}
       </div>
-      <div className="hidden h-full min-h-0 grid-cols-1 gap-4 sm:gap-6 md:grid md:grid-cols-3 md:px-4">
+      <div className="hidden min-h-0 flex-1 auto-rows-fr grid-cols-1 items-stretch gap-4 md:grid md:grid-cols-3 xl:gap-5">
         {columns.map((column) => (
           <KidColumn
             key={column.kid.id}
@@ -520,13 +524,13 @@ export function KidBoard({
             chores={sortByTimeOfDay(column.chores)}
             doneChores={column.done}
             starTotal={totals[column.kid.id] ?? 0}
-            progress={column.progress}
             onComplete={beginCompletion}
             onUndo={handleUndo}
             onBonusAwarded={handleBonusAward}
             mode={mode}
             pacificMinutes={pacificMinutes}
             approvalRequestsForDay={approvalRequestsForDay}
+            currentPeriod={currentPeriod}
           />
         ))}
       </div>
@@ -703,20 +707,19 @@ function KidColumn({
   chores,
   doneChores,
   starTotal,
-  progress,
   onComplete,
   onUndo,
   onBonusAwarded,
   mode,
   pacificMinutes,
   approvalRequestsForDay,
+  currentPeriod,
   disableCompletion = false,
 }: {
   kid: Kid
   chores: FreshChore[]
   doneChores: { chore: FreshChore; completionId: string }[]
   starTotal: number
-  progress: DailyChoreProgress
   onComplete: (
     chore: FreshChore,
     kidId: string,
@@ -732,6 +735,7 @@ function KidColumn({
   mode: KidBoardProps['mode']
   pacificMinutes: number
   approvalRequestsForDay: Record<string, boolean>
+  currentPeriod: ScheduledPeriod
   disableCompletion?: boolean
 }) {
   const router = useRouter()
@@ -740,8 +744,11 @@ function KidColumn({
   const [colorModalOpen, setColorModalOpen] = useState(false)
   const [pendingColor, setPendingColor] = useState(accent)
   const [isSavingColor, setIsSavingColor] = useState(false)
+  const [bonusOpen, setBonusOpen] = useState(false)
+  const [doneOpen, setDoneOpen] = useState(false)
   const accentColor = accentOverride ?? accent
-  const accentSoft = withAlpha(accentColor, 0.12)
+  const accentSoft = withAlpha(accentColor, 0.1)
+  const accentMid = withAlpha(accentColor, 0.22)
   const swatches = [
     '#0ea5e9',
     '#8b5cf6',
@@ -752,147 +759,22 @@ function KidColumn({
     '#f472b6',
     '#6366f1',
   ]
-  const timeGroups = useMemo<
-    { key: TimeGroupKey; label: string; emoji?: string }[]
-  >(
-    () => [
-      {
-        key: 'morning',
-        label: `Morning (by ${choreTimeDeadlineLabel('morning')})`,
-        emoji: '🌅',
-      },
-      {
-        key: 'afternoon',
-        label: `Afternoon (by ${choreTimeDeadlineLabel('afternoon')})`,
-        emoji: '☀️',
-      },
-      {
-        key: 'evening',
-        label: `Evening (by ${choreTimeDeadlineLabel('evening')})`,
-        emoji: '🌙',
-      },
-      {
-        key: 'night',
-        label: `Night (by ${choreTimeDeadlineLabel('night')})`,
-        emoji: '🌌',
-      },
-      { key: 'any', label: 'Bonus' },
-    ],
-    [],
+  const currentChores = chores.filter(
+    (chore) => chore.timeOfDay === currentPeriod,
   )
-  const [collapsedGroups, setCollapsedGroups] = useState<
-    Record<TimeGroupKey, boolean>
-  >(() => {
-    const initial: Record<TimeGroupKey, boolean> = {
-      morning: false,
-      afternoon: false,
-      evening: false,
-      night: false,
-      any: false,
-    }
-    for (const group of timeGroups) {
-      initial[group.key] = shouldAutoCollapse(mode, pacificMinutes, group.key)
-    }
-    return initial
-  })
-  const [collapsedDone, setCollapsedDone] = useState(true)
-  const manualExpansions = useRef<Set<TimeGroupKey>>(new Set())
-  const doneExpansion = useRef(false)
-  const recollapseTimer = useRef<number | undefined>(undefined)
-  const choresByTime: Record<TimeGroupKey, Chore[]> = {
-    morning: [],
-    afternoon: [],
-    evening: [],
-    night: [],
-    any: [],
-  }
-  const completedCount = progress.completed + progress.skipped
-  const progressPercent = progress.total
-    ? Math.min(100, Math.round((completedCount / progress.total) * 100))
-    : 0
-
-  const scheduleRecollapse = useCallback(() => {
-    if (recollapseTimer.current) {
-      window.clearTimeout(recollapseTimer.current)
-    }
-
-    const needsRecollapse =
-      Array.from(manualExpansions.current).some(
-        (key) =>
-          !shouldPersistExpansion(key) &&
-          shouldAutoCollapse(mode, pacificMinutes, key),
-      ) ||
-      (doneExpansion.current && !collapsedDone)
-    if (!needsRecollapse) return
-
-    recollapseTimer.current = window.setTimeout(() => {
-      setCollapsedGroups((prev) => {
-        let changed = false
-        const next = { ...prev }
-        const remainingExpansions = new Set<TimeGroupKey>()
-        for (const key of Array.from(manualExpansions.current)) {
-          if (shouldPersistExpansion(key)) {
-            remainingExpansions.add(key)
-            continue
-          }
-          if (shouldAutoCollapse(mode, pacificMinutes, key) && !next[key]) {
-            next[key] = true
-            changed = true
-          }
-        }
-        manualExpansions.current = remainingExpansions
-        return changed ? next : prev
-      })
-      setCollapsedDone((prev) => {
-        if (!doneExpansion.current || prev) return prev
-        doneExpansion.current = false
-        return true
-      })
-    }, RECOLLAPSE_IDLE_MS)
-  }, [collapsedDone, mode, pacificMinutes])
-
-  useEffect(() => {
-    setCollapsedGroups((prev) => {
-      let changed = false
-      const next = { ...prev }
-      for (const group of timeGroups) {
-        const autoCollapse = shouldAutoCollapse(mode, pacificMinutes, group.key)
-        if (!autoCollapse) {
-          if (next[group.key]) {
-            next[group.key] = false
-            changed = true
-          }
-          if (!shouldPersistExpansion(group.key)) {
-            manualExpansions.current.delete(group.key)
-          }
-          continue
-        }
-        if (manualExpansions.current.has(group.key)) continue
-        if (!next[group.key]) {
-          next[group.key] = true
-          changed = true
-        }
-      }
-      return changed ? next : prev
-    })
-  }, [mode, pacificMinutes, timeGroups])
-
-  useEffect(() => {
-    const events = ['click', 'keydown', 'pointermove', 'touchstart']
-    const handleInteraction = () => scheduleRecollapse()
-    events.forEach((event) =>
-      window.addEventListener(event, handleInteraction, { passive: true }),
-    )
-    scheduleRecollapse()
-    return () => {
-      if (recollapseTimer.current) {
-        window.clearTimeout(recollapseTimer.current)
-      }
-      events.forEach((event) =>
-        window.removeEventListener(event, handleInteraction),
-      )
-    }
-  }, [scheduleRecollapse])
+  const currentDone = doneChores.filter(
+    ({ chore }) => chore.timeOfDay === currentPeriod,
+  )
+  const bonusChores = chores.filter(
+    (chore) => !SCHEDULED_PERIODS.some(({ key }) => key === chore.timeOfDay),
+  )
+  const bonusDone = doneChores.filter(
+    ({ chore }) =>
+      !SCHEDULED_PERIODS.some(({ key }) => key === chore.timeOfDay),
+  )
+  const currentPeriodLabel =
+    SCHEDULED_PERIODS.find(({ key }) => key === currentPeriod)?.label ??
+    'Current'
 
   useEffect(() => {
     setAccentOverride(accent)
@@ -915,54 +797,18 @@ function KidColumn({
     }
   }
 
-  const toggleGroup = (key: TimeGroupKey) => {
-    setCollapsedGroups((prev) => {
-      const nextCollapsed = !prev[key]
-      const next = { ...prev, [key]: nextCollapsed }
-      if (
-        !nextCollapsed &&
-        (shouldAutoCollapse(mode, pacificMinutes, key) ||
-          shouldPersistExpansion(key))
-      ) {
-        manualExpansions.current.add(key)
-      } else if (nextCollapsed) {
-        manualExpansions.current.delete(key)
-      }
-      return next
-    })
-    scheduleRecollapse()
-  }
-
-  for (const chore of chores) {
-    if (chore.timeOfDay === 'morning') {
-      choresByTime.morning.push(chore)
-    } else if (chore.timeOfDay === 'afternoon') {
-      choresByTime.afternoon.push(chore)
-    } else if (chore.timeOfDay === 'evening') {
-      choresByTime.evening.push(chore)
-    } else if (chore.timeOfDay === 'night') {
-      choresByTime.night.push(chore)
-    } else {
-      choresByTime.any.push(chore)
-    }
-  }
-
   return (
     <div
-      className="flex min-h-0 flex-col overflow-hidden rounded-2xl border bg-white p-3 shadow-xs dark:bg-slate-900 md:h-full md:min-h-0"
+      className="flex min-h-[34rem] flex-col overflow-hidden rounded-[1.75rem] border bg-white/95 shadow-[0_22px_70px_-36px_rgba(15,23,42,0.45)] backdrop-blur-xl dark:bg-slate-950/95 md:h-full md:min-h-0"
       style={{
-        borderColor: accentColor,
-        backgroundColor: accentSoft,
-        boxShadow: `0 14px 40px -22px ${accentSoft}, inset 0 1px 0 ${accentSoft}`,
+        borderColor: accentMid,
       }}
     >
       <div
-        className="-mx-3 -mt-3 flex flex-wrap items-center gap-3 px-3 py-2"
+        className="flex items-center justify-between gap-3 border-b px-4 py-3.5 md:px-5"
         style={{
+          borderColor: accentMid,
           backgroundColor: accentSoft,
-          boxShadow: `0 10px 30px -25px ${accentColor}`,
-          backdropFilter: 'blur(6px)',
-          WebkitBackdropFilter: 'blur(6px)',
         }}
       >
         <button
@@ -971,187 +817,237 @@ function KidColumn({
             setPendingColor(accentColor)
             setColorModalOpen(true)
           }}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-slate-900 transition hover:text-slate-700 dark:text-slate-50 dark:hover:text-slate-200 xl:text-base"
+          className="group inline-flex items-center gap-2 rounded-lg text-left text-xl font-black tracking-tight text-slate-950 transition hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 dark:text-white md:text-2xl"
           aria-label={`Change ${kid.name}'s color`}
         >
           <span>{kid.name}</span>
-          <span aria-hidden="true" className="text-base text-slate-500">
+          <span
+            aria-hidden="true"
+            className="text-lg font-semibold text-slate-400 transition-transform group-hover:translate-x-0.5"
+          >
             ›
           </span>
         </button>
-        <div className="min-w-[120px] flex-1">
-          <div className="relative h-5 overflow-hidden rounded-full border border-slate-200/70 bg-slate-100/80 dark:border-slate-700 dark:bg-slate-800/80">
-            <div
-              className="h-full rounded-full transition-all duration-500 ease-out"
-              style={{
-                width: `${progressPercent}%`,
-                backgroundColor: accentColor,
-              }}
-              aria-hidden="true"
-            />
-            <div className="absolute inset-0 flex items-center justify-center text-[10px] font-semibold text-slate-700 dark:text-slate-100">
-              {progress.total > 0 ? (
-                <span className="inline-flex items-center gap-1">
-                  <span>{completedCount}</span>
-                  <span className="text-slate-400">/</span>
-                  <span>{progress.total}</span>
-                  <span className="text-slate-400">|</span>
-                  <span className="text-slate-900 drop-shadow-sm dark:text-slate-50">
-                    +{DAILY_BONUS_STARS} ⭐️
-                  </span>
-                </span>
-              ) : (
-                <span>No chores today</span>
-              )}
-            </div>
-          </div>
-        </div>
         <StarBadge value={starTotal} accent={accentColor} />
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pt-3">
-        <div className="space-y-3">
-          {chores.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-center text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200">
-              All clear! Come back when something new pops up.
-            </div>
+      <div className="border-b border-slate-200/80 px-3 py-3 dark:border-slate-800 md:px-4">
+        <div className="grid grid-cols-4" aria-label="Today's chore periods">
+          {SCHEDULED_PERIODS.map((period, index) => {
+            const openCount = chores.filter(
+              (chore) => chore.timeOfDay === period.key,
+            ).length
+            const doneCount = doneChores.filter(
+              ({ chore }) => chore.timeOfDay === period.key,
+            ).length
+            const isComplete = doneCount > 0 && openCount === 0
+            const isCurrent = period.key === currentPeriod
+
+            return (
+              <div
+                key={period.key}
+                className="relative flex min-w-0 flex-col items-center gap-1"
+                title={`${period.label}: ${doneCount} done, ${openCount} left`}
+              >
+                {index > 0 ? (
+                  <span
+                    aria-hidden="true"
+                    className="absolute right-1/2 top-3 h-px w-full bg-slate-200 dark:bg-slate-700"
+                  />
+                ) : null}
+                <span
+                  className={`relative z-10 flex h-6 w-6 items-center justify-center rounded-full border text-[11px] font-black transition ${
+                    isComplete
+                      ? 'text-white'
+                      : isCurrent
+                        ? 'bg-white text-slate-950 dark:bg-slate-900 dark:text-white'
+                        : 'border-slate-200 bg-slate-100 text-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-500'
+                  }`}
+                  style={
+                    isComplete
+                      ? {
+                          backgroundColor: accentColor,
+                          borderColor: accentColor,
+                        }
+                      : isCurrent
+                        ? {
+                            borderColor: accentColor,
+                            boxShadow: `0 0 0 3px ${accentSoft}`,
+                          }
+                        : undefined
+                  }
+                  aria-label={
+                    isComplete
+                      ? `${period.label} complete`
+                      : isCurrent
+                        ? `${period.label}, current period`
+                        : period.label
+                  }
+                >
+                  {isComplete ? '✓' : isCurrent ? period.emoji : ''}
+                </span>
+                <span
+                  className={`truncate text-[9px] font-bold uppercase tracking-wide sm:text-[10px] ${
+                    isCurrent
+                      ? 'text-slate-900 dark:text-slate-100'
+                      : 'text-slate-400 dark:text-slate-500'
+                  }`}
+                >
+                  {period.label}
+                </span>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-3 py-3 md:px-4 md:py-4">
+        <div className="flex flex-col gap-3">
+          {currentChores.length ? (
+            currentChores.map((chore) => (
+              <ChoreButton
+                key={chore.id}
+                chore={chore}
+                accent={accentColor}
+                kidId={kid.id}
+                onComplete={onComplete}
+                onBonusAwarded={onBonusAwarded}
+                disabled={disableCompletion}
+                approvalRequested={
+                  approvalRequestsForDay[
+                    approvalRequestKey(kid.id, chore.id)
+                  ] ?? false
+                }
+                approvalRequired={Boolean(
+                  approvalReasonFor(chore, mode, pacificMinutes),
+                )}
+                skipDisabled={
+                  mode !== 'today' ||
+                  hasChoreTimePassed(chore.timeOfDay, pacificMinutes)
+                }
+              />
+            ))
           ) : (
-            timeGroups
-              .map((group) => ({
-                ...group,
-                items: choresByTime[group.key],
-              }))
-              .filter((group) => group.items.length > 0)
-              .map((group) => {
-                const collapsed = collapsedGroups[group.key]
-                return (
-                  <div key={group.key} className="space-y-1.5">
-                    <button
-                      type="button"
-                      onClick={() => toggleGroup(group.key)}
-                      className="-mx-1.5 -my-1 flex w-full items-center gap-2 rounded-md px-1.5 py-1 text-left text-sm font-semibold uppercase tracking-wide text-slate-600 transition hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100"
-                      aria-expanded={!collapsed}
-                    >
-                      <svg
-                        aria-hidden="true"
-                        viewBox="0 0 20 20"
-                        className={`h-4 w-4 text-slate-500 transition-transform ${
-                          collapsed ? '' : 'rotate-90'
-                        }`}
-                      >
-                        <path
-                          d="m7 5 6 5-6 5"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                        />
-                      </svg>
-                      {group.emoji ? (
-                        <span aria-hidden="true" className="text-sm">
-                          {group.emoji}
-                        </span>
-                      ) : null}
-                      <span>{group.label}</span>
-                      {collapsed && group.key !== 'any' ? (
-                        <span className="ml-auto rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
-                          {group.items.length} left
-                        </span>
-                      ) : null}
-                    </button>
-                    {!collapsed ? (
-                      <div className="mt-1.5 space-y-2">
-                        {group.items.map((chore) => (
-                          <ChoreButton
-                            key={chore.id}
-                            chore={chore}
-                            accent={accentColor}
-                            kidId={kid.id}
-                            onComplete={onComplete}
-                            onBonusAwarded={onBonusAwarded}
-                            disabled={disableCompletion}
-                            approvalRequested={
-                              approvalRequestsForDay[
-                                approvalRequestKey(kid.id, chore.id)
-                              ] ?? false
-                            }
-                            approvalRequired={Boolean(
-                              approvalReasonFor(chore, mode, pacificMinutes),
-                            )}
-                            skipDisabled={
-                              mode !== 'today' ||
-                              hasChoreTimePassed(
-                                chore.timeOfDay,
-                                pacificMinutes,
-                              )
-                            }
-                          />
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
-                )
-              })
+            <div
+              className="flex min-h-52 flex-col items-center justify-center rounded-3xl border border-dashed px-5 py-8 text-center"
+              style={{ borderColor: accentMid, backgroundColor: accentSoft }}
+            >
+              <span
+                className="flex h-16 w-16 items-center justify-center rounded-full text-3xl font-black text-white shadow-sm"
+                style={{ backgroundColor: accentColor }}
+                aria-hidden="true"
+              >
+                {currentDone.length ? '✓' : '—'}
+              </span>
+              <h3 className="mt-4 text-xl font-black tracking-tight text-slate-950 dark:text-white">
+                {currentDone.length
+                  ? `${currentPeriodLabel} is all done`
+                  : `No ${currentPeriodLabel.toLowerCase()} chores`}
+              </h3>
+              <p className="mt-1 max-w-64 text-sm font-medium leading-snug text-slate-500 dark:text-slate-300">
+                {currentDone.length
+                  ? 'Nice work. This time is yours now.'
+                  : 'Nothing is due right now. Check bonus chores if you want to earn more stars.'}
+              </p>
+            </div>
           )}
         </div>
 
-        {doneChores.length ? (
-          <div className="mt-5 space-y-2 md:mt-6">
-            <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
+        <div className="mt-auto space-y-2 pt-5">
+          {currentDone.length ? (
+            <div>
               <button
                 type="button"
-                onClick={() =>
-                  setCollapsedDone((prev) => {
-                    const next = !prev
-                    doneExpansion.current = !next
-                    return next
-                  })
-                }
-                className="-mx-1 -my-1 inline-flex items-center gap-2 rounded-md px-1 py-1 transition hover:text-slate-900 dark:hover:text-slate-100"
-                aria-expanded={!collapsedDone}
+                onClick={() => setDoneOpen((open) => !open)}
+                className="flex w-full items-center gap-2 rounded-xl px-2 py-2 text-left text-xs font-bold uppercase tracking-[0.12em] text-slate-500 transition active:bg-slate-100 dark:text-slate-400 dark:active:bg-slate-800"
+                aria-expanded={doneOpen}
               >
-                <svg
+                <span
                   aria-hidden="true"
-                  viewBox="0 0 20 20"
-                  className={`h-4 w-4 text-slate-500 transition-transform ${
-                    collapsedDone ? '' : 'rotate-90'
-                  }`}
+                  className={`transition-transform ${doneOpen ? 'rotate-90' : ''}`}
                 >
-                  <path
-                    d="m7 5 6 5-6 5"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                  />
-                </svg>
-                <span>Done today</span>
-              </button>
-              <span className="h-px flex-1 rounded-full bg-slate-200 dark:bg-slate-700" />
-              {collapsedDone ? (
-                <span className="rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
-                  {doneChores.length} done
+                  ›
                 </span>
+                Done this period
+                <span className="ml-auto rounded-full bg-slate-100 px-2 py-0.5 tabular-nums text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                  {currentDone.length}
+                </span>
+              </button>
+              {doneOpen ? (
+                <div className="mt-2 space-y-2">
+                  {currentDone.map((entry) => (
+                    <CompletedChoreButton
+                      key={`${entry.chore.id}-${entry.completionId}`}
+                      chore={entry.chore}
+                      completionId={entry.completionId}
+                      accent={accentColor}
+                      kidId={kid.id}
+                      onUndo={onUndo}
+                    />
+                  ))}
+                </div>
               ) : null}
             </div>
-            {!collapsedDone ? (
-              <div className="space-y-2">
-                {doneChores.map((entry) => (
-                  <CompletedChoreButton
-                    key={`${entry.chore.id}-${entry.completionId}`}
-                    chore={entry.chore}
-                    completionId={entry.completionId}
-                    accent={accentColor}
-                    kidId={kid.id}
-                    onUndo={onUndo}
-                  />
-                ))}
-              </div>
-            ) : null}
-          </div>
-        ) : null}
+          ) : null}
+
+          {bonusChores.length || bonusDone.length ? (
+            <div>
+              <button
+                type="button"
+                onClick={() => setBonusOpen((open) => !open)}
+                className="flex w-full items-center gap-2 rounded-xl px-2 py-2 text-left text-xs font-bold uppercase tracking-[0.12em] text-slate-500 transition active:bg-slate-100 dark:text-slate-400 dark:active:bg-slate-800"
+                aria-expanded={bonusOpen}
+              >
+                <span aria-hidden="true">✦</span>
+                Bonus chores
+                <span
+                  aria-hidden="true"
+                  className={`ml-0.5 transition-transform ${bonusOpen ? 'rotate-90' : ''}`}
+                >
+                  ›
+                </span>
+                <span className="ml-auto rounded-full bg-slate-100 px-2 py-0.5 tabular-nums text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                  {bonusChores.length}
+                </span>
+              </button>
+              {bonusOpen ? (
+                <div className="mt-2 space-y-2">
+                  {bonusChores.map((chore) => (
+                    <ChoreButton
+                      key={chore.id}
+                      chore={chore}
+                      accent={accentColor}
+                      kidId={kid.id}
+                      onComplete={onComplete}
+                      onBonusAwarded={onBonusAwarded}
+                      compact
+                      disabled={disableCompletion}
+                      approvalRequested={
+                        approvalRequestsForDay[
+                          approvalRequestKey(kid.id, chore.id)
+                        ] ?? false
+                      }
+                      approvalRequired={Boolean(
+                        approvalReasonFor(chore, mode, pacificMinutes),
+                      )}
+                      skipDisabled={mode !== 'today'}
+                    />
+                  ))}
+                  {bonusDone.map((entry) => (
+                    <CompletedChoreButton
+                      key={`${entry.chore.id}-${entry.completionId}`}
+                      chore={entry.chore}
+                      completionId={entry.completionId}
+                      accent={accentColor}
+                      kidId={kid.id}
+                      onUndo={onUndo}
+                    />
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
       </div>
 
       {colorModalOpen ? (
@@ -1233,10 +1129,13 @@ function StarBadge({ value, accent }: { value: number; accent: string }) {
 
   return (
     <div
-      className="flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold shadow-xs"
+      className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-black shadow-xs"
       style={{ backgroundColor: accentSoft, color: accentStrong }}
+      aria-label={`${value} ${value === 1 ? 'star' : 'stars'}`}
     >
-      ⭐️ <span className="tabular-nums">{value}</span>
+      <span aria-hidden="true">⭐️</span>
+      <span className="tabular-nums">{value}</span>
+      <span>stars</span>
     </div>
   )
 }
@@ -1251,6 +1150,7 @@ function ChoreButton({
   approvalRequired = false,
   skipDisabled = false,
   disabled = false,
+  compact = false,
 }: {
   chore: FreshChore
   accent: string
@@ -1266,6 +1166,7 @@ function ChoreButton({
   approvalRequired?: boolean
   skipDisabled?: boolean
   disabled?: boolean
+  compact?: boolean
 }) {
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
@@ -1383,6 +1284,20 @@ function ChoreButton({
       console.error('Failed to play chore audio', error)
       setIsSpeaking(false)
     }
+  }
+
+  const openDetails = () => {
+    setDetailsOpen(true)
+    prefetchCompleteSound()
+    void fetchTtsUrl()
+  }
+
+  const handlePrimaryAction = () => {
+    if (completionDisabled || isAnimating) return
+    prefetchCompleteSound()
+    startTransition(() => {
+      void onComplete(chore, kidId, accent, triggerCelebration)
+    })
   }
 
   const detailsModal =
@@ -1532,55 +1447,114 @@ function ChoreButton({
 
   return (
     <div
-      className={`relative rounded-xl border-2 shadow-sm transition focus-within:-translate-y-0.5 active:-translate-y-0.5 focus-within:border-[var(--accent)] active:border-[var(--accent)] dark:focus-within:border-[var(--accent)] dark:active:border-[var(--accent)] ${cardToneClasses}`}
+      className={`relative overflow-hidden rounded-[1.35rem] border-2 shadow-[0_12px_28px_-22px_rgba(15,23,42,0.7)] transition focus-within:border-[var(--accent)] dark:focus-within:border-[var(--accent)] ${cardToneClasses}`}
       style={accentVars}
     >
-      <button
-        type="button"
-        onClick={() => {
-          setDetailsOpen(true)
-          prefetchCompleteSound()
-          void fetchTtsUrl()
-        }}
-        className="group flex w-full flex-col text-left text-slate-900 transition active:bg-[var(--accent-soft)] focus-visible:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:translate-y-0 disabled:opacity-60 dark:text-slate-50 dark:active:bg-[var(--accent-soft)] dark:focus-visible:bg-[var(--accent-soft)]"
-        aria-label={
-          approvalRequested
-            ? `Open "${chore.title}" actions (waiting for approval)`
-            : `Open "${chore.title}" actions`
-        }
+      <div
+        className={`grid grid-cols-[auto_minmax(0,1fr)_auto] items-stretch ${
+          compact ? 'min-h-24' : 'min-h-[clamp(8.5rem,16vh,11rem)]'
+        }`}
       >
-        <div className="flex items-start gap-3 px-3 py-2.5 xl:gap-4 xl:px-4 xl:py-3">
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-xl leading-none transition group-active:text-[var(--accent)] group-focus-visible:text-[var(--accent)] xl:text-3xl">
-              {isPending ? '…' : chore.emoji}
+        <button
+          type="button"
+          onClick={handlePrimaryAction}
+          className={`group flex items-center justify-center border-r border-slate-200 bg-[var(--accent-soft)] transition active:bg-white focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-[var(--accent)] disabled:cursor-wait disabled:opacity-55 dark:border-slate-700 dark:active:bg-slate-800 ${
+            compact ? 'w-16' : 'w-[4.75rem] sm:w-[5.25rem]'
+          }`}
+          disabled={completionDisabled || isAnimating}
+          aria-label={
+            approvalRequired
+              ? `Request approval for ${chore.title}`
+              : `Complete ${chore.title}`
+          }
+        >
+          <span
+            className={`flex items-center justify-center rounded-full border-[3px] bg-white text-[var(--accent)] shadow-sm transition group-active:scale-90 dark:bg-slate-900 ${
+              compact ? 'h-9 w-9' : 'h-12 w-12 sm:h-14 sm:w-14'
+            }`}
+            style={{ borderColor: accent }}
+            aria-hidden="true"
+          >
+            {isPending || isAnimating ? (
+              <span className="text-lg">…</span>
+            ) : approvalRequested ? (
+              <span className="text-base">⏳</span>
+            ) : approvalRequired ? (
+              <span className="text-base">🔐</span>
+            ) : (
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                className={compact ? 'h-5 w-5' : 'h-6 w-6'}
+              >
+                <path
+                  d="m6.5 12.5 3.3 3.3 7.7-8"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2.5"
+                />
+              </svg>
+            )}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={handlePrimaryAction}
+          className={`flex min-w-0 flex-col justify-center px-3 text-left text-slate-950 transition active:bg-[var(--accent-soft)] focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-[var(--accent)] disabled:cursor-wait disabled:opacity-55 dark:text-white sm:px-4 ${
+            compact ? 'py-3' : 'py-4'
+          }`}
+          disabled={completionDisabled || isAnimating}
+        >
+          <span className="flex items-start gap-2.5">
+            <span
+              aria-hidden="true"
+              className={
+                compact ? 'text-xl leading-none' : 'text-3xl leading-none'
+              }
+            >
+              {chore.emoji}
             </span>
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="text-sm font-semibold leading-tight xl:text-base">
+            <span
+              className={`min-w-0 font-black leading-[1.08] tracking-[-0.025em] ${
+                compact
+                  ? 'text-base sm:text-lg'
+                  : 'text-[clamp(1.15rem,1.35vw,1.7rem)]'
+              }`}
+            >
               {chore.title}
-            </div>
-          </div>
-        </div>
-        <div className="flex items-start justify-between border-t border-slate-200 px-3 py-1 text-xs font-semibold text-amber-700 dark:border-slate-700 dark:text-amber-200 xl:px-4">
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2 text-sm font-semibold leading-none xl:text-base">
-              <div>+{formatStarLabel(chore.stars)}</div>
-              {approvalRequired ? (
-                <div className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800 dark:bg-amber-900/50 dark:text-amber-100">
-                  {approvalRequested
-                    ? '⏳ Waiting for approval'
-                    : '🔐 Parent OK'}
-                </div>
-              ) : null}
-            </div>
-          </div>
-          {approvalRequested ? (
-            <div className="rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800 dark:bg-amber-900/50 dark:text-amber-100">
-              Awaiting approval
-            </div>
-          ) : null}
-        </div>
-      </button>
+            </span>
+          </span>
+          <span className="mt-2.5 flex flex-wrap items-center gap-1.5 text-xs font-bold text-amber-700 dark:text-amber-300">
+            <span>+{formatStarLabel(chore.stars)}</span>
+            {isNew ? (
+              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] uppercase tracking-wide text-amber-800 dark:bg-amber-900/60 dark:text-amber-100">
+                New
+              </span>
+            ) : null}
+            {approvalRequired ? (
+              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] uppercase tracking-wide text-amber-800 dark:bg-amber-900/60 dark:text-amber-100">
+                {approvalRequested ? 'Waiting for parent' : 'Parent OK'}
+              </span>
+            ) : null}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={openDetails}
+          className="flex w-11 items-center justify-center border-l border-slate-200 text-xl font-black tracking-widest text-slate-400 transition active:bg-[var(--accent-soft)] active:text-slate-900 focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-[var(--accent)] dark:border-slate-700 dark:text-slate-500 dark:active:text-white sm:w-12"
+          aria-label={`More options for ${chore.title}`}
+        >
+          <span aria-hidden="true" className="-translate-y-1">
+            …
+          </span>
+        </button>
+        {approvalRequested ? (
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1 bg-amber-300" />
+        ) : null}
+      </div>
       {detailsModal}
       {skipConfirmModal}
     </div>
