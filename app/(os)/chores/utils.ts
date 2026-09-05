@@ -448,22 +448,6 @@ export function shiftIsoDay(dayIso: string, delta: number): string {
   return formatPacificDate(base)
 }
 
-function nearestScheduledOnOrBefore(dayIso: string, daysOfWeek: number[]): string | null {
-  const day = dateFromIsoDay(dayIso)
-  if (!day) return null
-  const allowed = daysOfWeek.length ? daysOfWeek : ALL_WEEKDAYS
-
-  for (let offset = 0; offset < 7; offset++) {
-    const candidate = new Date(day)
-    candidate.setUTCDate(candidate.getUTCDate() - offset)
-    if (allowed.includes(candidate.getUTCDay())) {
-      return formatPacificDate(candidate)
-    }
-  }
-
-  return formatPacificDate(day)
-}
-
 function nextScheduledAfter(dayIso: string, daysOfWeek: number[]): string | null {
   const day = dateFromIsoDay(dayIso)
   if (!day) return null
