@@ -3,8 +3,12 @@ import { test, expect } from '@playwright/test'
 test('home page renders key sections', async ({ page }) => {
   await page.goto('/')
 
-  await expect(page.getByRole('heading', { name: 'TL;DR' })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Essays' })).toBeVisible()
+  await expect(
+    page.getByRole('heading', { name: 'Max Stoiber' }),
+  ).toBeVisible()
+  await expect(
+    page.getByRole('link', { name: 'Essays' }).first(),
+  ).toBeVisible()
   await expect(
     page.getByRole('link', { name: 'Shopify' }).first(),
   ).toBeVisible()
