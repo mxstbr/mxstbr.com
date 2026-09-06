@@ -1053,9 +1053,9 @@ function KidColumn({
                           {group.emoji}
                         </span>
                       ) : null}
-                      <span>{group.label}</span>
+                      <span className="min-w-0 truncate">{group.label}</span>
                       {collapsed && group.key !== 'any' ? (
-                        <span className="ml-auto rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                        <span className="ml-auto whitespace-nowrap rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
                           {group.items.length} left
                         </span>
                       ) : null}
