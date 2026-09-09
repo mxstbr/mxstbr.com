@@ -94,9 +94,9 @@ const formatStarLabel = (stars: number) =>
   `${stars} ${stars === 1 ? 'star' : 'stars'}`
 
 function currentPeriodFor(minutes: number): ScheduledPeriod {
-  if (minutes < 12 * 60) return 'morning'
-  if (minutes < 17 * 60) return 'afternoon'
-  if (minutes < 19 * 60) return 'evening'
+  if (!hasChoreTimePassed('morning', minutes)) return 'morning'
+  if (!hasChoreTimePassed('afternoon', minutes)) return 'afternoon'
+  if (!hasChoreTimePassed('evening', minutes)) return 'evening'
   return 'night'
 }
 

@@ -89,12 +89,12 @@ const formatStarLabel = (stars: number) =>
  *
  * - Before 12:00 PM: Morning group is open; Afternoon, Evening, Night, and Bonus are collapsed
  * - 12:00 PM - 5:00 PM: Afternoon group is open; Morning, Evening, Night, and Bonus are collapsed
- * - 5:00 PM - 7:00 PM: Evening group is open; Morning, Afternoon, Night, and Bonus are collapsed
- * - 7:00 PM - 10:00 PM: Night group is open; Morning and Afternoon are collapsed
+ * - 5:00 PM - 8:15 PM: Evening group is open; Morning, Afternoon, Night, and Bonus are collapsed
+ * - 8:15 PM - 10:00 PM: Evening and Night groups are open; Morning and Afternoon are collapsed
  * - After 10:00 PM: Morning, Afternoon, Evening, and Night are collapsed
  *
  * The "Bonus" group is always collapsed by default but can be manually expanded.
- * Groups automatically expand/collapse when crossing time thresholds (12pm, 5pm, 7pm, 10pm).
+ * Groups automatically expand/collapse at the shared chore deadlines.
  * Manually expanded groups stay open while the user interacts, but non-persistent groups
  * will auto-recollapse after 45 seconds of inactivity. Persistent groups (like evening)
  * will remain expanded even after idle time.
@@ -106,16 +106,16 @@ function shouldAutoCollapse(
 ): boolean {
   if (mode !== 'today') return false
   if (key === 'any') return true
-  if (minutes < 12 * 60) {
+  if (!hasChoreTimePassed('morning', minutes)) {
     return key !== 'morning'
   }
-  if (minutes < 17 * 60) {
+  if (!hasChoreTimePassed('afternoon', minutes)) {
     return key !== 'afternoon'
   }
-  if (minutes < 19 * 60) {
+  if (!hasChoreTimePassed('evening', minutes)) {
     return key !== 'evening'
   }
-  if (minutes < 22 * 60) {
+  if (!hasChoreTimePassed('night', minutes)) {
     return key !== 'evening' && key !== 'night'
   }
 

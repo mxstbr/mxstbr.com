@@ -413,9 +413,9 @@ function normalizeNewChore(state: ChoreState, value: Operation): Chore {
     requiresApproval: Boolean(value.requiresApproval),
     timeOfDay: value.timeOfDay,
     scheduledFor:
-      type === 'one-off'
-        ? (parseIsoDay(value.scheduledFor) ?? todayPacific())
-        : undefined,
+      parseIsoDay(value.scheduledFor) ??
+      (type === 'one-off' ? todayPacific() : undefined),
+    archivedFrom: parseIsoDay(value.archivedFrom) ?? undefined,
   }
   if (type === 'repeated') {
     chore.schedule = {
@@ -497,6 +497,8 @@ function searchRows(state: ChoreState, collection: Collection, query: string) {
           kids: item.kidIds.join(','),
           stars: item.stars,
           type: item.type,
+          scheduledFor: item.scheduledFor ?? '',
+          archivedFrom: item.archivedFrom ?? '',
           pausedUntil: item.pausedUntil ?? '',
         }
       }

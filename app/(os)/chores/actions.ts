@@ -22,6 +22,7 @@ import {
   hasDailyBonus,
   choreNeedsApproval,
   hasChoreTimePassed,
+  isChoreScheduledForDay,
   pacificDateFromTimestamp,
   pacificTimeInMinutes,
   shiftIsoDay,
@@ -269,6 +270,7 @@ async function applyCompletion({
     const kid = state.kids.find((k) => k.id === kidId)
     if (!chore || !kid) return
     if (!chore.kidIds.includes(kidId)) return
+    if (!isChoreScheduledForDay(chore, getToday(targetDay))) return
 
     if (!approvalGranted && choreNeedsApproval(chore, targetDay)) {
       result = {
@@ -724,6 +726,7 @@ export async function skipChore(formData: FormData): Promise<SkipResult> {
     const chore = state.chores.find((c) => c.id === choreId)
     const kid = state.kids.find((k) => k.id === kidId)
     if (!chore || !kid || !chore.kidIds.includes(kidId)) return
+    if (!isChoreScheduledForDay(chore, getToday(today))) return
     if (hasChoreTimePassed(chore.timeOfDay, currentMinutes)) return
 
     const alreadySnoozedForDay = chore.snoozedForKids?.[kidId] === nextDay

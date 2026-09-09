@@ -74,7 +74,7 @@ type AdminSearchParams = {
   type?: ChoreType
   timeOfDay?: 'morning' | 'afternoon' | 'evening' | 'night' | ''
   approval?: 'pin' | 'none'
-  status?: 'open' | 'paused' | 'completed' | 'scheduled'
+  status?: ChoreStatus
   sort?: 'created-desc' | 'created-asc' | 'stars-desc' | 'stars-asc' | 'title'
   page?: string
   q?: string
@@ -84,7 +84,7 @@ type AdminPageProps = {
   searchParams?: Promise<AdminSearchParams>
 }
 
-type ChoreStatus = 'open' | 'paused' | 'completed' | 'scheduled'
+type ChoreStatus = 'open' | 'paused' | 'completed' | 'scheduled' | 'archived'
 
 const PAGE_SIZE = 9
 const DAY_LETTERS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
@@ -152,6 +152,7 @@ function buildChoreAnalytics(
 }
 
 function choreStatus(chore: Chore, kids: Kid[], completions: Completion[], ctx: TodayContext): ChoreStatus {
+  if (chore.archivedFrom && ctx.todayIso >= chore.archivedFrom) return 'archived'
   if (isPaused(chore, ctx)) return 'paused'
 
   if (chore.type === 'one-off' && chore.completedAt) {
@@ -349,6 +350,7 @@ function StatusBadge({ status }: { status: ChoreStatus }) {
     paused: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-100',
     completed: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-100',
     scheduled: 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-200',
+    archived: 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-200',
   }
 
   const labels: Record<ChoreStatus, string> = {
@@ -356,6 +358,7 @@ function StatusBadge({ status }: { status: ChoreStatus }) {
     paused: 'Paused',
     completed: 'Completed',
     scheduled: 'Scheduled',
+    archived: 'Archived',
   }
 
   return (
@@ -433,7 +436,8 @@ function ChoreCard({ chore, kids, completions, ctx }: { chore: Chore; kids: Kid[
             </div>
             <p className="text-sm text-slate-600 dark:text-slate-300">
               {dueLabel}
-              {chore.type === 'one-off' ? ` • Scheduled for ${scheduledDay}` : ''}
+              {chore.type === 'one-off' || scheduledDay > ctx.todayIso ? ` • Starts ${scheduledDay}` : ''}
+              {chore.archivedFrom ? ` • Archived from ${chore.archivedFrom}` : ''}
               {doneToday.length && status !== 'paused' ? ` • Done today by ${doneToday.map((kid) => kid.name).join(', ')}` : ''}
             </p>
             <p className="text-xs text-slate-500 dark:text-slate-400">Created {createdLabel}</p>
@@ -476,7 +480,7 @@ function ChoreCard({ chore, kids, completions, ctx }: { chore: Chore; kids: Kid[
             <button
               type="submit"
               className="rounded-md bg-slate-900 px-3 py-1 text-xs font-semibold text-white transition hover:bg-slate-800 disabled:opacity-50 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
-              disabled={status === 'paused'}
+              disabled={status === 'paused' || status === 'archived'}
             >
               Save completion
             </button>
@@ -699,6 +703,7 @@ function ChoreFilters({ kids, filters }: { kids: Kid[]; filters: FilterState }) 
           <option value="all">Any status</option>
           <option value="open">Open</option>
           <option value="scheduled">Scheduled</option>
+          <option value="archived">Archived</option>
           <option value="paused">Paused</option>
           <option value="completed">Completed</option>
         </select>

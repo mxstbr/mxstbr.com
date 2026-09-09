@@ -14,7 +14,7 @@ const TIME_ORDER: Record<'morning' | 'afternoon' | 'evening' | 'night', number> 
 const TIME_END_MINUTES: Record<keyof typeof TIME_ORDER, number> = {
   morning: 12 * 60,
   afternoon: 17 * 60,
-  evening: 19 * 60,
+  evening: 20 * 60 + 15,
   night: 22 * 60,
 }
 
@@ -225,6 +225,20 @@ export function isPaused(chore: Chore, ctx: TodayContext): boolean {
   )
 }
 
+export function isChoreScheduledForDay(chore: Chore, ctx: TodayContext): boolean {
+  const startDay = chore.scheduledFor || pacificDateFromTimestamp(chore.createdAt)
+  if (startDay > ctx.todayIso) return false
+  // The archive date is the first inactive Pacific day; earlier history stays intact.
+  if (chore.archivedFrom && ctx.todayIso >= chore.archivedFrom) return false
+  if (chore.type === 'repeated') {
+    const days = (chore.schedule?.daysOfWeek ?? []).filter(
+      (day) => typeof day === 'number' && day >= 0 && day <= 6,
+    )
+    if (days.length && !days.includes(ctx.weekday)) return false
+  }
+  return true
+}
+
 export function isOpenForKid(
   chore: Chore,
   kidId: string,
@@ -232,9 +246,7 @@ export function isOpenForKid(
   ctx: TodayContext,
 ): boolean {
   if (!chore.kidIds.includes(kidId)) return false
-  const createdDay = pacificDateFromTimestamp(chore.createdAt)
-  const scheduledDay = chore.scheduledFor || createdDay
-  if (scheduledDay > ctx.todayIso) return false
+  if (!isChoreScheduledForDay(chore, ctx)) return false
   const snoozedForKid = chore.snoozedForKids?.[kidId]
   if (snoozedForKid && snoozedForKid > ctx.todayIso) return false
   if (chore.snoozedUntil && chore.snoozedUntil > ctx.todayIso) return false
@@ -306,9 +318,7 @@ export function isChoreExpectedForDay(
 ): boolean {
   if (!chore.kidIds.includes(kidId)) return false
   if (chore.type === 'perpetual' && !chore.timeOfDay) return false
-  const createdDay = pacificDateFromTimestamp(chore.createdAt)
-  const scheduledDay = chore.scheduledFor || createdDay
-  if (scheduledDay > ctx.todayIso) return false
+  if (!isChoreScheduledForDay(chore, ctx)) return false
   if (isPaused(chore, ctx)) return false
   if (chore.snoozedUntil && chore.snoozedUntil > ctx.todayIso) return false
 
@@ -372,12 +382,11 @@ export function scheduleLabel(chore: Chore): string {
     return chore.scheduledFor ? `One-off · ${chore.scheduledFor}` : 'One-off'
   }
   if (chore.type === 'perpetual') return 'Perpetual'
-  if (chore.schedule?.cadence === 'weekly') {
-    const days = chore.schedule.daysOfWeek ?? []
-    if (!days.length) return 'Weekly'
-    return `Weekly · ${days.map((day) => DAY_ABBRS[day]).join(', ')}`
-  }
-  return 'Daily'
+  const cadence = chore.schedule?.cadence === 'weekly' ? 'Weekly' : 'Daily'
+  const days = chore.schedule?.daysOfWeek ?? []
+  return days.length
+    ? `${cadence} · ${days.map((day) => DAY_ABBRS[day]).join(', ')}`
+    : cadence
 }
 
 export function recurringStatus(
@@ -386,6 +395,12 @@ export function recurringStatus(
   completions: Completion[],
   ctx: TodayContext,
 ): { label: string; tone: 'neutral' | 'success' | 'muted' } {
+  if (chore.archivedFrom && ctx.todayIso >= chore.archivedFrom) {
+    return { label: `Archived from ${chore.archivedFrom}`, tone: 'muted' }
+  }
+  if (chore.scheduledFor && chore.scheduledFor > ctx.todayIso) {
+    return { label: `Starts ${chore.scheduledFor}`, tone: 'muted' }
+  }
   if (isPaused(chore, ctx)) {
     return {
       label: `Paused until ${chore.pausedUntil}`,

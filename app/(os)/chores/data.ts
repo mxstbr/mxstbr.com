@@ -23,6 +23,7 @@ export type Chore = {
   type: ChoreType
   requiresApproval?: boolean
   scheduledFor?: string
+  archivedFrom?: string | null
   schedule?: ChoreSchedule
   pausedUntil?: string | null
   snoozedUntil?: string | null
