@@ -1000,7 +1000,7 @@ function StarBadge({ value, accent }: { value: number; accent: string }) {
     >
       <span aria-hidden="true">⭐️</span>
       <span className="tabular-nums">{value}</span>
-      <span>stars</span>
+      <span>{value === 1 ? 'star' : 'stars'}</span>
     </div>
   )
 }
