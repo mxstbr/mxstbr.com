@@ -480,7 +480,7 @@ function ChoreCard({ chore, kids, completions, ctx }: { chore: Chore; kids: Kid[
             <button
               type="submit"
               className="rounded-md bg-slate-900 px-3 py-1 text-xs font-semibold text-white transition hover:bg-slate-800 disabled:opacity-50 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
-              disabled={status === 'paused' || status === 'archived'}
+              disabled={status === 'paused'}
             >
               Save completion
             </button>
