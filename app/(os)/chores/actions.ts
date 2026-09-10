@@ -948,20 +948,6 @@ export async function archiveChoreDetailed(
   return applyArchiveChore(formData)
 }
 
-export async function setTimeOfDay(formData: FormData): Promise<void> {
-  await requireAuthorization(formData)
-
-  const choreId = formData.get('choreId')?.toString()
-  const timeOfDay = parseTimeOfDay(formData.get('timeOfDay'))
-  if (!choreId) return
-
-  await withUpdatedState((state) => {
-    const chore = state.chores.find((c) => c.id === choreId)
-    if (!chore) return
-    chore.timeOfDay = timeOfDay ?? undefined
-  })
-}
-
 async function applyKidStarAdjustment(
   formData: FormData,
 ): Promise<DetailedStarAdjustmentResult | null> {
