@@ -51,8 +51,32 @@ export async function drainNotifications(
         | null
       if (!raw) return
       const n: Notification = typeof raw === 'string' ? JSON.parse(raw) : raw
+      // The Telegram send and the post-send commit must not share one try/catch:
+      // a BUSY (or any transact failure) from the success-path commit is NOT a
+      // delivery failure. Let it propagate so the notification stays in
+      // `sending` with its lease intact and is re-claimed after the lease
+      // expires, rather than being falsely rewritten to `pending` and counted
+      // as a failed delivery of a message that was already sent.
+      let sendFailed = false
       try {
         await send(n.text)
+      } catch {
+        sendFailed = true
+      }
+      if (sendFailed) {
+        n.status = 'pending'
+        n.lastError = 'Delivery failed; retry scheduled.'
+        n.nextAttemptAt =
+          Date.now() + Math.min(3600000, 30000 * 2 ** Math.min(n.attempts, 7))
+        if (n.day && n.submissionId)
+          await repository.transact([n.day], null, (tx) => {
+            const s = tx.days[n.day!].submissions.find(
+              (s) => s.id === n.submissionId,
+            )
+            if (s) s.notificationRetrying = true
+          })
+        failed++
+      } else {
         n.status = 'delivered'
         n.deliveredAt = new Date().toISOString()
         delete n.lastError
@@ -67,19 +91,6 @@ export async function drainNotifications(
             }
           })
         delivered++
-      } catch {
-        n.status = 'pending'
-        n.lastError = 'Delivery failed; retry scheduled.'
-        n.nextAttemptAt =
-          Date.now() + Math.min(3600000, 30000 * 2 ** Math.min(n.attempts, 7))
-        if (n.day && n.submissionId)
-          await repository.transact([n.day], null, (tx) => {
-            const s = tx.days[n.day!].submissions.find(
-              (s) => s.id === n.submissionId,
-            )
-            if (s) s.notificationRetrying = true
-          })
-        failed++
       }
       delete n.leaseUntil
       await redis.eval(
