@@ -50,3 +50,11 @@ Implementation commit `70bec91c6dee175103df26f15a3149615acb704a` passed the loca
 The first board read settled the new period awards for already-completed work in the imported current day: Darian received four extra stars and Devina two. Those are explicit Chores2 bonus ledger entries after the exact opening-balance reconciliation; /chores received no changes.
 
 The existing QStash account has schedule `chores2-notification-drain`, calling the signed production endpoint every minute. The browser verification used a temporary device session that was revoked; Max receives a separate fresh invitation for the iPad.
+
+## Simplified iPad login
+
+Chores2 accepts the same `password` cookie as the original chore board. An iPad already signed into the site opens /chores2 directly. An unsigned device can type the same existing site password on /chores2; the login is saved for a year with an HttpOnly cookie. The login grants kid-only commands against the separate Chores2 data. Parent MCP authentication remains explicit and separate from browser cookies.
+
+Invitation links and scoped sessions remain optional for compatibility. Revoking an invitation session does not sign out an independently valid site-password login.
+
+Run `CHORES2_LOGIN_TEST=1 pnpm exec playwright test --config playwright.chores2.config.ts` against a fresh local server without the fixture auth bypass to verify inherited login, password entry/persistence, invalid credentials, origin checks, and denial of parent commands. This suite only reads the separate board and makes rejected domain commands; it does not complete chores or purchase rewards. Credential tracing is disabled.

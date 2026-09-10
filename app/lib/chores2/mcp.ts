@@ -92,7 +92,7 @@ export function registerChores2Tools(server: McpServer) {
     {
       title: 'Chores2 device access',
       description:
-        'Authorize the shared iPad with a one-use link, list existing scoped kid sessions, or revoke an exact device ID. No parent interface is needed. Invite links expire in 24 hours; device sessions last 90 days and permit kid commands only.',
+        'The kid board normally reuses the existing site-password login. Optionally authorize another device with a one-use link, list invitation sessions, or revoke an exact invitation session ID. Revoking an invitation session does not sign out a separate site-password login. Invite links expire in 24 hours; invitation sessions last 90 days and permit kid commands only.',
       inputSchema: z.object({
         action: z.enum(['invite', 'list', 'revoke']),
         label: z.string().min(1).max(80).optional(),

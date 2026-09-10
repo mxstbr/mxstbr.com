@@ -684,6 +684,41 @@
   max-width: 320px;
   margin-top: 20px;
 }
+.c2-login {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 320px;
+  max-width: 100%;
+  margin-top: 12px;
+  text-align: left;
+}
+.c2-login input {
+  font: inherit;
+  font-size: 22px;
+  min-height: 56px;
+  padding: 12px 16px;
+  border: 2px solid #8c9fb4;
+  border-radius: 16px;
+  background: #fff;
+  color: #25313f;
+}
+.c2-login button {
+  font: inherit;
+  font-size: 20px;
+  min-height: 56px;
+  padding: 12px;
+  border: 0;
+  border-radius: 16px;
+  background: #2870c6;
+  color: #fff;
+  box-shadow: 0 5px 0 #174b89;
+  cursor: pointer;
+}
+.c2-login button:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
 .c2-section-error {
   min-height: 560px;
   display: flex;

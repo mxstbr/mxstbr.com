@@ -57,7 +57,8 @@
     "skip": "Removed; no skip progress, bonus, or notification behavior.",
     "parentSurface": "ChatGPT through MCP for parent management and approvals. Telegram only delivers notifications; no Clippy, Telegram conversation or action buttons, or dedicated parent UI.",
     "bedtimeRecognition": "Dedicated last-night recognition/templates/generated chores/reminders removed.",
-    "dataIsolation": "Separate keys in the existing Redis database; copy source catalogs/history/balances once, then independent state."
+    "dataIsolation": "Separate keys in the existing Redis database; copy source catalogs/history/balances once, then independent state.",
+    "deviceAccess": "Reuse the existing site-password login; already-unlocked iPads open /chores2 directly. Otherwise enter the same password. Invitation links remain optional."
   },
   "counts": {
     "retained": 29,
@@ -82,9 +83,10 @@
         "status": "implemented",
         "files": [
           "app/lib/chores2/auth.ts",
-          "app/(chores2)/chores2/activate/page.tsx"
+          "app/(chores2)/chores2/login-form.tsx",
+          "app/api/chores2/login/route.ts"
         ],
-        "verification": "One-use device invitation, scoped session, revocation; production session verification."
+        "verification": "Login browser suite: existing site cookie, password entry/persistence, invalid password, origin checks, kid-only commands. Optional invitation sessions remain compatible."
       }
     },
     {
@@ -1639,9 +1641,10 @@
         "status": "implemented",
         "files": [
           "app/lib/chores2/auth.ts",
-          "app/(chores2)/chores2/activate/page.tsx"
+          "app/(chores2)/chores2/login-form.tsx",
+          "app/api/chores2/login/route.ts"
         ],
-        "verification": "One-use device invitation, scoped session, revocation; production session verification."
+        "verification": "Login browser suite: existing site cookie, password entry/persistence, invalid password, origin checks, kid-only commands. Optional invitation sessions remain compatible."
       }
     },
     {

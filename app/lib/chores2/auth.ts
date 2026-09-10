@@ -2,7 +2,7 @@ import { AsyncLocalStorage } from 'node:async_hooks'
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto'
 import { cookies } from 'next/headers'
 import { PREFIX, redisClient } from './repository'
-import { developmentFixture } from './runtime'
+import { choresService, developmentFixture } from './runtime'
 import { fail, type Actor } from './types'
 
 const COOKIE = 'chores2-device'
@@ -37,6 +37,31 @@ export function parentActor(): Actor {
     )
   return { kind: 'parent', id: 'chatgpt-mcp' }
 }
+export function sitePasswordMatches(candidate: string | undefined) {
+  const expected = process.env.CAL_PASSWORD
+  if (!expected || !candidate) return false
+  const actualBytes = Buffer.from(candidate)
+  const expectedBytes = Buffer.from(expected)
+  return (
+    actualBytes.length === expectedBytes.length &&
+    timingSafeEqual(actualBytes, expectedBytes)
+  )
+}
+export async function unlockWithSitePassword(password: string) {
+  if (!sitePasswordMatches(password))
+    fail(
+      'FORBIDDEN',
+      'That password isn’t right. Use the same password as the original chore board.',
+    )
+  ;(await cookies()).set('password', password, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 365 * 86400,
+  })
+  return { ok: true }
+}
 export async function deviceActor(): Promise<Actor | null> {
   if (developmentFixture())
     return {
@@ -44,14 +69,25 @@ export async function deviceActor(): Promise<Actor | null> {
       id: 'local-fixture',
       kidIds: ['kid-1', 'kid-2', 'kid-3'],
     }
-  const token = (await cookies()).get(COOKIE)?.value
-  if (!token || !/^[a-f0-9]{64}$/.test(token)) return null
-  const raw = await redisClient().get<string>(
-    `${PREFIX}:device:${tokenHash(token)}`,
-  )
-  if (!raw) return null
-  const session: Session = typeof raw === 'string' ? JSON.parse(raw) : raw
-  return { kind: 'kid', id: session.id, kidIds: session.kidIds }
+  const cookieStore = await cookies()
+  const token = cookieStore.get(COOKIE)?.value
+  if (token && /^[a-f0-9]{64}$/.test(token)) {
+    const raw = await redisClient().get<string>(
+      `${PREFIX}:device:${tokenHash(token)}`,
+    )
+    if (raw) {
+      const session: Session = typeof raw === 'string' ? JSON.parse(raw) : raw
+      return { kind: 'kid', id: session.id, kidIds: session.kidIds }
+    }
+  }
+  if (!sitePasswordMatches(cookieStore.get('password')?.value)) return null
+  const core = await choresService().repository.readCore()
+  // Reuse the OS login while retaining kid-only command permissions and v2 data.
+  return {
+    kind: 'kid',
+    id: 'site-login',
+    kidIds: core.kids.map((kid) => kid.id),
+  }
 }
 export async function requireDevice() {
   return (
