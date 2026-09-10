@@ -365,17 +365,78 @@ test('migration preserves exact balances and catalogs without double-counting le
     timestamp: '2026-09-08T16:00:00Z',
     cost: 20,
   })
+  source.rewardRedemptions.push({
+    id: 'old-movie',
+    kidId: 'kid-3',
+    rewardId: 'movie',
+    timestamp: '2026-09-08T17:00:00Z',
+    cost: 20,
+  })
   const { core, days } = migrateLegacy(source, new Date('2026-09-09T15:00:00Z'))
   assert.equal(core.balances['kid-3'], 6)
   assert.deepEqual(core.chores, source.chores)
   assert.deepEqual(core.rewards, source.rewards)
   assert.equal(days['2026-09-08'].redemptions[0].reward.cost, 20)
   assert(core.oneOffRedemptions['kid-3:lego'])
+  assert(!core.oneOffRedemptions['kid-3:movie'])
+  assert.equal(days['2026-09-08'].redemptions[1].reward.id, 'movie')
   assert.equal(
     Object.values(days)
       .flatMap((d) => d.ledger)
       .reduce((sum, e) => sum + e.amount, 0),
     Object.values(core.balances).reduce((a, b) => a + b, 0),
+  )
+})
+
+test('legacy perpetual reward redemptions stay redeemable after a parent flips the reward to one-off', async () => {
+  const now = new Date('2026-09-09T15:00:00Z')
+  const { source } = fixture(now)
+  source.rewardRedemptions.push({
+    id: 'old-movie',
+    kidId: 'kid-3',
+    rewardId: 'movie',
+    timestamp: '2026-09-08T16:00:00Z',
+    cost: 20,
+  })
+  const { core, days } = migrateLegacy(source, now)
+  assert.equal(core.rewards.find((r) => r.id === 'movie')!.type, 'perpetual')
+  assert.equal(core.oneOffRedemptions['kid-3:movie'], undefined)
+  const repo = new MemoryRepository(core, days)
+  const service = new ChoresService(repo, () => now)
+  const run = (command: unknown, actor: Actor = child, id = randomUUID()) =>
+    service.execute(actor, id, command)
+  const reward = async (rewardId: string) =>
+    (await service.getBoard(child)).kids
+      .find((k) => k.id === 'kid-3')!
+      .rewards.find((r) => r.id === rewardId)!
+  await run(
+    { action: 'update_reward', rewardId: 'movie', patch: { type: 'one-off' } },
+    parent,
+  )
+  const flipped = await reward('movie')
+  assert.equal(flipped.type, 'one-off')
+  assert.equal(flipped.redeemed, false)
+  await run(
+    { action: 'adjust_stars', kidId: 'kid-3', delta: 100, note: 'top up' },
+    parent,
+  )
+  const result = await run({
+    action: 'redeem',
+    kidId: 'kid-3',
+    rewardId: 'movie',
+    expectedCost: 20,
+  })
+  assert.equal(result.status, 'redeemed')
+  assert.ok(repo.core.oneOffRedemptions['kid-3:movie'])
+  assert.equal((await reward('movie')).redeemed, true)
+  await assert.rejects(
+    run({
+      action: 'redeem',
+      kidId: 'kid-3',
+      rewardId: 'movie',
+      expectedCost: 20,
+    }),
+    rejected('ALREADY_REDEEMED'),
   )
 })
 
