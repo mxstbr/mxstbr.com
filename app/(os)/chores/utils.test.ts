@@ -10,6 +10,8 @@ import {
   isChoreExpectedForDay,
   isChoreScheduledForDay,
   isOpenForKid,
+  isPacificNighttime,
+  pacificTimeInMinutes,
   recurringStatus,
   scheduleLabel,
 } from './utils'
@@ -152,4 +154,33 @@ test('evening completion and skipping use the exact 8:15pm cutoff', () => {
   assert.equal(choreTimeDeadlineLabel('morning'), '12pm')
   assert.equal(choreTimeDeadlineLabel('afternoon'), '5pm')
   assert.equal(choreTimeDeadlineLabel('night'), '10pm')
+})
+
+test('screen saver does not arm as nighttime while evening chores are still active', () => {
+  const atEightPm = new Date('2026-09-10T03:00:00Z')
+  const atEightOhFivePm = new Date('2026-09-10T03:05:00Z')
+  const atEightFourteenPm = new Date('2026-09-10T03:14:00Z')
+  const atEightFifteenPm = new Date('2026-09-10T03:15:00Z')
+
+  for (const date of [atEightPm, atEightOhFivePm, atEightFourteenPm]) {
+    const minutes = pacificTimeInMinutes(date)
+    assert.equal(hasChoreTimePassed('evening', minutes), false)
+    assert.equal(isPacificNighttime(date), false)
+  }
+
+  const minutes = pacificTimeInMinutes(atEightFifteenPm)
+  assert.equal(hasChoreTimePassed('evening', minutes), true)
+  assert.equal(isPacificNighttime(atEightFifteenPm), true)
+})
+
+test('nighttime still applies before the morning cutoff and late at night', () => {
+  const beforeMorning = new Date('2026-09-10T13:59:00Z')
+  const atMorning = new Date('2026-09-10T14:00:00Z')
+  const lateNight = new Date('2026-09-11T06:00:00Z')
+  const midday = new Date('2026-09-10T19:00:00Z')
+
+  assert.equal(isPacificNighttime(beforeMorning), true)
+  assert.equal(isPacificNighttime(atMorning), false)
+  assert.equal(isPacificNighttime(lateNight), true)
+  assert.equal(isPacificNighttime(midday), false)
 })

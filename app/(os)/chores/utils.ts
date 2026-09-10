@@ -1,11 +1,22 @@
 import type { Chore, Completion, Reward, RewardRedemption } from './data'
 
-export const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+export const DAY_NAMES = [
+  'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+]
 export const DAY_ABBRS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 export const PACIFIC_TIMEZONE = 'America/Los_Angeles'
 export const DAILY_BONUS_STARS = 10
 const DAILY_BONUS_PREFIX = 'daily-bonus'
-const TIME_ORDER: Record<'morning' | 'afternoon' | 'evening' | 'night', number> = {
+const TIME_ORDER: Record<
+  'morning' | 'afternoon' | 'evening' | 'night',
+  number
+> = {
   morning: 0,
   afternoon: 1,
   evening: 2,
@@ -88,7 +99,10 @@ export function formatPacificDate(date: Date): string {
   return pacificDateFormatter.format(date)
 }
 
-export function formatRelativeTargetDay(targetDay: string, todayIso: string): string {
+export function formatRelativeTargetDay(
+  targetDay: string,
+  todayIso: string,
+): string {
   const targetDate = dateFromIsoDay(targetDay)
   const todayDate = dateFromIsoDay(todayIso)
 
@@ -96,7 +110,9 @@ export function formatRelativeTargetDay(targetDay: string, todayIso: string): st
     return targetDay === todayIso ? 'today' : `⚠️ ${targetDay}`
   }
 
-  const diffDays = Math.round((targetDate.getTime() - todayDate.getTime()) / (1000 * 60 * 60 * 24))
+  const diffDays = Math.round(
+    (targetDate.getTime() - todayDate.getTime()) / (1000 * 60 * 60 * 24),
+  )
 
   const relative = (() => {
     if (diffDays === 0) return 'today'
@@ -138,17 +154,20 @@ export function hasDailyBonus(
 ): boolean {
   const bonusId = dailyBonusChoreId(dayIso)
   return completions.some(
-    (completion) => completion.kidId === kidId && completion.choreId === bonusId,
+    (completion) =>
+      completion.kidId === kidId && completion.choreId === bonusId,
   )
 }
 
-const NIGHT_START_MINUTES = 20 * 60
+const NIGHT_START_MINUTES = TIME_END_MINUTES.evening
 const MORNING_START_MINUTES = 7 * 60
 
 export function pacificTimeInMinutes(date: Date = new Date()): number {
   const parts = pacificDateTimeFormatter.formatToParts(date)
   const hour = Number(parts.find((part) => part.type === 'hour')?.value ?? '0')
-  const minute = Number(parts.find((part) => part.type === 'minute')?.value ?? '0')
+  const minute = Number(
+    parts.find((part) => part.type === 'minute')?.value ?? '0',
+  )
   return hour * 60 + minute
 }
 
@@ -209,7 +228,8 @@ function hasCompletionInWindow(
   ctx: TodayContext,
 ): boolean {
   return completions.some((completion) => {
-    if (completion.choreId !== choreId || completion.kidId !== kidId) return false
+    if (completion.choreId !== choreId || completion.kidId !== kidId)
+      return false
     const day = pacificDateFromTimestamp(completion.timestamp)
     if (day < startIso) return false
     if (day > ctx.todayIso) return false
@@ -219,14 +239,15 @@ function hasCompletionInWindow(
 }
 
 export function isPaused(chore: Chore, ctx: TodayContext): boolean {
-  return (
-    !!chore.pausedUntil &&
-    chore.pausedUntil >= ctx.todayIso
-  )
+  return !!chore.pausedUntil && chore.pausedUntil >= ctx.todayIso
 }
 
-export function isChoreScheduledForDay(chore: Chore, ctx: TodayContext): boolean {
-  const startDay = chore.scheduledFor || pacificDateFromTimestamp(chore.createdAt)
+export function isChoreScheduledForDay(
+  chore: Chore,
+  ctx: TodayContext,
+): boolean {
+  const startDay =
+    chore.scheduledFor || pacificDateFromTimestamp(chore.createdAt)
   if (startDay > ctx.todayIso) return false
   // The archive date is the first inactive Pacific day; earlier history stays intact.
   if (chore.archivedFrom && ctx.todayIso >= chore.archivedFrom) return false
@@ -253,7 +274,8 @@ export function isOpenForKid(
 
   if (chore.type === 'one-off') {
     const done = completions.some((completion) => {
-      if (completion.choreId !== chore.id || completion.kidId !== kidId) return false
+      if (completion.choreId !== chore.id || completion.kidId !== kidId)
+        return false
       const day = pacificDateFromTimestamp(completion.timestamp)
       return day <= ctx.todayIso
     })
@@ -416,7 +438,10 @@ export function recurringStatus(
     return { label: 'Done today', tone: 'success' }
   }
 
-  if (chore.schedule?.cadence === 'weekly' && chore.schedule.daysOfWeek?.length) {
+  if (
+    chore.schedule?.cadence === 'weekly' &&
+    chore.schedule.daysOfWeek?.length
+  ) {
     return {
       label: `Next: ${chore.schedule.daysOfWeek
         .map((day) => DAY_ABBRS[day])
@@ -463,7 +488,10 @@ export function shiftIsoDay(dayIso: string, delta: number): string {
   return formatPacificDate(base)
 }
 
-function nearestScheduledOnOrBefore(dayIso: string, daysOfWeek: number[]): string | null {
+function nearestScheduledOnOrBefore(
+  dayIso: string,
+  daysOfWeek: number[],
+): string | null {
   const day = dateFromIsoDay(dayIso)
   if (!day) return null
   const allowed = daysOfWeek.length ? daysOfWeek : ALL_WEEKDAYS
@@ -479,7 +507,10 @@ function nearestScheduledOnOrBefore(dayIso: string, daysOfWeek: number[]): strin
   return formatPacificDate(day)
 }
 
-function nextScheduledAfter(dayIso: string, daysOfWeek: number[]): string | null {
+function nextScheduledAfter(
+  dayIso: string,
+  daysOfWeek: number[],
+): string | null {
   const day = dateFromIsoDay(dayIso)
   if (!day) return null
   const allowed = daysOfWeek.length ? daysOfWeek : ALL_WEEKDAYS
@@ -503,16 +534,18 @@ export function sortByTimeOfDay<
     createdAt?: string
     type?: 'one-off' | 'repeated' | 'perpetual'
   },
->(
-  chores: T[],
-): T[] {
+>(chores: T[]): T[] {
   return [...chores].sort((a, b) => {
     const isPerpetualA = a.type === 'perpetual'
     const isPerpetualB = b.type === 'perpetual'
     if (isPerpetualA !== isPerpetualB) return isPerpetualA ? 1 : -1
 
-    const orderA = a.timeOfDay ? TIME_ORDER[a.timeOfDay] : Number.POSITIVE_INFINITY
-    const orderB = b.timeOfDay ? TIME_ORDER[b.timeOfDay] : Number.POSITIVE_INFINITY
+    const orderA = a.timeOfDay
+      ? TIME_ORDER[a.timeOfDay]
+      : Number.POSITIVE_INFINITY
+    const orderB = b.timeOfDay
+      ? TIME_ORDER[b.timeOfDay]
+      : Number.POSITIVE_INFINITY
     if (orderA !== orderB) return orderA - orderB
     const createdA = a.createdAt ?? ''
     const createdB = b.createdAt ?? ''
