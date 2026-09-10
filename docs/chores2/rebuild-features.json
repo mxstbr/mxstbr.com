@@ -1,5 +1,5 @@
 {
-  "status": "implemented_verification_in_progress",
+  "status": "implemented_and_deployed",
   "baselineSourceCommit": "18910b2799e21b6fa5481d838e99cfea064013cd",
   "governingDocument": "rebuild-scope.md",
   "newFeatures": [
