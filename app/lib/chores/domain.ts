@@ -1,6 +1,7 @@
 import { PRE_RENAME_SOURCE } from './compatibility'
 import { randomUUID } from 'node:crypto'
 import { PACKING_ITEMS } from './packing'
+import { formatStarLabel, starUnit } from './stars'
 import {
   currentTime,
   pacificDay,
@@ -433,7 +434,7 @@ export function submit(
     stars: s.stars,
     ...bonuses,
     balance: tx.core.balances[o.kidId],
-    message: `+${s.stars} ${s.stars === 1 ? 'star' : 'stars'}. Nice work!`,
+    message: `+${formatStarLabel(s.stars)}. Nice work!`,
   }
 }
 export function review(
@@ -603,7 +604,7 @@ export function redeem(
   if (tx.core.balances[kidId] < reward.cost)
     fail(
       'INSUFFICIENT_STARS',
-      `You need ${reward.cost - tx.core.balances[kidId]} more stars.`,
+      `You need ${reward.cost - tx.core.balances[kidId]} more ${starUnit(reward.cost - tx.core.balances[kidId])}.`,
     )
   const day = tx.days[pacificDay(now)],
     id = `${day.day}:${randomUUID()}`

@@ -7,6 +7,7 @@ import type {
   Period,
 } from 'app/lib/chores/types'
 import type { Command } from 'app/lib/chores/commands'
+import { formatStarLabel } from 'app/lib/chores/stars'
 import { ChildPanel, type PanelName } from './panels'
 import type { PendingAction } from './use-board'
 import { useChoreSounds } from './sounds'
@@ -121,7 +122,9 @@ export function KidColumn({
   }, [showPacking])
   useEffect(() => {
     if (kid.balance > previousBalance.current && !busy)
-      setNote(`+${kid.balance - previousBalance.current} stars arrived!`)
+      setNote(
+        `+${formatStarLabel(kid.balance - previousBalance.current)} arrived!`,
+      )
     previousBalance.current = kid.balance
   }, [kid.balance, busy])
   useEffect(() => {
@@ -201,7 +204,7 @@ export function KidColumn({
         </button>
         <button
           className="chores-wallet"
-          aria-label={`${kid.name} rewards, ${kid.balance} stars`}
+          aria-label={`${kid.name} rewards, ${formatStarLabel(kid.balance)}`}
           onClick={() => setView('rewards')}
         >
           {kid.balance} ★
