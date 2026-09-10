@@ -71,6 +71,31 @@ test('routine replacement switches on the Pacific day without altering history',
   )
 })
 
+test('archived routines stay schedulable on pre-archive days the admin can back-fill, and stop at the boundary', () => {
+  // The admin "Save completion" form posts a chosen `day`; applyCompletion gates
+  // recording on isChoreScheduledForDay(chore, getToday(targetDay)). This locks the
+  // day-context contract that makes dropping the client-side `archived` disabled-gate safe.
+  const old = { ...chore, archivedFrom: '2026-09-10' }
+  // last active Pacific day (archivedFrom − 1) is still recordable by the server
+  assert.equal(isChoreScheduledForDay(old, getToday('2026-09-09')), true)
+  // archivedFrom is the first inactive day; it and every later day are rejected
+  assert.equal(isChoreScheduledForDay(old, getToday('2026-09-10')), false)
+  assert.equal(isChoreScheduledForDay(old, getToday('2026-09-11')), false)
+  // days before the routine started remain out of range
+  assert.equal(isChoreScheduledForDay(old, getToday('2025-12-31')), false)
+
+  // weekly archived routine: a pre-archive day must also fall on a scheduled weekday
+  const weekly = {
+    ...chore,
+    schedule: { cadence: 'weekly' as const, daysOfWeek: [2] },
+    archivedFrom: '2026-09-10',
+  }
+  // 2026-09-08 is a Tuesday → scheduled weekday, before archive → recordable
+  assert.equal(isChoreScheduledForDay(weekly, getToday('2026-09-08')), true)
+  // 2026-09-07 is a Monday → not a scheduled weekday → not recordable even pre-archive
+  assert.equal(isChoreScheduledForDay(weekly, getToday('2026-09-07')), false)
+})
+
 test('school chores repeat once each weekday and do not count on weekends', () => {
   const school = {
     ...chore,
