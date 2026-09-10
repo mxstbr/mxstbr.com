@@ -10,6 +10,8 @@
     "reflect-append-daily-note": "tsm reflect-append-daily-note.ts",
     "set-telegram-webhook": "tsm set-telegram-webhook.ts",
     "chores": "tsm scripts/chores.ts",
+    "chores2": "tsm scripts/chores2.ts",
+    "test:chores2": "tsm --test app/lib/chores2/*.test.ts",
     "test:e2e": "playwright test",
     "format": "prettier --write .",
     "prepare": "husky"

@@ -1,0 +1,20 @@
+export const PACKING_ITEMS = [
+  { id: 'pillow', title: 'Pillow', emoji: '🛏️' },
+  {
+    id: 'electric-heating-blanket',
+    title: 'Electric heating blanket',
+    emoji: '♨️',
+  },
+  { id: 'kindle', title: 'Kindle', emoji: '📖' },
+  { id: 'headphones', title: 'Headphones', emoji: '🎧' },
+  { id: 'underwear', title: '6x pairs of underwear', emoji: '🩲' },
+  { id: 'long-sleeved-shirts', title: '6x long-sleeved shirts', emoji: '👕' },
+  { id: 'long-pants', title: 'Long pants', emoji: '👖' },
+  { id: 'socks', title: '6x socks', emoji: '🧦' },
+  { id: 'crocs', title: 'Crocs', emoji: '🩴' },
+  { id: 'sneakers', title: 'Sneakers', emoji: '👟' },
+  { id: 'bike-helmet', title: 'Bike helmet', emoji: '⛑️' },
+  { id: 'hat', title: 'Hat', emoji: '🧢' },
+  { id: 'sweater', title: 'Sweater', emoji: '🧥' },
+  { id: 'jacket', title: 'Jacket', emoji: '🌧️' },
+] as const

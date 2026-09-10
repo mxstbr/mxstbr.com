@@ -1,6 +1,7 @@
 import { registerAllTools } from 'app/lib/mcp/register-all-tools'
 import { createMcpHandler } from 'mcp-handler'
 import { NextRequest, NextResponse } from 'next/server'
+import { withParentContext } from 'app/lib/chores2/auth'
 
 export const maxDuration = 800
 
@@ -16,6 +17,7 @@ const handler = createMcpHandler(
     instructions: `This MCP server powers Maxie and Minnie workflows.
 
 Chores workflow:
+- The independent /chores2 rebuild test uses chores2_catalog, chores2_inspect_day, chores2_pending_approvals, chores2_command, chores2_device and chores2_notification_status. It has separate balances/data and requires this authenticated MCP connection; a Chores2 kid device cookie grants no parent access. Use these tools when Max refers to chores2 or the rebuild test. The unprefixed chores tools below still manage the original /chores.
 - Use get_chore_board for the UI-shaped state of a Pacific day (today by default). It returns each kid's current star balance, open chores, completed chores, and daily progress.
 - Use search_chores and search_rewards for the durable catalogs, including definitions that may not appear on today's board. Use list_kids for the small canonical kid roster.
 - Resolve canonical IDs with those read tools before mutating. Never invent an existing kid, chore, reward, or completion ID.
@@ -53,7 +55,7 @@ const routeWithAuth = (req: NextRequest) => {
     return new NextResponse('Unauthorized', { status: 401 })
   }
 
-  return handler(req)
+  return withParentContext(isAuthorized, () => handler(req))
 }
 
 export { routeWithAuth as GET, routeWithAuth as POST }
