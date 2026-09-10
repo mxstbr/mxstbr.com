@@ -1,30 +1,22 @@
 import React from 'react'
 import {
   addDays,
-  addWeeks,
   format,
   getDate,
   isFirstDayOfMonth,
   isPast,
-  isWithinInterval,
-  subDays,
-  eachDayOfInterval,
-  isMonday,
   isToday,
   isLastDayOfMonth,
-  getYear,
   isFuture,
   subYears,
   differenceInCalendarWeeks,
   lastDayOfMonth,
-  closestTo,
   addMonths,
   startOfWeek,
   differenceInCalendarDays,
   getDay,
   endOfWeek,
   endOfMonth,
-  Interval,
   formatISODateDay,
   today,
   isEqualDay,
@@ -35,7 +27,7 @@ import {
 import * as patterns from 'hero-patterns'
 import { Event, colors, ISODateDayString, createEventId } from './data'
 import { PUBLIC_HOLIDAYS, holidaysToEvents } from './public-holidays'
-import { BIRTHDAYS, birthdaysToEvents } from './birthdays'
+import { birthdaysToEvents } from './birthdays'
 
 // Get public holiday events
 const PUBLIC_HOLIDAY_EVENTS = holidaysToEvents(PUBLIC_HOLIDAYS)
@@ -302,21 +294,6 @@ function DayWrapper(props: any) {
   return <div {...props} className={`relative px-9 py-11`} />
 }
 
-function Cross() {
-  return (
-    <svg
-      fill="#000"
-      version="1.1"
-      viewBox="0 0 490 490"
-      xmlSpace="preserve"
-      preserveAspectRatio="none"
-      className="absolute bottom-0 left-0 right-0 top-0 h-full w-full z-20"
-    >
-      <path d="M456.851 0L245 212.564 33.149 0 0.708 32.337 212.669 245.004 0.708 457.678 33.149 490 245 277.443 456.851 490 489.292 457.678 277.331 245.004 489.292 32.337z"></path>
-    </svg>
-  )
-}
-
 type BorderProps = {
   top: Array<string>
   bottom: Array<string>
@@ -480,69 +457,6 @@ function getFirstVisibleQuarterStartDate() {
 
   // Otherwise, use the most recent quarter
   return pastQuarters[pastQuarters.length - 1]
-}
-
-function getWeeksWithinInterval(interval: Interval) {
-  return eachDayOfInterval({
-    start: interval.start,
-    end: interval.end,
-  }).reduce(
-    (weeks, day) => {
-      if (isMonday(day)) {
-        return [...weeks, [day]]
-      }
-
-      // If there are no weeks yet or the current week is empty, start a new week
-      if (weeks.length === 0 || weeks[weeks.length - 1].length === 0) {
-        return [[day]]
-      }
-
-      // Otherwise, add the day to the current week
-      return [...weeks.slice(0, -1), [...weeks[weeks.length - 1], day]]
-    },
-    [] as Array<Array<ISODateDayString>>,
-  )
-}
-
-function isWeekEventDaysEven(event: Event, day: ISODateDayString) {
-  const weeks = getWeeksWithinInterval(event)
-
-  const week = weeks.find((week) => week.includes(day))
-
-  if (!week)
-    throw new Error(
-      `Event ${
-        event.label || event.start
-      } has day ${day} that isn't within the event days. What!`,
-    )
-
-  return week.length % 2 === 0
-}
-
-/**
- * Check whether a day is the middle day of the longest continuous sequence of days in a visual row for a specific event
- */
-function isMiddleDayOfLongestWeekInInterval(
-  event: Interval,
-  day: ISODateDayString,
-) {
-  const weeks = getWeeksWithinInterval(event)
-
-  const longestWeek = weeks.sort((a, b) => b.length - a.length)[0]
-
-  const isInLongestWeek = isWithinInterval(day, {
-    start: longestWeek[0],
-    end: longestWeek[longestWeek.length - 1],
-  })
-
-  if (!isInLongestWeek) return false
-
-  const isMiddleDay =
-    // Even length: [1,2,3,4].indexOf(2) = 1 + 1; length / 2 = 2
-    // Uneven length: [1,2,3,4,5].indexOf(3) = 2 + 1; length / 2 = 2.5; Math.ceil(2.5) = 3
-    longestWeek.indexOf(day) + 1 === Math.ceil(longestWeek.length / 2)
-
-  return isMiddleDay
 }
 
 /**
