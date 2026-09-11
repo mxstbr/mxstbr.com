@@ -5,28 +5,6 @@ import React from 'react'
 import { MDXComponents } from 'mdx/types'
 import { slugify } from './app/slugify'
 
-function Table({ data }) {
-  let headers = data.headers.map((header, index) => (
-    <th key={index}>{header}</th>
-  ))
-  let rows = data.rows.map((row, index) => (
-    <tr key={index}>
-      {row.map((cell, cellIndex) => (
-        <td key={cellIndex}>{cell}</td>
-      ))}
-    </tr>
-  ))
-
-  return (
-    <table>
-      <thead>
-        <tr>{headers}</tr>
-      </thead>
-      <tbody>{rows}</tbody>
-    </table>
-  )
-}
-
 function CustomLink(props) {
   let href = props.href
 
@@ -100,7 +78,6 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     Image: RoundedImage,
     a: CustomLink,
     code: Code,
-    Table,
     ...components,
   }
 }
