@@ -1,7 +1,6 @@
 import type { NextConfig } from 'next'
 import createMDX from '@next/mdx'
 import { randomUUID } from 'node:crypto'
-import { getNotes } from './app/(public)/notes/hashnode'
 
 const nextConfig: NextConfig = {
   // Bake one identity into both server bundles even when the hosting project
@@ -15,17 +14,6 @@ const nextConfig: NextConfig = {
     mdxRs: true,
   },
   async redirects() {
-    const notes = await getNotes()
-    const previousSlugNotesRedirects = notes
-      .filter((note) => note.frontmatter.previousSlugs.length > 0)
-      .flatMap((note) =>
-        note.frontmatter.previousSlugs.map((previousSlug) => ({
-          source: `/notes/${previousSlug}`,
-          destination: `/notes/${note.frontmatter.slug}`,
-          permanent: true,
-        })),
-      )
-
     return [
       {
         source: '/investments',
@@ -37,7 +25,6 @@ const nextConfig: NextConfig = {
         destination: '/investing',
         permanent: true,
       },
-      ...previousSlugNotesRedirects,
     ]
   },
   outputFileTracingIncludes: {
