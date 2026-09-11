@@ -1,6 +1,15 @@
 'use client'
 
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import {
+  Area,
+  AreaChart,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend
+} from 'recharts'
 import { PortfolioValue } from './portfolio-calculator'
 import { useMoneyVisibility, BlurredValue } from './money-visibility'
 
@@ -9,44 +18,104 @@ function formatDollar(value: number): string {
   return Math.round(value).toLocaleString()
 }
 
+type ChartDataPoint = Record<string, number | string>
+
 interface PortfolioChartProps {
   portfolioHistory: PortfolioValue[]
 }
 
 export default function PortfolioChart({ portfolioHistory }: PortfolioChartProps) {
   const { unlocked, requestUnlock } = useMoneyVisibility()
-  // Format data for the chart
-  const chartData = portfolioHistory.map(item => ({
-    date: item.date,
-    value: Math.round(item.totalValue),
-    formattedDate: new Date(item.date).toLocaleDateString('en-US', { 
-      month: 'short', 
-      year: 'numeric' 
-    })
+  const tickers = Array.from(
+    new Set(portfolioHistory.flatMap(item => Object.keys(item.holdings || {})))
+  ).sort()
+
+  const colorPalette = [
+    '#10b981',
+    '#6366f1',
+    '#f59e0b',
+    '#ef4444',
+    '#8b5cf6',
+    '#06b6d4',
+    '#f97316'
+  ]
+
+  const series = tickers.map((ticker, index) => ({
+    ticker,
+    dataKey: `holding_${index}`,
+    color: colorPalette[index % colorPalette.length],
   }))
-  
-  // Custom tooltip for the chart
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white dark:bg-slate-800 p-3 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg">
-          <p className="text-slate-600 dark:text-slate-400">
-            {new Date(label).toLocaleDateString('en-US', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            })}
-          </p>
-          <p className="text-slate-900 dark:text-slate-100 font-semibold">
-            <BlurredValue>${formatDollar(payload[0].value)}</BlurredValue>
-          </p>
-        </div>
-      )
+
+  // Format data for the chart
+  const chartData: ChartDataPoint[] = portfolioHistory.map(item => {
+    const entry: ChartDataPoint = {
+      date: item.date,
+      totalValue: Math.round(item.totalValue),
+      formattedDate: new Date(item.date).toLocaleDateString('en-US', {
+        month: 'short',
+        year: 'numeric'
+      })
     }
-    return null
+
+    series.forEach(({ ticker, dataKey }) => {
+      const holdingValue = item.holdings?.[ticker]?.value ?? 0
+      entry[dataKey] = Math.round(holdingValue)
+    })
+
+    return entry
+  })
+
+  // Custom tooltip for the chart
+  const CustomTooltip = (props: {
+    active?: boolean
+    payload?: Array<{
+      color?: string
+      dataKey?: string | number
+      name?: string | number
+      value?: number
+      payload?: ChartDataPoint
+    }>
+    label?: string | number
+  }) => {
+    const { active, payload, label } = props
+    if (!active || !payload?.length) return null
+
+    const total = payload.reduce((sum, entry) => sum + (entry.value || 0), 0)
+    const formattedLabel = payload[0]?.payload?.date || label
+
+    return (
+      <div className="bg-white dark:bg-slate-800 p-3 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg">
+        <p className="text-slate-600 dark:text-slate-400">
+          {new Date(formattedLabel || '').toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })}
+        </p>
+        <p className="text-slate-900 dark:text-slate-100 font-semibold">
+          <BlurredValue>${formatDollar(total)}</BlurredValue>
+        </p>
+        <div className="mt-3 space-y-1">
+          {payload.map(entry => (
+            <div key={entry.dataKey} className="flex items-center justify-between text-sm">
+              <span className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                <span
+                  className="h-2 w-2 rounded-full"
+                  style={{ backgroundColor: entry.color }}
+                />
+                {entry.name}
+              </span>
+              <span className="text-slate-900 dark:text-slate-100">
+                <BlurredValue>${formatDollar(entry.value || 0)}</BlurredValue>
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
   }
-  
+
   return (
     <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700">
       <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-6">
@@ -63,7 +132,7 @@ export default function PortfolioChart({ portfolioHistory }: PortfolioChartProps
           </button>
         ) : null}
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart
+          <AreaChart
             data={chartData}
             margin={{
               top: 5,
@@ -73,8 +142,8 @@ export default function PortfolioChart({ portfolioHistory }: PortfolioChartProps
             }}
           >
             <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-            <XAxis 
-              dataKey="formattedDate" 
+            <XAxis
+              dataKey="formattedDate"
               className="text-slate-600 dark:text-slate-400"
               fontSize={12}
             />
@@ -84,15 +153,27 @@ export default function PortfolioChart({ portfolioHistory }: PortfolioChartProps
               tickFormatter={(value) => (unlocked ? `$${(value / 1000).toFixed(0)}k` : '•••')}
             />
             <Tooltip content={<CustomTooltip />} />
-            <Line 
-              type="monotone" 
-              dataKey="value" 
-              stroke="#10b981" 
-              strokeWidth={3}
-              dot={false}
-              activeDot={{ r: 6, className: "fill-green-500" }}
+            <Legend
+              wrapperStyle={{
+                color: 'rgb(148 163 184)' // slate-400
+              }}
             />
-          </LineChart>
+            {series.map(({ ticker, dataKey, color }) => (
+              <Area
+                key={dataKey}
+                type="monotone"
+                dataKey={dataKey}
+                name={ticker}
+                stackId="portfolio"
+                stroke={color}
+                fill={color}
+                fillOpacity={0.25}
+                strokeWidth={2.5}
+                activeDot={{ r: 5, className: 'opacity-80' }}
+                isAnimationActive={false}
+              />
+            ))}
+          </AreaChart>
         </ResponsiveContainer>
       </div>
     </div>
