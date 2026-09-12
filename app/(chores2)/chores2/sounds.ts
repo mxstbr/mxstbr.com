@@ -21,7 +21,7 @@ export function useChoreSounds() {
   }, [])
   const prime = (kind: 'chore' | 'reward') => {
     const audio = sounds.current?.[kind]
-    if (!audio) return
+    if (!audio || (!audio.paused && !audio.muted)) return
     audio.muted = true
     void audio
       .play()
