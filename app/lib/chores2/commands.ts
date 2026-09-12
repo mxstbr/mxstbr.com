@@ -18,9 +18,22 @@ const color = z.string().regex(/^#[0-9a-fA-F]{6}$/)
 const schedule = z
   .object({
     cadence: z.enum(['daily', 'weekly']),
-    daysOfWeek: z.array(z.number().int().min(0).max(6)).max(7).optional(),
+    daysOfWeek: z
+      .array(z.number().int().min(0).max(6))
+      .min(1)
+      .max(7)
+      .optional(),
   })
   .strict()
+  .superRefine((s, ctx) => {
+    if (s.cadence === 'weekly' && !(s.daysOfWeek && s.daysOfWeek.length > 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['daysOfWeek'],
+        message: 'Weekly cadence requires at least one weekday.',
+      })
+    }
+  })
 const choreFields = {
   title: z.string().trim().min(1).max(200),
   emoji: z.string().trim().min(1).max(24),
