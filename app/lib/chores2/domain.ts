@@ -52,12 +52,14 @@ export function scheduled(chore: Chore, kidId: string, day: string) {
   if (starts > day || (chore.archivedFrom && chore.archivedFrom <= day))
     return false
   if (chore.type === 'one-off' && starts !== day) return false
-  if (
-    chore.type === 'repeated' &&
-    chore.schedule?.daysOfWeek?.length &&
-    !chore.schedule.daysOfWeek.includes(weekday(day))
-  )
-    return false
+  if (chore.type === 'repeated' && chore.schedule) {
+    const days = chore.schedule.daysOfWeek
+    if (chore.schedule.cadence === 'weekly') {
+      if (!days || !days.includes(weekday(day))) return false
+    } else if (days && days.length && !days.includes(weekday(day))) {
+      return false
+    }
+  }
   return true
 }
 export function paused(chore: Chore, kidId: string, day: string) {
