@@ -65,6 +65,7 @@ export default function Home() {
           <li>
             Speed wins
             <ul>
+              <li>Fun is a competitive advantage</li>
               <li>There is no speed limit</li>
               <li>Pressure is a privilege</li>
               <li>Slow is smooth and smooth is fast</li>
