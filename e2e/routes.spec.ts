@@ -7,7 +7,9 @@ async function expectPageOk(page: Page, path: string) {
   expect(response, `Expected a response for ${path}`).toBeTruthy()
   expect(response!.ok(), `Expected ${path} to load successfully`).toBeTruthy()
   await expect(page.locator('body')).toBeVisible()
-  await expect(page.getByText('This page could not be found').first()).toHaveCount(0)
+  await expect(
+    page.getByText('This page could not be found').first(),
+  ).toHaveCount(0)
 }
 
 test.describe('Public pages render', () => {
@@ -62,7 +64,10 @@ test.describe('Public pages render', () => {
     })
 
     test.skip(notePaths.length === 0, 'No notes available to test detail pages')
-    test.skip(topicPaths.length === 0, 'No note topics available to test topic routes')
+    test.skip(
+      topicPaths.length === 0,
+      'No note topics available to test topic routes',
+    )
 
     for (const path of notePaths) {
       await expectPageOk(page, path)
@@ -71,6 +76,31 @@ test.describe('Public pages render', () => {
     for (const path of topicPaths) {
       await expectPageOk(page, path)
     }
+  })
+
+  test('homepage / emits social preview (og:* + twitter:*) meta tags', async ({
+    page,
+  }) => {
+    await page.goto('/', { waitUntil: 'networkidle' })
+
+    const ogImage = page.locator('meta[property="og:image"]')
+    const twitterCard = page.locator('meta[name="twitter:card"]')
+    const ogTitle = page.locator('meta[property="og:title"]')
+    const twitterImage = page.locator('meta[name="twitter:image"]')
+
+    await expect(
+      ogImage,
+      'og:image must be present so / unfurls a preview card',
+    ).toHaveAttribute('content', 'https://mxstbr.com/og')
+    await expect(
+      twitterCard,
+      'twitter:card must be present so / unfurls a preview card',
+    ).toHaveAttribute('content', 'summary_large_image')
+    await expect(ogTitle).toHaveAttribute('content', 'Max Stoiber (@mxstbr)')
+    await expect(twitterImage).toHaveAttribute(
+      'content',
+      'https://mxstbr.com/og',
+    )
   })
 
   test('renders /oss when GitHub access is configured', async ({ page }) => {
@@ -87,9 +117,9 @@ test.describe('Personal pages require the password', () => {
   async function addPasswordCookie(page: Page, testInfo: TestInfo) {
     const baseURL = testInfo.project.use.baseURL || 'http://127.0.0.1:3000'
 
-    await page.context().addCookies([
-      { name: 'password', value: CAL_PASSWORD, url: baseURL },
-    ])
+    await page
+      .context()
+      .addCookies([{ name: 'password', value: CAL_PASSWORD, url: baseURL }])
   }
 
   const personalRoutes = [
@@ -134,7 +164,9 @@ test.describe('Personal pages require the password', () => {
     expect(authStatus).toBe('true')
   })
 
-  test('/os shows unauthenticated state without the password', async ({ page }) => {
+  test('/os shows unauthenticated state without the password', async ({
+    page,
+  }) => {
     const response = await page.goto('/os', { waitUntil: 'networkidle' })
     expect(response?.ok()).toBeTruthy()
 
