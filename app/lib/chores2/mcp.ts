@@ -37,7 +37,7 @@ export function registerChores2Tools(server: McpServer) {
     {
       title: 'Chores2 catalog',
       description:
-        'Read the independent /chores2 test setup: canonical kid/chore/reward IDs, exact balances, explicit routine order, packing and migration provenance. This is separate from the legacy /chores board.',
+        'Read the current /chores board: canonical kid/chore/reward IDs, exact balances, explicit routine order, packing and migration provenance. The old board is now at /chores2; its unprefixed tools manage separate legacy data.',
       inputSchema: z.object({}),
     },
     () => result(() => choresService().catalog(parentActor())),
@@ -70,7 +70,7 @@ export function registerChores2Tools(server: McpServer) {
     {
       title: 'Change Chores2',
       description:
-        'Apply a named command to the independent /chores2 test setup. Resolve IDs first. Supply a unique requestId and reuse it after an uncertain response. submit requires an eligible current occurrence, even for parents. review approves/rejects an exact accepted on-time submission, including after its window/day. undo reverses an exact completion. Configure chores/rewards, pause/resume, adjust stars with a reason, order routines, rename/color kids, and update/reset packing. No skips, backdating, parent UI, or Telegram action buttons. pause_all until is the exclusive reappear date; update_chore pausedUntil is inclusive.',
+        'Apply a named command to the current /chores board. The chores2 tool prefix is retained for compatibility. Resolve IDs first. Supply a unique requestId and reuse it after an uncertain response. submit requires an eligible current occurrence, even for parents. review approves/rejects an exact accepted on-time submission, including after its window/day. undo reverses an exact completion. Configure chores/rewards, pause/resume, adjust stars with a reason, order routines, rename/color kids, and update/reset packing. No skips, backdating, parent UI, or Telegram action buttons. pause_all until is the exclusive reappear date; update_chore pausedUntil is inclusive.',
       inputSchema: z.object({
         requestId: z.string().min(8).max(100),
         command: commandSchema,

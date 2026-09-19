@@ -124,7 +124,7 @@ export async function inviteDevice(
     { ex: 86400 },
   )
   return {
-    url: `https://mxstbr.com/chores2/activate#code=${code}`,
+    url: `https://mxstbr.com/chores/activate#code=${code}`,
     expiresInHours: 24,
     message:
       'Open this one-use link on the shared iPad. It grants access only to the Chores2 kid board.',

@@ -83,7 +83,7 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
     if (day) params.set('day', day)
     if (osParam) params.set('os', osParam)
     const query = params.toString()
-    return query ? `/chores?${query}` : '/chores'
+    return query ? `/chores2?${query}` : '/chores2'
   }
 
   const openChoresByKid: Record<string, Chore[]> = {}

@@ -2,7 +2,7 @@ import nextEnv from '@next/env'
 import { randomBytes, createHash, randomUUID } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import { Client } from '@upstash/qstash'
-import type { ChoreState } from '../app/(os)/chores/data'
+import type { ChoreState } from '../app/(os)/chores2/data'
 import { migrateLegacy } from '../app/lib/chores2/migration'
 import {
   PREFIX,
@@ -161,7 +161,7 @@ return 1`,
       }),
       { ex: 86400 },
     )
-    console.log(`https://mxstbr.com/chores2/activate#code=${code}`)
+    console.log(`https://mxstbr.com/chores/activate#code=${code}`)
     return
   }
   if (action === 'notifications-setup') {

@@ -225,7 +225,7 @@ export function notify(
 ) {
   tx.notifications.push({
     id: randomUUID(),
-    text: `[Chores2 test] ${text}`,
+    text: `[Chores] ${text}`,
     status: 'pending',
     createdAt: now.toISOString(),
     attempts: 0,

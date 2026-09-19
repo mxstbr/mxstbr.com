@@ -10,7 +10,7 @@ import type {
   Kid,
   Reward,
   RewardType,
-} from '../app/(os)/chores/data'
+} from '../app/(os)/chores2/data'
 
 const CHORES_KEY = 'chores:mxstbr:family-board'
 const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/

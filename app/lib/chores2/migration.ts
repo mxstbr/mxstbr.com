@@ -1,4 +1,4 @@
-import type { ChoreState } from '../../(os)/chores/data'
+import type { ChoreState } from '../../(os)/chores2/data'
 import {
   emptyDay,
   ensurePlan,

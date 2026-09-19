@@ -8,9 +8,9 @@ type ChoresNavProps = {
 }
 
 const views: { id: ChoresView; label: string; path: string }[] = [
-  { id: 'chores', label: 'Chores', path: '/chores' },
-  { id: 'rewards', label: 'Rewards', path: '/chores/rewards' },
-  { id: 'packing', label: 'Packing', path: '/chores/packing' },
+  { id: 'chores', label: 'Chores', path: '/chores2' },
+  { id: 'rewards', label: 'Rewards', path: '/chores2/rewards' },
+  { id: 'packing', label: 'Packing', path: '/chores2/packing' },
 ]
 
 export function choresViewHref(path: string, osParam?: string) {

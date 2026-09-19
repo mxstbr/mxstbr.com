@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { KidBoard } from './kid-board'
-import { type Chore, getChoreState } from '../chores/data'
+import { type Chore, getChoreState } from '../chores2/data'
 import {
   getToday,
   getDailyChoreProgress,
@@ -9,13 +9,13 @@ import {
   pacificDateFromTimestamp,
   shiftIsoDay,
   sortByTimeOfDay,
-} from '../chores/utils'
-import { ScreenSaver } from '../chores/screen-saver'
+} from '../chores2/utils'
+import { ScreenSaver } from '../chores2/screen-saver'
 import { RefreshButton } from './refresh-button'
 import { PasswordForm } from '../components/password-form'
 import { auth, isMax } from '../../auth'
-import { ChoresErrorBoundary } from '../chores/error-boundary'
-import { choresViewHref } from '../chores/chores-nav'
+import { ChoresErrorBoundary } from '../chores2/error-boundary'
+import { choresViewHref } from '../chores2/chores-nav'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -171,13 +171,13 @@ export default async function ChoresPage({ searchParams }: ChoresPageProps) {
                 Chores
               </Link>
               <Link
-                href={choresViewHref('/chores/rewards', osParam)}
+                href={choresViewHref('/chores2/rewards', osParam)}
                 className="rounded-lg px-1.5 py-1.5 transition hover:bg-white/70 hover:text-slate-950 dark:hover:bg-slate-800 dark:hover:text-white sm:px-2"
               >
                 Rewards
               </Link>
               <Link
-                href={choresViewHref('/chores/packing', osParam)}
+                href={choresViewHref('/chores2/packing', osParam)}
                 className="rounded-lg px-1.5 py-1.5 transition hover:bg-white/70 hover:text-slate-950 dark:hover:bg-slate-800 dark:hover:text-white sm:px-2"
               >
                 Packing

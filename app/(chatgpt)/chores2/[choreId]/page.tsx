@@ -13,14 +13,14 @@ import {
   ShieldCheck,
   Star,
 } from '@openai/apps-sdk-ui/components/Icon'
-import { type Chore, getChoreState } from 'app/(os)/chores/data'
+import { type Chore, getChoreState } from 'app/(os)/chores2/data'
 import {
   getToday,
   hasCompletedTodayForKid,
   isOpenForKid,
   recurringStatus,
   scheduleLabel,
-} from 'app/(os)/chores/utils'
+} from 'app/(os)/chores2/utils'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0

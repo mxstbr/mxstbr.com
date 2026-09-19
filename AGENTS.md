@@ -21,6 +21,8 @@ Run commands from the repo root. Prefer `pnpm dev` for iterative changes; use `p
 
 ## Kids Chores
 
+- The current `/chores` product uses `pnpm chores2 ...` and authenticated `chores2_*` MCP tools with independent `chores:mxstbr:v2` Redis keys. Their names are retained for compatibility after promotion. The old board lives at `/chores2`; `pnpm chores ...` and unprefixed MCP chore tools manage only that legacy dataset. Default to the current product unless explicitly asked about the old board.
+
 - Chores live in Upstash RedisJSON at `chores:mxstbr:family-board` as `{ kids, chores, completions, rewards, rewardRedemptions }`; use `pnpm chores ...` for agent-managed reads and mutations.
 - `snoozedUntil` and `snoozedForKids[kidId]` are exclusive reappear dates, not inclusive hidden-through dates: the app hides a chore only when the stored snooze date is greater than the viewed Pacific date. To skip chores for June 21 and have them back on June 22, set the snooze date to `2026-06-22`, then verify both the skipped day and the reappear day.
 - For a future routine replacement, update old chores with `archivedFrom: "YYYY-MM-DD"` (first inactive Pacific day) and add replacements with `scheduledFor` set to that same day (first active day, including recurring chores). Keep old records for history, leave untimed Bonus chores untouched, and verify the prior day, start day, and weekend. Daily chores can use `schedule.daysOfWeek: [1,2,3,4,5]` for weekdays only.

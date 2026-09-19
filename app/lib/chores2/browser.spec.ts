@@ -5,7 +5,7 @@ test('read-aloud controls play a local audio fixture; idle panels and display wa
   page,
 }) => {
   await page.clock.install()
-  await page.goto('/chores2')
+  await page.goto('/chores')
   const board = await (await page.request.get('/api/chores2/board')).json()
   expect(board.serverNow).toBe('2026-09-09T15:00:00.000Z')
   const dilan = page.locator('[data-kid="kid-1"]')
@@ -41,7 +41,7 @@ test('landscape iPad: focus, stars, exact undo, rewards, packing, color, summary
 }) => {
   const errors: string[] = []
   page.on('pageerror', (e) => errors.push(e.message))
-  await page.goto('/chores2')
+  await page.goto('/chores')
   const initial = await (await page.request.get('/api/chores2/board')).json()
   // This suite must never mutate a live board.
   expect(initial.serverNow).toBe('2026-09-09T15:00:00.000Z')

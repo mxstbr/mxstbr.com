@@ -13,13 +13,13 @@ import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useReward } from 'react-rewards'
-import type { Chore, Completion, Kid } from '../chores/data'
+import type { Chore, Completion, Kid } from '../chores2/data'
 import {
   completeChore,
   requestApproval,
   skipChore,
   undoChore,
-} from '../chores/actions'
+} from '../chores2/actions'
 import {
   DAILY_BONUS_STARS,
   type DailyChoreProgress,
@@ -30,8 +30,8 @@ import {
   sortByTimeOfDay,
   starsForKid,
   withAlpha,
-} from '../chores/utils'
-import { useRandomAudioCue } from '../chores/use-audio-cue'
+} from '../chores2/utils'
+import { useRandomAudioCue } from '../chores2/use-audio-cue'
 
 type FreshChore = Chore & { isNew?: boolean }
 

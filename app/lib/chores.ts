@@ -12,7 +12,7 @@ import {
   undoChoreDetailed,
   updateChore,
   updateReward,
-} from 'app/(os)/chores/actions'
+} from 'app/(os)/chores2/actions'
 import {
   CHORES_KEY,
   getChoreState,
@@ -20,7 +20,7 @@ import {
   type Chore,
   type Kid,
   type Reward,
-} from 'app/(os)/chores/data'
+} from 'app/(os)/chores2/data'
 import {
   getDailyChoreProgress,
   getToday,
@@ -29,7 +29,7 @@ import {
   scheduleLabel,
   sortByTimeOfDay,
   starsForKid,
-} from 'app/(os)/chores/utils'
+} from 'app/(os)/chores2/utils'
 import { Redis } from '@upstash/redis'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { type FormEvent, createContext, useContext, useEffect, useState } from 'react'
-import { PARENTAL_PIN } from '../chores/parental-pin'
+import { PARENTAL_PIN } from '../chores2/parental-pin'
 
 interface MoneyVisibilityContextValue {
   unlocked: boolean

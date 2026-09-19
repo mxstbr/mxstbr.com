@@ -9,7 +9,7 @@ export default function Activate() {
     started.current = true
     const code =
       new URLSearchParams(window.location.hash.slice(1)).get('code') || ''
-    history.replaceState(null, '', '/chores2/activate')
+    history.replaceState(null, '', '/chores/activate')
     void fetch('/api/chores2/activate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -19,7 +19,7 @@ export default function Activate() {
         const data = await r.json()
         if (!r.ok)
           throw new Error(data.error?.message || 'Could not open this board.')
-        window.location.replace('/chores2')
+        window.location.replace('/chores')
       })
       .catch((e) => setError(e.message))
   }, [])

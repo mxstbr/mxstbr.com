@@ -756,7 +756,7 @@ function ChoreFilters({ kids, filters }: { kids: Kid[]; filters: FilterState }) 
             </button>
             <a
               className="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-200"
-              href="/chores/admin"
+              href="/chores2/admin"
             >
               Reset
             </a>
@@ -992,7 +992,7 @@ export default async function ChoreAdminPage({ searchParams }: AdminPageProps) {
     const params = new URLSearchParams(baseParams)
     params.set('page', page.toString())
     const query = params.toString()
-    return `/chores/admin${query ? `?${query}` : ''}`
+    return `/chores2/admin${query ? `?${query}` : ''}`
   }
 
   const analytics = buildChoreAnalytics(state, ctx)
@@ -1021,13 +1021,13 @@ export default async function ChoreAdminPage({ searchParams }: AdminPageProps) {
               </p>
             </div>
             <Link
-              href="/chores"
+              href="/chores2"
               className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 shadow-xs transition hover:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             >
               Open kid board
             </Link>
             <Link
-              href="/chores/rewards"
+              href="/chores2/rewards"
               className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 shadow-xs transition hover:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             >
               Open rewards

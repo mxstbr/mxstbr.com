@@ -1,4 +1,4 @@
-import type { ChoreState } from '../../(os)/chores/data'
+import type { ChoreState } from '../../(os)/chores2/data'
 import { migrateLegacy } from './migration'
 
 export function fixture(now = new Date('2026-09-09T15:00:00Z')) {

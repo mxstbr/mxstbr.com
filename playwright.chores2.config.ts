@@ -14,7 +14,7 @@ export default defineConfig({
   },
   webServer: {
     command: 'pnpm dev --hostname 127.0.0.1 --port 3022',
-    url: 'http://127.0.0.1:3022/chores2',
+    url: 'http://127.0.0.1:3022/chores',
     reuseExistingServer: true,
     env: { CHORES2_DEV_FIXTURE: login ? '0' : '1' },
     timeout: 120000,

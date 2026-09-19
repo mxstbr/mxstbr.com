@@ -12,8 +12,8 @@ import {
   Clock,
   Members,
 } from '@openai/apps-sdk-ui/components/Icon'
-import type { Chore, Kid } from 'app/(os)/chores/data'
-import { scheduleLabel } from 'app/(os)/chores/utils'
+import type { Chore, Kid } from 'app/(os)/chores2/data'
+import { scheduleLabel } from 'app/(os)/chores2/utils'
 import { useOpenAiGlobal, useWidgetState } from 'app/(chatgpt)/openai-hooks'
 
 type KidStatus = {
@@ -334,7 +334,7 @@ function ChoreRow({
                 {chore.title}
               </h2>
               <Link
-                href={`/chores/${encodeURIComponent(chore.id)}`}
+                href={`/chores2/${encodeURIComponent(chore.id)}`}
                 className="text-sm font-semibold text-secondary underline decoration-transparent transition group-hover:decoration-current"
                 onClick={(event) => event.stopPropagation()}
               >

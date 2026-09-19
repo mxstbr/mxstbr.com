@@ -23,7 +23,7 @@ export function LoginForm() {
           data.error?.message ||
             'Could not unlock the board. Please try again.',
         )
-      window.location.replace('/chores2')
+      window.location.replace('/chores')
     } catch (error) {
       setError(
         error instanceof Error

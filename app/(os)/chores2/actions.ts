@@ -115,10 +115,10 @@ async function withUpdatedState<T>(
   if (before === after) return result
 
   await saveChoreState(state)
-  revalidatePath('/chores')
-  revalidatePath('/chores/admin')
-  revalidatePath('/chores/rewards')
-  revalidatePath('/chores/bedtime-approval')
+  revalidatePath('/chores2')
+  revalidatePath('/chores2/admin')
+  revalidatePath('/chores2/rewards')
+  revalidatePath('/chores2/bedtime-approval')
   return result
 }
 
@@ -217,7 +217,7 @@ function maybeRevokeDailyBonus({
 
 async function approvalUrl(choreId: string, kidId: string, dayIso: string): Promise<string> {
   const baseUrl = await getBaseUrl()
-  const url = new URL(`/chores/approve/${encodeURIComponent(choreId)}`, baseUrl)
+  const url = new URL(`/chores2/approve/${encodeURIComponent(choreId)}`, baseUrl)
   url.searchParams.set('kidId', kidId)
   url.searchParams.set('day', dayIso)
   return url.toString()
@@ -230,7 +230,7 @@ async function undoUrl(
   dayIso: string,
 ): Promise<string> {
   const baseUrl = await getBaseUrl()
-  const url = new URL(`/chores/undo/${encodeURIComponent(completionId)}`, baseUrl)
+  const url = new URL(`/chores2/undo/${encodeURIComponent(completionId)}`, baseUrl)
   url.searchParams.set('choreId', choreId)
   url.searchParams.set('kidId', kidId)
   url.searchParams.set('day', dayIso)

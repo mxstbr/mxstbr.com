@@ -17,7 +17,7 @@ test('an existing OS login opens the board and APIs with kid-only permissions', 
   context,
 }) => {
   await context.addCookies([{ name: 'password', value: password!, url: base }])
-  await page.goto('/chores2')
+  await page.goto('/chores')
   await expect(page.locator('.c2-child')).toHaveCount(3)
   await expect(page.getByLabel('Site password')).toHaveCount(0)
   expect((await page.request.get('/api/chores2/board')).status()).toBe(200)
@@ -53,7 +53,7 @@ test('an iPad without a login can enter the existing password and remain signed 
   page,
   context,
 }) => {
-  await page.goto('/chores2')
+  await page.goto('/chores')
   await expect(
     page.getByRole('heading', { name: 'Your chore board' }),
   ).toBeVisible()
@@ -89,7 +89,7 @@ test('wrong cookies and cross-origin login requests grant no access', async ({
   await context.addCookies([
     { name: 'password', value: 'invalid-existing-login', url: base },
   ])
-  await page.goto('/chores2')
+  await page.goto('/chores')
   await expect(page.getByLabel('Site password')).toBeVisible()
   expect((await page.request.get('/api/chores2/board')).status()).toBe(401)
   const denied = await page.request.post('/api/chores2/login', {
@@ -103,4 +103,25 @@ test('wrong cookies and cross-origin login requests grant no access', async ({
     data: {},
   })
   expect(missing.status()).toBe(403)
+})
+
+test('the old board and its navigation live entirely at /chores2', async ({
+  page,
+  context,
+}) => {
+  await context.addCookies([{ name: 'password', value: password!, url: base }])
+  await page.goto('/chores2')
+  await expect(page.locator('.c2-child')).toHaveCount(0)
+  await expect(
+    page.getByRole('link', { name: 'Chores', exact: true }),
+  ).toHaveAttribute('href', '/chores2')
+  await expect(
+    page.getByRole('link', { name: 'Rewards', exact: true }),
+  ).toHaveAttribute('href', '/chores2/rewards')
+  await page.getByRole('link', { name: 'Rewards', exact: true }).click()
+  await expect(page).toHaveURL(`${base}/chores2/rewards`)
+  await page.getByRole('link', { name: 'Packing', exact: true }).click()
+  await expect(page).toHaveURL(`${base}/chores2/packing`)
+  await page.getByRole('link', { name: 'Chores', exact: true }).click()
+  await expect(page).toHaveURL(`${base}/chores2`)
 })

@@ -7,7 +7,9 @@ async function expectPageOk(page: Page, path: string) {
   expect(response, `Expected a response for ${path}`).toBeTruthy()
   expect(response!.ok(), `Expected ${path} to load successfully`).toBeTruthy()
   await expect(page.locator('body')).toBeVisible()
-  await expect(page.getByText('This page could not be found').first()).toHaveCount(0)
+  await expect(
+    page.getByText('This page could not be found').first(),
+  ).toHaveCount(0)
 }
 
 test.describe('Public pages render', () => {
@@ -62,7 +64,10 @@ test.describe('Public pages render', () => {
     })
 
     test.skip(notePaths.length === 0, 'No notes available to test detail pages')
-    test.skip(topicPaths.length === 0, 'No note topics available to test topic routes')
+    test.skip(
+      topicPaths.length === 0,
+      'No note topics available to test topic routes',
+    )
 
     for (const path of notePaths) {
       await expectPageOk(page, path)
@@ -87,16 +92,17 @@ test.describe('Personal pages require the password', () => {
   async function addPasswordCookie(page: Page, testInfo: TestInfo) {
     const baseURL = testInfo.project.use.baseURL || 'http://127.0.0.1:3000'
 
-    await page.context().addCookies([
-      { name: 'password', value: CAL_PASSWORD, url: baseURL },
-    ])
+    await page
+      .context()
+      .addCookies([{ name: 'password', value: CAL_PASSWORD, url: baseURL }])
   }
 
   const personalRoutes = [
     '/cal',
     '/chores',
-    '/chores/rewards',
-    '/chores/admin',
+    '/chores2',
+    '/chores2/rewards',
+    '/chores2/admin',
     '/finance',
     '/reminder',
     '/stats',
@@ -134,7 +140,9 @@ test.describe('Personal pages require the password', () => {
     expect(authStatus).toBe('true')
   })
 
-  test('/os shows unauthenticated state without the password', async ({ page }) => {
+  test('/os shows unauthenticated state without the password', async ({
+    page,
+  }) => {
     const response = await page.goto('/os', { waitUntil: 'networkidle' })
     expect(response?.ok()).toBeTruthy()
 

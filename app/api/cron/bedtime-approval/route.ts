@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { BEDTIME_TEMPLATES } from 'app/(os)/chores/bedtime-approval/constants'
-import { formatPacificDate, pacificTimeInMinutes, PACIFIC_TIMEZONE } from 'app/(os)/chores/utils'
+import { BEDTIME_TEMPLATES } from 'app/(os)/chores2/bedtime-approval/constants'
+import { formatPacificDate, pacificTimeInMinutes, PACIFIC_TIMEZONE } from 'app/(os)/chores2/utils'
 import { getBaseUrl } from 'app/lib/base-url'
 import { bot } from 'app/lib/telegram'
 
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
   }
 
   const baseUrl = await getBaseUrl()
-  const approvalUrl = new URL('/chores/bedtime-approval', baseUrl).toString()
+  const approvalUrl = new URL('/chores2/bedtime-approval', baseUrl).toString()
   const todayIso = formatPacificDate(new Date())
   const dayLabel = pacificDateLabel.format(new Date())
   const templateLines = BEDTIME_TEMPLATES.map(

@@ -65,7 +65,7 @@ export class RedisRepository implements Repository {
       parse<Core>(await this.redis.get(`${this.prefix}:core`)) ??
       fail(
         'NOT_INITIALIZED',
-        'The test board is being set up. Please try again shortly.',
+        'The chore board is being set up. Please try again shortly.',
       )
     )
   }
@@ -99,7 +99,7 @@ export class RedisRepository implements Repository {
       }
       const coreRaw = await this.redis.get<string>(coreKey)
       if (!coreRaw)
-        fail('NOT_INITIALIZED', 'The test board has not been initialized.')
+        fail('NOT_INITIALIZED', 'The chore board has not been initialized.')
       const core = parse<Core>(coreRaw)!
       const dayValues = await Promise.all(ids.map((id) => this.readDay(id)))
       const days = Object.fromEntries(

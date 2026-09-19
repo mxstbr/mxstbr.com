@@ -1,6 +1,14 @@
 # Chores2 implementation
 
-Status: deployed and verified at https://mxstbr.com/chores2. The goal covers every retained/revised/lower-priority requirement in rebuild-features.json plus K70/P55 and the approved playful iPad concept. Removed capabilities are explicitly excluded from /chores2.
+Status: promoted to https://mxstbr.com/chores; the legacy board is at https://mxstbr.com/chores2. The original trial and its verification are recorded below. The goal covers every retained/revised/lower-priority requirement in rebuild-features.json plus K70/P55 and the approved playful iPad concept. Removed capabilities are explicitly excluded from the new product.
+
+## Promotion to /chores — September 19, 2026
+
+The page trees have traded places: the focused kid board is `/chores`; all legacy pages (including rewards, packing, admin, and approval links) live under `/chores2`. Existing site-password logins continue working. The new product retains its `chores2_*` MCP names, `/api/chores2/*` endpoints, and `chores:mxstbr:v2` storage keys so devices, agents, and notification delivery keep working. MCP instructions and repository guidance select the new product by default. New notifications use `[Chores]`.
+
+Only balances are reconciled. Run `pnpm exec tsm scripts/promote-chores.ts initial` for a dry run, then append `--apply` immediately before deploying. After production is ready, run the same command with `final --apply` to carry any legacy star changes during deployment. Both phases use atomic checks against the source and destination and a permanent audit marker, making retries safe. Each difference is an explicit adjustment in the new ledger. No chore, reward, completion, entitlement, packing or historical record is copied or replaced. New-board activity during deployment is preserved by the final phase.
+
+Verification includes the existing domain suite, real Redis cutover tests on disposable keys, the 1024×680 kid flow, inherited/password login, and old-board rewards/packing navigation under `/chores2`.
 
 ## Testing setup confirmed by Max
 

@@ -38,7 +38,7 @@ export default async function RewardsPage({ searchParams }: RewardsPageProps) {
 
   const state = await getChoreState()
   const osParam = resolvedSearchParams?.os
-  const choresHref = choresViewHref('/chores', osParam)
+  const choresHref = choresViewHref('/chores2', osParam)
 
   const rewardsByKid: Record<string, Reward[]> = {}
 
