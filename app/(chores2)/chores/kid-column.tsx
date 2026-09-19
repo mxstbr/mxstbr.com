@@ -270,7 +270,7 @@ export function KidColumn({
             <button
               className="c2-period-reward"
               onClick={() => setView('choose')}
-              aria-label={`Choose a chore. ${kid.periodProgress.completed} of ${kid.periodProgress.total} done. ${kid.periodProgress.earned ? 'Two bonus stars earned.' : 'Finish all tasks in this period for two bonus stars.'}`}
+              aria-label={`Choose a chore. ${kid.periodProgress.completed} of ${kid.periodProgress.total} done.${waiting ? ` ${waiting} waiting for approval.` : ''} ${kid.periodProgress.earned ? 'Two bonus stars earned.' : 'Finish all tasks in this period for two bonus stars.'}`}
             >
               <span className="c2-period-title">
                 <span>
@@ -295,10 +295,6 @@ export function KidColumn({
                         : i + 1}
                   </span>
                 ))}
-              </span>
-              <span className="c2-period-count">
-                {kid.periodProgress.completed} of {kid.periodProgress.total}{' '}
-                done{waiting ? ` · ${waiting} waiting` : ''}
               </span>
             </button>
           ) : (

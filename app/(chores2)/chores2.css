@@ -244,7 +244,7 @@
   display: block;
   text-align: left;
   width: 100%;
-  height: 88px;
+  height: 74px;
   padding: 10px 12px;
   background: var(--c2-paper);
   border-radius: 17px;
@@ -293,12 +293,8 @@
   background: var(--c2-gold-paper);
   color: var(--c2-gold);
 }
-.c2-period-count {
-  color: var(--c2-muted);
-  font-size: 13px;
-}
 .c2-period-space {
-  height: 88px;
+  height: 74px;
   display: flex;
   align-items: center;
   justify-content: center;
