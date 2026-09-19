@@ -10,7 +10,7 @@ The visual is designed around a 1024px-wide 4:3 iPad and a roughly 680px usable 
 - Each column has the child's name and a stable color. A small star balance opens that child's Rewards.
 - The main area shows exactly one actionable chore from the parent's saved sequence. **Its existing assigned emoji is a large visual reminder**, paired with the full title, including the long school-clothes instruction. Reuse the same emoji in current choices and Done/Waiting; do not substitute randomly chosen artwork. Open-title audio is directly accessible.
 - The large completion button is always at the same vertical position across columns and successive tasks. Its label changes to “Ask for approval” when necessary.
-- “Choose another” opens current eligible choices inside that child's column. It does not reorder or skip tasks. No other child's view changes.
+- The “Finish this {timeframe}” card opens current eligible choices inside that child's column. It does not reorder or skip tasks. No other child's view changes.
 - A compact period-bonus panel combines progress with the explicit two-star reward. It distinguishes completed, pending, and earned states. Empty periods show no offer.
 - Bonus chores and current Done/Waiting records remain quiet secondary entries at the bottom of each column. The latter offers the allowed undo actions.
 
@@ -26,7 +26,7 @@ Use the existing Next.js client components with plain CSS, system fonts, and res
 
 The existing speech integration remains the production audio path. The local concept uses browser read-aloud only when explicitly tapped. Exact older-Safari compatibility is an implementation check, not established by a Chromium preview.
 
-Packing and the existing daily bonus remain retained capabilities with secondary access; the main-screen concept concentrates on the current period. Keep them out of the primary next-action area. The visual uses illustrative star balances, task prices, approval configuration, and a sample reward. Task order, weekday exceptions, and which children have empty periods come from the confirmed routine specification.
+Packing and counts-only daily progress remain available through secondary access; period bonuses replace the old daily bonus, and the main-screen concept concentrates on the current period. Keep them out of the primary next-action area. The visual uses illustrative star balances, task prices, approval configuration, and a sample reward. Task order, weekday exceptions, and which children have empty periods come from the confirmed routine specification.
 
 The conversation preview may reflow if displayed in a narrow conversation pane. That is preview presentation, not an additional device target for the product.
 

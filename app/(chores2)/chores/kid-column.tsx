@@ -65,7 +65,6 @@ export function KidColumn({
   const [isBonus, setIsBonus] = useState(false)
   const [note, setNote] = useState('')
   const [burst, setBurst] = useState(0)
-  const [dailyParty, setDailyParty] = useState(false)
   const [reading, setReading] = useState(false)
   const [cooldown, setCooldown] = useState(false)
   const idle = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -74,7 +73,6 @@ export function KidColumn({
     url?: string
     controller?: AbortController
   }>({})
-  const previousDaily = useRef(kid.dailyProgress.earned)
   const previousBalance = useRef(kid.balance)
   const primary = useRef<HTMLButtonElement>(null)
   const sounds = useChoreSounds()
@@ -111,7 +109,6 @@ export function KidColumn({
   useEffect(() => {
     close()
     setNote('')
-    setDailyParty(false)
   }, [day, period])
   useEffect(() => {
     if (stale) close()
@@ -123,12 +120,10 @@ export function KidColumn({
     }
   }, [showPacking])
   useEffect(() => {
-    if (kid.dailyProgress.earned && !previousDaily.current) setDailyParty(true)
     if (kid.balance > previousBalance.current && !busy)
       setNote(`+${kid.balance - previousBalance.current} stars arrived!`)
-    previousDaily.current = kid.dailyProgress.earned
     previousBalance.current = kid.balance
-  }, [kid.dailyProgress.earned, kid.balance, busy])
+  }, [kid.balance, busy])
   useEffect(() => {
     setCooldown(Boolean(current?.availableAt))
     if (!current?.availableAt) return
@@ -162,7 +157,6 @@ export function KidColumn({
       sounds.play(result.status === 'redeemed' ? 'reward' : 'chore')
       setBurst((n) => n + 1)
     }
-    if (result.dailyBonus) setDailyParty(true)
     if (['submit', 'redeem', 'undo', 'set_color'].includes(command.action))
       close()
     setTimeout(() => primary.current?.focus({ preventScroll: true }), 0)
@@ -338,26 +332,16 @@ export function KidColumn({
               <div className="c2-button-space" />
             )}
           </div>
-          <button
-            className="c2-choose"
-            style={{
-              visibility:
-                !stale &&
-                (isBonus ||
-                  kid.chores.length > 1 ||
-                  (allDone && kid.chores.length > 0))
-                  ? 'visible'
-                  : 'hidden',
-            }}
-            onClick={() => (isBonus ? close() : setView('choose'))}
-          >
-            {isBonus ? 'Back to my chores' : 'Choose another'}
-          </button>
+          {isBonus && (
+            <button className="c2-choose" onClick={close}>
+              Back to my chores
+            </button>
+          )}
           {kid.periodProgress.total > 0 && !isBonus && !stale ? (
             <button
               className="c2-period-reward"
-              onClick={() => setView('progress')}
-              aria-label={`${kid.periodProgress.completed} of ${kid.periodProgress.total} done. ${kid.periodProgress.earned ? 'Two bonus stars earned.' : 'Finish all tasks in this period for two bonus stars.'}`}
+              onClick={() => setView('choose')}
+              aria-label={`Choose a chore. ${kid.periodProgress.completed} of ${kid.periodProgress.total} done. ${kid.periodProgress.earned ? 'Two bonus stars earned.' : 'Finish all tasks in this period for two bonus stars.'}`}
             >
               <span className="c2-period-title">
                 <span>
@@ -437,17 +421,6 @@ export function KidColumn({
           <span>⭐</span>
           <span>⭐</span>
           <span>⭐</span>
-        </div>
-      )}
-      {dailyParty && (
-        <div className="c2-party" role="dialog" aria-label="Daily bonus earned">
-          <span aria-hidden="true">🎉</span>
-          <h2>You did it!</h2>
-          <p>All your required chores for today are done.</p>
-          <strong>+10 bonus stars</strong>
-          <button className="c2-primary" onClick={() => setDailyParty(false)}>
-            Yay!
-          </button>
         </div>
       )}
     </section>

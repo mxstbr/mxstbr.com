@@ -2,7 +2,7 @@
 
 Source: Max's September 8, 2026 instruction in **Kids chores**, task `019eec7d-5fa6-7d42-b242-520e62e89ef1`, message timestamp `2026-09-09T04:18:27.189Z` (9:18pm Pacific), followed by the instruction in this task that the written order is the desired order. The routine replacement begins September 9 Pacific. This document records rebuild requirements; it does not mutate the running board.
 
-Preserve the common tasks in their written sequence, then append that child's listed extras in their written sequence. School-only tasks are filtered out on weekends without reordering the survivors. Each child's period has an explicit ordered list of assignment IDs; titles below are for matching those assignments during migration. Completion/approval pending state removes a task from the suggested next-action queue without changing its stored position. Do not sort by stars, title, type, creation timestamp, or a model-generated priority. “Choose another” is a temporary selection, not a reorder or skip.
+Preserve the common tasks in their written sequence, then append that child's listed extras in their written sequence. School-only tasks are filtered out on weekends without reordering the survivors. Each child's period has an explicit ordered list of assignment IDs; titles below are for matching those assignments during migration. Completion/approval pending state removes a task from the suggested next-action queue without changing its stored position. Do not sort by stars, title, type, creation timestamp, or a model-generated priority. Choosing through the period card is a temporary selection, not a reorder or skip.
 
 ## Dilan
 
@@ -76,7 +76,7 @@ Each child earns **2 additional stars** when every distinct task occurrence in a
 
 Pending approvals do not count as completed yet. On-time submissions approved later can settle the original period's bonus, even after the day ends. Missed/expired tasks remain unfulfilled; hiding a card, deleting a definition, pausing it, or removing it from the next-action queue must not manufacture completion or a bonus. Prospective scheduling changes affect only the appropriate future obligations.
 
-Award once per child/Pacific day/period. Commit it with the triggering completion or approval, use a stable award identity, and reverse the bonus if an undo makes that period incomplete. A legitimate re-completion can restore it, but cannot create multiple net awards. This is additive to the existing ten-star daily bonus, consistent with the request to add a requirement.
+Award once per child/Pacific day/period. Commit it with the triggering completion or approval, use a stable award identity, and reverse the bonus if an undo makes that period incomplete. A legitimate re-completion can restore it, but cannot create multiple net awards. This replaces the ten-star daily bonus; there is no additional award for completing the entire day.
 
 | Schedule                 | Dilan                              | Darian                      | Devina           |
 | ------------------------ | ---------------------------------- | --------------------------- | ---------------- |

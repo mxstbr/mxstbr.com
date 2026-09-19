@@ -253,6 +253,7 @@
   height: 56px;
 }
 .chores2 .c2-period-reward {
+  margin-top: 12px;
   display: block;
   text-align: left;
   width: 100%;
@@ -516,7 +517,7 @@
   font-size: 36px;
   margin: 25px 0 6px;
 }
-.c2-daily-bonus {
+.c2-period-bonus {
   padding: 14px;
   background: var(--c2-gold-paper);
   color: var(--c2-gold);
@@ -524,7 +525,7 @@
   font-size: 16px;
   line-height: 1.4;
 }
-.c2-daily-bonus strong {
+.c2-period-bonus strong {
   display: block;
   font-size: 25px;
   font-weight: 500;
@@ -558,42 +559,6 @@
   margin-bottom: 14px;
   background: var(--c2-paper);
   border-radius: 15px;
-}
-.c2-party {
-  position: absolute;
-  z-index: 4;
-  inset: 68px 14px 14px;
-  background: var(--c2-paper);
-  border-radius: 22px;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: 12px;
-}
-.c2-party > span {
-  font-size: 75px;
-}
-.c2-party h2 {
-  font-size: 30px;
-  margin: 0;
-  font-weight: 500;
-}
-.c2-party p {
-  font-size: 18px;
-  line-height: 1.4;
-  margin: 0;
-}
-.c2-party strong {
-  color: var(--c2-gold);
-  font-size: 22px;
-  font-weight: 500;
-  margin: 14px 0;
-}
-.c2-party .c2-primary {
-  justify-content: center;
 }
 .c2-burst {
   position: absolute;

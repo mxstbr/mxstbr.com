@@ -10,17 +10,17 @@
       "priority": "core",
       "channel": "kid_board",
       "targetStory": "As a kid, I can earn two extra stars by completing every task in a nonempty time period and see my progress toward that bonus.",
-      "targetNotes": "Award once per child/Pacific day/named period. Empty periods earn nothing. Untimed Bonus chores are excluded. On-time requests can settle the original reward after later approval. Undo reverses it if incomplete; re-completion restores at most one net award. Additive to the ten-star daily bonus.",
+      "targetNotes": "Award once per child/Pacific day/named period. Empty periods earn nothing. Untimed Bonus chores are excluded. On-time requests can settle the original reward after later approval. Undo reverses it if incomplete; re-completion restores at most one net award. Replaces the ten-star daily bonus. Tapping the period card opens the current chore picker.",
       "basis": "explicit new two-star period completion requirement",
       "implementation": {
         "status": "implemented",
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/migration.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
-        "verification": "Domain suite: 2-star nonempty period and 10-star day, pending/missed work, undo/re-earn, exact records, midnight. Browser: period bonus and undo. Migration reconciles opening balances."
+        "verification": "Domain suite: 2-star nonempty periods with no daily award, pending/missed work, undo/re-earn, exact records, midnight. Browser: period bonus and undo. Migration reconciles opening balances."
       }
     },
     {
@@ -49,7 +49,7 @@
   "confirmedDecisions": {
     "deviceTarget": "The existing shared old iPad in landscape only; three persistent child columns. No phone, portrait, or desktop layout requirement.",
     "routineOrder": "Exact written September 8 Kids chores order per child/period; common steps then individual extras; stable weekday filtering.",
-    "periodBonus": "Two additional stars per child/day/nonempty named period after all tasks complete; timely approvals may settle later; untimed Bonus excluded; undo reverses when incomplete.",
+    "periodBonus": "Two additional stars per child/day/nonempty named period after all tasks complete; timely approvals may settle later; untimed Bonus excluded; undo reverses when incomplete. Replaces the ten-star daily bonus; no new daily awards or daily-bonus UI.",
     "timedChores": "Only the active named window is kid-visible and accepts new submissions.",
     "untimedBonusChores": "Remain available anytime, subject to date/assignment/recurrence eligibility.",
     "approvalAfterCutoff": "An on-time accepted submission remains approvable later, including after its day ends.",
@@ -58,12 +58,13 @@
     "parentSurface": "ChatGPT through MCP for parent management and approvals. Telegram only delivers notifications; no Clippy, Telegram conversation or action buttons, or dedicated parent UI.",
     "bedtimeRecognition": "Dedicated last-night recognition/templates/generated chores/reminders removed.",
     "dataIsolation": "Separate keys in the existing Redis database; copy source catalogs/history/balances once, then independent state.",
-    "deviceAccess": "Reuse the existing site-password login; already-unlocked iPads open /chores2 directly. Otherwise enter the same password. Invitation links remain optional."
+    "deviceAccess": "Reuse the existing site-password login; already-unlocked iPads open /chores directly. Otherwise enter the same password. Invitation links remain optional.",
+    "choreSwitcher": "Tap the Finish this {timeframe} card to choose a current chore. No separate Choose another button. My progress remains inside the picker."
   },
   "counts": {
-    "retained": 29,
-    "removed": 18,
-    "revised": 72,
+    "retained": 27,
+    "removed": 19,
+    "revised": 73,
     "lower_priority": 4
   },
   "features": [
@@ -83,7 +84,7 @@
         "status": "implemented",
         "files": [
           "app/lib/chores2/auth.ts",
-          "app/(chores2)/chores2/login-form.tsx",
+          "app/(chores2)/chores/login-form.tsx",
           "app/api/chores2/login/route.ts"
         ],
         "verification": "Login browser suite: existing site cookie, password entry/persistence, invalid password, origin checks, kid-only commands. Optional invitation sessions remain compatible."
@@ -104,9 +105,9 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/board.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/use-board.ts",
+          "app/(chores2)/chores/board.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/use-board.ts",
           "app/lib/chores2/domain.ts"
         ],
         "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
@@ -127,9 +128,9 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/board.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/use-board.ts",
+          "app/(chores2)/chores/board.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/use-board.ts",
           "app/lib/chores2/domain.ts"
         ],
         "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
@@ -152,7 +153,7 @@
         "files": [
           "app/lib/chores2/commands.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "No new-route UI, command, or specialized handler; strict schemas reject skip/backdate actions. Legacy /chores remains during the trial."
       }
@@ -174,7 +175,7 @@
         "files": [
           "app/lib/chores2/commands.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "No new-route UI, command, or specialized handler; strict schemas reject skip/backdate actions. Legacy /chores remains during the trial."
       }
@@ -194,9 +195,9 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/board.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/use-board.ts",
+          "app/(chores2)/chores/board.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/use-board.ts",
           "app/lib/chores2/domain.ts"
         ],
         "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
@@ -217,8 +218,8 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
           "app/lib/chores2/service.ts"
         ],
         "verification": "Counts-only date summary; Today action; 90-second inactivity return. Browser navigation and no hidden title assertions; timer review."
@@ -239,8 +240,8 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
           "app/lib/chores2/service.ts"
         ],
         "verification": "Counts-only date summary; Today action; 90-second inactivity return. Browser navigation and no hidden title assertions; timer review."
@@ -261,8 +262,8 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
           "app/lib/chores2/service.ts"
         ],
         "verification": "Counts-only date summary; Today action; 90-second inactivity return. Browser navigation and no hidden title assertions; timer review."
@@ -283,9 +284,9 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/board.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/use-board.ts",
+          "app/(chores2)/chores/board.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/use-board.ts",
           "app/lib/chores2/domain.ts"
         ],
         "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
@@ -306,9 +307,9 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/board.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/use-board.ts",
+          "app/(chores2)/chores/board.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/use-board.ts",
           "app/lib/chores2/domain.ts"
         ],
         "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
@@ -329,9 +330,9 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/board.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/use-board.ts",
+          "app/(chores2)/chores/board.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/use-board.ts",
           "app/lib/chores2/domain.ts"
         ],
         "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
@@ -352,9 +353,9 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/board.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/use-board.ts",
+          "app/(chores2)/chores/board.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/use-board.ts",
           "app/lib/chores2/domain.ts"
         ],
         "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
@@ -377,8 +378,8 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/service.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
       }
@@ -398,9 +399,9 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/board.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/use-board.ts",
+          "app/(chores2)/chores/board.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/use-board.ts",
           "app/lib/chores2/domain.ts"
         ],
         "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
@@ -421,9 +422,9 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/board.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/use-board.ts",
+          "app/(chores2)/chores/board.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/use-board.ts",
           "app/lib/chores2/domain.ts"
         ],
         "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
@@ -444,9 +445,9 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/board.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/use-board.ts",
+          "app/(chores2)/chores/board.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/use-board.ts",
           "app/lib/chores2/domain.ts"
         ],
         "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
@@ -469,7 +470,7 @@
         "files": [
           "app/lib/chores2/commands.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "No new-route UI, command, or specialized handler; strict schemas reject skip/backdate actions. Legacy /chores remains during the trial."
       }
@@ -491,7 +492,7 @@
         "files": [
           "app/lib/chores2/commands.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "No new-route UI, command, or specialized handler; strict schemas reject skip/backdate actions. Legacy /chores remains during the trial."
       }
@@ -511,9 +512,9 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/board.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/use-board.ts",
+          "app/(chores2)/chores/board.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/use-board.ts",
           "app/lib/chores2/domain.ts"
         ],
         "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
@@ -527,19 +528,19 @@
       "baselineSource": "/Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores/kid-board.tsx:982",
       "disposition": "revised",
       "priority": "normal",
-      "targetStory": "As a kid, I can see my current-period progress and two-star bonus opportunity, plus my daily bonus target.",
-      "targetNotes": "Current-time work is the visual priority. Keep daily bonus accounting across required occurrences; do not treat hidden expired work as done or reveal its old cards. The new two-star reward applies once to every nonempty named period, in addition to the ten-star daily bonus. Untimed Bonus chores are outside period targets; pending approval is not completion.",
-      "basis": "consequence of requested changes",
+      "targetStory": "As a kid, I can see my current-period progress and two-star bonus opportunity.",
+      "targetNotes": "Only nonempty named periods earn completion bonuses. Daily progress remains counts-only; no extra ten-star award. Untimed Bonus chores are outside period targets; pending approval is not completion.",
+      "basis": "September 19 clarification: period bonuses replace the daily bonus",
       "channel": "kid_board",
       "implementation": {
         "status": "implemented",
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/migration.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
-        "verification": "Domain suite: 2-star nonempty period and 10-star day, pending/missed work, undo/re-earn, exact records, midnight. Browser: period bonus and undo. Migration reconciles opening balances."
+        "verification": "Domain suite: 2-star nonempty periods with no daily award, pending/missed work, undo/re-earn, exact records, midnight. Browser: period bonus and undo. Migration reconciles opening balances."
       }
     },
     {
@@ -557,9 +558,9 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/board.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/use-board.ts",
+          "app/(chores2)/chores/board.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/use-board.ts",
           "app/lib/chores2/domain.ts"
         ],
         "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
@@ -582,8 +583,8 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/service.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
       }
@@ -605,8 +606,8 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/service.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
       }
@@ -628,7 +629,7 @@
         "files": [
           "app/lib/chores2/commands.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "No new-route UI, command, or specialized handler; strict schemas reject skip/backdate actions. Legacy /chores remains during the trial."
       }
@@ -648,9 +649,9 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/board.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/use-board.ts",
+          "app/(chores2)/chores/board.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/use-board.ts",
           "app/lib/chores2/domain.ts"
         ],
         "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
@@ -671,9 +672,9 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/board.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/use-board.ts",
+          "app/(chores2)/chores/board.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/use-board.ts",
           "app/lib/chores2/domain.ts"
         ],
         "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
@@ -694,9 +695,9 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/board.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/use-board.ts",
+          "app/(chores2)/chores/board.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/use-board.ts",
           "app/lib/chores2/domain.ts"
         ],
         "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
@@ -719,8 +720,8 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/service.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
       }
@@ -733,19 +734,19 @@
       "baselineSource": "/Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores/actions.ts:154",
       "disposition": "revised",
       "priority": "normal",
-      "targetStory": "As a kid, I can earn the daily bonus after completing the required work for that day.",
-      "targetNotes": "No skip credit. Keep the ten-star daily bonus baseline. An on-time pending request is neither missed nor completed; later approval may settle the original day’s bonus.",
-      "basis": "consequence of requested changes",
+      "targetStory": "As a kid, I can earn two extra stars after completing every task in a nonempty time period.",
+      "targetNotes": "This replaces the ten-star daily bonus. An on-time pending request can settle its original period bonus after later approval. No skip credit.",
+      "basis": "September 19 clarification: period bonuses replace the daily bonus",
       "channel": "kid_board",
       "implementation": {
         "status": "implemented",
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/migration.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
-        "verification": "Domain suite: 2-star nonempty period and 10-star day, pending/missed work, undo/re-earn, exact records, midnight. Browser: period bonus and undo. Migration reconciles opening balances."
+        "verification": "Domain suite: 2-star nonempty periods with no daily award, pending/missed work, undo/re-earn, exact records, midnight. Browser: period bonus and undo. Migration reconciles opening balances."
       }
     },
     {
@@ -754,21 +755,21 @@
       "group": "Kid: complete chores, earn stars, and correct mistakes",
       "baselineStory": "As a kid, I can see and dismiss a daily-bonus celebration.",
       "baselineSource": "/Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores/kid-board.tsx:660",
-      "disposition": "retained",
-      "priority": "normal",
-      "targetStory": "As a kid, I can see and dismiss a daily-bonus celebration.",
-      "targetNotes": "Retain this capability subject to rebuild-scope.md. Current implementation details and known defects are not automatically requirements.",
-      "basis": "unchanged capability",
-      "channel": "kid_board",
+      "disposition": "removed",
+      "priority": "none",
+      "targetStory": null,
+      "targetNotes": "Remove the ten-star daily-bonus dialog. Period progress still shows its earned two-star award.",
+      "basis": "Explicit replacement of daily bonus with period bonuses",
+      "channel": "none",
       "implementation": {
-        "status": "implemented",
+        "status": "excluded",
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/migration.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
-        "verification": "Domain suite: 2-star nonempty period and 10-star day, pending/missed work, undo/re-earn, exact records, midnight. Browser: period bonus and undo. Migration reconciles opening balances."
+        "verification": "Browser: no daily bonus dialog or +10 offer. Period card and star burst remain."
       }
     },
     {
@@ -788,10 +789,10 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/migration.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
-        "verification": "Domain suite: 2-star nonempty period and 10-star day, pending/missed work, undo/re-earn, exact records, midnight. Browser: period bonus and undo. Migration reconciles opening balances."
+        "verification": "Domain suite: 2-star nonempty periods with no daily award, pending/missed work, undo/re-earn, exact records, midnight. Browser: period bonus and undo. Migration reconciles opening balances."
       }
     },
     {
@@ -811,10 +812,10 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/migration.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
-        "verification": "Domain suite: 2-star nonempty period and 10-star day, pending/missed work, undo/re-earn, exact records, midnight. Browser: period bonus and undo. Migration reconciles opening balances."
+        "verification": "Domain suite: 2-star nonempty periods with no daily award, pending/missed work, undo/re-earn, exact records, midnight. Browser: period bonus and undo. Migration reconciles opening balances."
       }
     },
     {
@@ -823,21 +824,21 @@
       "group": "Kid: complete chores, earn stars, and correct mistakes",
       "baselineStory": "As a kid, I can have my balance reflect losing a daily bonus when I undo a required chore.",
       "baselineSource": "/Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores/actions.ts:191",
-      "disposition": "retained",
+      "disposition": "revised",
       "priority": "normal",
-      "targetStory": "As a kid, I can have my balance reflect losing a daily bonus when I undo a required chore.",
-      "targetNotes": "Retain this capability subject to rebuild-scope.md. Current implementation details and known defects are not automatically requirements.",
-      "basis": "unchanged capability",
+      "targetStory": "As a kid, I can have my balance reflect losing a period bonus when I undo a required chore.",
+      "targetNotes": "Undo reverses the two-star award if its period becomes incomplete; re-completion restores at most one net award. Historical daily credits remain in the ledger.",
+      "basis": "September 19 clarification: period bonuses replace the daily bonus",
       "channel": "kid_board",
       "implementation": {
         "status": "implemented",
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/migration.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
-        "verification": "Domain suite: 2-star nonempty period and 10-star day, pending/missed work, undo/re-earn, exact records, midnight. Browser: period bonus and undo. Migration reconciles opening balances."
+        "verification": "Domain suite: 2-star nonempty periods with no daily award, pending/missed work, undo/re-earn, exact records, midnight. Browser: period bonus and undo. Migration reconciles opening balances."
       }
     },
     {
@@ -857,10 +858,10 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/migration.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
-        "verification": "Domain suite: 2-star nonempty period and 10-star day, pending/missed work, undo/re-earn, exact records, midnight. Browser: period bonus and undo. Migration reconciles opening balances."
+        "verification": "Domain suite: 2-star nonempty periods with no daily award, pending/missed work, undo/re-earn, exact records, midnight. Browser: period bonus and undo. Migration reconciles opening balances."
       }
     },
     {
@@ -880,8 +881,8 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/service.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
       }
@@ -903,8 +904,8 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/service.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
       }
@@ -926,7 +927,7 @@
         "files": [
           "app/lib/chores2/commands.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "No new-route UI, command, or specialized handler; strict schemas reject skip/backdate actions. Legacy /chores remains during the trial."
       }
@@ -948,8 +949,8 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/service.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
       }
@@ -971,8 +972,8 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/service.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
       }
@@ -994,8 +995,8 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/service.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
       }
@@ -1017,7 +1018,7 @@
         "files": [
           "app/lib/chores2/commands.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "No new-route UI, command, or specialized handler; strict schemas reject skip/backdate actions. Legacy /chores remains during the trial."
       }
@@ -1039,7 +1040,7 @@
         "files": [
           "app/lib/chores2/commands.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "No new-route UI, command, or specialized handler; strict schemas reject skip/backdate actions. Legacy /chores remains during the trial."
       }
@@ -1061,7 +1062,7 @@
         "files": [
           "app/lib/chores2/commands.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "No new-route UI, command, or specialized handler; strict schemas reject skip/backdate actions. Legacy /chores remains during the trial."
       }
@@ -1083,7 +1084,7 @@
         "files": [
           "app/lib/chores2/commands.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "No new-route UI, command, or specialized handler; strict schemas reject skip/backdate actions. Legacy /chores remains during the trial."
       }
@@ -1104,8 +1105,8 @@
         "status": "implemented",
         "files": [
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/sounds.ts"
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/sounds.ts"
         ],
         "verification": "Browser suite: cheap-first catalog, details/cancel, affordability and purchase. Domain/Redis: one-off entitlements, repeat purchases, stale price and competing purchases."
       }
@@ -1126,8 +1127,8 @@
         "status": "implemented",
         "files": [
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/sounds.ts"
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/sounds.ts"
         ],
         "verification": "Browser suite: cheap-first catalog, details/cancel, affordability and purchase. Domain/Redis: one-off entitlements, repeat purchases, stale price and competing purchases."
       }
@@ -1148,8 +1149,8 @@
         "status": "implemented",
         "files": [
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/sounds.ts"
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/sounds.ts"
         ],
         "verification": "Browser suite: cheap-first catalog, details/cancel, affordability and purchase. Domain/Redis: one-off entitlements, repeat purchases, stale price and competing purchases."
       }
@@ -1170,8 +1171,8 @@
         "status": "implemented",
         "files": [
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/sounds.ts"
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/sounds.ts"
         ],
         "verification": "Browser suite: cheap-first catalog, details/cancel, affordability and purchase. Domain/Redis: one-off entitlements, repeat purchases, stale price and competing purchases."
       }
@@ -1192,8 +1193,8 @@
         "status": "implemented",
         "files": [
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/sounds.ts"
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/sounds.ts"
         ],
         "verification": "Browser suite: cheap-first catalog, details/cancel, affordability and purchase. Domain/Redis: one-off entitlements, repeat purchases, stale price and competing purchases."
       }
@@ -1214,8 +1215,8 @@
         "status": "implemented",
         "files": [
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/sounds.ts"
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/sounds.ts"
         ],
         "verification": "Browser suite: cheap-first catalog, details/cancel, affordability and purchase. Domain/Redis: one-off entitlements, repeat purchases, stale price and competing purchases."
       }
@@ -1236,8 +1237,8 @@
         "status": "implemented",
         "files": [
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/sounds.ts"
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/sounds.ts"
         ],
         "verification": "Browser suite: cheap-first catalog, details/cancel, affordability and purchase. Domain/Redis: one-off entitlements, repeat purchases, stale price and competing purchases."
       }
@@ -1258,8 +1259,8 @@
         "status": "implemented",
         "files": [
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/sounds.ts"
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/sounds.ts"
         ],
         "verification": "Browser suite: cheap-first catalog, details/cancel, affordability and purchase. Domain/Redis: one-off entitlements, repeat purchases, stale price and competing purchases."
       }
@@ -1279,9 +1280,9 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/board.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/use-board.ts",
+          "app/(chores2)/chores/board.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/use-board.ts",
           "app/lib/chores2/domain.ts"
         ],
         "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
@@ -1302,8 +1303,8 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
           "app/(chores2)/chores2.css"
         ],
         "verification": "Browser: color cancel/save, light and dark screenshots; custom-color contrast and reduced-motion review."
@@ -1324,8 +1325,8 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
           "app/(chores2)/chores2.css"
         ],
         "verification": "Browser: color cancel/save, light and dark screenshots; custom-color contrast and reduced-motion review."
@@ -1346,7 +1347,7 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/kid-column.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
           "app/api/chores2/speech/route.ts"
         ],
         "verification": "Server restricts speech to eligible open occurrence; same audio element primed in tap for iPad. Browser check uses intercepted local audio only; live provider check blocked by automatic approval review; physical iPad audio remains acceptance check."
@@ -1369,7 +1370,7 @@
         "files": [
           "app/lib/chores2/commands.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "No new-route UI, command, or specialized handler; strict schemas reject skip/backdate actions. Legacy /chores remains during the trial."
       }
@@ -1389,8 +1390,8 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
           "app/(chores2)/chores2.css"
         ],
         "verification": "Browser: color cancel/save, light and dark screenshots; custom-color contrast and reduced-motion review."
@@ -1411,9 +1412,9 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/board.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/use-board.ts",
+          "app/(chores2)/chores/board.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/use-board.ts",
           "app/lib/chores2/domain.ts"
         ],
         "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
@@ -1434,9 +1435,9 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/board.tsx",
-          "app/(chores2)/chores2/error.tsx",
-          "app/(chores2)/chores2/use-board.ts"
+          "app/(chores2)/chores/board.tsx",
+          "app/(chores2)/chores/error.tsx",
+          "app/(chores2)/chores/use-board.ts"
         ],
         "verification": "Per-column React error boundary; route retry; browser suite loses an already-committed response and recovers the exact request once."
       }
@@ -1458,8 +1459,8 @@
         "files": [
           "app/lib/chores2/packing.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/board.tsx"
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/board.tsx"
         ],
         "verification": "Browser: 14 items, individual/family independence, progress, all-packed, clear and reset confirmation. Domain: shared persistence and parent reset. One-time local packing import."
       }
@@ -1481,8 +1482,8 @@
         "files": [
           "app/lib/chores2/packing.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/board.tsx"
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/board.tsx"
         ],
         "verification": "Browser: 14 items, individual/family independence, progress, all-packed, clear and reset confirmation. Domain: shared persistence and parent reset. One-time local packing import."
       }
@@ -1504,8 +1505,8 @@
         "files": [
           "app/lib/chores2/packing.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/board.tsx"
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/board.tsx"
         ],
         "verification": "Browser: 14 items, individual/family independence, progress, all-packed, clear and reset confirmation. Domain: shared persistence and parent reset. One-time local packing import."
       }
@@ -1527,8 +1528,8 @@
         "files": [
           "app/lib/chores2/packing.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/board.tsx"
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/board.tsx"
         ],
         "verification": "Browser: 14 items, individual/family independence, progress, all-packed, clear and reset confirmation. Domain: shared persistence and parent reset. One-time local packing import."
       }
@@ -1550,8 +1551,8 @@
         "files": [
           "app/lib/chores2/packing.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/board.tsx"
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/board.tsx"
         ],
         "verification": "Browser: 14 items, individual/family independence, progress, all-packed, clear and reset confirmation. Domain: shared persistence and parent reset. One-time local packing import."
       }
@@ -1573,8 +1574,8 @@
         "files": [
           "app/lib/chores2/packing.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/board.tsx"
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/board.tsx"
         ],
         "verification": "Browser: 14 items, individual/family independence, progress, all-packed, clear and reset confirmation. Domain: shared persistence and parent reset. One-time local packing import."
       }
@@ -1596,8 +1597,8 @@
         "files": [
           "app/lib/chores2/packing.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/board.tsx"
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/board.tsx"
         ],
         "verification": "Browser: 14 items, individual/family independence, progress, all-packed, clear and reset confirmation. Domain: shared persistence and parent reset. One-time local packing import."
       }
@@ -1619,8 +1620,8 @@
         "files": [
           "app/lib/chores2/packing.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/board.tsx"
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/board.tsx"
         ],
         "verification": "Browser: 14 items, individual/family independence, progress, all-packed, clear and reset confirmation. Domain: shared persistence and parent reset. One-time local packing import."
       }
@@ -1641,7 +1642,7 @@
         "status": "implemented",
         "files": [
           "app/lib/chores2/auth.ts",
-          "app/(chores2)/chores2/login-form.tsx",
+          "app/(chores2)/chores/login-form.tsx",
           "app/api/chores2/login/route.ts"
         ],
         "verification": "Login browser suite: existing site cookie, password entry/persistence, invalid password, origin checks, kid-only commands. Optional invitation sessions remain compatible."
@@ -1825,8 +1826,8 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/service.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
       }
@@ -1848,8 +1849,8 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/service.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
       }
@@ -1871,8 +1872,8 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/service.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
       }
@@ -1894,8 +1895,8 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/service.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
       }
@@ -1917,8 +1918,8 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/service.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
       }
@@ -1940,8 +1941,8 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/service.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
       }
@@ -1963,8 +1964,8 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/service.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
       }
@@ -2009,8 +2010,8 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/service.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
       }
@@ -2032,8 +2033,8 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/service.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
       }
@@ -2078,8 +2079,8 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/service.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
       }
@@ -2101,8 +2102,8 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/service.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
       }
@@ -2124,8 +2125,8 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/service.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
       }
@@ -2147,8 +2148,8 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/service.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
       }
@@ -2170,8 +2171,8 @@
         "files": [
           "app/lib/chores2/domain.ts",
           "app/lib/chores2/service.ts",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
       }
@@ -2193,7 +2194,7 @@
         "files": [
           "app/lib/chores2/commands.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "No new-route UI, command, or specialized handler; strict schemas reject skip/backdate actions. Legacy /chores remains during the trial."
       }
@@ -2569,7 +2570,7 @@
         "files": [
           "app/lib/chores2/commands.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "No new-route UI, command, or specialized handler; strict schemas reject skip/backdate actions. Legacy /chores remains during the trial."
       }
@@ -2591,7 +2592,7 @@
         "files": [
           "app/lib/chores2/commands.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "No new-route UI, command, or specialized handler; strict schemas reject skip/backdate actions. Legacy /chores remains during the trial."
       }
@@ -2613,7 +2614,7 @@
         "files": [
           "app/lib/chores2/commands.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "No new-route UI, command, or specialized handler; strict schemas reject skip/backdate actions. Legacy /chores remains during the trial."
       }
@@ -2635,7 +2636,7 @@
         "files": [
           "app/lib/chores2/commands.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "No new-route UI, command, or specialized handler; strict schemas reject skip/backdate actions. Legacy /chores remains during the trial."
       }
@@ -2657,7 +2658,7 @@
         "files": [
           "app/lib/chores2/commands.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "No new-route UI, command, or specialized handler; strict schemas reject skip/backdate actions. Legacy /chores remains during the trial."
       }
@@ -2679,7 +2680,7 @@
         "files": [
           "app/lib/chores2/commands.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx"
+          "app/(chores2)/chores/panels.tsx"
         ],
         "verification": "No new-route UI, command, or specialized handler; strict schemas reject skip/backdate actions. Legacy /chores remains during the trial."
       }
@@ -2716,9 +2717,9 @@
       "baselineSource": "/Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores/actions.ts:706",
       "disposition": "revised",
       "priority": "normal",
-      "targetStory": "As a parent, I can receive Telegram updates for daily bonuses and reward redemptions.",
-      "targetNotes": "Skip updates and dedicated bedtime reminders are removed.",
-      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "targetStory": "As a parent, I can receive Telegram updates for period bonuses and reward redemptions.",
+      "targetNotes": "Two-star period bonuses replace daily bonuses. Skip updates and dedicated bedtime reminders are removed.",
+      "basis": "September 19 clarification: period bonuses replace the daily bonus",
       "channel": "telegram_notifications",
       "implementation": {
         "status": "implemented",
@@ -2771,9 +2772,9 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/board.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/use-board.ts",
+          "app/(chores2)/chores/board.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/use-board.ts",
           "app/lib/chores2/domain.ts"
         ],
         "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
@@ -2794,9 +2795,9 @@
       "implementation": {
         "status": "implemented",
         "files": [
-          "app/(chores2)/chores2/board.tsx",
-          "app/(chores2)/chores2/kid-column.tsx",
-          "app/(chores2)/chores2/use-board.ts",
+          "app/(chores2)/chores/board.tsx",
+          "app/(chores2)/chores/kid-column.tsx",
+          "app/(chores2)/chores/use-board.ts",
           "app/lib/chores2/domain.ts"
         ],
         "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
@@ -2819,8 +2820,8 @@
         "files": [
           "app/lib/chores2/packing.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/board.tsx"
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/board.tsx"
         ],
         "verification": "Browser: 14 items, individual/family independence, progress, all-packed, clear and reset confirmation. Domain: shared persistence and parent reset. One-time local packing import."
       }
@@ -2842,8 +2843,8 @@
         "files": [
           "app/lib/chores2/packing.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/board.tsx"
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/board.tsx"
         ],
         "verification": "Browser: 14 items, individual/family independence, progress, all-packed, clear and reset confirmation. Domain: shared persistence and parent reset. One-time local packing import."
       }
@@ -2865,8 +2866,8 @@
         "files": [
           "app/lib/chores2/packing.ts",
           "app/lib/chores2/domain.ts",
-          "app/(chores2)/chores2/panels.tsx",
-          "app/(chores2)/chores2/board.tsx"
+          "app/(chores2)/chores/panels.tsx",
+          "app/(chores2)/chores/board.tsx"
         ],
         "verification": "Browser: 14 items, individual/family independence, progress, all-packed, clear and reset confirmation. Domain: shared persistence and parent reset. One-time local packing import."
       }

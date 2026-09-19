@@ -67,7 +67,7 @@ export type LedgerEntry = {
   kind:
     | 'chore'
     | 'period-bonus'
-    | 'daily-bonus'
+    | 'daily-bonus' // Historical ledger entries only; no new daily awards.
     | 'reward'
     | 'adjustment'
     | 'reversal'
@@ -153,7 +153,6 @@ export type CommandResult = {
   id?: string
   stars?: number
   periodBonus?: number
-  dailyBonus?: number
   balance?: number
   message: string
 }

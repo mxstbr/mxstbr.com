@@ -2,6 +2,12 @@
 
 Status: promoted to https://mxstbr.com/chores; the legacy board is at https://mxstbr.com/chores2. The original trial and its verification are recorded below. The goal covers every retained/revised/lower-priority requirement in rebuild-features.json plus K70/P55 and the approved playful iPad concept. Removed capabilities are explicitly excluded from the new product.
 
+## Period bonus correction and chore picker — September 19, 2026
+
+The two-star award for each completed nonempty time period replaces the ten-star daily bonus. Completion, late approval, undo/re-completion, and lazy board reconciliation never create new daily awards. Historical credits and current balances remain recorded. The daily progress API keeps counts with zero bonus stars and no daily earned flag for existing clients. The daily reward offer and celebration dialog are removed.
+
+The “Finish this {timeframe}” card now opens the current chore picker; the separate “Choose another” button is removed. “My progress” is available inside the picker. Bonus chores retain their return link to the main routine.
+
 ## Promotion to /chores — September 19, 2026
 
 The page trees have traded places: the focused kid board is `/chores`; all legacy pages (including rewards, packing, admin, and approval links) live under `/chores2`. Existing site-password logins continue working. The new product retains its `chores2_*` MCP names, `/api/chores2/*` endpoints, and `chores:mxstbr:v2` storage keys so devices, agents, and notification delivery keep working. MCP instructions and repository guidance select the new product by default. New notifications use `[Chores]`.

@@ -224,7 +224,7 @@ test('kid undo targets the exact displayed record; bonus reversal and re-earning
     rejected('WINDOW_CLOSED'),
   )
 })
-test('daily bonus remains ten, in addition to both period awards; undo reverses both', async () => {
+test('finishing the whole day earns only two stars per period; undo and re-earn cannot add a daily bonus', async () => {
   const t = setup()
   for (const c of kid(await t.board()).chores)
     await t.run({ action: 'submit', occurrenceId: c.occurrenceId })
@@ -232,10 +232,86 @@ test('daily bonus remains ten, in addition to both period awards; undo reverses 
   let last: string | undefined
   for (const c of kid(await t.board()).chores)
     last = (await t.run({ action: 'submit', occurrenceId: c.occurrenceId })).id
-  assert.equal(kid(await t.board()).balance, 44)
-  assert.equal(kid(await t.board()).dailyProgress.earned, true)
+  assert.equal(kid(await t.board()).balance, 34)
+  const daily = kid(await t.board()).dailyProgress
+  assert.equal(daily.completed, daily.total)
+  assert.equal(daily.stars, 0)
+  assert.equal(daily.earned, false)
+  assert.equal(
+    t.repo.days['2026-09-09'].ledger.filter((e) => e.kind === 'daily-bonus')
+      .length,
+    0,
+  )
+  assert.equal(
+    t.repo.notifications.filter((n) => n.text.includes('bonus stars')).length,
+    2,
+  )
   await t.run({ action: 'undo', submissionId: last })
   assert.equal(kid(await t.board()).balance, 31)
+  for (const c of kid(await t.board()).chores)
+    await t.run({ action: 'submit', occurrenceId: c.occurrenceId })
+  assert.equal(kid(await t.board()).balance, 34)
+  assert.equal(
+    t.repo.days['2026-09-09'].ledger.filter((e) => e.kind === 'daily-bonus')
+      .length,
+    0,
+  )
+})
+test('approving the final on-time chore after midnight awards only its period bonus', async () => {
+  const t = setup()
+  for (const c of kid(await t.board()).chores)
+    await t.run({ action: 'submit', occurrenceId: c.occurrenceId })
+  t.clock('2026-09-10T01:00:00Z')
+  const evening = kid(await t.board()).chores
+  t.repo.days['2026-09-09'].occurrences.find(
+    (o) => o.id === evening[evening.length - 1].occurrenceId,
+  )!.chore.requiresApproval = true
+  let last: string | undefined
+  for (const c of evening)
+    last = (await t.run({ action: 'submit', occurrenceId: c.occurrenceId })).id
+  t.clock('2026-09-10T15:00:00Z')
+  const result = await t.run(
+    { action: 'review', submissionId: last, decision: 'approve' },
+    parent,
+  )
+  assert.equal(result.periodBonus, 2)
+  assert(!('dailyBonus' in result))
+  assert.equal(kid(await t.board()).balance, 34)
+  assert.equal(
+    t.repo.days['2026-09-09'].ledger.filter((e) => e.kind === 'daily-bonus')
+      .length,
+    0,
+  )
+})
+test('historical daily awards remain recorded without granting new ones or changing existing balances', async () => {
+  const t = setup()
+  const day = t.repo.days['2026-09-09']
+  day.awards['kid-3:daily'] = 'historical-daily-award'
+  day.ledger.push({
+    id: 'historical-daily-award',
+    kidId: 'kid-3',
+    amount: 10,
+    kind: 'daily-bonus',
+    sourceId: 'historical-day',
+    timestamp: '2026-09-09T14:00:00Z',
+    actor: 'legacy',
+    note: 'Previously awarded daily bonus',
+  })
+  t.repo.core.balances['kid-3'] += 10
+  assert.equal(kid(await t.board()).balance, 36)
+  assert.equal(kid(await t.board()).dailyProgress.earned, false)
+  const first = await t.run({
+    action: 'submit',
+    occurrenceId: kid(await t.board()).chores[0].occurrenceId,
+  })
+  await t.run({ action: 'undo', submissionId: first.id })
+  assert.equal(kid(await t.board()).balance, 36)
+  assert.equal(day.ledger.filter((e) => e.kind === 'daily-bonus').length, 1)
+  assert(
+    !t.repo.days['2026-09-09'].ledger.some(
+      (e) => e.reverses === 'historical-daily-award',
+    ),
+  )
 })
 test('expired, paused and removed started work cannot disappear from bonus targets', async () => {
   const t = setup(),

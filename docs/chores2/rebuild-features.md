@@ -6,7 +6,7 @@ Target scope: [rebuild-scope.md](rebuild-scope.md). The original [inventory](inv
 
 Untimed Bonus chores remain available anytime. On-time approval requests can be approved after their window/day closes. New late submissions cannot. Parents manage through ChatGPT and MCP. Telegram only delivers notifications. There is no Clippy or dedicated parent UI.
 
-Coverage: 123 original IDs; 29 retained, 18 removed, 72 revised, 4 lower priority.
+Coverage: 123 original IDs; 27 retained, 19 removed, 73 revised, 4 lower priority.
 
 ## Kid: get to my board
 
@@ -52,7 +52,7 @@ Coverage: 123 original IDs; 29 retained, 18 removed, 72 revised, 4 lower priorit
 
 - **K20 — As a kid, I can follow my chores in the order my parent specified for the current time period.** _Revised · Core._ Initialize each child/period from routine-order.md. Shared tasks first, then that child’s extras in written order. Filter weekdays without reordering survivors. No sorting by stars, title, type, creation time, or model priority.
 
-- **K21 — As a kid, I can see my current-period progress and two-star bonus opportunity, plus my daily bonus target.** _Revised._ Current-time work is the visual priority. Keep daily bonus accounting across required occurrences; do not treat hidden expired work as done or reveal its old cards. The new two-star reward applies once to every nonempty named period, in addition to the ten-star daily bonus. Untimed Bonus chores are outside period targets; pending approval is not completion.
+- **K21 — As a kid, I can see my current-period progress and two-star bonus opportunity.** _Revised._ Only nonempty named periods earn completion bonuses. Daily progress remains counts-only; no extra ten-star award. Untimed Bonus chores are outside period targets; pending approval is not completion.
 
 - **K22 — As a kid, I can see when I have no open chores in the current window.** _Revised._ Do not claim the whole day is done or display upcoming timed work. Untimed Bonus availability can be shown separately.
 
@@ -72,15 +72,15 @@ Coverage: 123 original IDs; 29 retained, 18 removed, 72 revised, 4 lower priorit
 
 - **K29 — As a kid, I can earn a repeatable chore again when it is eligible.** _Revised._ Untimed repeatable chores remain available anytime; timed ones only in their active window. Each attempt has its own identity and validated cooldown. Approval of an earlier attempt does not authorize a new late one.
 
-- **K30 — As a kid, I can earn the daily bonus after completing the required work for that day.** _Revised._ No skip credit. Keep the ten-star daily bonus baseline. An on-time pending request is neither missed nor completed; later approval may settle the original day’s bonus.
+- **K30 — As a kid, I can earn two extra stars after completing every task in a nonempty time period.** _Revised._ This replaces the ten-star daily bonus. An on-time pending request can settle its original period bonus after later approval. No skip credit.
 
-- **K31 — As a kid, I can see and dismiss a daily-bonus celebration.** _Retained._ Retain this capability subject to rebuild-scope.md. Current implementation details and known defects are not automatically requirements.
+- **K31 — As a kid, I can see and dismiss a daily-bonus celebration.** _Removed._ Remove the ten-star daily-bonus dialog. Period progress still shows its earned two-star award.
 
 - **K32 — As a kid, I can review completions from the current time window and today’s untimed work.** _Revised._ Do not reintroduce other named groups, historical completion actions, or group persistence timers.
 
 - **K33 — As a kid, I can undo one of my displayed completions.** _Revised._ Only currently displayed current-window/untimed completions are kid-accessible. Undo must target that exact record; historical parent corrections use agents.
 
-- **K34 — As a kid, I can have my balance reflect losing a daily bonus when I undo a required chore.** _Retained._ Retain this capability subject to rebuild-scope.md. Current implementation details and known defects are not automatically requirements.
+- **K34 — As a kid, I can have my balance reflect losing a period bonus when I undo a required chore.** _Revised._ Undo reverses the two-star award if its period becomes incomplete; re-completion restores at most one net award. Historical daily credits remain in the ledger.
 
 - **K35 — As a kid, I can carry my unspent star balance from day to day.** _Retained._ Retain this capability subject to rebuild-scope.md. Current implementation details and known defects are not automatically requirements.
 
@@ -270,7 +270,7 @@ Coverage: 123 original IDs; 29 retained, 18 removed, 72 revised, 4 lower priorit
 
 - **P47 — As a parent, I can receive Telegram updates for completed and undone chores.** _Revised._ Parent actions take place in ChatGPT through MCP. Telegram delivers notifications only.
 
-- **P48 — As a parent, I can receive Telegram updates for daily bonuses and reward redemptions.** _Revised._ Skip updates and dedicated bedtime reminders are removed.
+- **P48 — As a parent, I can receive Telegram updates for period bonuses and reward redemptions.** _Revised._ Two-star period bonuses replace daily bonuses. Skip updates and dedicated bedtime reminders are removed.
 
 - **P49 — As a parent, I can have recorded changes survive Telegram delivery failures.** _Revised._ Persist accepted on-time requests before delivering their notification; retry delivery without duplicating the domain operation.
 
@@ -288,7 +288,7 @@ Coverage: 123 original IDs; 29 retained, 18 removed, 72 revised, 4 lower priorit
 
 ## New rebuild capabilities
 
-- **K70 — As a kid, I can earn two extra stars by completing every task in a nonempty time period and see my progress toward that bonus.** _Added · Core._ Award once per child/Pacific day/named period. Empty periods earn nothing. Untimed Bonus chores are excluded. On-time requests can settle the original reward after later approval. Undo reverses it if incomplete; re-completion restores at most one net award. Additive to the ten-star daily bonus.
+- **K70 — As a kid, I can earn two extra stars by completing every task in a nonempty time period and see my progress toward that bonus.** _Added · Core._ Award once per child/Pacific day/named period. Empty periods earn nothing. Untimed Bonus chores are excluded. On-time requests can settle the original reward after later approval. Undo reverses it if incomplete; re-completion restores at most one net award. Replaces the ten-star daily bonus. Tapping the period card opens the current chore picker.
 
 - **P55 — As a parent, I can set the order of each child’s chores within a time period through ChatGPT and MCP.** _Added · Core._ Initial order is the September 8 Kids chores message, recorded in routine-order.md. Common tasks precede that child’s extras. Weekday filtering and temporary kid selection preserve saved order.
 

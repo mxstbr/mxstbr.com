@@ -117,7 +117,14 @@ export function ChildPanel({
         <button onClick={() => onView('now')}>Back</button>
       </div>
       <div className="c2-panel-scroll">
-        {view === 'choose' && choose(kid.chores)}
+        {view === 'choose' && (
+          <>
+            {choose(kid.chores)}
+            <button className="c2-choose" onClick={() => onView('progress')}>
+              My progress
+            </button>
+          </>
+        )}
         {view === 'bonus' && (
           <>
             <p className="c2-panel-note">Something extra, whenever you want.</p>
@@ -391,11 +398,9 @@ export function ChildPanel({
                       ? ` · ${summary.progress.pending} waiting`
                       : ''}
                   </p>
-                  <p className="c2-daily-bonus">
-                    {summary.progress.earned
-                      ? '✓ Daily bonus earned!'
-                      : 'Finish all required tasks for the day'}
-                    <strong>+10 ★</strong>
+                  <p className="c2-period-bonus">
+                    Finish every task in a time period
+                    <strong>+2 ★ per period</strong>
                   </p>
                   {summaryDay <= day && (
                     <p className="c2-panel-note">

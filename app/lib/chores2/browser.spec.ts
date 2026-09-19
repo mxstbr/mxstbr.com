@@ -60,6 +60,28 @@ test('landscape iPad: focus, stars, exact undo, rewards, packing, color, summary
     ),
   ).toBe(true)
 
+  await expect(
+    page.getByRole('button', { name: 'Choose another', exact: true }),
+  ).toHaveCount(0)
+  await dilan.locator('.c2-period-reward').click()
+  await expect(
+    dilan.getByRole('heading', { name: 'For right now' }),
+  ).toBeVisible()
+  await expect(
+    dilan.getByText('Bring your lunch bag to the kitchen'),
+  ).toHaveCount(0)
+  await dilan
+    .getByRole('button', { name: /Brush your teeth and your tongue/ })
+    .click()
+  await expect(
+    dilan.getByRole('heading', { name: 'Brush your teeth and your tongue' }),
+  ).toBeVisible()
+  await dilan.locator('.c2-period-reward').click()
+  await dilan.getByRole('button', { name: /Make your bed/ }).click()
+  await expect(
+    dilan.getByRole('heading', { name: 'Make your bed' }),
+  ).toBeVisible()
+
   // Reset only this local fixture's two test completions, through the actual UI.
   await devina.getByRole('button', { name: /^Done/ }).click()
   while (
@@ -142,11 +164,14 @@ test('landscape iPad: focus, stars, exact undo, rewards, packing, color, summary
   await devina.getByRole('button', { name: 'Choose #9250b3' }).click()
   await devina.getByRole('button', { name: 'Save my color' }).click()
   await devina.locator('.c2-period-reward').click()
+  await devina.getByRole('button', { name: 'My progress', exact: true }).click()
   await devina.getByRole('button', { name: 'Next day' }).click()
   await expect(devina.getByText('Scheduled tasks')).toBeVisible()
   await expect(devina.getByText('Change into your pyjama')).toHaveCount(0)
   await devina.getByRole('button', { name: 'Back to today' }).click()
   await expect(devina.getByText('Required tasks completed')).toBeVisible()
+  await expect(devina.getByText('+2 ★ per period')).toBeVisible()
+  await expect(page.getByText(/Daily bonus|\+10/)).toHaveCount(0)
   await devina.getByRole('button', { name: 'Back', exact: true }).click()
 
   // Lose the response after the server committed. Retry must reuse the ID.

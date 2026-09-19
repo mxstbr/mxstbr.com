@@ -185,8 +185,9 @@ export function progress(
     completed,
     pending: waiting,
     missed,
-    stars: group === 'daily' ? 10 : 2,
-    earned: Boolean(day.awards[orderKey(kidId, group as Group)]),
+    // Daily progress is counts-only; completion bonuses belong to time periods.
+    stars: group === 'daily' ? 0 : 2,
+    earned: group !== 'daily' && Boolean(day.awards[orderKey(kidId, group)]),
   }
 }
 function post(
@@ -242,9 +243,8 @@ export function reconcileBonuses(
   now: Date,
   reverseUnearned = true,
 ) {
-  let periodBonus = 0,
-    dailyBonus = 0
-  for (const group of [...PERIODS, 'daily'] as const) {
+  let periodBonus = 0
+  for (const group of PERIODS) {
     const p = progress(day, kidId, group, now)
     const key = `${kidId}:${group}`
     const earned = p.total > 0 && p.total === p.completed
@@ -256,18 +256,17 @@ export function reconcileBonuses(
         actor,
         kidId,
         p.stars,
-        group === 'daily' ? 'daily-bonus' : 'period-bonus',
+        'period-bonus',
         `${day.day}:${key}`,
         `${group} completion bonus`,
         now,
       )
       day.awards[key] = entry.id
-      if (group === 'daily') dailyBonus += p.stars
-      else periodBonus += p.stars
+      periodBonus += p.stars
       const kid = tx.core.kids.find((k) => k.id === kidId)!
       notify(
         tx,
-        `${kid.name} earned ${p.stars} bonus stars for completing every task in ${group === 'daily' ? 'the day' : `the ${group}`} (${day.day}).`,
+        `${kid.name} earned ${p.stars} bonus stars for completing every task in the ${group} (${day.day}).`,
         now,
         day.day,
       )
@@ -288,7 +287,7 @@ export function reconcileBonuses(
       day.awards[key] = null
     }
   }
-  return { periodBonus, dailyBonus }
+  return { periodBonus }
 }
 function actionable(tx: Transaction, actor: Actor, id: string, now: Date) {
   const day = tx.days[id.slice(0, 10)]
