@@ -178,7 +178,8 @@ export function migrateLegacy(
     const id = `${day.day}:legacy:${r.id}`
     // Legacy balances already include a negative completion for each purchase.
     // Import redemption metadata/entitlements, never a second debit.
-    core.oneOffRedemptions[entitlementKey(r.kidId, r.rewardId)] = id
+    if (reward?.type === 'one-off')
+      core.oneOffRedemptions[entitlementKey(r.kidId, r.rewardId)] = id
     if (reward)
       day.redemptions.push({
         id,
