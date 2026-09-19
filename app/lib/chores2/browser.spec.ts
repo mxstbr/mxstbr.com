@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import type { Board } from './types'
 
 test('idle panels and display wake return to now', async ({ page }) => {
   await page.clock.install()
@@ -95,6 +96,8 @@ test('landscape iPad: focus, stars, exact undo, rewards, packing, color, summary
   await expect(
     devina.getByRole('heading', { name: 'All done for now.' }),
   ).toBeVisible()
+  await expect(devina).toHaveAttribute('data-attention', 'clear')
+  await expect(dilan).toHaveAttribute('data-attention', 'needed')
   await expect(devina.locator('.c2-wallet')).toHaveText(`${balance + 4} ★`)
   await expect(devina.getByText('Bonus earned!')).toBeVisible()
   await expect(dilan.locator('.c2-wallet')).toHaveText(siblingWallet)
@@ -105,6 +108,7 @@ test('landscape iPad: focus, stars, exact undo, rewards, packing, color, summary
     .first()
     .click()
   await expect(devina.locator('.c2-wallet')).toHaveText(`${balance + 1} ★`)
+  await expect(devina).toHaveAttribute('data-attention', 'needed')
   await devina.getByRole('button', { name: /I did it!/ }).click()
   await expect(devina.locator('.c2-wallet')).toHaveText(`${balance + 4} ★`)
 
@@ -200,4 +204,119 @@ test('landscape iPad: focus, stars, exact undo, rewards, packing, color, summary
   ).toBeVisible()
   await expect(dilan.getByRole('button', { name: /I did it!/ })).toHaveCount(0)
   expect(errors).toEqual([])
+})
+
+test('a glance separates outstanding chores from empty, finished and pending work without a false all-clear', async ({
+  page,
+}) => {
+  const scene: Board = await (
+    await page.request.get('/api/chores2/board')
+  ).json()
+  expect(scene.serverNow).toBe('2026-09-09T15:00:00.000Z')
+  scene.revision += 100
+  const empty = scene.kids[1],
+    done = scene.kids[2]
+  empty.chores = []
+  empty.completed = []
+  empty.periodProgress = {
+    total: 0,
+    completed: 0,
+    pending: 0,
+    missed: 0,
+    stars: 2,
+    earned: false,
+  }
+  done.chores = []
+  done.periodProgress = {
+    total: 2,
+    completed: 2,
+    pending: 0,
+    missed: 0,
+    stars: 2,
+    earned: true,
+  }
+  await page.route('**/api/chores2/board', (route) =>
+    route.fulfill({ json: scene }),
+  )
+  await page.goto('/chores')
+  const dilan = page.locator('[data-kid="kid-1"]')
+  const darian = page.locator('[data-kid="kid-2"]')
+  const devina = page.locator('[data-kid="kid-3"]')
+  await expect(dilan).toHaveAttribute('data-attention', 'needed')
+  await expect(
+    darian.getByRole('heading', { name: 'Nothing to do right now.' }),
+  ).toBeVisible()
+  await expect(
+    devina.getByRole('heading', { name: 'All done for now.' }),
+  ).toBeVisible()
+  await expect(page.getByText('Go play.', { exact: true })).toHaveCount(2)
+  await expect(page.locator('[data-attention="clear"]')).toHaveCount(2)
+  await expect(darian.locator('.c2-primary')).toHaveCount(0)
+  for (const scheme of ['light', 'dark'] as const) {
+    await page.emulateMedia({ colorScheme: scheme })
+    const background = (selector: string) =>
+      page
+        .locator(selector)
+        .evaluate((el) => getComputedStyle(el).backgroundColor)
+    expect(await background('[data-kid="kid-1"]')).not.toBe(
+      await background('[data-kid="kid-2"]'),
+    )
+    expect(await background('[data-kid="kid-2"]')).toBe(
+      await background('[data-kid="kid-3"]'),
+    )
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollHeight <= innerHeight,
+      ),
+    ).toBe(true)
+    await page.screenshot({ path: `/private/tmp/chores-glance-${scheme}.png` })
+  }
+  await page.emulateMedia({ colorScheme: 'light' })
+  await darian
+    .getByRole('button', { name: 'Bonus chores', exact: true })
+    .click()
+  await expect(darian).toHaveAttribute('data-attention', 'clear')
+  await darian.getByRole('button', { name: /Do six pull-ups/ }).click()
+  await expect(darian).toHaveAttribute('data-attention', 'needed')
+  await darian.getByRole('button', { name: 'Back to my chores' }).click()
+  await expect(darian).toHaveAttribute('data-attention', 'clear')
+
+  done.periodProgress = {
+    ...done.periodProgress,
+    completed: 0,
+    pending: 2,
+    earned: false,
+  }
+  scene.revision++
+  await page.getByRole('button', { name: 'Refresh the board' }).click()
+  await expect(
+    devina.getByRole('heading', { name: 'Your part is done.' }),
+  ).toBeVisible()
+  await expect(devina.getByText('2 waiting for a parent.')).toBeVisible()
+  await expect(devina).toHaveAttribute('data-attention', 'clear')
+  await page.screenshot({ path: '/private/tmp/chores-glance-pending.png' })
+
+  // An uncertain save must still demand attention, even if a later read shows
+  // no remaining chore. This response is intercepted and never mutates data.
+  await page.route('**/api/chores2/command', (route) =>
+    route.fulfill({
+      status: 503,
+      json: { error: { message: 'Could not confirm the save.' } },
+    }),
+  )
+  await dilan.getByRole('button', { name: /I did it!/ }).click()
+  await expect(
+    dilan.getByRole('button', { name: 'Retry saving' }),
+  ).toBeVisible()
+  scene.kids[0].chores = []
+  scene.revision++
+  await page.getByRole('button', { name: 'Refresh the board' }).click()
+  await expect(
+    dilan.getByRole('heading', { name: 'Check your last chore.' }),
+  ).toBeVisible()
+  await expect(dilan).toHaveAttribute('data-attention', 'checking')
+  await expect(dilan.getByText('Go play.', { exact: true })).toHaveCount(0)
+  await page.evaluate(() => window.dispatchEvent(new Event('offline')))
+  await expect(page.locator('[data-attention="clear"]')).toHaveCount(0)
+  await expect(page.getByText('Go play.', { exact: true })).toHaveCount(0)
 })

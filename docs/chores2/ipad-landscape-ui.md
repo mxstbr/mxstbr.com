@@ -8,7 +8,7 @@ The visual is designed around a 1024px-wide 4:3 iPad and a roughly 680px usable 
 
 - A small shared header names the current period and its cutoff; today's date sits quietly at the right. There is no navigation to other periods.
 - Each column has the child's name and a stable color. A small star balance opens that child's Rewards.
-- The main area shows exactly one actionable chore from the parent's saved sequence. **Its existing assigned emoji is a large visual reminder**, paired with the full title, including the long school-clothes instruction. Reuse the same emoji in current choices and Done/Waiting; do not substitute randomly chosen artwork. Open-title audio is directly accessible.
+- The main area shows exactly one actionable chore from the parent's saved sequence. **Its existing assigned emoji is a large visual reminder**, paired with the full title, including the long school-clothes instruction. Reuse the same emoji in current choices and Done/Waiting; do not substitute randomly chosen artwork.
 - The large completion button is always at the same vertical position across columns and successive tasks. Its label changes to “Ask for approval” when necessary.
 - The “Finish this {timeframe}” card opens current eligible choices inside that child's column. It does not reorder or skip tasks. No other child's view changes.
 - A compact period-bonus panel combines progress with the explicit two-star reward. It distinguishes completed, pending, and earned states. Empty periods show no offer.
@@ -16,7 +16,9 @@ The visual is designed around a 1024px-wide 4:3 iPad and a roughly 680px usable 
 
 Use all three columns simultaneously. Each child owns their own next-action selection, open secondary panel, completion feedback, and bonus state. A child's Rewards, Bonus, or Done view stays within their column while the others keep working. Returning restores the authoritative next actionable chore. All such views are still subordinate to current-window eligibility; a boundary closes stale timed details.
 
-When a child's work is done, that column says “All done for now. You can go play.” On-time work awaiting approval instead says “Your part is done,” with the waiting count; the two-star reward is pending. No upcoming routine replaces finished work, and Bonus chores are never automatically assigned. At the next boundary the new current window appears for all children. With zero current tasks, the column says “Nothing to do right now” and offers no period payout.
+When a child's work is done, that column says “All done for now. Go play.” On-time work awaiting approval instead says “Your part is done,” with the waiting count; the two-star reward is pending. No upcoming routine replaces finished work, and Bonus chores are never automatically assigned. At the next boundary the new current window appears for all children. With zero current tasks, the column says “Nothing to do right now. Go play.” and offers no period payout.
+
+The whole column signals whether that child has something to do, even at a glance while running past. Outstanding chores keep their colorful, raised column, solid chore card, large emoji, and prominent completion button. Finished, empty, and awaiting-parent columns become flat, neutral gray-green, with a large muted check (or clock for pending approval), centered text, and no solid chore card. Their balance, progress stamps, and earned bonus are quiet too; the child's name keeps its identity color. An explicitly selected Bonus chore restores the active treatment. Loading, offline status, or an unconfirmed save must never show the quiet all-clear or “Go play.” Apply the distinction in both light and dark mode without dimming the entire column or making secondary controls unreadable.
 
 ## Implementation direction
 

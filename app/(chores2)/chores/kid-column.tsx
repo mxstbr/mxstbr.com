@@ -155,17 +155,31 @@ export function KidColumn({
   const allSubmitted =
     kid.periodProgress.total > 0 &&
     kid.periodProgress.completed + waiting === kid.periodProgress.total
+  const hasOutstanding = kid.chores.some(
+    (chore) => !completedIds.has(chore.occurrenceId),
+  )
+  const attention =
+    stale || blocked
+      ? 'checking'
+      : hasOutstanding || current
+        ? 'needed'
+        : 'clear'
   const doneTitle = stale
     ? 'Getting your chores…'
-    : allDone
-      ? 'All done for now.'
-      : allSubmitted && waiting
-        ? 'Your part is done.'
-        : 'Nothing to do right now.'
+    : blocked
+      ? busy
+        ? 'Saving your chore…'
+        : 'Check your last chore.'
+      : allDone
+        ? 'All done for now.'
+        : allSubmitted && waiting
+          ? 'Your part is done.'
+          : 'Nothing to do right now.'
   return (
     <section
       className="c2-child"
       data-kid={kid.id}
+      data-attention={attention}
       aria-label={`${kid.name} chores`}
       style={palette(kid.color, kid.id)}
       onPointerDown={touch}
@@ -189,7 +203,7 @@ export function KidColumn({
       </header>
       {view === 'now' || stale ? (
         <>
-          <div className="c2-focus">
+          <div className={`c2-focus${current ? '' : ' c2-focus-rest'}`}>
             <div className="c2-stage">
               {current ? (
                 <>
@@ -210,24 +224,28 @@ export function KidColumn({
               ) : (
                 <>
                   <div className="c2-done-mark" aria-hidden="true">
-                    {stale
-                      ? '🌤️'
-                      : allDone
-                        ? '🙌'
-                        : allSubmitted && waiting
-                          ? '💌'
-                          : '🌈'}
+                    {attention === 'clear' ? (
+                      <svg viewBox="0 0 80 80" fill="none">
+                        <circle cx="40" cy="40" r="35" />
+                        <path
+                          d={
+                            waiting > 0
+                              ? 'M40 20v22l14 8'
+                              : 'm23 40 11 11 23-26'
+                          }
+                        />
+                      </svg>
+                    ) : (
+                      '◷'
+                    )}
                   </div>
                   <h2 className="c2-task-title">{doneTitle}</h2>
-                  {!stale && (
+                  {attention === 'clear' && (
                     <p className="c2-done-text">
+                      <strong>Go play.</strong>
                       {waiting > 0 && (
-                        <>
-                          {waiting} waiting for a parent.
-                          <br />
-                        </>
+                        <span>{waiting} waiting for a parent.</span>
                       )}
-                      You can go play.
                     </p>
                   )}
                 </>
@@ -257,9 +275,7 @@ export function KidColumn({
                 </span>
                 <span className="c2-action-stars">+{current.stars} ★</span>
               </button>
-            ) : (
-              <div className="c2-button-space" />
-            )}
+            ) : null}
           </div>
           {isBonus && (
             <button className="c2-choose" onClick={close}>
