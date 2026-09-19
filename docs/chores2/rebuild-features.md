@@ -6,7 +6,7 @@ Target scope: [rebuild-scope.md](rebuild-scope.md). The original [inventory](inv
 
 Untimed Bonus chores remain available anytime. On-time approval requests can be approved after their window/day closes. New late submissions cannot. Parents manage through ChatGPT and MCP. Telegram only delivers notifications. There is no Clippy or dedicated parent UI.
 
-Coverage: 123 original IDs; 27 retained, 19 removed, 73 revised, 4 lower priority.
+Coverage: 123 original IDs; 27 retained, 20 removed, 72 revised, 4 lower priority.
 
 ## Kid: get to my board
 
@@ -64,7 +64,7 @@ Coverage: 123 original IDs; 27 retained, 19 removed, 73 revised, 4 lower priorit
 
 ## Kid: complete chores, earn stars, and correct mistakes
 
-- **K26 — As a kid, I can open an eligible chore to complete it, request required approval, or hear its title.** _Revised · Core._ No Skip action. An expired timed modal must not remain actionable.
+- **K26 — As a kid, I can open an eligible chore to complete it or request required approval.** _Revised · Core._ No Skip action. An expired timed modal must not remain actionable.
 
 - **K27 — As a kid, I can complete an occurrence that is eligible now and receive its stars.** _Revised · Core._ No early, backdated, or elapsed-window submissions. Enforce on the server. On-time approval requests may be settled later.
 
@@ -134,9 +134,9 @@ Coverage: 123 original IDs; 27 retained, 19 removed, 73 revised, 4 lower priorit
 
 - **K56 — As a kid, I can save or cancel my color choice.** _Retained._ Retain this capability subject to rebuild-scope.md. Current implementation details and known defects are not automatically requirements.
 
-- **K57 — As a kid, I can have an eligible open chore’s title read aloud.** _Revised._ Retained for current-window and untimed work. Completed-title playback is removed.
+- **K57 — As a kid, I can have an open chore’s title read aloud.** _Removed._ Remove chore-title read-aloud, its controls and its speech endpoint. The kids can read their chores.
 
-- **K58 — As a kid, I can hear the title of a completed chore without undoing it.** _Removed._ Remove completed-chore title speech. Keep open-chore title speech (K57).
+- **K58 — As a kid, I can hear the title of a completed chore without undoing it.** _Removed._ Remove completed-chore title speech. Open-chore title speech (K57) is also removed.
 
 - **K59 — As a kid, I can use the board in my device’s light or dark appearance.** _Lower Priority._ Lower priority, not removed. Do not make this a dependency of the primary current-time kid experience.
 

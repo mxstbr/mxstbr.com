@@ -170,12 +170,6 @@
   transform: rotate(-6deg);
   flex-shrink: 0;
 }
-.c2-task-tools {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 1px;
-}
 .c2-label {
   color: var(--c2-muted);
   font-size: 13px;
@@ -195,13 +189,6 @@
   color: var(--c2-gold);
   padding: 3px 5px;
   border-radius: 6px;
-}
-.chores2 .c2-read {
-  color: var(--c2-identity);
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
 }
 .c2-task-title {
   font-size: 27px;

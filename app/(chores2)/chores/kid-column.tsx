@@ -65,14 +65,8 @@ export function KidColumn({
   const [isBonus, setIsBonus] = useState(false)
   const [note, setNote] = useState('')
   const [burst, setBurst] = useState(0)
-  const [reading, setReading] = useState(false)
   const [cooldown, setCooldown] = useState(false)
   const idle = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const speech = useRef<{
-    audio?: HTMLAudioElement
-    url?: string
-    controller?: AbortController
-  }>({})
   const previousBalance = useRef(kid.balance)
   const primary = useRef<HTMLButtonElement>(null)
   const sounds = useChoreSounds()
@@ -130,18 +124,6 @@ export function KidColumn({
     const timer = setTimeout(() => setCooldown(false), 5000)
     return () => clearTimeout(timer)
   }, [current?.availableAt])
-  useEffect(() => {
-    speech.current.controller?.abort()
-    speech.current.audio?.pause()
-    if (speech.current.url) URL.revokeObjectURL(speech.current.url)
-    speech.current = {}
-    setReading(false)
-    return () => {
-      speech.current.controller?.abort()
-      speech.current.audio?.pause()
-      if (speech.current.url) URL.revokeObjectURL(speech.current.url)
-    }
-  }, [current?.occurrenceId, stale])
   async function perform(command: Command, retry = false) {
     touch()
     if (command.action === 'submit' || command.action === 'redeem')
@@ -166,49 +148,6 @@ export function KidColumn({
     setIsBonus(c.group === 'bonus')
     setView('now')
     touch()
-  }
-  async function hear() {
-    if (!current || reading) return
-    setReading(true)
-    touch()
-    // Unlock this same audio element during the tap for older iPad Safari.
-    const audio = new Audio('/static/audio/chores/cha-ching-money.mp3')
-    audio.muted = true
-    const primed = audio
-      .play()
-      .then(() => {
-        audio.pause()
-        audio.currentTime = 0
-      })
-      .catch(() => {})
-    speech.current.audio = audio
-    const controller = new AbortController()
-    speech.current.controller = controller
-    try {
-      const r = await fetch('/api/chores2/speech', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ occurrenceId: current.occurrenceId }),
-        signal: controller.signal,
-      })
-      if (!r.ok) throw new Error('Read-aloud is unavailable. Please try again.')
-      const url = URL.createObjectURL(await r.blob())
-      await primed
-      if (controller.signal.aborted) {
-        URL.revokeObjectURL(url)
-        return
-      }
-      speech.current = { controller, url, audio }
-      audio.src = url
-      audio.muted = false
-      audio.onended = () => setReading(false)
-      await audio.play()
-    } catch (e) {
-      if (!controller.signal.aborted) {
-        setReading(false)
-        setNote(e instanceof Error ? e.message : 'Please tap Hear it again.')
-      }
-    }
   }
   const allDone =
     kid.periodProgress.total > 0 &&
@@ -258,20 +197,10 @@ export function KidColumn({
                     <span className="c2-task-emoji" aria-hidden="true">
                       {current.emoji}
                     </span>
-                    <div className="c2-task-tools">
-                      <span className="c2-label">
-                        {isBonus ? 'Bonus · anytime' : 'Do this now'}
-                        {current.isNew && <small>New</small>}
-                      </span>
-                      <button
-                        className="c2-read"
-                        disabled={reading}
-                        onClick={hear}
-                        aria-label={`Read ${kid.name}’s chore aloud`}
-                      >
-                        {reading ? 'Reading…' : '♪ Hear it'}
-                      </button>
-                    </div>
+                    <span className="c2-label">
+                      {isBonus ? 'Bonus · anytime' : 'Do this now'}
+                      {current.isNew && <small>New</small>}
+                    </span>
                   </div>
                   <h2 className="c2-task-title">{current.title}</h2>
                   {current.requiresApproval && (

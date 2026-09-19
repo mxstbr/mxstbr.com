@@ -1,26 +1,11 @@
 import { test, expect } from '@playwright/test'
-import { readFile } from 'node:fs/promises'
 
-test('read-aloud controls play a local audio fixture; idle panels and display wake return to now', async ({
-  page,
-}) => {
+test('idle panels and display wake return to now', async ({ page }) => {
   await page.clock.install()
   await page.goto('/chores')
   const board = await (await page.request.get('/api/chores2/board')).json()
   expect(board.serverNow).toBe('2026-09-09T15:00:00.000Z')
   const dilan = page.locator('[data-kid="kid-1"]')
-  const audio = await readFile('public/static/audio/chores/cha-ching-money.mp3')
-  let requested = ''
-  // Intercept before any request reaches the speech route or external service.
-  await page.route('**/api/chores2/speech', async (route) => {
-    requested = route.request().postDataJSON().occurrenceId
-    await route.fulfill({ contentType: 'audio/mpeg', body: audio })
-  })
-  await dilan.getByRole('button', { name: 'Read Dilan’s chore aloud' }).click()
-  await expect.poll(() => requested).toBe(board.kids[0].chores[0].occurrenceId)
-  await expect(
-    dilan.getByRole('button', { name: 'Read Dilan’s chore aloud' }),
-  ).toHaveText('Reading…')
   await dilan.locator('.c2-wallet').click()
   await expect(
     dilan.getByRole('heading', { name: 'Rewards', exact: true }),

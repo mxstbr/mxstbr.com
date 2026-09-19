@@ -49,7 +49,7 @@ Commands:
 - `pnpm exec playwright test --config playwright.chores2.config.ts`: isolated development fixture and 1024×680 browser flow. Start with a fresh fixture server for repeatable balances.
 - `pnpm build`: passed in a clean checkout without unrelated workspace edits; existing essay sync reported no changes.
 
-Live speech-provider verification was rejected by automatic approval review because it sends a household chore title to OpenAI. The browser speech test intercepts the request and serves a local audio fixture; no external speech request is sent. The existing speech integration is retained, and physical iPad playback remains an acceptance check.
+Chore-title speech was removed on September 19, 2026, at Max’s request: the kids can read their chores. The Hear it control, playback lifecycle, and `/api/chores2/speech` route are removed. Completion and reward sound effects remain.
 
 Catalog changes retain opened obligations and accepted submission snapshots. Future opportunities are amended; previously paused future work can resume while its window is still open. A scheduling change cannot turn missed work into completed credit. Parent historical undo and explicit manual adjustments remain available through exact IDs.
 

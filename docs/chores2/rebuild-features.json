@@ -59,12 +59,13 @@
     "bedtimeRecognition": "Dedicated last-night recognition/templates/generated chores/reminders removed.",
     "dataIsolation": "Separate keys in the existing Redis database; copy source catalogs/history/balances once, then independent state.",
     "deviceAccess": "Reuse the existing site-password login; already-unlocked iPads open /chores directly. Otherwise enter the same password. Invitation links remain optional.",
-    "choreSwitcher": "Tap the Finish this {timeframe} card to choose a current chore. No separate Choose another button. My progress remains inside the picker."
+    "choreSwitcher": "Tap the Finish this {timeframe} card to choose a current chore. No separate Choose another button. My progress remains inside the picker.",
+    "choreSpeech": "Removed: the kids can read their chores; no Hear it control or speech endpoint."
   },
   "counts": {
     "retained": 27,
-    "removed": 19,
-    "revised": 73,
+    "removed": 20,
+    "revised": 72,
     "lower_priority": 4
   },
   "features": [
@@ -642,7 +643,7 @@
       "baselineSource": "/Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores/kid-board.tsx:1388",
       "disposition": "revised",
       "priority": "core",
-      "targetStory": "As a kid, I can open an eligible chore to complete it, request required approval, or hear its title.",
+      "targetStory": "As a kid, I can open an eligible chore to complete it or request required approval.",
       "targetNotes": "No Skip action. An expired timed modal must not remain actionable.",
       "basis": "consequence of requested changes",
       "channel": "kid_board",
@@ -1338,19 +1339,16 @@
       "group": "Kid: personalize the board and get help",
       "baselineStory": "As a kid, I can have an open chore’s title read aloud.",
       "baselineSource": "/Users/mxstbr/projects/mxstbr/mxstbr.com/app/api/chores/tts/route.ts:9",
-      "disposition": "revised",
-      "priority": "normal",
-      "targetStory": "As a kid, I can have an eligible open chore’s title read aloud.",
-      "targetNotes": "Retained for current-window and untimed work. Completed-title playback is removed.",
-      "basis": "consequence of requested changes",
-      "channel": "kid_board",
+      "disposition": "removed",
+      "priority": "none",
+      "targetStory": null,
+      "targetNotes": "Remove chore-title read-aloud, its controls and its speech endpoint. The kids can read their chores.",
+      "basis": "Explicit September 19 request to remove Hear it",
+      "channel": "none",
       "implementation": {
-        "status": "implemented",
-        "files": [
-          "app/(chores2)/chores/kid-column.tsx",
-          "app/api/chores2/speech/route.ts"
-        ],
-        "verification": "Server restricts speech to eligible open occurrence; same audio element primed in tap for iPad. Browser check uses intercepted local audio only; live provider check blocked by automatic approval review; physical iPad audio remains acceptance check."
+        "status": "excluded",
+        "files": ["app/(chores2)/chores/kid-column.tsx"],
+        "verification": "Chore-title playback and its API route removed. Browser verification confirms no Hear it control."
       }
     },
     {
@@ -1362,7 +1360,7 @@
       "disposition": "removed",
       "priority": "none",
       "targetStory": null,
-      "targetNotes": "Remove completed-chore title speech. Keep open-chore title speech (K57).",
+      "targetNotes": "Remove completed-chore title speech. Open-chore title speech (K57) is also removed.",
       "basis": "explicit removal or directly implied dependency",
       "channel": "none",
       "implementation": {

@@ -24,7 +24,7 @@ Max accepted the information architecture as worth trying, including one chore a
 
 Use the existing Next.js client components with plain CSS, system fonts, and restrained transitions. Avoid dependency-heavy effects or continuous animations on the old iPad. Keep the primary action about 56px high and other touch targets at least 44px. Budget the layout against usable Safari height, not only the physical screen aspect ratio. Long titles, transient messages, and secondary panels must fit without pushing another child's button down.
 
-The existing speech integration remains the production audio path. The local concept uses browser read-aloud only when explicitly tapped. Exact older-Safari compatibility is an implementation check, not established by a Chromium preview.
+Chore-title read-aloud is removed: the kids can read their chores. Completion and reward sound effects remain.
 
 Packing and counts-only daily progress remain available through secondary access; period bonuses replace the old daily bonus, and the main-screen concept concentrates on the current period. Keep them out of the primary next-action area. The visual uses illustrative star balances, task prices, approval configuration, and a sample reward. Task order, weekday exceptions, and which children have empty periods come from the confirmed routine specification.
 
