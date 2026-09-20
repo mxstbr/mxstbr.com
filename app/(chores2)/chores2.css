@@ -87,6 +87,23 @@
   font-size: 14px;
   margin: 0;
 }
+.c2-tabs {
+  display: flex;
+  flex-shrink: 0;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 16px;
+  box-shadow: inset 0 0 0 1px var(--c2-rule);
+}
+.chores2 .c2-tabs button {
+  padding: 8px 18px;
+  color: var(--c2-muted);
+}
+.chores2 .c2-tabs button[aria-pressed='true'] {
+  background: var(--c2-paper);
+  color: var(--c2-ink);
+  box-shadow: 0 1px 3px #0002;
+}
 .c2-toolbar {
   display: flex;
   align-items: center;

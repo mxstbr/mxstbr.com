@@ -20,6 +20,7 @@ type Props = {
   day: string
   disabled: boolean
   onView: (view: PanelName) => void
+  onBack: () => void
   onSelect: (card: ChoreCard) => void
   onAct: (command: Command) => void
   onPrimeReward: () => void
@@ -52,6 +53,7 @@ export function ChildPanel({
   day,
   disabled,
   onView,
+  onBack,
   onSelect,
   onAct,
   onPrimeReward,
@@ -114,7 +116,7 @@ export function ChildPanel({
     <div className="c2-panel">
       <div className="c2-panel-head">
         <h3>{title(view)}</h3>
-        <button onClick={() => onView('now')}>Back</button>
+        <button onClick={onBack}>Back</button>
       </div>
       <div className="c2-panel-scroll">
         {view === 'choose' && (

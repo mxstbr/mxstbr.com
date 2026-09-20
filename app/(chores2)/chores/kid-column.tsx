@@ -24,6 +24,8 @@ type Props = {
   ) => Promise<CommandResult | null>
   dismiss: (kidId: string) => void
   showPacking: number
+  homeView: 'now' | 'rewards'
+  onChores: () => void
 }
 function palette(color: string, id: string): CSSProperties {
   const fallback =
@@ -59,8 +61,10 @@ export function KidColumn({
   act,
   dismiss,
   showPacking,
+  homeView,
+  onChores,
 }: Props) {
-  const [view, setView] = useState<PanelName>('now')
+  const [view, setView] = useState<PanelName>(homeView)
   const [selected, setSelected] = useState<string | null>(null)
   const [isBonus, setIsBonus] = useState(false)
   const [note, setNote] = useState('')
@@ -86,7 +90,7 @@ export function KidColumn({
   const busy = Boolean(request?.busy)
   const blocked = busy || Boolean(request?.error)
   const close = () => {
-    setView('now')
+    setView(homeView)
     setSelected(null)
     setIsBonus(false)
   }
@@ -101,9 +105,10 @@ export function KidColumn({
     [],
   )
   useEffect(() => {
+    if (idle.current) clearTimeout(idle.current)
     close()
     setNote('')
-  }, [day, period])
+  }, [day, period, homeView])
   useEffect(() => {
     if (stale) close()
   }, [stale])
@@ -335,6 +340,11 @@ export function KidColumn({
           day={day}
           disabled={blocked || stale}
           onView={setView}
+          onBack={() => {
+            if (view.startsWith('reward:')) setView('rewards')
+            else if (homeView === 'rewards' && view === 'rewards') onChores()
+            else close()
+          }}
           onSelect={select}
           onAct={(c) => void perform(c)}
           onPrimeReward={() => sounds.prime('reward')}

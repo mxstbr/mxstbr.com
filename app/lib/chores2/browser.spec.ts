@@ -15,6 +15,24 @@ test('idle panels and display wake return to now', async ({ page }) => {
   await expect(
     dilan.getByRole('heading', { name: 'Make your bed' }),
   ).toBeVisible()
+  const views = page.getByRole('navigation', { name: 'Board views' })
+  await views.getByRole('button', { name: 'Rewards', exact: true }).click()
+  await expect(
+    page.getByRole('heading', { name: 'Rewards', exact: true }),
+  ).toHaveCount(3)
+  await page.clock.fastForward(60000)
+  await dilan.getByRole('button', { name: /Choose a movie/ }).click()
+  await page.clock.fastForward(60000)
+  await expect(
+    views.getByRole('button', { name: 'Rewards', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true')
+  await page.clock.fastForward(31000)
+  await expect(
+    page.getByRole('heading', { name: 'Make your bed' }),
+  ).toHaveCount(3)
+  await expect(
+    views.getByRole('button', { name: 'Chores', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true')
   await page.clock.fastForward(301000)
   const sleep = page.getByRole('button', { name: 'Tap to wake up' })
   await expect(sleep).toBeVisible()
@@ -142,7 +160,33 @@ test('landscape iPad: focus, stars, exact undo, rewards, packing, color, summary
   await devina.getByRole('button', { name: /I did it!/ }).click()
   await expect(devina.locator('.c2-wallet')).toHaveText(`${balance + 4} ★`)
 
-  await devina.locator('.c2-wallet').click()
+  const views = page.getByRole('navigation', { name: 'Board views' })
+  await views.getByRole('button', { name: 'Rewards', exact: true }).click()
+  await expect(
+    page.getByRole('heading', { name: 'Rewards', exact: true }),
+  ).toHaveCount(3)
+  for (const colorScheme of ['light', 'dark'] as const) {
+    await page.emulateMedia({ colorScheme })
+    expect(
+      await page.evaluate(
+        () =>
+          document.documentElement.scrollHeight <= innerHeight &&
+          document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true)
+    await page.screenshot({
+      path: `/private/tmp/chores-rewards-${colorScheme}.png`,
+    })
+  }
+  await page.emulateMedia({ colorScheme: 'light' })
+  await devina.getByRole('button', { name: /Choose a movie/ }).click()
+  await expect(
+    dilan.getByRole('heading', { name: 'Rewards', exact: true }),
+  ).toBeVisible()
+  await devina.getByRole('button', { name: 'Back', exact: true }).click()
+  await expect(
+    devina.getByRole('heading', { name: 'Rewards', exact: true }),
+  ).toBeVisible()
   await devina.getByRole('button', { name: /Choose a movie/ }).click()
   await expect(devina.locator('.c2-wallet')).toHaveText(`${balance + 4} ★`)
   await devina.getByRole('button', { name: 'Keep my stars' }).click()
@@ -154,6 +198,11 @@ test('landscape iPad: focus, stars, exact undo, rewards, packing, color, summary
   await devina.getByRole('button', { name: /Choose a movie/ }).click()
   await devina.getByRole('button', { name: 'Get this reward' }).click()
   await expect(devina.locator('.c2-wallet')).toHaveText(`${balance - 16} ★`)
+  await expect(
+    devina.getByRole('heading', { name: 'Rewards', exact: true }),
+  ).toBeVisible()
+  await expect(dilan.locator('.c2-wallet')).toHaveText(siblingWallet)
+  await views.getByRole('button', { name: 'Chores', exact: true }).click()
 
   await page.getByRole('button', { name: '🎒 Packing', exact: true }).click()
   await expect(devina.getByRole('checkbox')).toHaveCount(14)
@@ -340,7 +389,8 @@ test('a glance separates outstanding chores from empty, finished and pending wor
   ).toBeVisible()
   scene.kids[0].chores = []
   scene.revision++
-  await page.getByRole('button', { name: 'Refresh the board' }).click()
+  // A background refresh preserves the uncertain save; a full page reload does not.
+  await page.evaluate(() => window.dispatchEvent(new Event('online')))
   await expect(
     dilan.getByRole('heading', { name: 'Check your last chore.' }),
   ).toBeVisible()
@@ -349,4 +399,36 @@ test('a glance separates outstanding chores from empty, finished and pending wor
   await page.evaluate(() => window.dispatchEvent(new Event('offline')))
   await expect(page.locator('[data-attention="clear"]')).toHaveCount(0)
   await expect(page.getByText('Go play.', { exact: true })).toHaveCount(0)
+})
+
+test('Refresh reloads the document and returns to the chore view', async ({
+  page,
+}) => {
+  await page.goto('/chores')
+  const views = page.getByRole('navigation', { name: 'Board views' })
+  await views.getByRole('button', { name: 'Rewards', exact: true }).click()
+  await expect(
+    page.getByRole('heading', { name: 'Rewards', exact: true }),
+  ).toHaveCount(3)
+  await Promise.all([
+    page.waitForEvent('domcontentloaded'),
+    page.getByRole('button', { name: 'Refresh the board' }).click(),
+  ])
+  expect(
+    await page.evaluate(
+      () =>
+        (
+          performance.getEntriesByType(
+            'navigation',
+          )[0] as PerformanceNavigationTiming
+        ).type,
+    ),
+  ).toBe('reload')
+  await expect(
+    views.getByRole('button', { name: 'Chores', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.locator('.c2-child')).toHaveCount(3)
+  await expect(
+    page.getByRole('heading', { name: 'Rewards', exact: true }),
+  ).toHaveCount(0)
 })

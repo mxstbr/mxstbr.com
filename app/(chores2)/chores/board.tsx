@@ -30,23 +30,31 @@ export function ChoresBoard({ initial }: { initial: Board }) {
   const { board, stale, error, pending, act, refresh, dismiss } =
     useBoard(initial)
   const [packing, setPacking] = useState(0)
+  const [tab, setTab] = useState<'now' | 'rewards'>('now')
   const [asleep, setAsleep] = useState(false)
   const idle = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const tabIdle = useRef<ReturnType<typeof setTimeout> | null>(null)
   const imported = useRef(false)
   useEffect(() => {
     const active = () => {
       if (idle.current) clearTimeout(idle.current)
+      if (tabIdle.current) clearTimeout(tabIdle.current)
       idle.current = setTimeout(() => setAsleep(true), 5 * 60000)
+      tabIdle.current = setTimeout(() => setTab('now'), 90000)
     }
     window.addEventListener('pointerdown', active)
     window.addEventListener('keydown', active)
     active()
     return () => {
       if (idle.current) clearTimeout(idle.current)
+      if (tabIdle.current) clearTimeout(tabIdle.current)
       window.removeEventListener('pointerdown', active)
       window.removeEventListener('keydown', active)
     }
   }, [])
+  useEffect(() => {
+    setTab('now')
+  }, [board.day, board.period, stale])
   useEffect(() => {
     if (!asleep) return
     const root = document.documentElement
@@ -116,6 +124,18 @@ export function ChoresBoard({ initial }: { initial: Board }) {
             <p>{cutoff ? `Until ${cutoff}` : 'Nothing timed right now'}</p>
           </div>
         </div>
+        <nav className="c2-tabs" aria-label="Board views">
+          <button aria-pressed={tab === 'now'} onClick={() => setTab('now')}>
+            Chores
+          </button>
+          <button
+            aria-pressed={tab === 'rewards'}
+            disabled={stale}
+            onClick={() => setTab('rewards')}
+          >
+            Rewards
+          </button>
+        </nav>
         <div className="c2-toolbar">
           <span className="c2-date">
             {new Date(`${board.day}T12:00:00Z`).toLocaleDateString('en-US', {
@@ -126,7 +146,10 @@ export function ChoresBoard({ initial }: { initial: Board }) {
             })}
           </span>
           <button onClick={() => setPacking((n) => n + 1)}>🎒 Packing</button>
-          <button onClick={() => void refresh()} aria-label="Refresh the board">
+          <button
+            onClick={() => window.location.reload()}
+            aria-label="Refresh the board"
+          >
             ↻ Refresh
           </button>
         </div>
@@ -149,6 +172,8 @@ export function ChoresBoard({ initial }: { initial: Board }) {
               act={act}
               dismiss={dismiss}
               showPacking={packing}
+              homeView={tab}
+              onChores={() => setTab('now')}
             />
           </ColumnBoundary>
         ))}
