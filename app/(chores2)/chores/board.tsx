@@ -48,6 +48,20 @@ export function ChoresBoard({ initial }: { initial: Board }) {
     }
   }, [])
   useEffect(() => {
+    if (!asleep) return
+    const root = document.documentElement
+    const theme = document.querySelector<HTMLMetaElement>(
+      'meta[name="theme-color"]',
+    )
+    const previousTheme = theme?.content
+    root.classList.add('c2-asleep')
+    theme?.setAttribute('content', '#000000')
+    return () => {
+      root.classList.remove('c2-asleep')
+      if (theme && previousTheme !== undefined) theme.content = previousTheme
+    }
+  }, [asleep])
+  useEffect(() => {
     if (imported.current || board.packingImported) return
     imported.current = true
     try {
@@ -142,14 +156,12 @@ export function ChoresBoard({ initial }: { initial: Board }) {
       {asleep && (
         <button
           className="c2-sleep"
+          aria-label="Tap to wake up"
           onClick={async () => {
             await refresh()
             setAsleep(false)
           }}
-        >
-          <span aria-hidden="true">🌙</span>
-          <span>Tap to wake up</span>
-        </button>
+        />
       )}
     </main>
   )

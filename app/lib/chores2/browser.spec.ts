@@ -16,7 +16,37 @@ test('idle panels and display wake return to now', async ({ page }) => {
     dilan.getByRole('heading', { name: 'Make your bed' }),
   ).toBeVisible()
   await page.clock.fastForward(301000)
-  await page.getByRole('button', { name: 'Tap to wake up' }).click()
+  const sleep = page.getByRole('button', { name: 'Tap to wake up' })
+  await expect(sleep).toBeVisible()
+  await expect(sleep).toBeEmpty()
+  for (const colorScheme of ['light', 'dark'] as const) {
+    await page.emulateMedia({ colorScheme })
+    for (const element of [sleep, page.locator('html'), page.locator('body')])
+      await expect(element).toHaveCSS('background-color', 'rgb(0, 0, 0)')
+    expect(await sleep.boundingBox()).toEqual({
+      x: 0,
+      y: 0,
+      width: 1024,
+      height: 680,
+    })
+    await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute(
+      'content',
+      '#000000',
+    )
+  }
+  await sleep.focus()
+  await expect(sleep).toHaveCSS('outline-style', 'none')
+  await page.screenshot({
+    path: '/private/tmp/chores-blackout.png',
+    style: 'nextjs-portal { visibility: hidden; }',
+  })
+  await sleep.click()
+  await expect(sleep).toHaveCount(0)
+  await expect(page.locator('html')).not.toHaveClass(/c2-asleep/)
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute(
+    'content',
+    '#fff8e8',
+  )
   await expect(
     dilan.getByRole('heading', { name: 'Make your bed' }),
   ).toBeVisible()

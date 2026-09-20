@@ -28,6 +28,8 @@ Use the existing Next.js client components with plain CSS, system fonts, and res
 
 Chore-title read-aloud is removed: the kids can read their chores. Completion and reward sound effects remain.
 
+After five idle minutes, the display becomes pure black with no moon, text, or visible controls. The page background and browser theme color also turn black while asleep to avoid bright edges; the original theme returns on waking. The full-screen black area remains an accessible “Tap to wake up” button and refreshes before revealing the board. This is a webpage blackout, not control over the iPad's hardware brightness or backlight.
+
 Packing and counts-only daily progress remain available through secondary access; period bonuses replace the old daily bonus, and the main-screen concept concentrates on the current period. Keep them out of the primary next-action area. The visual uses illustrative star balances, task prices, approval configuration, and a sample reward. Task order, weekday exceptions, and which children have empty periods come from the confirmed routine specification.
 
 The conversation preview may reflow if displayed in a narrow conversation pane. That is preview presentation, not an additional device target for the product.

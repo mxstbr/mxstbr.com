@@ -648,6 +648,13 @@
     opacity: 0;
   }
 }
+html.c2-asleep,
+html.c2-asleep .chores2-body {
+  background: #000;
+  overflow: hidden;
+  overscroll-behavior: none;
+  color-scheme: dark;
+}
 .chores2 .c2-sleep {
   position: fixed;
   z-index: 10;
@@ -655,17 +662,14 @@
   width: 100%;
   height: 100%;
   border-radius: 0;
-  background: #172032;
-  color: #f7e8c7;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 30px;
-  font-size: 25px;
+  background: #000;
+  color: #000;
+  padding: 0;
+  touch-action: none;
+  cursor: none;
 }
-.c2-sleep span:first-child {
-  font-size: 85px;
+.chores2 .c2-sleep:focus-visible {
+  outline: none;
 }
 .c2-lock {
   min-height: 100vh;
