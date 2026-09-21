@@ -51,7 +51,11 @@ Commands:
 
 Chore-title speech was removed on September 19, 2026, at Max’s request: the kids can read their chores. The Hear it control, playback lifecycle, and `/api/chores2/speech` route are removed. Completion and reward sound effects remain.
 
-Catalog changes retain opened obligations and accepted submission snapshots. Future opportunities are amended; previously paused future work can resume while its window is still open. A scheduling change cannot turn missed work into completed credit. Parent historical undo and explicit manual adjustments remain available through exact IDs.
+As of September 21, parent-hidden chores are excluded from completion targets even after their window opens, including occurrences with undone or pending submissions. This applies to family/child snoozes, inclusive pauses, archival, removal of an assignment, and scheduling edits that hide the occurrence. The occurrence and accepted submission snapshots remain intact for history, late approval, and exact undo. Resuming restores a requirement while its window remains open; it cannot reinstate expired work. The exclusive reappear date creates normal requirements again on the following eligible day.
+
+Catalog mutations and board reads reconcile the period bonus in the same atomic ledger transaction. Finishing all remaining tasks in a nonempty period earns exactly two bonus stars; an empty period earns none. Hiding grants no chore stars or completion credit. Existing saved plans are repaired on board read without repeating completion reversals or rewriting prior days. Ordinary expired, unmuted work still counts as missed. Current operating instructions are in [Managing chores](./managing.md).
+
+Verification: 33 deterministic checks passed, along with the real Redis concurrency/outbox test on disposable keys and a production build in a clean checkout. A read-only preview of September 21's live plan waived only the three muted bed occurrences, preserved every submission and ledger entry, and left balances unchanged.
 
 The new ledger and notification outbox commit atomically. Delivery is at least once: Telegram has no idempotent send API, so a crash after delivery but before its receipt is saved can repeat a notification, never a star award or redemption. One QStash schedule in the existing account drains retries every minute. Notifications use the existing chores group and are prefixed `[Chores2 test]` with no action buttons.
 

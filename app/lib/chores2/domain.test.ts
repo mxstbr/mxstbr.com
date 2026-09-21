@@ -313,13 +313,9 @@ test('historical daily awards remain recorded without granting new ones or chang
     ),
   )
 })
-test('expired, paused and removed started work cannot disappear from bonus targets', async () => {
+test('expired unmuted work still counts as missed and cannot earn a period bonus', async () => {
   const t = setup(),
     b = await t.board()
-  await t.run(
-    { action: 'archive_chore', choreId: kid(b).chores[0].choreId },
-    parent,
-  )
   await t.run({ action: 'submit', occurrenceId: kid(b).chores[1].occurrenceId })
   assert.equal(kid(await t.board()).periodProgress.total, 2)
   assert.equal(kid(await t.board()).periodProgress.earned, false)
@@ -328,6 +324,184 @@ test('expired, paused and removed started work cannot disappear from bonus targe
     await t.run({ action: 'submit', occurrenceId: c.occurrenceId })
   assert.equal(kid(await t.board()).dailyProgress.earned, false)
   assert.equal(kid(await t.board()).dailyProgress.missed, 1)
+})
+test('parent-hidden opened chores stop counting; only completed remaining work earns the bonus', async (ctx) => {
+  for (const patch of [
+    { snoozedUntil: '2026-09-10' },
+    { pausedUntil: '2026-09-09' },
+    { snoozedForKids: { 'kid-3': '2026-09-10' } },
+    { archivedFrom: '2026-09-09' },
+    { kidIds: ['kid-1', 'kid-2'] },
+    { scheduledFor: '2026-09-10' },
+    { timeOfDay: 'evening' },
+  ])
+    await ctx.test(JSON.stringify(patch), async () => {
+      const t = setup()
+      const [bed, teeth] = kid(await t.board()).chores
+      await t.run({ action: 'submit', occurrenceId: teeth.occurrenceId })
+      const requestId = randomUUID()
+      const command = { action: 'update_chore', choreId: bed.choreId, patch }
+      await t.run(command, parent, requestId)
+      // The command itself commits the bonus, without waiting for an iPad read.
+      assert.equal(t.repo.core.balances['kid-3'], 29)
+      await t.run(command, parent, requestId)
+      const boards = await Promise.all([t.board(), t.board()])
+      for (const b of boards) {
+        assert.equal(kid(b).chores.length, 0)
+        assert.equal(kid(b).periodProgress.total, 1)
+        assert.equal(kid(b).periodProgress.completed, 1)
+        assert.equal(kid(b).periodProgress.earned, true)
+        assert.equal(kid(b).balance, 29)
+      }
+      const day = t.repo.days['2026-09-09']
+      assert.equal(day.submissions.length, 1)
+      assert.equal(
+        day.ledger.filter((e) => e.kind === 'period-bonus').length,
+        1,
+      )
+      await assert.rejects(
+        t.run({ action: 'submit', occurrenceId: bed.occurrenceId }),
+        rejected('UNAVAILABLE'),
+      )
+    })
+})
+test('a stored mute with an undone submission is repaired on board read without repeating its debit', async () => {
+  const t = setup()
+  const [bed, teeth] = kid(await t.board()).chores
+  const submission = await t.run({
+    action: 'submit',
+    occurrenceId: bed.occurrenceId,
+  })
+  await t.run({ action: 'undo', submissionId: submission.id }, parent)
+  await t.run({ action: 'submit', occurrenceId: teeth.occurrenceId })
+  // Reproduce a pre-fix saved plan: the catalog is muted but its target remains.
+  t.repo.core.chores.find((c) => c.id === bed.choreId)!.snoozedUntil =
+    '2026-09-10'
+  const before = structuredClone(t.repo.days['2026-09-09'])
+  const inspection = await t.service.inspect(parent, '2026-09-09')
+  assert.equal(
+    inspection.occurrences.find((o) => o.id === bed.occurrenceId)!.waived,
+    true,
+  )
+  await Promise.all([t.board(), t.board()])
+  assert.equal(kid(await t.board()).balance, 29)
+  assert.equal(kid(await t.board()).periodProgress.total, 1)
+  const day = t.repo.days['2026-09-09']
+  assert.deepEqual(day.submissions, before.submissions)
+  assert.deepEqual(day.ledger.slice(0, before.ledger.length), before.ledger)
+  assert.equal(day.ledger.length, before.ledger.length + 1)
+  assert.equal(day.ledger.at(-1)!.kind, 'period-bonus')
+  t.clock('2026-09-10T15:00:00Z')
+  assert.equal(kid(await t.board()).periodProgress.total, 2)
+  assert(kid(await t.board()).chores.some((c) => c.choreId === bed.choreId))
+  assert.equal(
+    (await t.service.inspect(parent, '2026-09-09')).occurrences.find(
+      (o) => o.id === bed.occurrenceId,
+    )!.waived,
+    true,
+  )
+})
+test('per-child mute applies before and after opening; resume cannot restore expired requirements', async () => {
+  const t = setup('2026-09-09T13:00:00Z')
+  const choreId = 'routine-2026-09-09-bed'
+  const mute = (until: string | null) =>
+    t.run(
+      {
+        action: 'update_chore',
+        choreId,
+        patch: { snoozedForKids: { 'kid-3': until } },
+      },
+      parent,
+    )
+  await mute('2026-09-10')
+  t.clock('2026-09-09T15:00:00Z')
+  assert.equal(kid(await t.board()).periodProgress.total, 1)
+  assert.equal(kid(await t.board(), 'kid-1').periodProgress.total, 5)
+  await mute(null)
+  assert.equal(kid(await t.board()).periodProgress.total, 2)
+  assert(kid(await t.board()).chores.some((c) => c.choreId === choreId))
+  await mute('2026-09-10')
+  t.clock('2026-09-09T20:00:00Z')
+  await mute(null)
+  assert.equal(
+    (await t.service.inspect(parent, '2026-09-09')).occurrences.find(
+      (o) => o.kidId === 'kid-3' && o.choreId === choreId,
+    )!.waived,
+    true,
+  )
+  t.clock('2026-09-10T15:00:00Z')
+  assert.equal(kid(await t.board()).periodProgress.total, 2)
+})
+test('muted on-time submissions remain approvable later using the original stars and snapshot', async () => {
+  const t = setup()
+  const day = t.repo.days['2026-09-09']
+  const bedOccurrence = day.occurrences.find(
+    (o) => o.kidId === 'kid-3' && o.choreId.endsWith('-bed'),
+  )!
+  bedOccurrence.chore.requiresApproval = true
+  const snapshot = structuredClone(bedOccurrence.chore)
+  const [bed, teeth] = kid(await t.board()).chores
+  const submission = await t.run({
+    action: 'submit',
+    occurrenceId: bed.occurrenceId,
+  })
+  await t.run({ action: 'submit', occurrenceId: teeth.occurrenceId })
+  await t.run(
+    {
+      action: 'update_chore',
+      choreId: bed.choreId,
+      patch: { snoozedUntil: '2026-09-10', stars: 99 },
+    },
+    parent,
+  )
+  assert.equal(kid(await t.board()).balance, 29)
+  assert.equal(kid(await t.board()).periodProgress.pending, 0)
+  assert.equal((await t.service.approvals(parent)).length, 1)
+  t.clock('2026-09-10T15:00:00Z')
+  const approved = await t.run(
+    { action: 'review', submissionId: submission.id, decision: 'approve' },
+    parent,
+  )
+  assert.equal(approved.stars, 1)
+  assert.equal(approved.periodBonus, 0)
+  assert.equal(kid(await t.board()).balance, 30)
+  assert.deepEqual(
+    t.repo.days['2026-09-09'].occurrences.find(
+      (o) => o.id === bed.occurrenceId,
+    )!.chore,
+    snapshot,
+  )
+  await t.run({ action: 'undo', submissionId: submission.id }, parent)
+  assert.equal(kid(await t.board()).balance, 29)
+  assert(t.repo.days['2026-09-09'].awards['kid-3:morning'])
+})
+test('hiding every chore makes an empty period, preserves chore credit, and reconciles bonus changes exactly once', async () => {
+  const t = setup()
+  for (const c of kid(await t.board()).chores)
+    await t.run({ action: 'submit', occurrenceId: c.occurrenceId })
+  assert.equal(kid(await t.board()).balance, 30)
+  const submissions = structuredClone(t.repo.days['2026-09-09'].submissions)
+  await t.run({ action: 'pause_all', until: '2026-09-10' }, parent)
+  assert.equal(t.repo.core.balances['kid-3'], 28)
+  const after = kid(await t.board())
+  assert.equal(after.periodProgress.total, 0)
+  assert.equal(after.periodProgress.earned, false)
+  assert.equal(after.chores.length, 0)
+  assert.equal(after.bonus.length, 0)
+  assert.deepEqual(t.repo.days['2026-09-09'].submissions, submissions)
+  assert.equal(t.repo.core.balances['kid-1'], 42)
+  await t.run({ action: 'pause_all', until: null }, parent)
+  assert.equal(kid(await t.board()).balance, 30)
+  const ledger = t.repo.days['2026-09-09'].ledger
+  const awards = ledger.filter((e) => e.kind === 'period-bonus')
+  const reversals = ledger.filter((e) =>
+    awards.some((a) => a.id === e.reverses),
+  )
+  assert.equal(
+    awards.reduce((sum, e) => sum + e.amount, 0) +
+      reversals.reduce((sum, e) => sum + e.amount, 0),
+    2,
+  )
 })
 test('untimed repeatable work is available overnight, obeys cooldown, and does not grow bonus targets', async () => {
   const t = setup('2026-09-10T06:00:00Z'),

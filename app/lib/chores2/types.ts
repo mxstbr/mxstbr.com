@@ -44,6 +44,8 @@ export type Occurrence = {
   required: boolean
   order: number
   withdrawn?: boolean
+  // Parent-hidden work is excluded from targets without deleting its history.
+  waived?: boolean
 }
 export type Submission = {
   id: string

@@ -105,11 +105,19 @@ export function ensurePlan(core: Core, day: Day) {
     }
   day.planned = true
 }
-// A catalog edit may amend future work, but it cannot erase an obligation that
-// has already opened. Keeping the plan is what prevents a pause from earning stars.
+// Parent-hidden work no longer counts toward completion targets. Keep the
+// occurrence and submission snapshots so approval and undo retain their facts.
 export function amendPlan(core: Core, day: Day, now: Date) {
   for (const o of day.occurrences) {
     const definition = core.chores.find((c) => c.id === o.choreId)
+    const eligible =
+      definition &&
+      scheduled(definition, o.kidId, day.day) &&
+      !paused(definition, o.kidId, day.day)
+    if (!eligible || (definition.timeOfDay || 'bonus') !== o.group)
+      o.waived = true
+    // Resuming cannot reinstate a requirement the child can no longer do.
+    else if (Date.parse(o.closesAt) > now.getTime()) o.waived = false
     o.order = (core.orders[orderKey(o.kidId, o.group)] || []).indexOf(o.choreId)
     if (o.order < 0) o.order = 100000
     if (day.submissions.some((s) => s.occurrenceId === o.id)) continue
@@ -123,7 +131,7 @@ export function amendPlan(core: Core, day: Day, now: Date) {
     ) {
       const restored = makeOccurrence(core, definition, o.kidId, day.day)
       if (Date.parse(restored.closesAt) > now.getTime())
-        Object.assign(o, restored, { withdrawn: false })
+        Object.assign(o, restored, { withdrawn: false, waived: false })
     }
     if (Date.parse(o.opensAt) <= now.getTime()) continue
     if (
@@ -135,11 +143,15 @@ export function amendPlan(core: Core, day: Day, now: Date) {
     else
       Object.assign(o, makeOccurrence(core, definition, o.kidId, day.day), {
         withdrawn: false,
+        waived: false,
       })
   }
   for (const kid of core.kids)
     for (const chore of core.chores) {
       if (!scheduled(chore, kid.id, day.day) || paused(chore, kid.id, day.day))
+        continue
+      const prior = core.oneOffCompletions[entitlementKey(kid.id, chore.id)]
+      if (chore.type === 'one-off' && prior && prior.slice(0, 10) < day.day)
         continue
       if (
         day.occurrences.some(
@@ -168,6 +180,7 @@ export function progress(
       o.kidId === kidId &&
       o.required &&
       !o.withdrawn &&
+      !o.waived &&
       (group === 'daily' || o.group === group),
   )
   const completed = entries.filter((o) => approved(day, o.id).length).length
@@ -241,7 +254,6 @@ export function reconcileBonuses(
   actor: Actor,
   kidId: string,
   now: Date,
-  reverseUnearned = true,
 ) {
   let periodBonus = 0
   for (const group of PERIODS) {
@@ -270,7 +282,7 @@ export function reconcileBonuses(
         now,
         day.day,
       )
-    } else if (!earned && current && reverseUnearned) {
+    } else if (!earned && current) {
       const original = day.ledger.find((e) => e.id === current)
       post(
         tx,
@@ -307,6 +319,7 @@ function actionable(tx: Transaction, actor: Actor, id: string, now: Date) {
   const definition = tx.core.chores.find((c) => c.id === o.choreId)
   if (
     o.withdrawn ||
+    o.waived ||
     !definition ||
     !scheduled(definition, o.kidId, o.day) ||
     paused(definition, o.kidId, o.day) ||
@@ -686,7 +699,7 @@ export function configureChore(
     status: 'updated',
     id: chore.id,
     message:
-      'Chore saved. Recorded submissions and opened obligations keep their original facts.',
+      'Chore saved. Hidden chores are excluded from completion targets; recorded submissions keep their original facts.',
   }
 }
 export function configureReward(
@@ -773,6 +786,7 @@ export function board(tx: Transaction, actor: Actor, now: Date): Board {
         .filter((o) => {
           const definition = tx.core.chores.find((c) => c.id === o.choreId)
           return (
+            !o.waived &&
             definition &&
             scheduled(definition, k.id, clock.day) &&
             !paused(definition, k.id, clock.day) &&

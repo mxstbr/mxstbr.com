@@ -40,8 +40,9 @@ export class ChoresService {
       if (pacificDay(now) !== today)
         fail('REFRESH_REQUIRED', 'A new day has started. Please refresh.')
       ensurePlan(tx.core, tx.days[today])
-      // Lazy initialization can discover work already finished in the imported
-      // current day. Reconcile its new bonuses once using the same atomic ledger.
+      amendPlan(tx.core, tx.days[today], now)
+      // Reconcile saved plans (including older hidden targets) and their period
+      // bonuses atomically. Repeated reads cannot duplicate a credit or reversal.
       for (const kid of tx.core.kids)
         reconcileBonuses(
           tx,
@@ -49,7 +50,6 @@ export class ChoresService {
           { kind: 'parent', id: 'bonus-reconciliation' },
           kid.id,
           now,
-          false,
         )
       return board(tx, actor, now)
     })
@@ -91,7 +91,19 @@ export class ChoresService {
             'A new day has started. Retry this same action.',
           )
         ensurePlan(tx.core, tx.days[today])
-        return this.apply(tx, actor, command, now)
+        amendPlan(tx.core, tx.days[today], now)
+        const result = this.apply(tx, actor, command, now)
+        if (
+          [
+            'create_chore',
+            'update_chore',
+            'archive_chore',
+            'pause_all',
+          ].includes(command.action)
+        )
+          for (const kid of tx.core.kids)
+            reconcileBonuses(tx, tx.days[today], actor, kid.id, now)
+        return result
       },
     )
   }
@@ -149,7 +161,7 @@ export class ChoresService {
         return {
           status: 'updated',
           message: c.until
-            ? `Chores paused; they reappear on ${c.until}. This awards no stars or completion credit.`
+            ? `Chores paused; they reappear on ${c.until}. Hidden chores are excluded from completion targets without awarding chore stars.`
             : 'Chores resumed subject to current eligibility.',
         }
       }
@@ -247,7 +259,10 @@ export class ChoresService {
       awards: {},
       planned: false,
     }
-    if (day >= pacificDay(this.clock())) ensurePlan(core, view)
+    if (day >= pacificDay(this.clock())) {
+      ensurePlan(core, view)
+      amendPlan(core, view, this.clock())
+    }
     return {
       historicalFacts:
         day < core.initializedAt.slice(0, 10)
@@ -287,7 +302,10 @@ export class ChoresService {
       awards: {},
       planned: false,
     }
-    if (day >= pacificDay(this.clock())) ensurePlan(core, data)
+    if (day >= pacificDay(this.clock())) {
+      ensurePlan(core, data)
+      amendPlan(core, data, this.clock())
+    }
     return {
       day,
       kids: core.kids
