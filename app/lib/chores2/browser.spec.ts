@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test'
 import type { Board } from './types'
 
-test('idle panels and display wake return to now', async ({ page }) => {
-  await page.clock.install()
+test('idle panels return to now without daytime blackout', async ({ page }) => {
+  await page.clock.install({ time: new Date('2026-09-10T01:52:00Z') })
   await page.goto('/chores')
   const board = await (await page.request.get('/api/chores2/board')).json()
   expect(board.serverNow).toBe('2026-09-09T15:00:00.000Z')
@@ -34,40 +34,80 @@ test('idle panels and display wake return to now', async ({ page }) => {
     views.getByRole('button', { name: 'Chores', exact: true }),
   ).toHaveAttribute('aria-pressed', 'true')
   await page.clock.fastForward(301000)
-  const sleep = page.getByRole('button', { name: 'Tap to wake up' })
-  await expect(sleep).toBeVisible()
-  await expect(sleep).toBeEmpty()
-  for (const colorScheme of ['light', 'dark'] as const) {
-    await page.emulateMedia({ colorScheme })
-    for (const element of [sleep, page.locator('html'), page.locator('body')])
-      await expect(element).toHaveCSS('background-color', 'rgb(0, 0, 0)')
-    expect(await sleep.boundingBox()).toEqual({
-      x: 0,
-      y: 0,
-      width: 1024,
-      height: 680,
+  await expect(
+    page.getByRole('button', { name: 'Tap to wake up' }),
+  ).toHaveCount(0)
+})
+
+test.describe('overnight blackout', () => {
+  // An iPad's own time zone must not change the San Francisco schedule.
+  test.use({ timezoneId: 'Asia/Tokyo' })
+  test('starts at 8:30pm Pacific when idle, still wakes on tap, and clears at 6am', async ({
+    page,
+  }) => {
+    await page.clock.install({ time: new Date('2026-09-10T01:52:00Z') })
+    await page.goto('/chores')
+    const sleep = page.getByRole('button', { name: 'Tap to wake up' })
+    await page.clock.fastForward(301000)
+    await expect(sleep).toHaveCount(0)
+    await page.clock.setSystemTime(new Date('2026-09-10T03:29:59Z'))
+    await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+    await expect(sleep).toHaveCount(0)
+    await page.clock.runFor(1000)
+    await expect(sleep).toBeVisible()
+    await expect(sleep).toBeEmpty()
+    for (const colorScheme of ['light', 'dark'] as const) {
+      await page.emulateMedia({ colorScheme })
+      for (const element of [sleep, page.locator('html'), page.locator('body')])
+        await expect(element).toHaveCSS('background-color', 'rgb(0, 0, 0)')
+      expect(await sleep.boundingBox()).toEqual({
+        x: 0,
+        y: 0,
+        width: 1024,
+        height: 680,
+      })
+      await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute(
+        'content',
+        '#000000',
+      )
+    }
+    await sleep.focus()
+    await expect(sleep).toHaveCSS('outline-style', 'none')
+    await page.screenshot({
+      path: '/private/tmp/chores-blackout.png',
+      style: 'nextjs-portal { visibility: hidden; }',
     })
+    await sleep.click()
+    await expect(sleep).toHaveCount(0)
+    await expect(page.locator('html')).not.toHaveClass(/c2-asleep/)
     await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute(
       'content',
-      '#000000',
+      '#fff8e8',
     )
-  }
-  await sleep.focus()
-  await expect(sleep).toHaveCSS('outline-style', 'none')
-  await page.screenshot({
-    path: '/private/tmp/chores-blackout.png',
-    style: 'nextjs-portal { visibility: hidden; }',
+    await expect(
+      page
+        .locator('[data-kid="kid-1"]')
+        .getByRole('heading', { name: 'Make your bed' }),
+    ).toBeVisible()
+    await page.clock.fastForward(299000)
+    await expect(sleep).toHaveCount(0)
+    await page.clock.runFor(1000)
+    await expect(sleep).toBeVisible()
+    await page.clock.setSystemTime(new Date('2026-09-10T12:59:59Z'))
+    await page.evaluate(() =>
+      document.dispatchEvent(new Event('visibilitychange')),
+    )
+    await expect(sleep).toBeVisible()
+    await page.clock.runFor(1000)
+    await expect(sleep).toHaveCount(0)
+    await expect(page.locator('html')).not.toHaveClass(/c2-asleep/)
+    await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute(
+      'content',
+      '#fff8e8',
+    )
+    await page.clock.fastForward(301000)
+    await expect(sleep).toHaveCount(0)
   })
-  await sleep.click()
-  await expect(sleep).toHaveCount(0)
-  await expect(page.locator('html')).not.toHaveClass(/c2-asleep/)
-  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute(
-    'content',
-    '#fff8e8',
-  )
-  await expect(
-    dilan.getByRole('heading', { name: 'Make your bed' }),
-  ).toBeVisible()
 })
 
 test('landscape iPad: focus, stars, exact undo, rewards, packing, color, summary, retries and expiry', async ({

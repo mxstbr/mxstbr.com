@@ -1,6 +1,7 @@
 'use client'
 import { Component, useEffect, useRef, useState, type ReactNode } from 'react'
 import type { Board } from 'app/lib/chores2/types'
+import { blackoutWindow } from 'app/lib/chores2/time'
 import { KidColumn } from './kid-column'
 import { useBoard } from './use-board'
 
@@ -36,20 +37,45 @@ export function ChoresBoard({ initial }: { initial: Board }) {
   const tabIdle = useRef<ReturnType<typeof setTimeout> | null>(null)
   const imported = useRef(false)
   useEffect(() => {
-    const active = () => {
+    let lastActivity = Date.now()
+    const checkBlackout = () => {
       if (idle.current) clearTimeout(idle.current)
+      const now = new Date()
+      const schedule = blackoutWindow(now)
+      const idleAt = lastActivity + 5 * 60000
+      if (!schedule.active) setAsleep(false)
+      else if (now.getTime() >= idleAt) setAsleep(true)
+      // Check at idle expiry or the next Pacific boundary, even while asleep.
+      const next =
+        schedule.active && idleAt > now.getTime()
+          ? Math.min(idleAt, Date.parse(schedule.boundary))
+          : Date.parse(schedule.boundary)
+      idle.current = setTimeout(
+        checkBlackout,
+        Math.max(1, next - now.getTime()),
+      )
+    }
+    const active = () => {
+      lastActivity = Date.now()
+      checkBlackout()
       if (tabIdle.current) clearTimeout(tabIdle.current)
-      idle.current = setTimeout(() => setAsleep(true), 5 * 60000)
       tabIdle.current = setTimeout(() => setTab('now'), 90000)
+    }
+    const visible = () => {
+      if (!document.hidden) checkBlackout()
     }
     window.addEventListener('pointerdown', active)
     window.addEventListener('keydown', active)
+    window.addEventListener('focus', visible)
+    document.addEventListener('visibilitychange', visible)
     active()
     return () => {
       if (idle.current) clearTimeout(idle.current)
       if (tabIdle.current) clearTimeout(tabIdle.current)
       window.removeEventListener('pointerdown', active)
       window.removeEventListener('keydown', active)
+      window.removeEventListener('focus', visible)
+      document.removeEventListener('visibilitychange', visible)
     }
   }, [])
   useEffect(() => {

@@ -74,3 +74,18 @@ export function currentTime(now: Date) {
   const next = [420, 720, 1020, 1215, 1320, 1440].find((n) => n > minutes)!
   return { day, period, boundary: pacificInstant(day, next) }
 }
+
+export function blackoutWindow(now: Date) {
+  const day = pacificDay(now)
+  const p = parts(now)
+  const minutes = Number(p.hour) * 60 + Number(p.minute)
+  const start = 20 * 60 + 30
+  const end = 6 * 60
+  return {
+    active: minutes >= start || minutes < end,
+    boundary: pacificInstant(
+      minutes >= start ? shiftDay(day, 1) : day,
+      minutes < end || minutes >= start ? end : start,
+    ),
+  }
+}

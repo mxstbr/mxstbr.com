@@ -2,6 +2,12 @@
 
 Status: promoted to https://mxstbr.com/chores; the legacy board is at https://mxstbr.com/chores2. The original trial and its verification are recorded below. The goal covers every retained/revised/lower-priority requirement in rebuild-features.json plus K70/P55 and the approved playful iPad concept. Removed capabilities are explicitly excluded from the new product.
 
+## Overnight blackout — September 21, 2026
+
+The five-minute idle blackout is enabled only from 8:30pm (inclusive) to 6am (exclusive) in `America/Los_Angeles`, including daylight saving time. At 8:30pm an already-idle display can black out; at 6am it automatically returns to the board. Activity resets the idle delay, and tapping the black screen still wakes it. Focus and visibility changes recheck the schedule after a suspended browser resumes. Daytime inactivity continues to return secondary panels to the current chores without blacking out the display.
+
+Verification covers the reported 6:52pm case, both exact boundaries, the five-minute delay after waking, a device set to Tokyo time, and winter/summer/DST date calculations. All five iPad browser checks and 34 deterministic checks passed.
+
 ## Period bonus correction and chore picker — September 19, 2026
 
 The two-star award for each completed nonempty time period replaces the ten-star daily bonus. Completion, late approval, undo/re-completion, and lazy board reconciliation never create new daily awards. Historical credits and current balances remain recorded. The daily progress API keeps counts with zero bonus stars and no daily earned flag for existing clients. The daily reward offer and celebration dialog are removed.
