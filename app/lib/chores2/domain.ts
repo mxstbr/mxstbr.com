@@ -239,7 +239,7 @@ export function notify(
 ) {
   tx.notifications.push({
     id: randomUUID(),
-    text: `[Chores] ${text}`,
+    text,
     status: 'pending',
     createdAt: now.toISOString(),
     attempts: 0,
@@ -278,7 +278,7 @@ export function reconcileBonuses(
       const kid = tx.core.kids.find((k) => k.id === kidId)!
       notify(
         tx,
-        `${kid.name} earned ${p.stars} bonus stars for completing every task in the ${group} (${day.day}).`,
+        `${kid.name} earned +${p.stars} bonus stars for completing every task in the ${group} (${tx.core.balances[kidId]} total).`,
         now,
         day.day,
       )
@@ -401,7 +401,7 @@ export function submit(
   const bonuses = reconcileBonuses(tx, day, actor, o.kidId, now)
   notify(
     tx,
-    `${kid.name} completed ${o.chore.emoji} ${o.chore.title} (+${s.stars} stars; ${tx.core.balances[o.kidId]} total). Completion: ${s.id}.`,
+    `${kid.name} completed ${o.chore.emoji} ${o.chore.title} (+${s.stars} stars; ${tx.core.balances[o.kidId]} total).`,
     now,
     day.day,
   )

@@ -2,6 +2,10 @@
 
 Status: promoted to https://mxstbr.com/chores; the legacy board is at https://mxstbr.com/chores2. The original trial and its verification are recorded below. The goal covers every retained/revised/lower-priority requirement in rebuild-features.json plus K70/P55 and the approved playful iPad concept. Removed capabilities are explicitly excluded from the new product.
 
+## Concise Telegram notifications — September 21, 2026
+
+Current chore notifications omit the `[Chores]` prefix. Completion messages retain the chore, awarded stars, and total balance, without the trailing completion label/ID. Period bonuses show `+2 bonus stars` and the resulting total balance, without the occurrence date. IDs and dates remain in the ledger and notification metadata; agents resolve exact submissions through the day record or pending approvals. Repository agent instructions summarize the current CLI/MCP workflow and link to the detailed management guide.
+
 ## Overnight blackout — September 21, 2026
 
 The five-minute idle blackout is enabled only from 8:30pm (inclusive) to 6am (exclusive) in `America/Los_Angeles`, including daylight saving time. At 8:30pm an already-idle display can black out; at 6am it automatically returns to the board. Activity resets the idle delay, and tapping the black screen still wakes it. Focus and visibility changes recheck the schedule after a suspended browser resumes. Daytime inactivity continues to return secondary panels to the current chores without blacking out the display.

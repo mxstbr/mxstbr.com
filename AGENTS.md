@@ -14,18 +14,19 @@ pnpm dev               # run Next.js in dev mode with hot reload
 pnpm build             # production build and sync essays to GitHub
 pnpm start             # serve the production build locally
 pnpm update-essay-views# refresh Upstash-backed essay view counts
-pnpm chores help       # manage Redis-backed kids chores/rewards
+pnpm chores2 help      # manage the current kids chores/rewards
 ```
 
 Run commands from the repo root. Prefer `pnpm dev` for iterative changes; use `pnpm build` before shipping to ensure MDX and dynamic routes compile.
 
 ## Kids Chores
 
-- The current `/chores` product uses `pnpm chores2 ...` and authenticated `chores2_*` MCP tools with independent `chores:mxstbr:v2` Redis keys. Their names are retained for compatibility after promotion. The old board lives at `/chores2`; `pnpm chores ...` and unprefixed MCP chore tools manage only that legacy dataset. Default to the current product unless explicitly asked about the old board.
-
-- Chores live in Upstash RedisJSON at `chores:mxstbr:family-board` as `{ kids, chores, completions, rewards, rewardRedemptions }`; use `pnpm chores ...` for agent-managed reads and mutations.
-- `snoozedUntil` and `snoozedForKids[kidId]` are exclusive reappear dates, not inclusive hidden-through dates: the app hides a chore only when the stored snooze date is greater than the viewed Pacific date. To skip chores for June 21 and have them back on June 22, set the snooze date to `2026-06-22`, then verify both the skipped day and the reappear day.
-- For a future routine replacement, update old chores with `archivedFrom: "YYYY-MM-DD"` (first inactive Pacific day) and add replacements with `scheduledFor` set to that same day (first active day, including recurring chores). Keep old records for history, leave untimed Bonus chores untouched, and verify the prior day, start day, and weekend. Daily chores can use `schedule.daysOfWeek: [1,2,3,4,5]` for weekdays only.
+- **Default to current `/chores`:** use `pnpm chores2` or authenticated `chores2_*` MCP tools (`chores:mxstbr:v2` Redis keys). The old `/chores2` board uses `pnpm chores` and unprefixed MCP tools; those do not manage the current system. If only legacy MCP tools are available, use the CLI from this repository.
+- **Read before changing:** `pnpm chores2 catalog`, `day YYYY-MM-DD`, and `approvals` resolve exact IDs. Apply JSON with `pnpm chores2 command /private/tmp/command.json REQUEST_ID`; see `app/lib/chores2/commands.ts` for the schema. Reuse the same request ID after an uncertain response. Telegram is notification-only; look up completion IDs in the day record.
+- **Mute/resume:** `update_chore` fields `snoozedUntil`/`snoozedForKids[kidId]` and `pause_all.until` are exclusive reappear dates; `pausedUntil` is inclusive. To hide September 21 and return September 22, use `2026-09-22`. Clear with `null`; merge existing per-child snoozes before replacing that map. Hidden chores are not required, even after opening. Only nonempty completed periods earn +2; there is no +10 daily bonus.
+- **Stars/history:** use `undo` with the exact submission ID to reverse an incorrect completion, never an additional manual deduction for the same event. `review` can approve an on-time submission later; new late completions are forbidden. Keep history and balances; do not reimport, resync legacy balances, or write Redis directly.
+- **Routines:** `archivedFrom` is the first inactive Pacific day; `scheduledFor` is the first active day. Preserve old records and untimed Bonus chores when replacing routines. Use `schedule.daysOfWeek: [1,2,3,4,5]` for weekdays and `set_order` for each child's time group.
+- **Verify:** inspect the affected day and reappear day; for routine replacements also check the prior day and weekend. Confirm the live board when relevant. More details: [Managing chores](docs/chores2/managing.md).
 
 ## Coding Style & Naming Conventions
 
