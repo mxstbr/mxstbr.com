@@ -1,300 +1,845 @@
-# Chores: the complete kid and parent feature inventory
+# Chores: current kid and parent behavior inventory
 
-This describes the implemented product for a rebuild. Every feature is expressed as a kid or parent capability, with the rules that change its outcome. It adapts the supplied product-description guide: outside-in behavior, state transitions, boundaries, evidence, and a separate defect list, without reproducing the guide’s documentation framework.
+<!-- Generated from rebuild-features.json by node scripts/render-chores-behaviors.mjs. -->
 
-Scope: `/chores`, `/chores/rewards`, `/chores/packing`, `/chores/bedtime-approval`, approval and undo links, their shared business rules, audio, authentication, and notifications. Parent configuration capabilities are included; the admin page, its forms/PIN/chat, MCP tools, ChatGPT widgets, and `/chores-new` preview are excluded as interfaces. The CLI was read to identify additional stored-state behavior and discrepancies, not to turn command syntax or arbitrary database edits into product features.
+Audited 2026-09-21 against application commit `d9957197211d60bb93c600cff7380106da1f060d`. Current product: **/chores**. The separate legacy board is **/chores2**.
 
-**Kid and parent are perspectives, not separate account roles in this implementation.** The board uses a shared family password. Anyone using an unlocked board can select any kid, complete or undo their chores, spend their stars, and change their color. Parent management capabilities below are supported by shared actions or stored state; they do not imply that a dedicated parent interface must survive the rebuild.
+This is the current behavior reference for a rebuild. Positive capabilities describe the shipped system. **Not current behavior** explicitly rejects an old or superseded behavior; it must not be rebuilt merely because legacy code or an old prototype contains it. Lower-priority capabilities are still implemented unless marked removed.
 
-Evidence: source commit `18910b2799e21b6fa5481d838e99cfea064013cd` in `/Users/mxstbr/projects/mxstbr/mxstbr.com`. All included product source was read. Thirty isolated behavior checks passed, including deliberate reproductions of defects. Live browser checks confirmed the password gates for chores, rewards, packing, and bedtime approval, and the approval link’s missing-kid screen. Authenticated interactions, real Telegram delivery, and audio playback were not verified live. See [source coverage](source-coverage.md), [verification](verification.md), and [rebuild decisions and defects](rebuild-decisions.md).
+123 original IDs + 2 added requirements = 125 records; 105 current capabilities, 20 removed capabilities, and 27 explicit not-current-behavior rules.
+
+Use [scope and acceptance rules](rebuild-scope.md), [current iPad interface](ipad-landscape-ui.md), [coverage/evidence](coverage.md), and [agent operations](managing.md) for supporting detail. The [annotated legacy audit](legacy-inventory.md) preserves the historical source without presenting it as current behavior.
+
+## Current decisions at a glance
+
+- **deviceTarget:** The existing shared old iPad in landscape only; three persistent child columns. No phone, portrait, or desktop layout requirement.
+- **routineOrder:** Use the saved per-child/per-group order. The September 8 message was the initial seed, not an immutable replacement for later parent edits. Filter weekday/ineligible/pending/completed work without reordering the remaining tasks; a picker selection does not change the saved sequence.
+- **periodBonus:** Award exactly +2 per child/Pacific day/nonempty named period once all remaining required work is approved. Parent-hidden work is excluded, including after opening; hiding itself grants no chore stars. Ordinary missed work remains unfulfilled. Late approval of an on-time request can settle its original period. Undo or restored requirements reconcile the award without duplicate net credit. No extra daily bonus, empty-period payout, or Bonus-period award.
+- **timedChores:** Only the active named window is kid-visible and accepts new submissions.
+- **untimedBonusChores:** Remain available anytime, subject to date/assignment/recurrence eligibility.
+- **approvalAfterCutoff:** An on-time accepted submission remains approvable later, including after its day ends.
+- **pastCompletion:** No new backdated or elapsed-window submissions; later review of an on-time request is distinct.
+- **skip:** Removed; no skip progress, bonus, or notification behavior.
+- **parentSurface:** ChatGPT through MCP for parent management and approvals. Telegram only delivers notifications; no Clippy, Telegram conversation or action buttons, or dedicated parent UI.
+- **bedtimeRecognition:** Dedicated last-night recognition/templates/generated chores/reminders removed.
+- **dataIsolation:** Current /chores is independent v2 state in the existing Redis service; legacy /chores2 remains separate. The original catalogs/history were copied for the trial, balances alone were reconciled at promotion, and there is no ongoing sync. No new infrastructure.
+- **deviceAccess:** Reuse the existing site-password login; already-unlocked iPads open /chores directly. Otherwise enter the same password. Invitation links remain optional.
+- **choreSwitcher:** Tap the Finish this {timeframe} card to choose a current chore. No separate Choose another button. My progress remains inside the picker.
+- **choreSpeech:** Removed: the kids can read their chores; no Hear it control or speech endpoint.
+- **namedWindows:** Pacific windows are Morning 7am–noon, Afternoon noon–5pm, Evening 5pm–8:15pm, and Night 8:15pm–10pm, with exclusive closing boundaries. Between 10pm and 7am only eligible untimed Bonus work is available. Old timed cards and secondary selections close at a boundary; accepted pending requests remain recorded.
+- **hiddenRequirements:** Merge existing per-child snoozes when updating that map. Hidden work is waived from targets even with pending/undone submissions, without deleting history or awarding chore stars. An on-time accepted request can still be reviewed later.
+- **blackout:** Five idle minutes can trigger pure black only from 8:30pm inclusive until 6am exclusive in America/Los_Angeles, automatically following DST. At 8:30pm an already-idle board can black out; at 6am it clears automatically. Tapping wakes and refreshes. Focus/visibility return rechecks the schedule. No visible moon or text appears; webpage blackout does not change the hardware backlight.
+- **quietAllClear:** Outstanding chores keep colorful raised columns, a solid card, emoji, and action button. Finished, empty, or awaiting-parent columns are subdued and say All done for now, Nothing to do right now, or Your part is done, with Go play only when the current state is confirmed. Pending approval uses a clock; failures/loading do not show an all-clear. This concerns the current window, not the whole day.
+- **refresh:** The shared Refresh button calls window.location.reload(), loading a fresh document and app code. Automatic data refresh and the Reconnect action remain separate.
+- **rewardsNavigation:** The shared header has Chores and Rewards tabs and a Packing button. Rewards opens all three catalogs; a child’s star balance opens only that child’s catalog. Secondary panels remain inside the child’s column.
+- **progressDisplay:** The period card contains progress stamps and the +2 offer or earned/pending state. No second “0 of 5 done” line appears below it. Daily history is counts-only. Parent-hidden occurrences are excluded from targets; pending approval is not completion. Empty periods offer no bonus.
+- **telegramCompletion:** New completion messages show the child, chore emoji/title, +stars and total balance. They have no [Chores] prefix or trailing Completion label/ID. Undo updates remain supported; exact submission IDs are looked up through tools, not copied from completion messages.
+- **telegramBonus:** A bonus message says the child earned +2 bonus stars for completing the period and includes the resulting total balance, without the occurrence date. Reward redemption updates include the cost and resulting balance. No daily-bonus, skip, or dedicated bedtime-recognition updates are generated.
+- **packingPersistence:** Packing is shared in Redis across authorized devices and agents. A one-time import can carry over the old browser checklist; subsequent progress does not depend on that browser’s local storage.
+- **featurePriority:** K07–K09 counts-only summaries and K59 system appearance remain implemented at lower priority. K04/K05 small-screen selection was superseded by the accepted landscape-only target and is excluded.
+
+## Explicitly not current behavior
+
+<a id="n01"></a>
+
+### N01 — Small-screen child selection
+
+**Not current behavior:** A phone/portrait layout, one-child selector, or deep link selecting a child is not current behavior or a rebuild requirement.
+
+**Current behavior:** Use three persistent columns on the shared old iPad in landscape.
+
+Applies to K03, K04, K05. Basis: explicit decision.
+
+<a id="n02"></a>
+
+### N02 — Other-day chore browsing
+
+**Not current behavior:** Navigating dates must not display past/future chore lists or their completion controls.
+
+**Current behavior:** Daily history is counts-only; the actionable board stays on today and the current period.
+
+Applies to K06, K07, K08, K09, K12, K32. Basis: explicit decision.
+
+<a id="n03"></a>
+
+### N03 — Opening other time groups
+
+**Not current behavior:** Expanding/collapsing other named groups, keeping them open manually, and group recollapse timers are not current behavior.
+
+**Current behavior:** Only the current named period and eligible untimed Bonus chores are reachable.
+
+Applies to K12, K15, K17, K18, K19. Basis: explicit decision.
+
+<a id="n04"></a>
+
+### N04 — Overlapping Evening and Night
+
+**Not current behavior:** The old 7pm Night opening and simultaneous Evening/Night display are not current behavior.
+
+**Current behavior:** Evening ends and Night begins at 8:15pm Pacific; all named windows are non-overlapping.
+
+Applies to K16, K17, P14. Basis: explicit decision.
+
+<a id="n05"></a>
+
+### N05 — Late or backdated completions
+
+**Not current behavior:** Neither kids nor parents can create an early, previous-day, or elapsed-window completion/request, including through an approval escape hatch.
+
+**Current behavior:** An actually accepted on-time submission can be approved later without reopening its old chore.
+
+Applies to K25, K27, K36, K37, K38, K41, P09, P10, P15, P29, P31. Basis: explicit decision.
+
+<a id="n06"></a>
+
+### N06 — Automatic overdue one-off carryover
+
+**Not current behavior:** An unfinished one-off does not remain completable indefinitely after its scheduled date or window.
+
+**Current behavior:** A parent can explicitly reschedule current/future work without inventing past credit.
+
+Applies to K25, P09, P10. Basis: explicit decision.
+
+<a id="n07"></a>
+
+### N07 — Skipping and skip credit
+
+**Not current behavior:** Skip, skip confirmation/cancellation, per-kid skip/unskip, skipped progress, skipped bonus credit, and skip notifications are not current behavior for kids or parents.
+
+**Current behavior:** Parents may mute through scheduling; this excludes requirements without completing them or awarding chore stars.
+
+Applies to K26, K30, K38, K42, K43, K44, K45, P20, P22, P24, P25, P48. Basis: explicit decision.
+
+<a id="n08"></a>
+
+### N08 — Automatic chore sorting
+
+**Not current behavior:** Sorting chores by type, newest-first creation order, title, stars, or model priority is not current behavior.
+
+**Current behavior:** Use the saved parent-specified sequence; filtering and temporary choice do not reorder it.
+
+Applies to K20, P55. Basis: explicit decision.
+
+<a id="n09"></a>
+
+### N09 — Extra ten-star daily award
+
+**Not current behavior:** The +10 full-day bonus, its target/progress offer, celebration dialog, and new notification are not current behavior.
+
+**Current behavior:** Exactly +2 per completed nonempty named period replaces it. Preserve historical credits already recorded.
+
+Applies to K21, K30, K31, K34, K70, P04, P48. Basis: explicit decision.
+
+<a id="n10"></a>
+
+### N10 — Empty-period or Bonus-period payout
+
+**Not current behavior:** An empty period or untimed Bonus list does not earn a period-completion payout.
+
+**Current behavior:** A named period must have at least one remaining required task; pending work must first be approved.
+
+Applies to K21, K30, K70, P22. Basis: explicit decision.
+
+<a id="n11"></a>
+
+### N11 — Hidden work still required
+
+**Not current behavior:** A parent-hidden chore must not remain in the period target just because its window opened or it has pending/undone history.
+
+**Current behavior:** Exclude it immediately while preserving history. Completed remaining nonempty periods can earn +2. Unmuted missed work is still missed.
+
+Applies to K21, K30, K34, K70, P19, P20, P21, P22, P23, P24. Basis: explicit decision.
+
+<a id="n12"></a>
+
+### N12 — Automatic Bonus assignment
+
+**Not current behavior:** Finishing required chores must not automatically assign an untimed Bonus chore as the next obligation.
+
+**Current behavior:** Bonus is an optional explicit choice available anytime.
+
+Applies to K15, K22. Basis: accepted design.
+
+<a id="n13"></a>
+
+### N13 — Indistinguishable all-clear and active cards
+
+**Not current behavior:** Finished/empty columns must not look like outstanding chore cards; pending approval, failure, or loading must not be presented as completed work.
+
+**Current behavior:** Use subdued finished/empty/pending states and colorful outstanding cards. Only a confirmed current all-clear invites Go play.
+
+Applies to K22, K28, K40. Basis: explicit decision.
+
+<a id="n14"></a>
+
+### N14 — Dedicated Choose another button
+
+**Not current behavior:** A separate Choose another button is not current behavior.
+
+**Current behavior:** Tap the Finish this {timeframe} period card to open the chore picker.
+
+Applies to K15, K20, K26, K70. Basis: explicit decision.
+
+<a id="n15"></a>
+
+### N15 — Duplicate completion count
+
+**Not current behavior:** A second 0 of N done line directly beneath the card repeating its progress is not current behavior.
+
+**Current behavior:** Keep progress inside the period card.
+
+Applies to K21. Basis: explicit decision.
+
+<a id="n16"></a>
+
+### N16 — Chore-title read-aloud
+
+**Not current behavior:** Hear it, open/completed-title speech, and the chore speech endpoint are not current behavior.
+
+**Current behavior:** The kids read their chores; completion and redemption sound effects remain.
+
+Applies to K26, K57, K58. Basis: explicit decision.
+
+<a id="n17"></a>
+
+### N17 — Daytime blackout or visible sleep decoration
+
+**Not current behavior:** All-day five-minute blackout and a visible moon/text on the black screen are not current behavior.
+
+**Current behavior:** Only 8:30pm–6am San Francisco time permits the pure-black idle screen; it clears at 6am. This does not control iPad hardware brightness.
+
+Applies to K60, P50. Basis: explicit decision.
+
+<a id="n18"></a>
+
+### N18 — Dedicated parent interface
+
+**Not current behavior:** Parent dashboards, forms/settings pages, PIN gates, approval/undo pages, and a dedicated parent packing/setup portal are not current behavior.
+
+**Current behavior:** Parents talk to ChatGPT using authenticated current MCP/CLI tools; they can still look at the shared kid display.
+
+Applies to P01, P02, P03, P04, P05, P06, P07, P08, P09, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22, P23, P24, P25, P26, P27, P28, P29, P30, P31, P32, P33, P34, P35, P36, P37, P38, P39, P40, P41, P42, P43, P44, P45, P46, P47, P48, P49, P50, P51, P52, P53, P54, P55. Basis: explicit decision.
+
+<a id="n19"></a>
+
+### N19 — Clippy or Telegram management
+
+**Not current behavior:** Clippy, conversational Telegram commands, and approval/undo action buttons in Telegram are not the current management workflow.
+
+**Current behavior:** ChatGPT is the parent interaction surface; Telegram delivers notifications only.
+
+Applies to P01, P02, P26, P27, P29, P30, P32, P47, P48, P49, P50, P51. Basis: explicit decision.
+
+<a id="n20"></a>
+
+### N20 — Last-night bedtime recognition
+
+**Not current behavior:** Special in-bed/delightful-night templates, selections, generated morning chores, result screens, and dedicated recognition reminders/schedules are not current behavior.
+
+**Current behavior:** Ordinary evening/night chores, including a manually defined bedtime chore, remain possible.
+
+Applies to P41, P42, P43, P44, P45, P46. Basis: explicit decision.
+
+<a id="n21"></a>
+
+### N21 — Required transferred setup link
+
+**Not current behavior:** A transferred invitation link is not required to unlock the family iPads.
+
+**Current behavior:** Reuse the existing site-password login; invitations are optional compatibility support.
+
+Applies to K01, P01. Basis: explicit decision.
+
+<a id="n22"></a>
+
+### N22 — Shared live legacy data or ongoing resync
+
+**Not current behavior:** The current and legacy boards do not share mutable chore/reward/ledger state or continually resynchronize balances.
+
+**Current behavior:** Use independent v2 keys in the existing infrastructure. Balances were reconciled once at promotion; current /chores uses chores2 tools and legacy /chores2 uses unprefixed tools.
+
+Applies to K35, P51. Basis: explicit decision.
+
+<a id="n23"></a>
+
+### N23 — Verbose completion and bonus logs
+
+**Not current behavior:** New notifications do not add [Chores], a trailing Completion label/ID, or the occurrence date in the bonus message.
+
+**Current behavior:** Completions show +stars and total; period bonuses show +2 bonus stars and total. Approval-request identifying details remain available.
+
+Applies to P47, P48. Basis: explicit decision.
+
+<a id="n24"></a>
+
+### N24 — Refresh that only refetches data
+
+**Not current behavior:** The manual Refresh button must not merely refetch the board API.
+
+**Current behavior:** It reloads the browser document with window.location.reload().
+
+Applies to K10. Basis: explicit decision.
+
+<a id="n25"></a>
+
+### N25 — Browser-only packing
+
+**Not current behavior:** A single browser’s local storage is not the authoritative current packing store.
+
+**Current behavior:** Share packing through the current dataset; retain one-time legacy import.
+
+Applies to K69, P52, P53, P54. Basis: implemented replacement.
+
+<a id="n26"></a>
+
+### N26 — Whole-list primary chore screen
+
+**Not current behavior:** Showing every chore as the primary interface or requiring ordinary completion through a details dialog is not the accepted current interface.
+
+**Current behavior:** One emoji-led next-action card per child, with a period-card picker.
+
+Applies to K15, K26. Basis: accepted design.
+
+<a id="n27"></a>
+
+### N27 — No shared Rewards tab
+
+**Not current behavior:** Leaving children without a shared Rewards tab is not current behavior.
+
+**Current behavior:** The header has Chores/Rewards and each balance also opens that child’s rewards.
+
+Applies to K02, K46. Basis: explicit decision.
 
 ## Kid: get to my board
 
-- **K01 — As a kid, I can use the chore board on a device my family has unlocked.** The shared password unlocks the OS area; the browser remembers it with a cookie lasting up to a year. A wrong stored password shows an error and another password form. There is no separate kid login. [Source][access]
-- **K02 — As a kid, I can move between Chores, Rewards, and Packing.** A fixed bottom navigation bar names all three destinations and marks the current page. Switching views returns Chores to its default day and kid selection; the optional OS query parameter is retained. [Source][navigation]
-- **K03 — As a kid, I can recognize my chores by my name and color.** Each kid has a separate column, balance, assignments, and progress. Desktop shows three columns together. [Source][columns]
-- **K04 — As a kid, I can choose whose chores to view on a small screen.** The chore board shows one kid at a time with a selector, defaults to the first kid, and records the selection in the URL. Rewards and Packing instead stack all kids’ columns. [Source][mobile]
-- **K05 — As a kid, I can open a link that selects my chore column on a small screen.** A valid `kid` parameter selects that kid; an unknown one falls back to the first column. Desktop still shows everyone. Date and bottom-navigation links do not preserve this selection. [Source][mobile]
-- **K06 — As a kid, I can see which day I am viewing.** The toolbar shows weekday, month, and date; today gets a check mark, and other days use a different background. Chore dates and daily rules use Pacific time. [Source][board-page]
-- **K07 — As a kid, I can look backward and forward one day at a time.** Previous/Next controls have no explicit browsing limit. Invalid date inputs fall back to today when the date helper cannot parse them. [Source][dates]
-- **K08 — As a kid, I can jump back to today.** The Today button returns to the current Pacific date. A past-day completion prompt also offers Go to today. [Source][board-page]
-- **K09 — As a kid, I can leave a past or future day idle and have the board return to today.** After 30 seconds without clicks, keys, pointer movement, or touches, it replaces the viewed date with today. This can also interrupt an open prompt. [Source][past-idle]
-- **K10 — As a kid, I can refresh the chore board manually.** The refresh button reloads the whole page and disables itself as reload starts. Saved family data survives; unsaved dialogs and temporary expansion choices do not. [Source][refresh]
-- **K11 — As a kid, I can see changes made elsewhere appear on the chore board without refreshing it myself.** The board requests fresh data every minute and at the next Pacific midnight; successful local actions also refresh it. This is periodic synchronization, not instant shared editing. An explicitly selected date remains selected during refresh. [Source][refresh-timers]
+<a id="k01"></a>
+
+- **K01 — As a kid, I can use the chore board on a device my family has unlocked.** _Current behavior · retained._ Reuse the existing site-password cookie; an already-unlocked iPad opens /chores directly. Otherwise enter the same password, remembered for a year. This grants kid commands, not parent management. Optional scoped device invitations remain supported. **Not current behavior:** [N21: Required transferred setup link](inventory.md#n21).
+
+<a id="k02"></a>
+
+- **K02 — As a kid, I can move between Chores, Rewards, and Packing.** _Current behavior · retained._ The shared header has Chores and Rewards tabs and a Packing button. Rewards opens all three catalogs; a child’s star balance opens only that child’s catalog. Secondary panels remain inside the child’s column. **Not current behavior:** [N27: No shared Rewards tab](inventory.md#n27).
+
+<a id="k03"></a>
+
+- **K03 — As a kid, I can recognize my chores by my name and color.** _Current behavior · retained._ Dilan, Darian, and Devina have permanent landscape columns with independent balances, current chores, choices, and feedback. Their names retain the chosen identity colors even when their columns become subdued. **Not current behavior:** [N01: Small-screen child selection](inventory.md#n01).
+
+<a id="k04"></a>
+
+- **K04 — As a kid, I cannot choose whose chores to view on a small screen.** _Not current behavior · removed._ Small-screen kid selector is outside the explicitly requested iPad-landscape-only rebuild. All three children remain visible in permanent columns. **Not current behavior:** [N01: Small-screen child selection](inventory.md#n01).
+
+<a id="k05"></a>
+
+- **K05 — As a kid, I cannot open a link that selects my chore column on a small screen.** _Not current behavior · removed._ Small-screen links selecting one kid are outside the explicitly requested iPad-landscape-only rebuild. **Not current behavior:** [N01: Small-screen child selection](inventory.md#n01).
+
+<a id="k06"></a>
+
+- **K06 — As a kid, I can see today and the current time window.** _Current behavior · revised._ Default board context is the current Pacific date/window, not a freely selected day. **Not current behavior:** [N02: Other-day chore browsing](inventory.md#n02).
+
+<a id="k07"></a>
+
+- **K07 — As a kid, I can browse counts-only daily progress backward and forward one day at a time.** _Current behavior · lower priority._ My progress is a counts-only daily summary reached from the current chore picker (or the My progress fallback when no period card is shown). Previous/next days show counts, pending work, and applicable star activity, never other-day chore titles or completion controls. This lower-priority capability is implemented. **Not current behavior:** [N02: Other-day chore browsing](inventory.md#n02).
+
+<a id="k08"></a>
+
+- **K08 — As a kid, I can return my daily summary to today.** _Current behavior · lower priority._ Back to today changes the date of the counts-only summary. It does not select another date for the actionable chore board. This lower-priority capability is implemented. **Not current behavior:** [N02: Other-day chore browsing](inventory.md#n02).
+
+<a id="k09"></a>
+
+- **K09 — As a kid, I can leave a daily summary idle and return to the current chore view.** _Current behavior · lower priority._ After 90 seconds without interaction, a secondary panel closes back to the current view; a global Rewards view also returns to Chores. It does not restore the legacy past/future chore-list mode. This lower-priority capability is implemented. **Not current behavior:** [N02: Other-day chore browsing](inventory.md#n02).
+
+<a id="k10"></a>
+
+- **K10 — As a kid, I can refresh the chore board manually.** _Current behavior · retained._ The shared Refresh button calls window.location.reload(), loading a fresh document and app code. Automatic data refresh and the Reconnect action remain separate. **Not current behavior:** [N24: Refresh that only refetches data](inventory.md#n24).
+
+<a id="k11"></a>
+
+- **K11 — As a kid, I can have my board reflect the current time window and changes made through ChatGPT and MCP.** _Current behavior · revised._ Refresh the data while visible, recheck after reconnect/focus/visibility return, and switch at authoritative Pacific boundaries. Server eligibility governs writes even if the device clock or a stale screen disagrees.
 
 ## Kid: understand what needs doing
 
-- **K12 — As a kid, I can see the chores assigned to me that are available for the viewed day.** A chore’s assignments, starting date, recurrence, completion history, pauses, and snoozes determine whether it appears. A sibling’s completion normally does not complete my assignment. [Source][availability]
-- **K13 — As a kid, I can recognize a chore by its title, emoji, and star value before acting.** The card shows the whole title and the number of stars it offers, with singular/plural wording. [Source][chore-card]
-- **K14 — As a kid, I can spot recently added chores.** Chores created within approximately the last four hours receive an amber highlight. This is based on creation time, not whether I have seen them; no read/unread state is saved. [Source][freshness]
-- **K15 — As a kid, I can find chores grouped by time of day.** The groups are Morning, Afternoon, Evening, Night, and Bonus. “Bonus” contains everything without a time-of-day assignment; that label does not itself mean the chore is optional or excluded from daily progress. [Source][groups]
-- **K16 — As a kid, I can see the deadline for each timed group.** Morning ends at noon, Afternoon at 5pm, Evening at 7pm, and Night at 10pm, all Pacific. At the deadline itself, completion starts requiring parent approval and skipping is disabled. [Source][deadlines]
-- **K17 — As a kid, I can have the board emphasize the relevant time of day automatically.** Before noon it opens Morning; noon–5pm Afternoon; 5–7pm Evening; 7–10pm both Evening and Night; after 10pm all groups collapse. Bonus starts collapsed. Past and future dates start with all open groups expanded. Time-based changes are checked once a minute. [Source][auto-groups]
-- **K18 — As a kid, I can expand or collapse a group myself.** Collapsed timed groups show how many chores remain; the collapsed Bonus group does not show that count. A manually collapsed currently relevant group may reopen on the next time update. [Source][group-controls]
-- **K19 — As a kid, I can leave extra groups open while I am interacting.** Groups that normally belong collapsed fold back after 45 seconds of inactivity. Manually expanded Evening stays expanded during that mounted session. The Done section also folds back after inactivity. These preferences are not durable across reloads. [Source][group-idle]
-- **K20 — As a kid, I can see ordinary chores before repeat-anytime chores within a time group.** Sorting puts perpetual chores after other chores; within the same type priority and time group, newer chores appear first. There is no manual reordering. [Source][sorting]
-- **K21 — As a kid, I can see my daily progress and the ten-star bonus target.** The progress bar shows resolved chores over expected chores and a `+10` star target. “Resolved” includes both completed and skipped chores. With no expected chores, it says No chores today. [Source][progress-ui]
-- **K22 — As a kid, I can see an all-clear message when my open chore list is empty.** It invites me to return when something new appears. Empty open chores and zero expected chores are different states; completed or skipped chores can empty the list. [Source][empty-board]
-- **K23 — As a kid, I can see daily chores return on their next scheduled day.** Repeated chores are complete once per kid per Pacific day. Daily normally means every day; stored daily schedules with selected weekdays are also honored by the board. [Source][availability]
-- **K24 — As a kid, I can see weekly chores on the weekdays selected for them.** Each selected weekday is its own due opportunity. A missed weekly chore does not stay open on an unselected day. An empty weekday list is treated as every day, despite the “weekly” label. [Source][availability]
-- **K25 — As a kid, I can keep seeing an unfinished one-off chore after its scheduled day.** Its date is an earliest appearance date, not an expiry date. It remains due until I complete it, it is hidden, or it is removed. [Source][availability]
+<a id="k12"></a>
+
+- **K12 — As a kid, I can see my current-window chores and untimed Bonus chores that are eligible now.** _Current behavior · revised._ Never expose another named window through a URL, group, preview, or stale state. Honor kid assignment and authoritative time. **Not current behavior:** [N02: Other-day chore browsing](inventory.md#n02); [N03: Opening other time groups](inventory.md#n03).
+
+<a id="k13"></a>
+
+- **K13 — As a kid, I can recognize a chore by its title, emoji, and star value before acting.** _Current behavior · retained._ Show the chore’s existing assigned emoji prominently on its main card, and reuse it in the picker and Done list. Show its full title and star amount before submission.
+
+<a id="k14"></a>
+
+- **K14 — As a kid, I can spot recently added chores.** _Current behavior · retained._ Eligible cards and picker rows display New for chores created within the last 24 hours.
+
+<a id="k15"></a>
+
+- **K15 — As a kid, I can focus on one current chore at a time and choose another through the period card.** _Current behavior · revised._ Each child sees one suggested actionable chore from the saved order. The Finish this {timeframe} card opens that child’s current chore picker; choosing a task changes only the temporary selection. Bonus chores has a separate always-reachable entry and is never automatically selected after required work. **Not current behavior:** [N03: Opening other time groups](inventory.md#n03); [N12: Automatic Bonus assignment](inventory.md#n12); [N14: Dedicated Choose another button](inventory.md#n14); [N26: Whole-list primary chore screen](inventory.md#n26).
+
+<a id="k16"></a>
+
+- **K16 — As a kid, I can see when my current chore window ends.** _Current behavior · revised._ New submissions stop at the cutoff. Untimed Bonus work has no time-group cutoff, but remains subject to its date/recurrence eligibility. **Not current behavior:** [N04: Overlapping Evening and Night](inventory.md#n04).
+
+<a id="k17"></a>
+
+- **K17 — As a kid, I can have the next time window’s chores replace the previous window’s chores automatically.** _Current behavior · revised._ Pacific windows are Morning 7am–noon, Afternoon noon–5pm, Evening 5pm–8:15pm, and Night 8:15pm–10pm, with exclusive closing boundaries. Between 10pm and 7am only eligible untimed Bonus work is available. Old timed cards and secondary selections close at a boundary; accepted pending requests remain recorded. **Not current behavior:** [N03: Opening other time groups](inventory.md#n03); [N04: Overlapping Evening and Night](inventory.md#n04).
+
+<a id="k18"></a>
+
+- **K18 — As a kid, I cannot expand or collapse a group myself.** _Not current behavior · removed._ Remove time-group expansion/collapse. Non-current windows are absent, not hidden behind controls. **Not current behavior:** [N03: Opening other time groups](inventory.md#n03).
+
+<a id="k19"></a>
+
+- **K19 — As a kid, I cannot leave extra groups open while I am interacting.** _Not current behavior · removed._ Remove persistent/manual group expansion and idle recollapse behavior, including Evening overlap. **Not current behavior:** [N03: Opening other time groups](inventory.md#n03).
+
+<a id="k20"></a>
+
+- **K20 — As a kid, I can follow my chores in the order my parent specified for the current time period.** _Current behavior · revised._ Use the saved per-child/per-group order. The September 8 message was the initial seed, not an immutable replacement for later parent edits. Filter weekday/ineligible/pending/completed work without reordering the remaining tasks; a picker selection does not change the saved sequence. **Not current behavior:** [N08: Automatic chore sorting](inventory.md#n08); [N14: Dedicated Choose another button](inventory.md#n14).
+
+<a id="k21"></a>
+
+- **K21 — As a kid, I can see my current-period progress and two-star bonus opportunity.** _Current behavior · revised._ The period card contains progress stamps and the +2 offer or earned/pending state. No second “0 of 5 done” line appears below it. Daily history is counts-only. Parent-hidden occurrences are excluded from targets; pending approval is not completion. Empty periods offer no bonus. **Not current behavior:** [N09: Extra ten-star daily award](inventory.md#n09); [N10: Empty-period or Bonus-period payout](inventory.md#n10); [N11: Hidden work still required](inventory.md#n11); [N15: Duplicate completion count](inventory.md#n15).
+
+<a id="k22"></a>
+
+- **K22 — As a kid, I can see when I have no open chores in the current window.** _Current behavior · revised._ Outstanding chores keep colorful raised columns, a solid card, emoji, and action button. Finished, empty, or awaiting-parent columns are subdued and say All done for now, Nothing to do right now, or Your part is done, with Go play only when the current state is confirmed. Pending approval uses a clock; failures/loading do not show an all-clear. This concerns the current window, not the whole day. **Not current behavior:** [N12: Automatic Bonus assignment](inventory.md#n12); [N13: Indistinguishable all-clear and active cards](inventory.md#n13).
+
+<a id="k23"></a>
+
+- **K23 — As a kid, I can see a daily chore when its next daily occurrence is eligible.** _Current behavior · revised._ The next occurrence is distinct from yesterday’s missed work. Named time windows and the untimed exception apply.
+
+<a id="k24"></a>
+
+- **K24 — As a kid, I can see a weekly chore when its next scheduled occurrence is eligible.** _Current behavior · revised._ Honor scheduled weekdays plus the current time window or untimed eligibility; no overdue catch-up path.
+
+<a id="k25"></a>
+
+- **K25 — As a kid, I cannot keep seeing an unfinished one-off chore after its scheduled day.** _Not current behavior · removed._ Remove automatic overdue one-off carryover. A parent may explicitly schedule a new eligible opportunity; this does not backdate the missed occurrence. **Not current behavior:** [N05: Late or backdated completions](inventory.md#n05); [N06: Automatic overdue one-off carryover](inventory.md#n06).
 
 ## Kid: complete chores, earn stars, and correct mistakes
 
-- **K26 — As a kid, I can open a chore to choose what to do.** Tapping the card opens a dialog with Complete task or Request parent approval, Skip for today, and Read title. Opening the card alone does not complete it. Close or tapping the dialog backdrop dismisses it. [Source][chore-details]
-- **K27 — As a kid, I can complete an eligible chore today and receive its stars.** For a chore that does not need approval, choosing Complete task records a completion and updates my balance. The amount is captured when completion is recorded. Zero-star chores can still be completed. Server rejection does not award stars. [Source][complete]
-- **K28 — As a kid, I can celebrate a successful chore completion with animation and sound.** A local completion awarding more than zero stars triggers emoji/confetti and a randomly chosen completion sound. Zero-star completion skips that ordinary celebration; a daily bonus can still trigger its own celebration. Sound depends on browser playback and available audio files. [Source][celebration]
-- **K29 — As a kid, I can complete a perpetual chore repeatedly.** It briefly disappears after completion and is eligible to return after five seconds; the client schedules another refresh at about 5.2 seconds. Its time-of-day approval rules still apply. The server does not enforce this cooldown, which is a defect to resolve. [Source][perpetual]
-- **K30 — As a kid, I can earn ten extra stars when I resolve my final expected chore for a day.** Completion or skipping can trigger the bonus, at most once per kid per day while the bonus record exists. There must be at least one expected chore. Untimed perpetual chores are excluded; other untimed chores can count. [Source][daily-bonus]
-- **K31 — As a kid, I can see and dismiss a daily-bonus celebration.** A local action that earns the bonus opens a named congratulatory dialog and larger confetti burst; Close or Awesome dismisses it. A remotely awarded bonus appears through refreshed data without this local callback-driven dialog. [Source][bonus-dialog]
-- **K32 — As a kid, I can review completed chores for the viewed day.** Done today is initially collapsed, shows a count, and expands to crossed-out cards with the current title, emoji, and configured star value. On a past date the heading still says Done today. Manual star changes, spending, and bonus entries are not shown as chore cards. [Source][done]
-- **K33 — As a kid, I can undo a displayed completion.** Tapping its card or Undo immediately removes that completion’s recorded stars and refreshes the board, with no confirmation or extra parent approval. This also works on past/future views. A one-off chore can reopen. [Source][undo]
-- **K34 — As a kid, I can have my balance reflect losing a daily bonus when I undo a required chore.** If the undo leaves expected work unfinished, its daily bonus is removed too. The deducted total may therefore exceed the chore’s own stars. If all expected work remains resolved, the bonus stays. [Source][bonus-revoke]
-- **K35 — As a kid, I can carry my unspent star balance from day to day.** The balance sums all recorded earnings, bonuses, parent adjustments, and reward spending. It is not a daily score and does not reset at midnight; it remains the current all-time balance even while browsing another day. [Source][balance]
+<a id="k26"></a>
+
+- **K26 — As a kid, I can open an eligible chore to complete it or request required approval.** _Current behavior · revised._ The main chore card completes directly or sends the explicitly required approval request. The period card opens the picker. There is no ordinary completion-detail dialog, skip action, or Hear it control; an expired occurrence is rejected by the service. **Not current behavior:** [N07: Skipping and skip credit](inventory.md#n07); [N14: Dedicated Choose another button](inventory.md#n14); [N16: Chore-title read-aloud](inventory.md#n16); [N26: Whole-list primary chore screen](inventory.md#n26).
+
+<a id="k27"></a>
+
+- **K27 — As a kid, I can complete an occurrence that is eligible now and receive its stars.** _Current behavior · revised._ No early, backdated, or elapsed-window submissions. Enforce on the server. On-time approval requests may be settled later. **Not current behavior:** [N05: Late or backdated completions](inventory.md#n05).
+
+<a id="k28"></a>
+
+- **K28 — As a kid, I can celebrate a successful chore completion with animation and sound.** _Current behavior · retained._ Confirmed completion gives local star feedback and a short sound/animation, then returns to the next eligible chore. Pending approval and failed writes do not celebrate. Reduced-motion styles suppress movement. **Not current behavior:** [N13: Indistinguishable all-clear and active cards](inventory.md#n13).
+
+<a id="k29"></a>
+
+- **K29 — As a kid, I can earn a repeatable chore again when it is eligible.** _Current behavior · revised._ Repeatable work can be performed again when eligible, subject to the service’s five-second cooldown and any approval requirement. Untimed work remains available anytime; timed work stays window-gated. One approved occurrence fulfills a timed period target, not endless repetitions.
+
+<a id="k30"></a>
+
+- **K30 — As a kid, I can earn two extra stars after completing every task in a nonempty time period.** _Current behavior · revised._ The +2 award belongs to each child/Pacific day/nonempty named period. This replaces the old +10 daily award. Complete the remaining unhidden requirements; timely pending submissions may settle their original period later. Empty periods and untimed Bonus work create no period payout. **Not current behavior:** [N07: Skipping and skip credit](inventory.md#n07); [N09: Extra ten-star daily award](inventory.md#n09); [N10: Empty-period or Bonus-period payout](inventory.md#n10); [N11: Hidden work still required](inventory.md#n11).
+
+<a id="k31"></a>
+
+- **K31 — As a kid, I cannot see and dismiss a daily-bonus celebration.** _Not current behavior · removed._ Remove the ten-star daily-bonus dialog. Period progress still shows its earned two-star award. **Not current behavior:** [N09: Extra ten-star daily award](inventory.md#n09).
+
+<a id="k32"></a>
+
+- **K32 — As a kid, I can review completions from the current time window and today’s untimed work.** _Current behavior · revised._ Do not reintroduce other named groups, historical completion actions, or group persistence timers. **Not current behavior:** [N02: Other-day chore browsing](inventory.md#n02).
+
+<a id="k33"></a>
+
+- **K33 — As a kid, I can undo one of my displayed completions.** _Current behavior · revised._ Only currently displayed current-window/untimed completions are kid-accessible. Undo must target that exact record; historical parent corrections use agents.
+
+<a id="k34"></a>
+
+- **K34 — As a kid, I can have my balance reflect losing a period bonus when I undo a required chore.** _Current behavior · revised._ Undo reverses the +2 award if it makes the remaining required period incomplete. A legitimate re-completion can restore one net bonus. Historical daily-bonus ledger entries remain; no new daily bonuses or daily-bonus dialog are created. **Not current behavior:** [N09: Extra ten-star daily award](inventory.md#n09); [N11: Hidden work still required](inventory.md#n11).
+
+<a id="k35"></a>
+
+- **K35 — As a kid, I can carry my unspent star balance from day to day.** _Current behavior · retained._ The independent current-system ledger keeps unspent stars across days, adds earned credits, and subtracts purchases/explicit reversals. Legacy balances were reconciled at promotion, not continuously synchronized afterward. **Not current behavior:** [N22: Shared live legacy data or ongoing resync](inventory.md#n22).
 
 ## Kid: ask for parent approval
 
-- **K36 — As a kid, I can recognize when completing a chore needs a parent.** A Parent OK badge appears when the chore explicitly requires approval, its deadline has passed, or I am viewing another day. The details dialog changes its completion action accordingly. [Source][approval-reason]
-- **K37 — As a kid, I can ask a parent to approve a chore.** Choosing the approval action sends the kid, chore, and target date to the parents’ Telegram chat with an Approve link. It does not award stars or add a server-side pending completion. [Source][request-approval]
-- **K38 — As a kid, I can request credit for a past day after an extra confirmation.** The first attempt explains that I am editing a past day and offers Go to today, Request approval, or Cancel. Only Request approval proceeds to sending the request. Future dates go directly to the approval flow. [Source][past-prompt]
-- **K39 — As a kid, I can see whether an approval request is sending, sent, or failed.** A failure displays a reason and Try again; a successful request shows confirmation. Closing the prompt after sending does not withdraw the request. [Source][approval-status]
-- **K40 — As a kid, I can see that I already requested approval for a chore on this device.** A waiting badge is remembered by kid, chore, and day in this browser. Another completion request is disabled for that combination. The marker is local, has no expiry/clear flow, and can remain after an approved completion is undone. [Source][approval-memory]
-- **K41 — As a kid, I can receive approved stars when my parent acts remotely.** A successful parent approval records the completion for the requested day, including an eligible daily bonus. The chore board’s periodic refresh then reflects the result. There is no explicit rejection or “needs more work” state. [Source][parent-complete]
+<a id="k36"></a>
+
+- **K36 — As a kid, I can recognize an eligible chore that explicitly needs parent approval.** _Current behavior · revised._ Deadline expiry no longer creates an approval opportunity; the expired timed chore leaves the kid view. **Not current behavior:** [N05: Late or backdated completions](inventory.md#n05).
+
+<a id="k37"></a>
+
+- **K37 — As a kid, I can submit an eligible chore for parent approval.** _Current behavior · revised._ Persist the occurrence and authoritative on-time submission before Telegram delivery. No new requests for earlier days or closed time groups. **Not current behavior:** [N05: Late or backdated completions](inventory.md#n05).
+
+<a id="k38"></a>
+
+- **K38 — As a kid, I cannot request credit for a past day after an extra confirmation.** _Not current behavior · removed._ Remove past-day and elapsed-time-group completion requests, their prompt, and any late-request approval escape hatch. **Not current behavior:** [N05: Late or backdated completions](inventory.md#n05); [N07: Skipping and skip credit](inventory.md#n07).
+
+<a id="k39"></a>
+
+- **K39 — As a kid, I can see whether my valid approval submission was accepted and whether sending its notification needs retrying.** _Current behavior · revised._ Separate durable request acceptance from Telegram delivery so notification failures do not lose an on-time submission. Closing a prompt does not retract it.
+
+<a id="k40"></a>
+
+- **K40 — As a kid, I can see that my eligible chore is awaiting parent approval.** _Current behavior · revised._ Use durable per-occurrence request identity rather than a permanent browser-only marker. Old timed cards stay hidden after cutoff; their request still exists for parent review. **Not current behavior:** [N13: Indistinguishable all-clear and active cards](inventory.md#n13).
+
+<a id="k41"></a>
+
+- **K41 — As a kid, I can receive stars when my parent approves my on-time submission later.** _Current behavior · revised._ Later review may occur after the window or day ends. Credit belongs to the original occurrence. Update balance/progress without reopening the old timed chore. **Not current behavior:** [N05: Late or backdated completions](inventory.md#n05).
 
 ## Kid: skip for today
 
-- **K42 — As a kid, I can skip my assignment for the rest of today before its deadline.** From chore details, Skip for today opens a confirmation. Confirming hides it for me until the next Pacific date, without awarding the chore’s stars. Untimed chores have no time deadline; skipping on another viewed day is disabled. [Source][skip]
-- **K43 — As a kid, I can change my mind before confirming a skip.** Cancel or Close leaves the chore untouched. After confirming, there is no kid-facing unskip control. A parent must change the stored snooze or wait for its return. [Source][skip-dialog]
-- **K44 — As a kid, I can skip my part without hiding the chore from my siblings.** The snooze belongs to my assignment. It ends on the stored return date; the chore only reappears then if its other schedule and completion rules also permit it. [Source][skip]
-- **K45 — As a kid, I can have a skipped chore count toward finishing my day.** It increases resolved daily progress, can unlock the ten-star daily bonus, and sends the parents a skip notification when Telegram is configured. This is implemented behavior requiring an explicit product decision for the rebuild. [Source][skip]
+<a id="k42"></a>
+
+- **K42 — As a kid, I cannot skip my assignment for the rest of today before its deadline.** _Not current behavior · removed._ Remove the skip entry action as well as the follow-on K43–K45 behaviors. **Not current behavior:** [N07: Skipping and skip credit](inventory.md#n07).
+
+<a id="k43"></a>
+
+- **K43 — As a kid, I cannot change my mind before confirming a skip.** _Not current behavior · removed._ Remove skip confirmation, cancellation, and unskip-related UX. **Not current behavior:** [N07: Skipping and skip credit](inventory.md#n07).
+
+<a id="k44"></a>
+
+- **K44 — As a kid, I cannot skip my part without hiding the chore from my siblings.** _Not current behavior · removed._ Remove kid-triggered per-assignment skipping. **Not current behavior:** [N07: Skipping and skip credit](inventory.md#n07).
+
+<a id="k45"></a>
+
+- **K45 — As a kid, I cannot have a skipped chore count toward finishing my day.** _Not current behavior · removed._ Remove skip-based progress, daily bonus eligibility, and notifications. **Not current behavior:** [N07: Skipping and skip credit](inventory.md#n07).
 
 ## Kid: spend stars on rewards
 
-- **K46 — As a kid, I can browse rewards assigned to me alongside my current balance.** The Rewards page shows each kid’s catalog, emoji, title, and price. Archived rewards are omitted. A kid with no listed rewards gets a No rewards yet message. [Source][rewards-page]
-- **K47 — As a kid, I can find cheaper rewards first.** My rewards sort by ascending star cost, then alphabetically by title for ties. [Source][reward-sort]
-- **K48 — As a kid, I can see which rewards I can afford and how many more stars I need.** Available cards say Redeem or show the exact shortfall. An unaffordable reward can still be opened to inspect its details. [Source][reward-card]
-- **K49 — As a kid, I can inspect a reward before spending stars.** Opening it shows the reward, cost, current balance, and Redeem reward action. Closing or clicking the backdrop before redeeming spends nothing. [Source][reward-dialog]
-- **K50 — As a kid, I can redeem an available reward when I have enough stars.** Confirmation immediately deducts the current stored price and records redemption. There is no parent-approval step, reservation, or later fulfillment state. The server rechecks assignment, availability, and balance. [Source][redeem]
-- **K51 — As a kid, I can celebrate a successful redemption.** The browser plays a random reward sound, runs emoji/confetti, updates my balance, and refreshes. The dialog closes after the attempt, including unsuccessful attempts; a detailed redemption failure message is not provided. [Source][redeem-ui]
-- **K52 — As a kid, I can recognize a one-off reward I have already taken.** It remains in my catalog as Taken with a disabled card. Each assigned kid can take that reward once independently. [Source][reward-availability]
-- **K53 — As a kid, I can redeem a repeatable reward again while I can afford it.** Perpetual rewards have no daily cap or cooldown. A zero-cost perpetual reward can be redeemed without reducing my balance. [Source][redeem]
-- **K54 — As a kid, I can leave Rewards idle and return automatically to Chores.** Two minutes without mouse movement, keys, clicks, touches, or wheel activity navigates back to today’s board, even if a reward dialog was open. [Source][reward-idle]
+<a id="k46"></a>
+
+- **K46 — As a kid, I can browse rewards assigned to me alongside my current balance.** _Current behavior · retained._ Open Rewards in the shared header for all three children or tap one child’s balance. Each catalog shows only rewards assigned to that child alongside their spendable balance. **Not current behavior:** [N27: No shared Rewards tab](inventory.md#n27).
+
+<a id="k47"></a>
+
+- **K47 — As a kid, I can find cheaper rewards first.** _Current behavior · retained._ Available assigned rewards are sorted by ascending cost.
+
+<a id="k48"></a>
+
+- **K48 — As a kid, I can see which rewards I can afford and how many more stars I need.** _Current behavior · retained._ Reward rows show You can get this, the remaining stars needed, or Already yours for a redeemed one-off. The detail view shows the resulting balance; unavailable purchases are disabled and also rejected by the service.
+
+<a id="k49"></a>
+
+- **K49 — As a kid, I can inspect a reward before spending stars.** _Current behavior · retained._ Open reward details to see its emoji, title, cost, and resulting balance, then choose Get this reward or Keep my stars/Back.
+
+<a id="k50"></a>
+
+- **K50 — As a kid, I can redeem an available reward when I have enough stars.** _Current behavior · retained._ The service checks assignment, availability, one-off entitlement, current balance, and the price shown before committing the debit and redemption together. Retries cannot duplicate spending.
+
+<a id="k51"></a>
+
+- **K51 — As a kid, I can celebrate a successful redemption.** _Current behavior · retained._ A confirmed redemption plays the reward effect and returns to the applicable child view. A failed purchase does not celebrate or spend stars.
+
+<a id="k52"></a>
+
+- **K52 — As a kid, I can recognize a one-off reward I have already taken.** _Current behavior · retained._ A redeemed one-off reward remains recognizable as Already yours and cannot be purchased again by that child.
+
+<a id="k53"></a>
+
+- **K53 — As a kid, I can redeem a repeatable reward again while I can afford it.** _Current behavior · retained._ A perpetual reward can be purchased repeatedly while the child remains assigned, it is available, and enough stars remain.
+
+<a id="k54"></a>
+
+- **K54 — As a kid, I can leave Rewards idle and return automatically to the current chore view.** _Current behavior · revised._ After 90 seconds without interaction, Rewards returns to current Chores. Opening/using reward details counts as interaction. A period/day change also resets stale secondary views.
 
 ## Kid: personalize the board and get help
 
-- **K55 — As a kid, I can choose the color of my column.** Tapping my name opens a picker with eight preset colors and a custom color input. This is available directly on the chore board without a parent PIN, including when viewing another date. [Source][color]
-- **K56 — As a kid, I can save or cancel my color choice.** Save color writes it to the family record and refreshes; Cancel or Close discards the unsaved choice. The saved color also appears on Rewards and Packing. A failed save has no dedicated explanatory message. [Source][color-save]
-- **K57 — As a kid, I can have an open chore’s title read aloud.** Read title generates and plays English speech. Only the first 140 characters are spoken; the control is unavailable while that speech attempt is active. There is no stop, speed, or voice control. [Source][speech]
-- **K58 — As a kid, I can hear the title of a completed chore without undoing it.** The speaker button on its completed card plays the title separately from the Undo action. Audio failures are logged but have no visible error explanation. [Source][done-speech]
-- **K59 — As a kid, I can use the board in my device’s light or dark appearance.** Shared styles and component variants follow the system preference. There is no chores-specific appearance toggle, and some page backgrounds do not have matching dark variants. [Source][styles]
-- **K60 — As a kid, I can wake the darkened chore display by interacting with it.** After one idle minute, a black overlay appears when no kid has open chores today or during 8pm–7am Pacific. Pointer/key/touch activity resets it. Hiding the tab stops the timer; returning restarts it. This is an overlay, not an operating-system sleep command. [Source][screen-saver]
-- **K61 — As a kid, I can try reloading a failed board section.** The main board, toolbar, navigation, and screen saver have section error boundaries with a refresh action; Packing also has section boundaries. This does not provide an offline queue or reliably explain failed event-handler requests. The route-level fallback is suspect. [Source][errors]
+<a id="k55"></a>
+
+- **K55 — As a kid, I can choose the color of my column.** _Current behavior · retained._ Tap the child’s name to open the color picker, choose a preset or custom color, and save it to shared state.
+
+<a id="k56"></a>
+
+- **K56 — As a kid, I can save or cancel my color choice.** _Current behavior · retained._ Save my color persists the selection; Cancel leaves the saved color unchanged.
+
+<a id="k57"></a>
+
+- **K57 — As a kid, I cannot have an open chore’s title read aloud.** _Not current behavior · removed._ Remove chore-title read-aloud, its controls and its speech endpoint. The kids can read their chores. **Not current behavior:** [N16: Chore-title read-aloud](inventory.md#n16).
+
+<a id="k58"></a>
+
+- **K58 — As a kid, I cannot hear the title of a completed chore without undoing it.** _Not current behavior · removed._ Remove completed-chore title speech. Open-chore title speech (K57) is also removed. **Not current behavior:** [N16: Chore-title read-aloud](inventory.md#n16).
+
+<a id="k59"></a>
+
+- **K59 — As a kid, I can use the board in my device’s light or dark appearance.** _Current behavior · lower priority._ System light/dark appearance is implemented, including legible active and subdued states. It remains lower priority than the landscape current-chore flow.
+
+<a id="k60"></a>
+
+- **K60 — As a kid, I can wake the idle shared chore display and see the work eligible now.** _Current behavior · revised._ Five idle minutes can trigger pure black only from 8:30pm inclusive until 6am exclusive in America/Los_Angeles, automatically following DST. At 8:30pm an already-idle board can black out; at 6am it clears automatically. Tapping wakes and refreshes. Focus/visibility return rechecks the schedule. No visible moon or text appears; webpage blackout does not change the hardware backlight. **Not current behavior:** [N17: Daytime blackout or visible sleep decoration](inventory.md#n17).
+
+<a id="k61"></a>
+
+- **K61 — As a kid, I can try reloading a failed board section.** _Current behavior · retained._ A failed column offers Reload this column. Connection errors expose Reconnect; failed writes retain the exact request for Retry saving. The shared Refresh button reloads the whole page.
 
 ## Kid: pack for a camping trip
 
-- **K62 — As a kid, I can open a camping packing checklist with my own progress.** Packing uses the same three kids and colors, separate from chore completions and stars. Each kid receives the same fourteen fixed items. [Source][packing]
-- **K63 — As a kid, I can see exactly what the packing list asks me to bring.** Pillow; electric heating blanket; Kindle; headphones; six pairs of underwear; six long-sleeved shirts; long pants; six socks; Crocs; sneakers; bike helmet; hat; sweater; jacket. Quantities are text, not individual counters. [Source][packing-items]
-- **K64 — As a kid, I can check an item as I pack it and uncheck it if needed.** Each toggle immediately changes its checkmark, crossed-out title, and my packed count. It changes only the selected kid’s item. No chore stars are awarded. [Source][packing-toggle]
-- **K65 — As a kid, I can see my packing count and progress bar.** The column shows packed items out of fourteen and a bar; the page also totals packed items across the family, normally out of forty-two. [Source][packing-progress]
-- **K66 — As a kid, I can mark my entire packing list packed at once.** All packed checks all fourteen items for the selected kid, without a confirmation step. [Source][packing-bulk]
-- **K67 — As a kid, I can clear my packing list and start again.** Clear unchecks that kid’s entire list immediately. There is no separate undo history. [Source][packing-bulk]
-- **K68 — As a kid, I can reset everyone’s packing lists for a new trip.** Reset trip clears the whole family checklist immediately. This control is available to everyone on the unlocked page and has no parent gate or confirmation. [Source][packing-reset]
-- **K69 — As a kid, I can return to my packing progress in the same browser.** Checks persist in local browser storage across visits. They do not synchronize across devices or update live in other tabs, attach to a named trip, or expire by date. A storage failure may leave the on-screen checklist usable without saving it. [Source][packing-storage]
+<a id="k62"></a>
+
+- **K62 — As a kid, I can open a camping packing checklist with my own progress.** _Current behavior · retained._ Packing opens each child’s checklist inside their column, with progress stored in the current shared board.
+
+<a id="k63"></a>
+
+- **K63 — As a kid, I can see exactly what the packing list asks me to bring.** _Current behavior · retained._ Packing lists the defined item titles and emojis; the checklist is separate from chore-star and period-bonus targets.
+
+<a id="k64"></a>
+
+- **K64 — As a kid, I can check an item as I pack it and uncheck it if needed.** _Current behavior · retained._ Check or uncheck a packing item through a shared-state command; packing itself does not award chore stars.
+
+<a id="k65"></a>
+
+- **K65 — As a kid, I can see my packing count and progress bar.** _Current behavior · retained._ Show the packed item count and progress bar for that child.
+
+<a id="k66"></a>
+
+- **K66 — As a kid, I can mark my entire packing list packed at once.** _Current behavior · retained._ All packed marks every defined packing item for that child.
+
+<a id="k67"></a>
+
+- **K67 — As a kid, I can clear my packing list and start again.** _Current behavior · retained._ Clear mine clears that child’s packing list.
+
+<a id="k68"></a>
+
+- **K68 — As a kid, I can reset everyone’s packing lists for a new trip.** _Current behavior · retained._ New trip for everyone asks for confirmation before clearing all packing lists; cancelling preserves them.
+
+<a id="k69"></a>
+
+- **K69 — As a kid, I can return to my shared packing progress from another authorized device.** _Current behavior · revised._ Packing is shared in Redis across authorized devices and agents. A one-time import can carry over the old browser checklist; subsequent progress does not depend on that browser’s local storage. **Not current behavior:** [N25: Browser-only packing](inventory.md#n25).
 
 ## Parent: understand the family’s work and balances
 
-- **P01 — As a parent, I can unlock a shared family device for the chores product.** The same family password protects the board, rewards, packing, and bedtime page. This is a shared-device access model, not independent parent and kid accounts. The standalone approval/undo endpoints have different access behavior; see the defect list. [Source][access]
-- **P02 — As a parent, I can see each kid’s open chores, completed chores, daily progress, and current stars.** Desktop shows the three kids together; the small-screen chore board provides a selector. Parents use the same read surfaces as kids. [Source][columns]
-- **P03 — As a parent, I can inspect previous days and preview future scheduled work.** Date navigation recomputes a board from the current definitions and completion records. It is not an immutable historical report: later edits, assignment changes, removal, and snoozing can change what an old day shows. [Source][board-page]
-- **P04 — As a parent, I can distinguish the daily work target from each kid’s spendable balance.** The progress bar is for the viewed day; the balance includes earnings and spending across all dates, including any already-recorded future completion. [Source][balance]
-- **P05 — As a parent, I can rename each of the three kid columns.** Names change while the kid’s identity, assignments, and balance remain tied to the same kid record. Empty names are ignored. The current product normalizes to exactly three kids and provides no add/remove-kid action. [Source][kid-management]
-- **P06 — As a parent, I can set a kid’s identifying color.** Preset/custom colors can be set on the board; shared actions accept valid three- or six-digit hex colors. This changes the saved family color, not just one device’s preference. [Source][color-save]
+<a id="p01"></a>
+
+- **P01 — As a parent, I can make a shared family device ready for the kid board.** _Current behavior · revised._ Open /chores on an iPad already unlocked with the site password, or enter that same password. No dedicated parent setup page or transferred link is required. Optional invitations grant scoped kid sessions; parent MCP authorization remains separate. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N19: Clippy or Telegram management](inventory.md#n19); [N21: Required transferred setup link](inventory.md#n21).
+
+<a id="p02"></a>
+
+- **P02 — As a parent, I can ask an agent for each kid’s chores, completions, progress, and stars.** _Current behavior · revised._ Provide readable results in ChatGPT through MCP; Telegram only delivers notifications. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N19: Clippy or Telegram management](inventory.md#n19).
+
+<a id="p03"></a>
+
+- **P03 — As a parent, I can ask an agent to inspect past activity and future schedules.** _Current behavior · revised._ Parent read access to history is allowed. It does not enable late/future completion or expose old timed cards to kids. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p04"></a>
+
+- **P04 — As a parent, I can ask an agent to distinguish daily progress from spendable stars.** _Current behavior · revised._ Daily summaries distinguish task counts from ledger credits/debits and current spendable balances. Day/occurrence/submission/approval timestamps remain inspectable through tools; daily counts do not offer a +10 bonus. **Not current behavior:** [N09: Extra ten-star daily award](inventory.md#n09); [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p05"></a>
+
+- **P05 — As a parent, I can rename kid columns through an agent.** _Current behavior · revised._ Keep identity and history stable when changing a display name. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p06"></a>
+
+- **P06 — As a parent, I can set a kid’s color through an agent.** _Current behavior · revised._ The kid-facing color picker remains; no parent settings screen. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
 
 ## Parent: define and change chores
 
-- **P07 — As a parent, I can create a chore with a title, emoji, and star value.** A nonblank title and at least one valid kid are required. Values are rounded to whole nonnegative stars; zero is permitted. The shared action defaults to one star and a star emoji when omitted. [Source][create-chore]
-- **P08 — As a parent, I can assign one chore to one kid or several kids.** Each kid has their own completion and stars. At least one valid kid must remain assigned. A shared chore is not a race for one family-wide reward. [Source][assign-chore]
-- **P09 — As a parent, I can create a one-off chore.** It appears from its scheduled day onward and stays open for each assignee until completed. The shared record becomes fully complete only when all assigned kids have a completion. [Source][create-chore]
-- **P10 — As a parent, I can schedule or reschedule a one-off chore for a particular date.** The dedicated date action defaults to today when no valid-looking date is supplied. Rescheduling does not erase existing completion records or refund/reaward stars. [Source][one-off-date]
-- **P11 — As a parent, I can create a routine that repeats daily.** The shared creation/schedule actions make daily chores eligible every day from their starting date. Each kid can ordinarily earn its stars once per day. [Source][create-chore]
-- **P12 — As a parent, I can create a routine for selected weekdays.** Weekly cadence accepts one or more weekday numbers. Every selected weekday is a separate due day; there is no “once in any seven-day window” interpretation or automatic carryover onto other days. Creation without selected days defaults to the server’s current UTC weekday. [Source][schedule-change]
-- **P13 — As a parent, I can create a chore that can be earned repeatedly.** A perpetual chore becomes available again after the board’s short cooldown. Leaving it untimed excludes it from the daily bonus target; giving it a time group can include it and also subjects it to that group’s deadline. [Source][availability]
-- **P14 — As a parent, I can place a chore in Morning, Afternoon, Evening, Night, or the untimed Bonus group.** This changes where kids find it and, for timed chores, when completion needs approval and skipping stops. There are no custom per-chore clock times. [Source][time-change]
-- **P15 — As a parent, I can require my approval whenever a chore is completed.** The approval flag applies even before the deadline. Removing it restores ordinary self-completion only when no date/deadline rule still requires approval. [Source][update-chore]
-- **P16 — As a parent, I can edit a chore’s title, emoji, and future star value.** New completions use the updated value; old earned stars remain the amounts recorded originally. Completed cards nonetheless display the latest configured value, which can misrepresent historical earnings. [Source][update-chore]
-- **P17 — As a parent, I can change a chore’s type and repeat schedule.** Shared actions can update one-off/repeated/perpetual type and daily/weekly cadence. Existing completion and fully-completed flags are retained; changing type is not a clean reset and can leave stale state. [Source][update-chore]
-- **P18 — As a parent, I can change which kids a chore is assigned to.** New assignments affect the visible board and old-day cards immediately. Existing completion records and earned stars remain. A previously fully completed one-off may fail to reopen correctly for a newly added kid. [Source][assign-chore]
-- **P19 — As a parent, I can remove a chore from the active catalog.** The action called Archive actually deletes the definition. Earned stars stay, but the associated completed cards disappear and ordinary chore Undo no longer finds the definition. There is no archive browser or restore action in the included product. [Source][archive-chore]
+<a id="p07"></a>
+
+- **P07 — As a parent, I can create a chore with its title, emoji, and star value through an agent.** _Current behavior · revised._ Retain the underlying configuration capability. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p08"></a>
+
+- **P08 — As a parent, I can assign a chore to one or more kids through an agent.** _Current behavior · revised._ Each kid has independent occurrences and credit. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p09"></a>
+
+- **P09 — As a parent, I can create a one-off chore through an agent.** _Current behavior · revised._ Give it an eligible date/time or untimed occurrence; do not automatically carry a missed occurrence into later dates/windows. **Not current behavior:** [N05: Late or backdated completions](inventory.md#n05); [N06: Automatic overdue one-off carryover](inventory.md#n06); [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p10"></a>
+
+- **P10 — As a parent, I can schedule or reschedule a one-off chore through an agent.** _Current behavior · revised._ Only create an eligible current/future opportunity. Rescheduling cannot manufacture completion credit for a missed past occurrence. **Not current behavior:** [N05: Late or backdated completions](inventory.md#n05); [N06: Automatic overdue one-off carryover](inventory.md#n06); [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p11"></a>
+
+- **P11 — As a parent, I can create daily routines through an agent.** _Current behavior · revised._ Each scheduled day/window is a distinct opportunity. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p12"></a>
+
+- **P12 — As a parent, I can schedule routines for selected weekdays through an agent.** _Current behavior · revised._ Show the occurrence only when its current time/date eligibility permits it. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p13"></a>
+
+- **P13 — As a parent, I can create a repeatable chore through an agent.** _Current behavior · revised._ Untimed repeatable chores stay available anytime; timed ones remain window-gated. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p14"></a>
+
+- **P14 — As a parent, I can assign a chore to a named time window or make it an untimed Bonus chore through an agent.** _Current behavior · revised._ The untimed option is explicitly retained. Named windows do not overlap in the kid experience. **Not current behavior:** [N04: Overlapping Evening and Night](inventory.md#n04); [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p15"></a>
+
+- **P15 — As a parent, I can require approval for a chore through an agent.** _Current behavior · revised._ Kids must submit during eligibility. On-time requests remain approvable later. **Not current behavior:** [N05: Late or backdated completions](inventory.md#n05); [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p16"></a>
+
+- **P16 — As a parent, I can edit chore titles, emoji, and star values through an agent.** _Current behavior · revised._ Preserve recorded occurrence/submission facts and earned amounts; do not rewrite history accidentally. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p17"></a>
+
+- **P17 — As a parent, I can change chore types and repeat schedules through an agent.** _Current behavior · revised._ Reconcile future eligibility safely; no stale global completed flag trapping new assignees. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p18"></a>
+
+- **P18 — As a parent, I can change chore assignments through an agent.** _Current behavior · revised._ Changes must not lose recorded credit or make an expired occurrence completable. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p19"></a>
+
+- **P19 — As a parent, I can remove a chore from availability through an agent.** _Current behavior · revised._ Archive/remove an assignment or change eligibility through an agent while retaining its occurrence, submission, and ledger history. If hidden for today, it stops counting toward the relevant requirement, even after opening. **Not current behavior:** [N11: Hidden work still required](inventory.md#n11); [N18: Dedicated parent interface](inventory.md#n18).
 
 ## Parent: pause routines and make exceptions
 
-- **P20 — As a parent, I can pause a repeated chore through a chosen day.** That day is inclusive: a pause through June 21 can reopen June 22, subject to the weekday schedule. The single-chore pause action only applies to repeated chores. [Source][pause]
-- **P21 — As a parent, I can resume a paused repeated chore.** Clearing its pause removes that restriction. Other snoozes, dates, and completion rules can still keep it hidden. [Source][pause]
-- **P22 — As a parent, I can pause all current chores through a chosen day.** The shared action hides repeated, one-off, and perpetual chores and uses the following day as the snooze return date. It edits the existing chores; it is not a global setting inherited by new chores created later. [Source][pause-all]
-- **P23 — As a parent, I can resume all chores affected by the global pause.** This clears global pause/snooze values across the current catalog but leaves kid-specific snoozes in place. It does not restore each chore’s earlier individual pause settings. [Source][pause-all]
-- **P24 — As a parent, I can arrange for a chore to disappear until a chosen return date for one kid or everyone assigned.** The data supports per-kid and whole-chore snoozes; current arbitrary-date management requires editing those fields through the replaceable management tooling. These dates are exclusive return dates: the chore may reappear on the date itself. [Source][snoozes]
-- **P25 — As a parent, I can excuse a kid’s chore today using the board’s skip flow.** The same confirmation, per-kid effect, deadline restriction, no chore-star award, and daily-bonus eligibility apply. The board does not offer a parent override for a late skip. [Source][skip]
+<a id="p20"></a>
+
+- **P20 — As a parent, I can pause a repeated chore through an agent.** _Current behavior · revised._ Parent pauses hide the affected work and exclude it from completion targets immediately, even after opening or an undone submission. pausedUntil is inclusive; snoozedUntil and per-child snoozedForKids are exclusive reappear dates. This gives no chore credit; completed remaining nonempty periods may earn +2. **Not current behavior:** [N07: Skipping and skip credit](inventory.md#n07); [N11: Hidden work still required](inventory.md#n11); [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p21"></a>
+
+- **P21 — As a parent, I can resume a repeated chore through an agent.** _Current behavior · revised._ Clear the relevant pause/snooze subject to remaining restrictions. Resume before cutoff restores the requirement and reconciles its period award; resume after cutoff cannot reinstate expired work. The next eligible day has its normal requirement again. **Not current behavior:** [N11: Hidden work still required](inventory.md#n11); [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p22"></a>
+
+- **P22 — As a parent, I can pause the family’s chores through an agent.** _Current behavior · revised._ pause_all sets an exclusive reappear date on the current catalog. Hidden work is excluded from targets; an empty period earns no bonus. No chore is marked completed or skipped, and recorded submissions are preserved. **Not current behavior:** [N07: Skipping and skip credit](inventory.md#n07); [N10: Empty-period or Bonus-period payout](inventory.md#n10); [N11: Hidden work still required](inventory.md#n11); [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p23"></a>
+
+- **P23 — As a parent, I can resume the family’s chores through an agent.** _Current behavior · revised._ Clearing pause_all removes the global snoozes it set. Separate inclusive pauses and child-specific snoozes still apply; only work that remains eligible before its cutoff returns. **Not current behavior:** [N11: Hidden work still required](inventory.md#n11); [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p24"></a>
+
+- **P24 — As a parent, I can change a chore’s availability for one kid or all assignees through an agent.** _Current behavior · revised._ Merge existing per-child snoozes when updating that map. Hidden work is waived from targets even with pending/undone submissions, without deleting history or awarding chore stars. An on-time accepted request can still be reviewed later. **Not current behavior:** [N07: Skipping and skip credit](inventory.md#n07); [N11: Hidden work still required](inventory.md#n11); [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p25"></a>
+
+- **P25 — As a parent, I cannot excuse a kid’s chore today using the board’s skip flow.** _Not current behavior · removed._ Remove the parent version of the board skip action. Agent scheduling/pauses remain separate from completion credit. **Not current behavior:** [N07: Skipping and skip credit](inventory.md#n07); [N18: Dedicated parent interface](inventory.md#n18).
 
 ## Parent: approve work and correct credit
 
-- **P26 — As a parent, I can receive a request when a kid needs chore approval.** Telegram names the kid, chore, and target day and supplies an Approve link. There is no parent inbox or queue in the included app itself. [Source][request-approval]
-- **P27 — As a parent, I can open an approval link without awarding stars just by opening it.** The GET page shows identifiers, the target date, and an explicit Approve this chore button. Completion happens on form submission; simply opening a message preview or link does not commit it. [Source][approval-link]
-- **P28 — As a parent, I can see when an approval link targets a day other than today.** The page labels today/yesterday/tomorrow or a day offset, includes the date, and adds a warning marker for a different day. The pre-submit page shows IDs rather than resolving the chore title and kid name. [Source][approval-link]
-- **P29 — As a parent, I can approve the chore and award its stars for the requested day.** Submission bypasses the kid’s approval restriction, records the completion, and may award that day’s bonus. The result names the kid, chore, and award. Past and future dates are supported. [Source][parent-complete]
-- **P30 — As a parent, I can see when an approval made no change or could not find the target.** Repeated same-day approvals and fully completed one-offs report Already completed; missing chore/kid combinations report failure. Duplicate prevention is incomplete for shared one-offs and perpetual chores. [Source][approval-link]
-- **P31 — As a parent, I can directly record a kid’s completion with parent authority.** A shared parent action supports a specified day and bypasses the normal approval requirement. This is a domain capability for a replacement parent interface, not a distinct control on the kid board. [Source][parent-complete]
-- **P32 — As a parent, I can undo a completion from its notification.** The completion message includes an Undo link. Opening it shows a confirmation with the target date; only Undo this completion removes credit. Missing link information and nothing-to-undo cases have explicit results. [Source][undo-link]
-- **P33 — As a parent, I can undo a completion directly from the board.** The selected completion’s original stars are removed, and any now-unearned daily bonus can also be removed. The balance can become negative if stars were already spent. No automatic reward refund or cancellation follows. [Source][undo]
-- **P34 — As a parent, I can give or take away stars independently of a chore.** A manual adjustment adds a dated positive or negative whole-star entry. Zero has no effect; removals are not capped at the current balance. These entries change the balance but do not appear in the kid’s completed-chore list or earn the daily bonus. [Source][star-adjustment]
+<a id="p26"></a>
+
+- **P26 — As a parent, I can receive on-time approval requests in Telegram.** _Current behavior · revised._ Identify the child, chore, occurrence, submission time, and expected award. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N19: Clippy or Telegram management](inventory.md#n19).
+
+<a id="p27"></a>
+
+- **P27 — As a parent, I can review a request in Telegram without approving it merely by reading it.** _Current behavior · revised._ Approval requires an explicit instruction to ChatGPT through MCP; Telegram is notification-only, with no action buttons or web approval page. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N19: Clippy or Telegram management](inventory.md#n19).
+
+<a id="p28"></a>
+
+- **P28 — As a parent, I can see which occurrence an approval request belongs to and when it was submitted.** _Current behavior · revised._ Differentiate a valid pending request from an attempted new late submission, including after midnight. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p29"></a>
+
+- **P29 — As a parent, I can approve an on-time submission later through ChatGPT and MCP.** _Current behavior · revised._ Approval can follow the window/day cutoff. Preserve the original occurrence and submission time; do not reopen its old kid card. **Not current behavior:** [N05: Late or backdated completions](inventory.md#n05); [N18: Dedicated parent interface](inventory.md#n18); [N19: Clippy or Telegram management](inventory.md#n19).
+
+<a id="p30"></a>
+
+- **P30 — As a parent, I can see whether an approval succeeded, was already handled, or failed.** _Current behavior · revised._ Report the authoritative result in ChatGPT and prevent duplicate credit; Telegram may receive a notification. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N19: Clippy or Telegram management](inventory.md#n19).
+
+<a id="p31"></a>
+
+- **P31 — As a parent, I can record an eligible current completion through an agent.** _Current behavior · revised._ No generic parent backdate/future-date bypass. Later review of an existing on-time request is allowed separately. **Not current behavior:** [N05: Late or backdated completions](inventory.md#n05); [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p32"></a>
+
+- **P32 — As a parent, I can undo an exact completion through ChatGPT and MCP.** _Current behavior · revised._ Resolve the exact submission from the day/approval tools, then undo it once. The original amount and any affected +2 bonus are reversed atomically. Do not also make a manual star deduction for that same completion; no Telegram or parent-web undo buttons exist. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N19: Clippy or Telegram management](inventory.md#n19).
+
+<a id="p33"></a>
+
+- **P33 — As a parent, I can ask an agent to correct a recorded completion.** _Current behavior · revised._ Historical undo/correction is distinct from newly completing a past occurrence. No parent board controls. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p34"></a>
+
+- **P34 — As a parent, I can add or remove stars through an agent.** _Current behavior · revised._ Record manual adjustments explicitly; do not disguise them as completion of a missed chore. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
 
 ## Parent: define rewards
 
-- **P35 — As a parent, I can create a reward with a title, emoji, and star cost.** It requires a nonblank title and at least one valid kid. Costs are rounded to nonnegative whole stars; zero-cost rewards are allowed. The shared action defaults to a gift emoji, cost one, and perpetual availability. [Source][create-reward]
-- **P36 — As a parent, I can make a reward available to one kid or several kids.** Each kid spends their own stars and gets their own redemption record. There is no family-wide inventory quantity. [Source][assign-reward]
-- **P37 — As a parent, I can choose whether a reward is once per kid or repeatable.** One-off rewards become Taken separately for each kid; perpetual rewards remain redeemable whenever affordable. Neither type has a parent-approval step in the kid flow. [Source][reward-availability]
-- **P38 — As a parent, I can change a reward’s title, emoji, price, type, or assignments.** Changes affect future availability and purchases. Existing deductions/redemption costs remain recorded as they were; switching a perpetual reward to one-off makes any kid with a previous redemption ineligible. [Source][update-reward]
-- **P39 — As a parent, I can remove a reward from the catalog.** The Archive action deletes the reward and its redemption records, while retaining its negative star entries. This removes redemption history and does not refund anyone. There is no restore or redemption-cancellation action in the shared product actions. [Source][archive-reward]
-- **P40 — As a parent, I can redeem a reward for a kid using the same rules as the kid board.** The shared action validates eligibility and balance, records a redemption, and deducts stars immediately. It does not track whether the real-world reward has been delivered. [Source][redeem]
+<a id="p35"></a>
+
+- **P35 — As a parent, I can create and price rewards through an agent.** _Current behavior · revised._ The kid reward UI remains. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p36"></a>
+
+- **P36 — As a parent, I can assign rewards to kids through an agent.** _Current behavior · revised._ Retain independent eligibility and balances. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p37"></a>
+
+- **P37 — As a parent, I can choose once-per-kid or repeatable rewards through an agent.** _Current behavior · revised._ Retain the reward types; no parent reward-configuration UI. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p38"></a>
+
+- **P38 — As a parent, I can edit reward details, prices, types, and assignments through an agent.** _Current behavior · revised._ Preserve transaction history and authoritative purchase prices. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p39"></a>
+
+- **P39 — As a parent, I can remove a reward from availability through an agent.** _Current behavior · revised._ Removal must not silently destroy the history needed to explain spending. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p40"></a>
+
+- **P40 — As a parent, I can redeem an eligible reward for a kid through an agent.** _Current behavior · revised._ Use the same balance and eligibility rules as the kid action. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
 
 ## Parent: recognize last night’s bedtime behavior
 
-- **P41 — As a parent, I can record which kids were ready and in bed before Alexa’s bedtime announcement.** The bedtime page offers a fixed one-star option for being changed, brushed, and peed before that announcement the previous night. This is a manual parental judgment; there is no Alexa integration checking it. [Source][bedtime-templates]
-- **P42 — As a parent, I can record which kids had a delightful bedtime through waking up.** A second fixed option is worth two stars. I can choose it independently of the first option and select different kids for each. [Source][bedtime-templates]
-- **P43 — As a parent, I can turn the selected bedtime achievements into today’s morning chores.** Submission creates a separate one-off morning chore per selected kid and achievement. It does not award stars immediately; the kid claims them through the ordinary chore flow, with late-morning approval rules still applying. [Source][bedtime-create]
-- **P44 — As a parent, I can see which bedtime achievements already have chores for today.** Matching existing chores preselect the corresponding boxes. An ordinary repeat submission skips exact matching kid/title/value/date/morning chores instead of creating duplicates. Unchecking an existing choice does not remove its chore. [Source][bedtime-page]
-- **P45 — As a parent, I can see the outcome of a bedtime submission.** While saving, the submit button is disabled. Success reports the number created and already present, grouped by kid and achievement. No selection, unmatched kids, and failed saves produce explanatory messages. [Source][bedtime-form]
-- **P46 — As a parent, I can receive a morning reminder to record bedtime stars when the reminder endpoint is scheduled externally.** The handler only sends during 5:00–5:59am Pacific and includes both options plus a bedtime-page link. Telegram must be configured. The repository’s Vercel cron list is empty, so an active daily schedule is not established by this code; repeated calls in the window can send duplicates. [Source][bedtime-reminder]
+<a id="p41"></a>
+
+- **P41 — As a parent, I cannot record which kids were ready and in bed before Alexa’s bedtime announcement.** _Not current behavior · removed._ Remove the special last-night in-bed achievement template and workflow. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N20: Last-night bedtime recognition](inventory.md#n20).
+
+<a id="p42"></a>
+
+- **P42 — As a parent, I cannot record which kids had a delightful bedtime through waking up.** _Not current behavior · removed._ Remove the special delightful-night achievement template and workflow. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N20: Last-night bedtime recognition](inventory.md#n20).
+
+<a id="p43"></a>
+
+- **P43 — As a parent, I cannot turn the selected bedtime achievements into today’s morning chores.** _Not current behavior · removed._ Remove automatic creation of morning chores from last-night bedtime recognition. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N20: Last-night bedtime recognition](inventory.md#n20).
+
+<a id="p44"></a>
+
+- **P44 — As a parent, I cannot see which bedtime achievements already have chores for today.** _Not current behavior · removed._ Remove bedtime selections and duplicate-template discovery. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N20: Last-night bedtime recognition](inventory.md#n20).
+
+<a id="p45"></a>
+
+- **P45 — As a parent, I cannot see the outcome of a bedtime submission.** _Not current behavior · removed._ Remove bedtime submission/status/result UI and its specialized action. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N20: Last-night bedtime recognition](inventory.md#n20).
+
+<a id="p46"></a>
+
+- **P46 — As a parent, I cannot receive a morning reminder to record bedtime stars when the reminder endpoint is scheduled externally.** _Not current behavior · removed._ Remove dedicated bedtime reminder delivery, endpoint, and scheduling requirements. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N20: Last-night bedtime recognition](inventory.md#n20).
 
 ## Parent: stay informed and use the shared display
 
-- **P47 — As a parent, I can receive Telegram updates when kids complete or undo chores.** Completion messages include the kid, title, earned stars, running balance, and an Undo link when available. Undo messages include the removed amount and resulting balance. The ordinary completion message’s balance is computed before a newly awarded daily bonus; that bonus gets a separate message. [Source][notifications]
-- **P48 — As a parent, I can receive separate Telegram updates for skips, daily bonuses, and reward redemptions.** Skips name the chore and return date; bonuses name the award and updated balance; redemption messages name the reward and cost. There are no per-parent or per-event notification preferences in the product. [Source][skip]
-- **P49 — As a parent, I can have recorded chores and star changes survive a notification delivery failure.** Ordinary completion, undo, skip, and redemption notifications are best effort. Approval requests instead report sending failure because delivery is their purpose. There is no delivery history or retry queue in the product. [Source][notifications]
-- **P50 — As a parent, I can leave the main board on a shared display that refreshes and darkens when idle.** It polls every minute, refreshes at Pacific midnight, and enables the one-minute black-overlay timer when everyone is clear or at night. This behavior is automatic, with no settings UI. [Source][screen-saver]
-- **P51 — As a parent, I can see the same saved chores, stars, rewards, and colors on another unlocked device.** These live in shared storage. Packing checkmarks and sent-approval badges are browser-local exceptions. Concurrent edits can overwrite one another in the current persistence design. [Source][storage]
+<a id="p47"></a>
+
+- **P47 — As a parent, I can receive Telegram updates for completed and undone chores.** _Current behavior · revised._ New completion messages show the child, chore emoji/title, +stars and total balance. They have no [Chores] prefix or trailing Completion label/ID. Undo updates remain supported; exact submission IDs are looked up through tools, not copied from completion messages. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N19: Clippy or Telegram management](inventory.md#n19); [N23: Verbose completion and bonus logs](inventory.md#n23).
+
+<a id="p48"></a>
+
+- **P48 — As a parent, I can receive Telegram updates for period bonuses and reward redemptions.** _Current behavior · revised._ A bonus message says the child earned +2 bonus stars for completing the period and includes the resulting total balance, without the occurrence date. Reward redemption updates include the cost and resulting balance. No daily-bonus, skip, or dedicated bedtime-recognition updates are generated. **Not current behavior:** [N07: Skipping and skip credit](inventory.md#n07); [N09: Extra ten-star daily award](inventory.md#n09); [N18: Dedicated parent interface](inventory.md#n18); [N19: Clippy or Telegram management](inventory.md#n19); [N23: Verbose completion and bonus logs](inventory.md#n23).
+
+<a id="p49"></a>
+
+- **P49 — As a parent, I can have recorded changes survive Telegram delivery failures.** _Current behavior · revised._ Commit the domain change and durable notification outbox together. Delivery retries do not duplicate stars or redemptions. Telegram delivery is at least once, so a delivery/receipt crash can repeat a message; do not promise exactly-once messages. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N19: Clippy or Telegram management](inventory.md#n19).
+
+<a id="p50"></a>
+
+- **P50 — As a parent, I can leave the kid board on a shared display that refreshes and handles inactivity.** _Current behavior · revised._ The shared kid board refreshes, returns idle secondary panels to current chores, and uses the five-minute pure-black idle screen only from 8:30pm to 6am Pacific. It wakes automatically at 6am and accepts tap-to-wake overnight. This is not a parent dashboard or hardware brightness control. **Not current behavior:** [N17: Daytime blackout or visible sleep decoration](inventory.md#n17); [N18: Dedicated parent interface](inventory.md#n18); [N19: Clippy or Telegram management](inventory.md#n19).
+
+<a id="p51"></a>
+
+- **P51 — As a parent, I can have changes made through agents appear on the family’s kid devices.** _Current behavior · revised._ Agents manage the independent current /chores state via chores2\_\* MCP or pnpm chores2. Legacy /chores2 and unprefixed tools use a separate dataset. No continuing legacy/current balance or catalog synchronization occurs. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N19: Clippy or Telegram management](inventory.md#n19); [N22: Shared live legacy data or ongoing resync](inventory.md#n22).
 
 ## Parent: help the family pack
 
-- **P52 — As a parent, I can review each kid’s camping packing progress and the family total.** Every kid gets the same fourteen-item template, with individual checks and progress. Packing contributes no stars and does not automatically complete a packing-related chore. [Source][packing]
-- **P53 — As a parent, I can help pack by toggling items, marking a kid all packed, or clearing their list.** These controls are shared with kids and take effect immediately on the current browser. There is no parent sign-off or protection against a sibling changing another list. [Source][packing-bulk]
-- **P54 — As a parent, I can reset all packing checklists for another trip.** Reset trip clears the current browser’s entire packing state. There is one fixed template and no trip names, saved past trips, custom list editor, or cross-device packing sync. [Source][packing-reset]
+<a id="p52"></a>
 
-## The interaction states to carry into a rebuild
+- **P52 — As a parent, I can ask an agent for individual and family packing progress.** _Current behavior · revised._ Requires agent-accessible packing state rather than relying solely on one browser’s local storage. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N25: Browser-only packing](inventory.md#n25).
 
-These summarize the stories above; they are not additional features.
+<a id="p53"></a>
 
-| Interaction    | Start                          | Before committing                             | Commit                                     | Afterwards                                               | Cancel/failure                                                                      |
-| -------------- | ------------------------------ | --------------------------------------------- | ------------------------------------------ | -------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| Ordinary chore | Available card                 | Open details                                  | Complete task records earned stars         | Completed card, balance/progress refresh, possible bonus | Close details discards no work; request failure has limited UI                      |
-| Approval chore | Available, approval required   | Past date first warns; otherwise send request | Parent separately submits approval link    | Completion and stars appear on refresh                   | Closing request dialog does not retract Telegram; sending failure can retry         |
-| Skip           | Available today before cutoff  | Explicit confirmation                         | Save per-kid return date                   | Hidden, resolved progress, possible bonus                | Cancel before confirm; no kid unskip                                                |
-| Undo           | Completed card or notification | Board has no confirm; link has confirm        | Remove completion and possibly bonus       | Chore can reopen, balance falls                          | Closing link before submit changes nothing; stale-ID fallback is unsafe             |
-| Reward         | Listed card                    | Review price, balance, eligibility            | Redeem deducts stars and records purchase  | Celebration, Taken or available again                    | Close before submit changes nothing; closing after submit does not cancel it        |
-| Color          | Tap kid name                   | Select preset/custom                          | Save color                                 | Shared color updates                                     | Cancel discards selection; closing during an in-flight save does not abort the save |
-| Bedtime        | Today’s achievement choices    | Select kids for each achievement              | Create matching one-off chores             | Created/already-present summary                          | Leaving before submit saves nothing; unchecking is not deletion                     |
-| Packing        | Checklist                      | No staged draft                               | Each toggle/bulk/reset applies immediately | Local counts and storage update                          | No transaction undo; storage failure has no visible warning                         |
+- **P53 — As a parent, I can ask an agent to update a kid’s packing checklist.** _Current behavior · revised._ Retain individual, all-packed, and clear operations without a dedicated parent checklist UI. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N25: Browser-only packing](inventory.md#n25).
 
-## Boundaries that are not additional implemented features
+<a id="p54"></a>
 
-| Area             | Current boundary                                                                                                                                                                 |
-| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Family model     | Exactly three normalized kids, one shared family board, no family switching or independent role accounts                                                                         |
-| Parent decisions | Approve exists; reject, comment, request a redo, delegated approval, and an approval queue do not                                                                                |
-| Chore model      | Title and emoji, no description/subtasks/attachments/photos; fixed time groups; no custom deadlines, interval recurrence, alternating assignees, or chore dependencies           |
-| History          | Completion entries exist, but no kid-facing transaction ledger, immutable historical board, streaks, reward-spending history, or archived-item recovery in the included surfaces |
-| Skips            | A return-date field, not a dated skip-history event; no kid-facing unskip                                                                                                        |
-| Rewards          | Immediate star exchange; no fulfillment, reservation, refund/cancel flow, inventory stock, expiration, shopping basket, or approval                                              |
-| Packing          | Fixed template; no template editor, trip model, stars, attachments, approval, or cloud sync                                                                                      |
-| Reliability      | No offline queue, conflict detection, cross-device pending-request state, or delivery retry system                                                                               |
-| Preferences      | No mute, voice choice, reduced-animation setting, timezone setting, deadline editor, screen-saver setting, or notification preference controls                                   |
+- **P54 — As a parent, I can reset packing for another trip through an agent.** _Current behavior · revised._ The kid packing UI remains. Remote operation needs access to its authoritative state. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N25: Browser-only packing](inventory.md#n25).
 
-## Source references
+## Added rebuild capabilities
 
-[access]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/components/password-form.tsx:23
-[navigation]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/chores-nav.tsx:10
-[columns]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/kid-board.tsx:472
-[mobile]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/kid-board.tsx:460
-[board-page]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/page.tsx:39
-[dates]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/utils.ts:60
-[past-idle]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/kid-board.tsx:291
-[refresh]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/refresh-button.tsx:5
-[refresh-timers]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/kid-board.tsx:220
-[availability]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/utils.ts:228
-[chore-card]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/kid-board.tsx:1533
-[freshness]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/page.tsx:56
-[groups]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/kid-board.tsx:755
-[deadlines]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/utils.ts:14
-[auto-groups]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/kid-board.tsx:102
-[group-controls]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/kid-board.tsx:1019
-[group-idle]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/kid-board.tsx:814
-[sorting]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/utils.ts:485
-[progress-ui]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/kid-board.tsx:982
-[empty-board]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/kid-board.tsx:1012
-[chore-details]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/kid-board.tsx:1388
-[complete]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:239
-[celebration]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/kid-board.tsx:1270
-[perpetual]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/utils.ts:252
-[daily-bonus]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:154
-[bonus-dialog]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/kid-board.tsx:660
-[done]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/kid-board.tsx:1099
-[undo]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:540
-[bonus-revoke]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:191
-[balance]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/utils.ts:416
-[approval-reason]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/kid-board.tsx:125
-[request-approval]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:505
-[past-prompt]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/kid-board.tsx:533
-[approval-status]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/kid-board.tsx:589
-[approval-memory]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/kid-board.tsx:266
-[parent-complete]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:478
-[skip]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:706
-[skip-dialog]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/kid-board.tsx:1486
-[rewards-page]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/rewards/page.tsx:25
-[reward-sort]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/reward-board.tsx:153
-[reward-card]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/reward-board.tsx:205
-[reward-dialog]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/reward-board.tsx:277
-[redeem]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:1190
-[redeem-ui]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/reward-board.tsx:77
-[reward-availability]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/utils.ts:508
-[reward-idle]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/rewards/inactivity-redirect.tsx:11
-[color]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/kid-board.tsx:1157
-[color-save]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/kid-board.tsx:902
-[speech]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/api/chores/tts/route.ts:9
-[done-speech]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/kid-board.tsx:1665
-[styles]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/os-global.css:33
-[screen-saver]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/screen-saver.tsx:9
-[errors]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/error-boundary.tsx:15
-[packing]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/packing/page.tsx:25
-[packing-items]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/packing-checklist.tsx:17
-[packing-toggle]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/packing-checklist.tsx:271
-[packing-progress]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/packing-checklist.tsx:187
-[packing-bulk]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/packing-checklist.tsx:249
-[packing-reset]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/packing-checklist.tsx:133
-[packing-storage]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/packing-checklist.tsx:85
-[kid-management]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:881
-[create-chore]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:392
-[assign-chore]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:1008
-[one-off-date]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:1042
-[schedule-change]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:771
-[time-change]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:948
-[update-chore]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:795
-[archive-chore]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:924
-[pause]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:659
-[pause-all]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:674
-[snoozes]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/data.ts:17
+<a id="k70"></a>
 
-[approval-link]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/approve/[choreId]/route.ts:98
-[undo-link]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/undo/[completionId]/route.ts:96
-[star-adjustment]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:962
-[create-reward]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:1057
-[assign-reward]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:1127
-[update-reward]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:1148
-[archive-reward]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:1102
-[bedtime-templates]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/bedtime-approval/constants.ts:1
-[bedtime-create]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:1264
-[bedtime-page]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/bedtime-approval/page.tsx:64
-[bedtime-form]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/bedtime-approval/form.tsx:17
-[bedtime-reminder]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/api/cron/bedtime-approval/route.ts:25
-[notifications]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/actions.ts:330
-[storage]: /Users/mxstbr/projects/mxstbr/mxstbr.com/app/(os)/chores2/data.ts:207
+- **K70 — As a kid, I can earn two extra stars by completing every task in a nonempty time period and see my progress toward that bonus.** _Current behavior · added._ Award exactly +2 per child/Pacific day/nonempty named period once all remaining required work is approved. Parent-hidden work is excluded, including after opening; hiding itself grants no chore stars. Ordinary missed work remains unfulfilled. Late approval of an on-time request can settle its original period. Undo or restored requirements reconcile the award without duplicate net credit. No extra daily bonus, empty-period payout, or Bonus-period award. **Not current behavior:** [N09: Extra ten-star daily award](inventory.md#n09); [N10: Empty-period or Bonus-period payout](inventory.md#n10); [N11: Hidden work still required](inventory.md#n11); [N14: Dedicated Choose another button](inventory.md#n14).
 
-Source reviewed at commit `18910b2799e21b6fa5481d838e99cfea064013cd`; unrelated working-tree changes were present and left untouched. Inventory prepared September 8, 2026 Pacific.
+<a id="p55"></a>
+
+- **P55 — As a parent, I can set the order of each child’s chores within a time period through ChatGPT and MCP.** _Current behavior · added._ Persist explicit order per child/time group; changes appear without rewriting occurrence/submission facts. The September 8 list in routine-order.md was the initial order. Later explicit parent order changes become authoritative; weekday filtering and temporary kid selections preserve that sequence. **Not current behavior:** [N08: Automatic chore sorting](inventory.md#n08); [N18: Dedicated parent interface](inventory.md#n18).

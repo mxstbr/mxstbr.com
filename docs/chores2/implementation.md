@@ -1,6 +1,6 @@
-# Chores2 implementation
+# Chores implementation and deployment history
 
-Status: promoted to https://mxstbr.com/chores; the legacy board is at https://mxstbr.com/chores2. The original trial and its verification are recorded below. The goal covers every retained/revised/lower-priority requirement in rebuild-features.json plus K70/P55 and the approved playful iPad concept. Removed capabilities are explicitly excluded from the new product.
+The current product is https://mxstbr.com/chores; the separate legacy board is https://mxstbr.com/chores2. Use [inventory.md](inventory.md), [rebuild-scope.md](rebuild-scope.md), and [coverage.md](coverage.md) for the current behavior contract. The dated entries below preserve implementation and trial history; historical routes, snapshots, and verification results must not be read as instructions to restore superseded behavior.
 
 ## Concise Telegram notifications — September 21, 2026
 
@@ -26,7 +26,7 @@ Only balances are reconciled. Run `pnpm exec tsm scripts/promote-chores.ts initi
 
 Verification includes the existing domain suite, real Redis cutover tests on disposable keys, the 1024×680 kid flow, inherited/password login, and old-board rewards/packing navigation under `/chores2`.
 
-## Testing setup confirmed by Max
+## Original September 9 trial setup — historical
 
 Use a completely separate setup in the existing Upstash database. Copy the current kids, chore and reward definitions, history, entitlements, and exact balances once. After initialization /chores2 is independent; it does not spend or award stars in /chores. Keep the legacy application and writers untouched during this trial. No new infrastructure or account.
 
@@ -36,7 +36,7 @@ Parent commands for the trial are explicitly named chores2 tools on the existing
 
 Morning begins at 7am Pacific, retaining the existing baseline. Other boundaries: noon, 5pm, 8:15pm, 10pm. Between 10pm and 7am only eligible untimed Bonus work is available. Exact iPad/Safari hardware verification remains Max's acceptance step after deployment.
 
-## Delivery checklist
+## Original trial delivery checklist — historical
 
 - [x] Domain rules, occurrence snapshots, atomic ledger and idempotency
 - [x] Migration and reconciliation against current live catalog/history
@@ -67,11 +67,11 @@ Catalog mutations and board reads reconcile the period bonus in the same atomic 
 
 Verification: 33 deterministic checks passed, along with the real Redis concurrency/outbox test on disposable keys and a production build in a clean checkout. A read-only preview of September 21's live plan waived only the three muted bed occurrences, preserved every submission and ledger entry, and left balances unchanged.
 
-The new ledger and notification outbox commit atomically. Delivery is at least once: Telegram has no idempotent send API, so a crash after delivery but before its receipt is saved can repeat a notification, never a star award or redemption. One QStash schedule in the existing account drains retries every minute. Notifications use the existing chores group and are prefixed `[Chores2 test]` with no action buttons.
+The new ledger and notification outbox commit atomically. Delivery is at least once: Telegram has no idempotent send API, so a crash after delivery but before its receipt is saved can repeat a notification, never a star award or redemption. One QStash schedule in the existing account drains retries every minute. The original trial used `[Chores2 test]` in the existing chores group. Current notifications have no prefix and no action buttons; see the September 21 notification entry.
 
 Use `pnpm chores2 help` for import/status/agent commands, device invitation and notification setup. Import refuses to overwrite existing Chores2 keys. Device invitation URLs expire after 24 hours and are consumed once; sessions last 90 days and can be revoked through MCP. Invite URLs must remain private and must not be committed.
 
-## Production verification
+## Original September 9 production verification — historical
 
 Implementation commit `70bec91c6dee175103df26f15a3149615acb704a` passed the local build and Vercel production build, and was published through the existing master integration. Live verification confirmed all three columns at 1024×680, current-period-only payloads, counts-only summary, the six new MCP tools with existing parent authentication, and all 41/12 catalog definitions. A temporary invite was consumed once; its secure HttpOnly session could not adjust stars or call parent MCP tools. Replaying its invite failed, and revoking the test session immediately locked its board. No test chores were completed and no rewards purchased on the live copy.
 
@@ -81,7 +81,7 @@ The existing QStash account has schedule `chores2-notification-drain`, calling t
 
 ## Simplified iPad login
 
-Chores2 accepts the same `password` cookie as the original chore board. An iPad already signed into the site opens /chores2 directly. An unsigned device can type the same existing site password on /chores2; the login is saved for a year with an HttpOnly cookie. The login grants kid-only commands against the separate Chores2 data. Parent MCP authentication remains explicit and separate from browser cookies.
+Chores2 accepts the same `password` cookie as the original chore board. An iPad already signed into the site opens /chores directly. An unsigned device can type the same existing site password on /chores; the login is saved for a year with an HttpOnly cookie. The login grants kid-only commands against the separate Chores2 data. Parent MCP authentication remains explicit and separate from browser cookies.
 
 Invitation links and scoped sessions remain optional for compatibility. Revoking an invitation session does not sign out an independently valid site-password login.
 
