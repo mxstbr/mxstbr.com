@@ -2,7 +2,7 @@
 
 <!-- Generated from rebuild-features.json by node scripts/render-chores-behaviors.mjs. -->
 
-Audited 2026-09-21 against application commit `a2346a2 (with the September 21 legacy-removal and canonical-name changes)`. Current product: **/chores**. The legacy implementation has been removed.
+Audited 2026-09-21 against application commit `97b3f32f1a02c09cc7062fb7060bcace0e841956`. Current product: **/chores**. The legacy implementation has been removed.
 
 123 original IDs + 2 added requirements = 125 records; 105 current capabilities, 20 removed capabilities, and 28 explicit not-current-behavior rules.
 

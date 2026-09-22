@@ -1,6 +1,6 @@
 # Current chores scope and acceptance rules
 
-Updated September 21, 2026 for the legacy-removal and canonical-name changes following `a2346a2`. The [current inventory](inventory.md) and its [structured records](rebuild-features.json) enumerate all 123 original IDs and two added requirements. The [legacy audit](legacy-inventory.md) is historical evidence, not the current contract. Explicit exclusions are labeled **Not current behavior** in every current index.
+Updated September 21, 2026 against the legacy-removal and canonical-name implementation `97b3f32`. The [current inventory](inventory.md) and its [structured records](rebuild-features.json) enumerate all 123 original IDs and two added requirements. The [legacy audit](legacy-inventory.md) is historical evidence, not the current contract. Explicit exclusions are labeled **Not current behavior** in every current index.
 
 ## Product and access
 

@@ -3132,7 +3132,7 @@
     }
   ],
   "auditedAt": "2026-09-21",
-  "auditedSourceCommit": "a2346a2 (with the September 21 legacy-removal and canonical-name changes)",
+  "auditedSourceCommit": "97b3f32f1a02c09cc7062fb7060bcace0e841956",
   "currentDocument": "inventory.md",
   "legacyDocument": "legacy-inventory.md",
   "notCurrentBehaviors": [

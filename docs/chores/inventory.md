@@ -2,7 +2,7 @@
 
 <!-- Generated from rebuild-features.json by node scripts/render-chores-behaviors.mjs. -->
 
-Audited 2026-09-21 against application commit `a2346a2 (with the September 21 legacy-removal and canonical-name changes)`. Current product: **/chores**. The legacy implementation has been removed.
+Audited 2026-09-21 against application commit `97b3f32f1a02c09cc7062fb7060bcace0e841956`. Current product: **/chores**. The legacy implementation has been removed.
 
 This is the current behavior reference for a rebuild. Positive capabilities describe the shipped system. **Not current behavior** explicitly rejects an old or superseded behavior; it must not be rebuilt merely because legacy code or an old prototype contains it. Lower-priority capabilities are still implemented unless marked removed.
 
@@ -317,7 +317,7 @@ Applies to K02, K46. Basis: explicit decision.
 
 **Not current behavior:** The old board, prototype, dedicated admin/approval pages, old MCP tools, legacy CLI/importer, balance-cutover scripts, speech and bedtime-reminder endpoints are not supported or executable. The trial product names are not current routes or tool names.
 
-**Current behavior:** There is one /chores board, /api/chores/_ API, pnpm chores CLI and chores\__ MCP tool set. Minimal compatibility for stored identifiers preserves existing sessions, accepted submissions and command receipts. Retain the existing Redis schema namespace and financial history.
+**Current behavior:** There is one /chores board, /api/chores/\_ API, pnpm chores CLI and chores\_\_ MCP tool set. Minimal compatibility for stored identifiers preserves existing sessions, accepted submissions and command receipts. Retain the existing Redis schema namespace and financial history.
 
 Applies to K01, P01, P50. Basis: explicit decision.
 

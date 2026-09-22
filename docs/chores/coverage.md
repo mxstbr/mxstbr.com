@@ -2,7 +2,7 @@
 
 <!-- Generated from rebuild-features.json by node scripts/render-chores-behaviors.mjs. -->
 
-Audited 2026-09-21 against application commit `a2346a2 (with the September 21 legacy-removal and canonical-name changes)`. Current product: **/chores**. The legacy implementation has been removed.
+Audited 2026-09-21 against application commit `97b3f32f1a02c09cc7062fb7060bcace0e841956`. Current product: **/chores**. The legacy implementation has been removed.
 
 Evidence combines source inspection and the recorded checks. See implementation.md for the latest rename/removal verification; historical checks do not imply new physical-iPad verification. Excluded rows remain explicit requirements even though the legacy implementation has been deleted.
 
