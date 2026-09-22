@@ -58,3 +58,7 @@ pnpm reflect-append-daily-note --recording-id idx_example --content "Remember to
 ## License
 
 Licensed under the MIT License. Feel free to use parts of the code in your own projects with attribution!
+
+## Kids chores
+
+The kids use [`/chores`](https://mxstbr.com/chores). Agents manage the same system with `pnpm chores` or authenticated `chores_*` MCP tools. See [behavior inventory](docs/chores/inventory.md), [management instructions](docs/chores/managing.md), and [implementation/verification](docs/chores/implementation.md). The legacy implementation is removed.

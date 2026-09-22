@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { resolve } from 'node:path'
 
 const root = fileURLToPath(new URL('../', import.meta.url))
-const docs = resolve(root, 'docs/chores2')
+const docs = resolve(root, 'docs/chores')
 const data = JSON.parse(
   readFileSync(resolve(docs, 'rebuild-features.json'), 'utf8'),
 )
@@ -61,7 +61,7 @@ const cell = (value) =>
     .replaceAll('\n', ' ')
 const generated =
   '<!-- Generated from rebuild-features.json by node scripts/render-chores-behaviors.mjs. -->'
-const asOf = `Audited ${data.auditedAt} against application commit \`${data.auditedSourceCommit}\`. Current product: **/chores**. The separate legacy board is **/chores2**.`
+const asOf = `Audited ${data.auditedAt} against application commit \`${data.auditedSourceCommit}\`. Current product: **/chores**. The legacy implementation has been removed.`
 const count = `${data.features.length} original IDs + ${data.newFeatures.length} added requirements = ${features.length} records; ${features.filter((f) => f.isCurrentBehavior).length} current capabilities, ${features.filter((f) => !f.isCurrentBehavior).length} removed capabilities, and ${exclusions.size} explicit not-current-behavior rules.`
 
 const inventory = [
@@ -140,7 +140,7 @@ const coverage = [
   '',
   asOf,
   '',
-  'Evidence is source inspection plus the listed previously completed checks; this documentation update does not claim a new test run or new physical-iPad verification. Excluded rows document absence in the current product, regardless of separate legacy code.',
+  'Evidence combines source inspection and the recorded checks. See implementation.md for the latest rename/removal verification; historical checks do not imply new physical-iPad verification. Excluded rows remain explicit requirements even though the legacy implementation has been deleted.',
   '',
   '| ID | State | Current capability or explicit exclusion | Implementation evidence | Verification evidence |',
   '| --- | --- | --- | --- | --- |',

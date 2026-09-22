@@ -1,0 +1,3470 @@
+{
+  "status": "current_behavior_inventory",
+  "baselineSourceCommit": "18910b2799e21b6fa5481d838e99cfea064013cd",
+  "governingDocument": "rebuild-scope.md",
+  "newFeatures": [
+    {
+      "id": "K70",
+      "persona": "kid",
+      "disposition": "added",
+      "priority": "core",
+      "channel": "kid_board",
+      "targetStory": "As a kid, I can earn two extra stars by completing every task in a nonempty time period and see my progress toward that bonus.",
+      "targetNotes": "Award exactly +2 per child/Pacific day/nonempty named period once all remaining required work is approved. Parent-hidden work is excluded, including after opening; hiding itself grants no chore stars. Ordinary missed work remains unfulfilled. Late approval of an on-time request can settle its original period. Undo or restored requirements reconcile the award without duplicate net credit. No extra daily bonus, empty-period payout, or Bonus-period award.",
+      "basis": "explicit new two-star period completion requirement",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "domain.test.ts covers hidden started work, undone/pending history, remaining nonempty-period awards, empty periods, exclusive reappearance, cutoff-safe resume, late approval and exact undo/re-earn. Live September 21 bed mute was verified without a second debit."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N09", "N10", "N11", "N14"]
+    },
+    {
+      "id": "P55",
+      "persona": "parent",
+      "disposition": "added",
+      "priority": "core",
+      "channel": "chatgpt_mcp",
+      "targetStory": "As a parent, I can set the order of each child’s chores within a time period through ChatGPT and MCP.",
+      "targetNotes": "Persist explicit order per child/time group; changes appear without rewriting occurrence/submission facts. The September 8 list in routine-order.md was the initial order. Later explicit parent order changes become authoritative; weekday filtering and temporary kid selections preserve that sequence.",
+      "basis": "explicit instruction to retain the written routine order",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/service.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Authenticated MCP transport test, catalog/history/day snapshots, named command validation. Domain tests: CRUD, assignments, orders, metadata, reward archival and historical prices."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N08", "N18"]
+    }
+  ],
+  "newFeatureCount": 2,
+  "routineOrderSource": "routine-order.md",
+  "confirmedDecisions": {
+    "deviceTarget": "The existing shared old iPad in landscape only; three persistent child columns. No phone, portrait, or desktop layout requirement.",
+    "routineOrder": "Use the saved per-child/per-group order. The September 8 message was the initial seed, not an immutable replacement for later parent edits. Filter weekday/ineligible/pending/completed work without reordering the remaining tasks; a picker selection does not change the saved sequence.",
+    "periodBonus": "Award exactly +2 per child/Pacific day/nonempty named period once all remaining required work is approved. Parent-hidden work is excluded, including after opening; hiding itself grants no chore stars. Ordinary missed work remains unfulfilled. Late approval of an on-time request can settle its original period. Undo or restored requirements reconcile the award without duplicate net credit. No extra daily bonus, empty-period payout, or Bonus-period award.",
+    "timedChores": "Only the active named window is kid-visible and accepts new submissions.",
+    "untimedBonusChores": "Remain available anytime, subject to date/assignment/recurrence eligibility.",
+    "approvalAfterCutoff": "An on-time accepted submission remains approvable later, including after its day ends.",
+    "pastCompletion": "No new backdated or elapsed-window submissions; later review of an on-time request is distinct.",
+    "skip": "Removed; no skip progress, bonus, or notification behavior.",
+    "parentSurface": "ChatGPT through MCP for parent management and approvals. Telegram only delivers notifications; no Clippy, Telegram conversation or action buttons, or dedicated parent UI.",
+    "bedtimeRecognition": "Dedicated last-night recognition/templates/generated chores/reminders removed.",
+    "dataIsolation": "There is one /chores implementation, using the existing chores:mxstbr:v2 storage schema and live data. The retired board, prototype, admin/approval pages, old MCP tools, import and balance-cutover scripts are deleted. The original import and promotion remain recorded history; no reimport, reset or balance synchronization occurs. No new infrastructure.",
+    "deviceAccess": "Reuse the existing site-password login; already-unlocked iPads open /chores directly. Otherwise enter the same password. Invitation links remain optional.",
+    "choreSwitcher": "Tap the Finish this {timeframe} card to choose a current chore. No separate Choose another button. My progress remains inside the picker.",
+    "choreSpeech": "Removed: the kids can read their chores; no Hear it control or speech endpoint.",
+    "namedWindows": "Pacific windows are Morning 7am–noon, Afternoon noon–5pm, Evening 5pm–8:15pm, and Night 8:15pm–10pm, with exclusive closing boundaries. Between 10pm and 7am only eligible untimed Bonus work is available. Old timed cards and secondary selections close at a boundary; accepted pending requests remain recorded.",
+    "hiddenRequirements": "Merge existing per-child snoozes when updating that map. Hidden work is waived from targets even with pending/undone submissions, without deleting history or awarding chore stars. An on-time accepted request can still be reviewed later.",
+    "blackout": "Five idle minutes can trigger pure black only from 8:30pm inclusive until 6am exclusive in America/Los_Angeles, automatically following DST. At 8:30pm an already-idle board can black out; at 6am it clears automatically. Tapping wakes and refreshes. Focus/visibility return rechecks the schedule. No visible moon or text appears; webpage blackout does not change the hardware backlight.",
+    "quietAllClear": "Outstanding chores keep colorful raised columns, a solid card, emoji, and action button. Finished, empty, or awaiting-parent columns are subdued and say All done for now, Nothing to do right now, or Your part is done, with Go play only when the current state is confirmed. Pending approval uses a clock; failures/loading do not show an all-clear. This concerns the current window, not the whole day.",
+    "refresh": "The shared Refresh button calls window.location.reload(), loading a fresh document and app code. Automatic data refresh and the Reconnect action remain separate.",
+    "rewardsNavigation": "The shared header has Chores and Rewards tabs and a Packing button. Rewards opens all three catalogs; a child’s star balance opens only that child’s catalog. Secondary panels remain inside the child’s column.",
+    "progressDisplay": "The period card contains progress stamps and the +2 offer or earned/pending state. No second “0 of 5 done” line appears below it. Daily history is counts-only. Parent-hidden occurrences are excluded from targets; pending approval is not completion. Empty periods offer no bonus.",
+    "telegramCompletion": "New completion messages show the child, chore emoji/title, +stars and total balance. They have no [Chores] prefix or trailing Completion label/ID. Undo updates remain supported; exact submission IDs are looked up through tools, not copied from completion messages.",
+    "telegramBonus": "A bonus message says the child earned +2 bonus stars for completing the period and includes the resulting total balance, without the occurrence date. Reward redemption updates include the cost and resulting balance. No daily-bonus, skip, or dedicated bedtime-recognition updates are generated.",
+    "packingPersistence": "Packing is shared in Redis across authorized devices and agents. A one-time import can carry over the old browser checklist; subsequent progress does not depend on that browser’s local storage.",
+    "featurePriority": "K07–K09 counts-only summaries and K59 system appearance remain implemented at lower priority. K04/K05 small-screen selection was superseded by the accepted landscape-only target and is excluded.",
+    "canonicalNames": "Use pnpm chores, chores_* MCP tools, /api/chores/*, app/lib/chores, app/(chores), and docs/chores. The old board and API routes no longer exist. Stored pre-rename submission sources, device cookies and CLI receipt identity remain compatible to preserve accepted requests, sessions and deduplication."
+  },
+  "counts": {
+    "retained": 26,
+    "removed": 20,
+    "revised": 73,
+    "lower_priority": 4
+  },
+  "features": [
+    {
+      "id": "K01",
+      "persona": "kid",
+      "group": "Kid: get to my board",
+      "baselineStory": "As a kid, I can use the chore board on a device my family has unlocked.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/components/password-form.tsx#L23",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can use the chore board on a device my family has unlocked.",
+      "targetNotes": "Reuse the existing site-password cookie; an already-unlocked iPad opens /chores directly. Otherwise enter the same password, remembered for a year. This grants kid commands, not parent management. Optional scoped device invitations remain supported.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/auth.ts",
+          "app/(chores)/chores/login-form.tsx",
+          "app/api/chores/login/route.ts"
+        ],
+        "verification": "Login browser suite: existing site cookie, password entry/persistence, invalid password, origin checks, kid-only commands. Optional invitation sessions remain compatible."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N21", "N28"]
+    },
+    {
+      "id": "K02",
+      "persona": "kid",
+      "group": "Kid: get to my board",
+      "baselineStory": "As a kid, I can move between Chores, Rewards, and Packing.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/chores-nav.tsx#L10",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can move between Chores, Rewards, and Packing.",
+      "targetNotes": "The shared header has Chores and Rewards tabs and a Packing button. Rewards opens all three catalogs; a child’s star balance opens only that child’s catalog. Secondary panels remain inside the child’s column.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/board.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Current board/panel source and browser.spec.ts: shared Rewards, hard reload, period-card chooser, no duplicate count or speech control, and distinct outstanding/finished/empty/pending/error states."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N27"]
+    },
+    {
+      "id": "K03",
+      "persona": "kid",
+      "group": "Kid: get to my board",
+      "baselineStory": "As a kid, I can recognize my chores by my name and color.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L472",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can recognize my chores by my name and color.",
+      "targetNotes": "Dilan, Darian, and Devina have permanent landscape columns with independent balances, current chores, choices, and feedback. Their names retain the chosen identity colors even when their columns become subdued.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/board.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/use-board.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N01"]
+    },
+    {
+      "id": "K04",
+      "persona": "kid",
+      "group": "Kid: get to my board",
+      "baselineStory": "As a kid, I can choose whose chores to view on a small screen.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L460",
+      "disposition": "removed",
+      "priority": "none",
+      "targetStory": null,
+      "targetNotes": "Small-screen kid selector is outside the explicitly requested iPad-landscape-only rebuild. All three children remain visible in permanent columns.",
+      "basis": "explicit removal or directly implied dependency",
+      "channel": "none",
+      "implementation": {
+        "status": "excluded",
+        "files": [
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Excluded from the current product by explicit scope decisions; retained legacy code is not evidence of a current capability. See the referenced not-current-behavior rules."
+      },
+      "isCurrentBehavior": false,
+      "notBehaviorRefs": ["N01"],
+      "notBehavior": "As a kid, I cannot choose whose chores to view on a small screen."
+    },
+    {
+      "id": "K05",
+      "persona": "kid",
+      "group": "Kid: get to my board",
+      "baselineStory": "As a kid, I can open a link that selects my chore column on a small screen.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L460",
+      "disposition": "removed",
+      "priority": "none",
+      "targetStory": null,
+      "targetNotes": "Small-screen links selecting one kid are outside the explicitly requested iPad-landscape-only rebuild.",
+      "basis": "explicit removal or directly implied dependency",
+      "channel": "none",
+      "implementation": {
+        "status": "excluded",
+        "files": [
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Excluded from the current product by explicit scope decisions; retained legacy code is not evidence of a current capability. See the referenced not-current-behavior rules."
+      },
+      "isCurrentBehavior": false,
+      "notBehaviorRefs": ["N01"],
+      "notBehavior": "As a kid, I cannot open a link that selects my chore column on a small screen."
+    },
+    {
+      "id": "K06",
+      "persona": "kid",
+      "group": "Kid: get to my board",
+      "baselineStory": "As a kid, I can see which day I am viewing.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/page.tsx#L39",
+      "disposition": "revised",
+      "priority": "core",
+      "targetStory": "As a kid, I can see today and the current time window.",
+      "targetNotes": "Default board context is the current Pacific date/window, not a freely selected day.",
+      "basis": "consequence of requested changes",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/board.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/use-board.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N02"]
+    },
+    {
+      "id": "K07",
+      "persona": "kid",
+      "group": "Kid: get to my board",
+      "baselineStory": "As a kid, I can look backward and forward one day at a time.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/utils.ts#L60",
+      "disposition": "lower_priority",
+      "priority": "low",
+      "targetStory": "As a kid, I can browse counts-only daily progress backward and forward one day at a time.",
+      "targetNotes": "My progress is a counts-only daily summary reached from the current chore picker (or the My progress fallback when no period card is shown). Previous/next days show counts, pending work, and applicable star activity, never other-day chore titles or completion controls. This lower-priority capability is implemented.",
+      "basis": "explicit user priority change",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/panels.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/lib/chores/service.ts"
+        ],
+        "verification": "Counts-only date summary; Today action; 90-second inactivity return. Browser navigation and no hidden title assertions; timer review."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N02"]
+    },
+    {
+      "id": "K08",
+      "persona": "kid",
+      "group": "Kid: get to my board",
+      "baselineStory": "As a kid, I can jump back to today.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/page.tsx#L39",
+      "disposition": "lower_priority",
+      "priority": "low",
+      "targetStory": "As a kid, I can return my daily summary to today.",
+      "targetNotes": "Back to today changes the date of the counts-only summary. It does not select another date for the actionable chore board. This lower-priority capability is implemented.",
+      "basis": "explicit user priority change",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/panels.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/lib/chores/service.ts"
+        ],
+        "verification": "Counts-only date summary; Today action; 90-second inactivity return. Browser navigation and no hidden title assertions; timer review."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N02"]
+    },
+    {
+      "id": "K09",
+      "persona": "kid",
+      "group": "Kid: get to my board",
+      "baselineStory": "As a kid, I can leave a past or future day idle and have the board return to today.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L291",
+      "disposition": "lower_priority",
+      "priority": "low",
+      "targetStory": "As a kid, I can leave a daily summary idle and return to the current chore view.",
+      "targetNotes": "After 90 seconds without interaction, a secondary panel closes back to the current view; a global Rewards view also returns to Chores. It does not restore the legacy past/future chore-list mode. This lower-priority capability is implemented.",
+      "basis": "explicit user priority change",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/panels.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/lib/chores/service.ts"
+        ],
+        "verification": "Counts-only date summary; Today action; 90-second inactivity return. Browser navigation and no hidden title assertions; timer review."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N02"]
+    },
+    {
+      "id": "K10",
+      "persona": "kid",
+      "group": "Kid: get to my board",
+      "baselineStory": "As a kid, I can refresh the chore board manually.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/refresh-button.tsx#L5",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can refresh the chore board manually.",
+      "targetNotes": "The shared Refresh button calls window.location.reload(), loading a fresh document and app code. Automatic data refresh and the Reconnect action remain separate.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/board.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Current board/panel source and browser.spec.ts: shared Rewards, hard reload, period-card chooser, no duplicate count or speech control, and distinct outstanding/finished/empty/pending/error states."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N24"]
+    },
+    {
+      "id": "K11",
+      "persona": "kid",
+      "group": "Kid: get to my board",
+      "baselineStory": "As a kid, I can see changes made elsewhere appear on the chore board without refreshing it myself.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L220",
+      "disposition": "revised",
+      "priority": "core",
+      "targetStory": "As a kid, I can have my board reflect the current time window and changes made through ChatGPT and MCP.",
+      "targetNotes": "Refresh the data while visible, recheck after reconnect/focus/visibility return, and switch at authoritative Pacific boundaries. Server eligibility governs writes even if the device clock or a stale screen disagrees.",
+      "basis": "consequence of requested changes",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/board.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/use-board.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K12",
+      "persona": "kid",
+      "group": "Kid: understand what needs doing",
+      "baselineStory": "As a kid, I can see the chores assigned to me that are available for the viewed day.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/utils.ts#L228",
+      "disposition": "revised",
+      "priority": "core",
+      "targetStory": "As a kid, I can see my current-window chores and untimed Bonus chores that are eligible now.",
+      "targetNotes": "Never expose another named window through a URL, group, preview, or stale state. Honor kid assignment and authoritative time.",
+      "basis": "explicit current-time focus plus confirmed untimed exception",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/board.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/use-board.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N02", "N03"]
+    },
+    {
+      "id": "K13",
+      "persona": "kid",
+      "group": "Kid: understand what needs doing",
+      "baselineStory": "As a kid, I can recognize a chore by its title, emoji, and star value before acting.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L1533",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can recognize a chore by its title, emoji, and star value before acting.",
+      "targetNotes": "Show the chore’s existing assigned emoji prominently on its main card, and reuse it in the picker and Done list. Show its full title and star amount before submission.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/board.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/use-board.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K14",
+      "persona": "kid",
+      "group": "Kid: understand what needs doing",
+      "baselineStory": "As a kid, I can spot recently added chores.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/page.tsx#L56",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can spot recently added chores.",
+      "targetNotes": "Eligible cards and picker rows display New for chores created within the last 24 hours.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/service.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K15",
+      "persona": "kid",
+      "group": "Kid: understand what needs doing",
+      "baselineStory": "As a kid, I can find chores grouped by time of day.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L755",
+      "disposition": "revised",
+      "priority": "core",
+      "targetStory": "As a kid, I can focus on one current chore at a time and choose another through the period card.",
+      "targetNotes": "Each child sees one suggested actionable chore from the saved order. The Finish this {timeframe} card opens that child’s current chore picker; choosing a task changes only the temporary selection. Bonus chores has a separate always-reachable entry and is never automatically selected after required work.",
+      "basis": "explicit current-time focus plus confirmed untimed exception",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/board.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Current board/panel source and browser.spec.ts: shared Rewards, hard reload, period-card chooser, no duplicate count or speech control, and distinct outstanding/finished/empty/pending/error states."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N03", "N12", "N14", "N26"]
+    },
+    {
+      "id": "K16",
+      "persona": "kid",
+      "group": "Kid: understand what needs doing",
+      "baselineStory": "As a kid, I can see the deadline for each timed group.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/utils.ts#L14",
+      "disposition": "revised",
+      "priority": "core",
+      "targetStory": "As a kid, I can see when my current chore window ends.",
+      "targetNotes": "New submissions stop at the cutoff. Untimed Bonus work has no time-group cutoff, but remains subject to its date/recurrence eligibility.",
+      "basis": "consequence of requested changes",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/board.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/use-board.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N04"]
+    },
+    {
+      "id": "K17",
+      "persona": "kid",
+      "group": "Kid: understand what needs doing",
+      "baselineStory": "As a kid, I can have the board emphasize the relevant time of day automatically.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L102",
+      "disposition": "revised",
+      "priority": "core",
+      "targetStory": "As a kid, I can have the next time window’s chores replace the previous window’s chores automatically.",
+      "targetNotes": "Pacific windows are Morning 7am–noon, Afternoon noon–5pm, Evening 5pm–8:15pm, and Night 8:15pm–10pm, with exclusive closing boundaries. Between 10pm and 7am only eligible untimed Bonus work is available. Old timed cards and secondary selections close at a boundary; accepted pending requests remain recorded.",
+      "basis": "explicit extreme current-time focus",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/board.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/use-board.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N03", "N04"]
+    },
+    {
+      "id": "K18",
+      "persona": "kid",
+      "group": "Kid: understand what needs doing",
+      "baselineStory": "As a kid, I can expand or collapse a group myself.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L1019",
+      "disposition": "removed",
+      "priority": "none",
+      "targetStory": null,
+      "targetNotes": "Remove time-group expansion/collapse. Non-current windows are absent, not hidden behind controls.",
+      "basis": "explicit removal or directly implied dependency",
+      "channel": "none",
+      "implementation": {
+        "status": "excluded",
+        "files": [
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Excluded from the current product by explicit scope decisions; retained legacy code is not evidence of a current capability. See the referenced not-current-behavior rules."
+      },
+      "isCurrentBehavior": false,
+      "notBehaviorRefs": ["N03"],
+      "notBehavior": "As a kid, I cannot expand or collapse a group myself."
+    },
+    {
+      "id": "K19",
+      "persona": "kid",
+      "group": "Kid: understand what needs doing",
+      "baselineStory": "As a kid, I can leave extra groups open while I am interacting.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L814",
+      "disposition": "removed",
+      "priority": "none",
+      "targetStory": null,
+      "targetNotes": "Remove persistent/manual group expansion and idle recollapse behavior, including Evening overlap.",
+      "basis": "explicit removal or directly implied dependency",
+      "channel": "none",
+      "implementation": {
+        "status": "excluded",
+        "files": [
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Excluded from the current product by explicit scope decisions; retained legacy code is not evidence of a current capability. See the referenced not-current-behavior rules."
+      },
+      "isCurrentBehavior": false,
+      "notBehaviorRefs": ["N03"],
+      "notBehavior": "As a kid, I cannot leave extra groups open while I am interacting."
+    },
+    {
+      "id": "K20",
+      "persona": "kid",
+      "group": "Kid: understand what needs doing",
+      "baselineStory": "As a kid, I can see ordinary chores before repeat-anytime chores within a time group.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/utils.ts#L485",
+      "disposition": "revised",
+      "priority": "core",
+      "targetStory": "As a kid, I can follow my chores in the order my parent specified for the current time period.",
+      "targetNotes": "Use the saved per-child/per-group order. The September 8 message was the initial seed, not an immutable replacement for later parent edits. Filter weekday/ineligible/pending/completed work without reordering the remaining tasks; a picker selection does not change the saved sequence.",
+      "basis": "explicit instruction: use the September 8 Kids chores list order",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/board.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/use-board.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N08", "N14"]
+    },
+    {
+      "id": "K21",
+      "persona": "kid",
+      "group": "Kid: understand what needs doing",
+      "baselineStory": "As a kid, I can see my daily progress and the ten-star bonus target.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L982",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a kid, I can see my current-period progress and two-star bonus opportunity.",
+      "targetNotes": "The period card contains progress stamps and the +2 offer or earned/pending state. No second “0 of 5 done” line appears below it. Daily history is counts-only. Parent-hidden occurrences are excluded from targets; pending approval is not completion. Empty periods offer no bonus.",
+      "basis": "September 19 clarification: period bonuses replace the daily bonus",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/board.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Current board/panel source and browser.spec.ts: shared Rewards, hard reload, period-card chooser, no duplicate count or speech control, and distinct outstanding/finished/empty/pending/error states."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N09", "N10", "N11", "N15"]
+    },
+    {
+      "id": "K22",
+      "persona": "kid",
+      "group": "Kid: understand what needs doing",
+      "baselineStory": "As a kid, I can see an all-clear message when my open chore list is empty.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L1012",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a kid, I can see when I have no open chores in the current window.",
+      "targetNotes": "Outstanding chores keep colorful raised columns, a solid card, emoji, and action button. Finished, empty, or awaiting-parent columns are subdued and say All done for now, Nothing to do right now, or Your part is done, with Go play only when the current state is confirmed. Pending approval uses a clock; failures/loading do not show an all-clear. This concerns the current window, not the whole day.",
+      "basis": "consequence of requested changes",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/board.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Current board/panel source and browser.spec.ts: shared Rewards, hard reload, period-card chooser, no duplicate count or speech control, and distinct outstanding/finished/empty/pending/error states."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N12", "N13"]
+    },
+    {
+      "id": "K23",
+      "persona": "kid",
+      "group": "Kid: understand what needs doing",
+      "baselineStory": "As a kid, I can see daily chores return on their next scheduled day.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/utils.ts#L228",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a kid, I can see a daily chore when its next daily occurrence is eligible.",
+      "targetNotes": "The next occurrence is distinct from yesterday’s missed work. Named time windows and the untimed exception apply.",
+      "basis": "consequence of requested changes",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/service.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K24",
+      "persona": "kid",
+      "group": "Kid: understand what needs doing",
+      "baselineStory": "As a kid, I can see weekly chores on the weekdays selected for them.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/utils.ts#L228",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a kid, I can see a weekly chore when its next scheduled occurrence is eligible.",
+      "targetNotes": "Honor scheduled weekdays plus the current time window or untimed eligibility; no overdue catch-up path.",
+      "basis": "consequence of requested changes",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/service.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K25",
+      "persona": "kid",
+      "group": "Kid: understand what needs doing",
+      "baselineStory": "As a kid, I can keep seeing an unfinished one-off chore after its scheduled day.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/utils.ts#L228",
+      "disposition": "removed",
+      "priority": "none",
+      "targetStory": null,
+      "targetNotes": "Remove automatic overdue one-off carryover. A parent may explicitly schedule a new eligible opportunity; this does not backdate the missed occurrence.",
+      "basis": "explicit removal or directly implied dependency",
+      "channel": "none",
+      "implementation": {
+        "status": "excluded",
+        "files": [
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Excluded from the current product by explicit scope decisions; retained legacy code is not evidence of a current capability. See the referenced not-current-behavior rules."
+      },
+      "isCurrentBehavior": false,
+      "notBehaviorRefs": ["N05", "N06"],
+      "notBehavior": "As a kid, I cannot keep seeing an unfinished one-off chore after its scheduled day."
+    },
+    {
+      "id": "K26",
+      "persona": "kid",
+      "group": "Kid: complete chores, earn stars, and correct mistakes",
+      "baselineStory": "As a kid, I can open a chore to choose what to do.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L1388",
+      "disposition": "revised",
+      "priority": "core",
+      "targetStory": "As a kid, I can open an eligible chore to complete it or request required approval.",
+      "targetNotes": "The main chore card completes directly or sends the explicitly required approval request. The period card opens the picker. There is no ordinary completion-detail dialog, skip action, or Hear it control; an expired occurrence is rejected by the service.",
+      "basis": "consequence of requested changes",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/board.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Current board/panel source and browser.spec.ts: shared Rewards, hard reload, period-card chooser, no duplicate count or speech control, and distinct outstanding/finished/empty/pending/error states."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N07", "N14", "N16", "N26"]
+    },
+    {
+      "id": "K27",
+      "persona": "kid",
+      "group": "Kid: complete chores, earn stars, and correct mistakes",
+      "baselineStory": "As a kid, I can complete an eligible chore today and receive its stars.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L239",
+      "disposition": "revised",
+      "priority": "core",
+      "targetStory": "As a kid, I can complete an occurrence that is eligible now and receive its stars.",
+      "targetNotes": "No early, backdated, or elapsed-window submissions. Enforce on the server. On-time approval requests may be settled later.",
+      "basis": "consequence of requested changes",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/board.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/use-board.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N05"]
+    },
+    {
+      "id": "K28",
+      "persona": "kid",
+      "group": "Kid: complete chores, earn stars, and correct mistakes",
+      "baselineStory": "As a kid, I can celebrate a successful chore completion with animation and sound.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L1270",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can celebrate a successful chore completion with animation and sound.",
+      "targetNotes": "Confirmed completion gives local star feedback and a short sound/animation, then returns to the next eligible chore. Pending approval and failed writes do not celebrate. Reduced-motion styles suppress movement.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/board.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/use-board.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N13"]
+    },
+    {
+      "id": "K29",
+      "persona": "kid",
+      "group": "Kid: complete chores, earn stars, and correct mistakes",
+      "baselineStory": "As a kid, I can complete a perpetual chore repeatedly.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/utils.ts#L252",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a kid, I can earn a repeatable chore again when it is eligible.",
+      "targetNotes": "Repeatable work can be performed again when eligible, subject to the service’s five-second cooldown and any approval requirement. Untimed work remains available anytime; timed work stays window-gated. One approved occurrence fulfills a timed period target, not endless repetitions.",
+      "basis": "consequence of requested changes",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/service.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K30",
+      "persona": "kid",
+      "group": "Kid: complete chores, earn stars, and correct mistakes",
+      "baselineStory": "As a kid, I can earn ten extra stars when I resolve my final expected chore for a day.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L154",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a kid, I can earn two extra stars after completing every task in a nonempty time period.",
+      "targetNotes": "The +2 award belongs to each child/Pacific day/nonempty named period. This replaces the old +10 daily award. Complete the remaining unhidden requirements; timely pending submissions may settle their original period later. Empty periods and untimed Bonus work create no period payout.",
+      "basis": "September 19 clarification: period bonuses replace the daily bonus",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "domain.test.ts covers hidden started work, undone/pending history, remaining nonempty-period awards, empty periods, exclusive reappearance, cutoff-safe resume, late approval and exact undo/re-earn. Live September 21 bed mute was verified without a second debit."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N07", "N09", "N10", "N11"]
+    },
+    {
+      "id": "K31",
+      "persona": "kid",
+      "group": "Kid: complete chores, earn stars, and correct mistakes",
+      "baselineStory": "As a kid, I can see and dismiss a daily-bonus celebration.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L660",
+      "disposition": "removed",
+      "priority": "none",
+      "targetStory": null,
+      "targetNotes": "Remove the ten-star daily-bonus dialog. Period progress still shows its earned two-star award.",
+      "basis": "Explicit replacement of daily bonus with period bonuses",
+      "channel": "none",
+      "implementation": {
+        "status": "excluded",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Excluded from the current product by explicit scope decisions; retained legacy code is not evidence of a current capability. See the referenced not-current-behavior rules."
+      },
+      "isCurrentBehavior": false,
+      "notBehaviorRefs": ["N09"],
+      "notBehavior": "As a kid, I cannot see and dismiss a daily-bonus celebration."
+    },
+    {
+      "id": "K32",
+      "persona": "kid",
+      "group": "Kid: complete chores, earn stars, and correct mistakes",
+      "baselineStory": "As a kid, I can review completed chores for the viewed day.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L1099",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a kid, I can review completions from the current time window and today’s untimed work.",
+      "targetNotes": "Do not reintroduce other named groups, historical completion actions, or group persistence timers.",
+      "basis": "consequence of requested changes",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Domain suite: 2-star nonempty periods with no daily award, pending/missed work, undo/re-earn, exact records, midnight. Browser: period bonus and undo. Opening balances were historically reconciled; the retired importer is no longer executable."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N02"]
+    },
+    {
+      "id": "K33",
+      "persona": "kid",
+      "group": "Kid: complete chores, earn stars, and correct mistakes",
+      "baselineStory": "As a kid, I can undo a displayed completion.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L540",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a kid, I can undo one of my displayed completions.",
+      "targetNotes": "Only currently displayed current-window/untimed completions are kid-accessible. Undo must target that exact record; historical parent corrections use agents.",
+      "basis": "consequence of requested changes",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Domain suite: 2-star nonempty periods with no daily award, pending/missed work, undo/re-earn, exact records, midnight. Browser: period bonus and undo. Opening balances were historically reconciled; the retired importer is no longer executable."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K34",
+      "persona": "kid",
+      "group": "Kid: complete chores, earn stars, and correct mistakes",
+      "baselineStory": "As a kid, I can have my balance reflect losing a daily bonus when I undo a required chore.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L191",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a kid, I can have my balance reflect losing a period bonus when I undo a required chore.",
+      "targetNotes": "Undo reverses the +2 award if it makes the remaining required period incomplete. A legitimate re-completion can restore one net bonus. Historical daily-bonus ledger entries remain; no new daily bonuses or daily-bonus dialog are created.",
+      "basis": "September 19 clarification: period bonuses replace the daily bonus",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "domain.test.ts covers hidden started work, undone/pending history, remaining nonempty-period awards, empty periods, exclusive reappearance, cutoff-safe resume, late approval and exact undo/re-earn. Live September 21 bed mute was verified without a second debit."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N09", "N11"]
+    },
+    {
+      "id": "K35",
+      "persona": "kid",
+      "group": "Kid: complete chores, earn stars, and correct mistakes",
+      "baselineStory": "As a kid, I can carry my unspent star balance from day to day.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/utils.ts#L416",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can carry my unspent star balance from day to day.",
+      "targetNotes": "The independent current-system ledger keeps unspent stars across days, adds earned credits, and subtracts purchases/explicit reversals. Legacy balances were reconciled at promotion, not continuously synchronized afterward.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Domain suite: 2-star nonempty periods with no daily award, pending/missed work, undo/re-earn, exact records, midnight. Browser: period bonus and undo. Opening balances were historically reconciled; the retired importer is no longer executable."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N22"]
+    },
+    {
+      "id": "K36",
+      "persona": "kid",
+      "group": "Kid: ask for parent approval",
+      "baselineStory": "As a kid, I can recognize when completing a chore needs a parent.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L125",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a kid, I can recognize an eligible chore that explicitly needs parent approval.",
+      "targetNotes": "Deadline expiry no longer creates an approval opportunity; the expired timed chore leaves the kid view.",
+      "basis": "consequence of requested changes",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/service.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N05"]
+    },
+    {
+      "id": "K37",
+      "persona": "kid",
+      "group": "Kid: ask for parent approval",
+      "baselineStory": "As a kid, I can ask a parent to approve a chore.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L505",
+      "disposition": "revised",
+      "priority": "core",
+      "targetStory": "As a kid, I can submit an eligible chore for parent approval.",
+      "targetNotes": "Persist the occurrence and authoritative on-time submission before Telegram delivery. No new requests for earlier days or closed time groups.",
+      "basis": "consequence of requested changes",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/service.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N05"]
+    },
+    {
+      "id": "K38",
+      "persona": "kid",
+      "group": "Kid: ask for parent approval",
+      "baselineStory": "As a kid, I can request credit for a past day after an extra confirmation.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L533",
+      "disposition": "removed",
+      "priority": "none",
+      "targetStory": null,
+      "targetNotes": "Remove past-day and elapsed-time-group completion requests, their prompt, and any late-request approval escape hatch.",
+      "basis": "explicit removal or directly implied dependency",
+      "channel": "none",
+      "implementation": {
+        "status": "excluded",
+        "files": [
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Excluded from the current product by explicit scope decisions; retained legacy code is not evidence of a current capability. See the referenced not-current-behavior rules."
+      },
+      "isCurrentBehavior": false,
+      "notBehaviorRefs": ["N05", "N07"],
+      "notBehavior": "As a kid, I cannot request credit for a past day after an extra confirmation."
+    },
+    {
+      "id": "K39",
+      "persona": "kid",
+      "group": "Kid: ask for parent approval",
+      "baselineStory": "As a kid, I can see whether an approval request is sending, sent, or failed.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L589",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a kid, I can see whether my valid approval submission was accepted and whether sending its notification needs retrying.",
+      "targetNotes": "Separate durable request acceptance from Telegram delivery so notification failures do not lose an on-time submission. Closing a prompt does not retract it.",
+      "basis": "consequence of requested changes",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/service.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K40",
+      "persona": "kid",
+      "group": "Kid: ask for parent approval",
+      "baselineStory": "As a kid, I can see that I already requested approval for a chore on this device.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L266",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a kid, I can see that my eligible chore is awaiting parent approval.",
+      "targetNotes": "Use durable per-occurrence request identity rather than a permanent browser-only marker. Old timed cards stay hidden after cutoff; their request still exists for parent review.",
+      "basis": "consequence of requested changes",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/service.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N13"]
+    },
+    {
+      "id": "K41",
+      "persona": "kid",
+      "group": "Kid: ask for parent approval",
+      "baselineStory": "As a kid, I can receive approved stars when my parent acts remotely.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L478",
+      "disposition": "revised",
+      "priority": "core",
+      "targetStory": "As a kid, I can receive stars when my parent approves my on-time submission later.",
+      "targetNotes": "Later review may occur after the window or day ends. Credit belongs to the original occurrence. Update balance/progress without reopening the old timed chore.",
+      "basis": "explicit answer: keep on-time submissions approvable later",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/service.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N05"]
+    },
+    {
+      "id": "K42",
+      "persona": "kid",
+      "group": "Kid: skip for today",
+      "baselineStory": "As a kid, I can skip my assignment for the rest of today before its deadline.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L706",
+      "disposition": "removed",
+      "priority": "none",
+      "targetStory": null,
+      "targetNotes": "Remove the skip entry action as well as the follow-on K43–K45 behaviors.",
+      "basis": "explicit removal or directly implied dependency",
+      "channel": "none",
+      "implementation": {
+        "status": "excluded",
+        "files": [
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Excluded from the current product by explicit scope decisions; retained legacy code is not evidence of a current capability. See the referenced not-current-behavior rules."
+      },
+      "isCurrentBehavior": false,
+      "notBehaviorRefs": ["N07"],
+      "notBehavior": "As a kid, I cannot skip my assignment for the rest of today before its deadline."
+    },
+    {
+      "id": "K43",
+      "persona": "kid",
+      "group": "Kid: skip for today",
+      "baselineStory": "As a kid, I can change my mind before confirming a skip.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L1486",
+      "disposition": "removed",
+      "priority": "none",
+      "targetStory": null,
+      "targetNotes": "Remove skip confirmation, cancellation, and unskip-related UX.",
+      "basis": "explicit removal or directly implied dependency",
+      "channel": "none",
+      "implementation": {
+        "status": "excluded",
+        "files": [
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Excluded from the current product by explicit scope decisions; retained legacy code is not evidence of a current capability. See the referenced not-current-behavior rules."
+      },
+      "isCurrentBehavior": false,
+      "notBehaviorRefs": ["N07"],
+      "notBehavior": "As a kid, I cannot change my mind before confirming a skip."
+    },
+    {
+      "id": "K44",
+      "persona": "kid",
+      "group": "Kid: skip for today",
+      "baselineStory": "As a kid, I can skip my part without hiding the chore from my siblings.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L706",
+      "disposition": "removed",
+      "priority": "none",
+      "targetStory": null,
+      "targetNotes": "Remove kid-triggered per-assignment skipping.",
+      "basis": "explicit removal or directly implied dependency",
+      "channel": "none",
+      "implementation": {
+        "status": "excluded",
+        "files": [
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Excluded from the current product by explicit scope decisions; retained legacy code is not evidence of a current capability. See the referenced not-current-behavior rules."
+      },
+      "isCurrentBehavior": false,
+      "notBehaviorRefs": ["N07"],
+      "notBehavior": "As a kid, I cannot skip my part without hiding the chore from my siblings."
+    },
+    {
+      "id": "K45",
+      "persona": "kid",
+      "group": "Kid: skip for today",
+      "baselineStory": "As a kid, I can have a skipped chore count toward finishing my day.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L706",
+      "disposition": "removed",
+      "priority": "none",
+      "targetStory": null,
+      "targetNotes": "Remove skip-based progress, daily bonus eligibility, and notifications.",
+      "basis": "explicit removal or directly implied dependency",
+      "channel": "none",
+      "implementation": {
+        "status": "excluded",
+        "files": [
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Excluded from the current product by explicit scope decisions; retained legacy code is not evidence of a current capability. See the referenced not-current-behavior rules."
+      },
+      "isCurrentBehavior": false,
+      "notBehaviorRefs": ["N07"],
+      "notBehavior": "As a kid, I cannot have a skipped chore count toward finishing my day."
+    },
+    {
+      "id": "K46",
+      "persona": "kid",
+      "group": "Kid: spend stars on rewards",
+      "baselineStory": "As a kid, I can browse rewards assigned to me alongside my current balance.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/rewards/page.tsx#L25",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can browse rewards assigned to me alongside my current balance.",
+      "targetNotes": "Open Rewards in the shared header for all three children or tap one child’s balance. Each catalog shows only rewards assigned to that child alongside their spendable balance.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/board.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Current board/panel source and browser.spec.ts: shared Rewards, hard reload, period-card chooser, no duplicate count or speech control, and distinct outstanding/finished/empty/pending/error states."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N27"]
+    },
+    {
+      "id": "K47",
+      "persona": "kid",
+      "group": "Kid: spend stars on rewards",
+      "baselineStory": "As a kid, I can find cheaper rewards first.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/reward-board.tsx#L153",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can find cheaper rewards first.",
+      "targetNotes": "Available assigned rewards are sorted by ascending cost.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx",
+          "app/(chores)/chores/sounds.ts"
+        ],
+        "verification": "Browser suite: cheap-first catalog, details/cancel, affordability and purchase. Domain/Redis: one-off entitlements, repeat purchases, stale price and competing purchases."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K48",
+      "persona": "kid",
+      "group": "Kid: spend stars on rewards",
+      "baselineStory": "As a kid, I can see which rewards I can afford and how many more stars I need.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/reward-board.tsx#L205",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can see which rewards I can afford and how many more stars I need.",
+      "targetNotes": "Reward rows show You can get this, the remaining stars needed, or Already yours for a redeemed one-off. The detail view shows the resulting balance; unavailable purchases are disabled and also rejected by the service.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx",
+          "app/(chores)/chores/sounds.ts"
+        ],
+        "verification": "Browser suite: cheap-first catalog, details/cancel, affordability and purchase. Domain/Redis: one-off entitlements, repeat purchases, stale price and competing purchases."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K49",
+      "persona": "kid",
+      "group": "Kid: spend stars on rewards",
+      "baselineStory": "As a kid, I can inspect a reward before spending stars.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/reward-board.tsx#L277",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can inspect a reward before spending stars.",
+      "targetNotes": "Open reward details to see its emoji, title, cost, and resulting balance, then choose Get this reward or Keep my stars/Back.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx",
+          "app/(chores)/chores/sounds.ts"
+        ],
+        "verification": "Browser suite: cheap-first catalog, details/cancel, affordability and purchase. Domain/Redis: one-off entitlements, repeat purchases, stale price and competing purchases."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K50",
+      "persona": "kid",
+      "group": "Kid: spend stars on rewards",
+      "baselineStory": "As a kid, I can redeem an available reward when I have enough stars.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L1190",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can redeem an available reward when I have enough stars.",
+      "targetNotes": "The service checks assignment, availability, one-off entitlement, current balance, and the price shown before committing the debit and redemption together. Retries cannot duplicate spending.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx",
+          "app/(chores)/chores/sounds.ts"
+        ],
+        "verification": "Browser suite: cheap-first catalog, details/cancel, affordability and purchase. Domain/Redis: one-off entitlements, repeat purchases, stale price and competing purchases."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K51",
+      "persona": "kid",
+      "group": "Kid: spend stars on rewards",
+      "baselineStory": "As a kid, I can celebrate a successful redemption.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/reward-board.tsx#L77",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can celebrate a successful redemption.",
+      "targetNotes": "A confirmed redemption plays the reward effect and returns to the applicable child view. A failed purchase does not celebrate or spend stars.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx",
+          "app/(chores)/chores/sounds.ts"
+        ],
+        "verification": "Browser suite: cheap-first catalog, details/cancel, affordability and purchase. Domain/Redis: one-off entitlements, repeat purchases, stale price and competing purchases."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K52",
+      "persona": "kid",
+      "group": "Kid: spend stars on rewards",
+      "baselineStory": "As a kid, I can recognize a one-off reward I have already taken.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/utils.ts#L508",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can recognize a one-off reward I have already taken.",
+      "targetNotes": "A redeemed one-off reward remains recognizable as Already yours and cannot be purchased again by that child.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx",
+          "app/(chores)/chores/sounds.ts"
+        ],
+        "verification": "Browser suite: cheap-first catalog, details/cancel, affordability and purchase. Domain/Redis: one-off entitlements, repeat purchases, stale price and competing purchases."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K53",
+      "persona": "kid",
+      "group": "Kid: spend stars on rewards",
+      "baselineStory": "As a kid, I can redeem a repeatable reward again while I can afford it.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L1190",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can redeem a repeatable reward again while I can afford it.",
+      "targetNotes": "A perpetual reward can be purchased repeatedly while the child remains assigned, it is available, and enough stars remain.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx",
+          "app/(chores)/chores/sounds.ts"
+        ],
+        "verification": "Browser suite: cheap-first catalog, details/cancel, affordability and purchase. Domain/Redis: one-off entitlements, repeat purchases, stale price and competing purchases."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K54",
+      "persona": "kid",
+      "group": "Kid: spend stars on rewards",
+      "baselineStory": "As a kid, I can leave Rewards idle and return automatically to Chores.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/rewards/inactivity-redirect.tsx#L11",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a kid, I can leave Rewards idle and return automatically to the current chore view.",
+      "targetNotes": "After 90 seconds without interaction, Rewards returns to current Chores. Opening/using reward details counts as interaction. A period/day change also resets stale secondary views.",
+      "basis": "consequence of requested changes",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/board.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Current board/panel source and browser.spec.ts: shared Rewards, hard reload, period-card chooser, no duplicate count or speech control, and distinct outstanding/finished/empty/pending/error states."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K55",
+      "persona": "kid",
+      "group": "Kid: personalize the board and get help",
+      "baselineStory": "As a kid, I can choose the color of my column.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L1157",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can choose the color of my column.",
+      "targetNotes": "Tap the child’s name to open the color picker, choose a preset or custom color, and save it to shared state.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/panels.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores.css"
+        ],
+        "verification": "Browser: color cancel/save, light and dark screenshots; custom-color contrast and reduced-motion review."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K56",
+      "persona": "kid",
+      "group": "Kid: personalize the board and get help",
+      "baselineStory": "As a kid, I can save or cancel my color choice.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L902",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can save or cancel my color choice.",
+      "targetNotes": "Save my color persists the selection; Cancel leaves the saved color unchanged.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/panels.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores.css"
+        ],
+        "verification": "Browser: color cancel/save, light and dark screenshots; custom-color contrast and reduced-motion review."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K57",
+      "persona": "kid",
+      "group": "Kid: personalize the board and get help",
+      "baselineStory": "As a kid, I can have an open chore’s title read aloud.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/api/chores/tts/route.ts#L9",
+      "disposition": "removed",
+      "priority": "none",
+      "targetStory": null,
+      "targetNotes": "Remove chore-title read-aloud, its controls and its speech endpoint. The kids can read their chores.",
+      "basis": "Explicit September 19 request to remove Hear it",
+      "channel": "none",
+      "implementation": {
+        "status": "excluded",
+        "files": ["app/(chores)/chores/kid-column.tsx"],
+        "verification": "Excluded from the current product by explicit scope decisions; retained legacy code is not evidence of a current capability. See the referenced not-current-behavior rules."
+      },
+      "isCurrentBehavior": false,
+      "notBehaviorRefs": ["N16"],
+      "notBehavior": "As a kid, I cannot have an open chore’s title read aloud."
+    },
+    {
+      "id": "K58",
+      "persona": "kid",
+      "group": "Kid: personalize the board and get help",
+      "baselineStory": "As a kid, I can hear the title of a completed chore without undoing it.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L1665",
+      "disposition": "removed",
+      "priority": "none",
+      "targetStory": null,
+      "targetNotes": "Remove completed-chore title speech. Open-chore title speech (K57) is also removed.",
+      "basis": "explicit removal or directly implied dependency",
+      "channel": "none",
+      "implementation": {
+        "status": "excluded",
+        "files": [
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Excluded from the current product by explicit scope decisions; retained legacy code is not evidence of a current capability. See the referenced not-current-behavior rules."
+      },
+      "isCurrentBehavior": false,
+      "notBehaviorRefs": ["N16"],
+      "notBehavior": "As a kid, I cannot hear the title of a completed chore without undoing it."
+    },
+    {
+      "id": "K59",
+      "persona": "kid",
+      "group": "Kid: personalize the board and get help",
+      "baselineStory": "As a kid, I can use the board in my device’s light or dark appearance.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/os-global.css#L33",
+      "disposition": "lower_priority",
+      "priority": "low",
+      "targetStory": "As a kid, I can use the board in my device’s light or dark appearance.",
+      "targetNotes": "System light/dark appearance is implemented, including legible active and subdued states. It remains lower priority than the landscape current-chore flow.",
+      "basis": "explicit user priority change",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/panels.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores.css"
+        ],
+        "verification": "Browser: color cancel/save, light and dark screenshots; custom-color contrast and reduced-motion review."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K60",
+      "persona": "kid",
+      "group": "Kid: personalize the board and get help",
+      "baselineStory": "As a kid, I can wake the darkened chore display by interacting with it.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/screen-saver.tsx#L9",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a kid, I can wake the idle shared chore display and see the work eligible now.",
+      "targetNotes": "Five idle minutes can trigger pure black only from 8:30pm inclusive until 6am exclusive in America/Los_Angeles, automatically following DST. At 8:30pm an already-idle board can black out; at 6am it clears automatically. Tapping wakes and refreshes. Focus/visibility return rechecks the schedule. No visible moon or text appears; webpage blackout does not change the hardware backlight.",
+      "basis": "consequence of requested changes",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/board.tsx",
+          "app/(chores)/chores.css",
+          "app/lib/chores/time.ts"
+        ],
+        "verification": "time.test.ts covers 8:30pm/6am and DST. browser.spec.ts covers daytime inactivity, exact boundaries, tap-to-wake and Tokyo device time zone; production browser verification passed September 21."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N17"]
+    },
+    {
+      "id": "K61",
+      "persona": "kid",
+      "group": "Kid: personalize the board and get help",
+      "baselineStory": "As a kid, I can try reloading a failed board section.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/error-boundary.tsx#L15",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can try reloading a failed board section.",
+      "targetNotes": "A failed column offers Reload this column. Connection errors expose Reconnect; failed writes retain the exact request for Retry saving. The shared Refresh button reloads the whole page.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/board.tsx",
+          "app/(chores)/chores/error.tsx",
+          "app/(chores)/chores/use-board.ts"
+        ],
+        "verification": "Per-column React error boundary; route retry; browser suite loses an already-committed response and recovers the exact request once."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K62",
+      "persona": "kid",
+      "group": "Kid: pack for a camping trip",
+      "baselineStory": "As a kid, I can open a camping packing checklist with my own progress.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/packing/page.tsx#L25",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can open a camping packing checklist with my own progress.",
+      "targetNotes": "Packing opens each child’s checklist inside their column, with progress stored in the current shared board.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/packing.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx",
+          "app/(chores)/chores/board.tsx"
+        ],
+        "verification": "Browser: 14 items, individual/family independence, progress, all-packed, clear and reset confirmation. Domain: shared persistence and parent reset. One-time local packing import."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K63",
+      "persona": "kid",
+      "group": "Kid: pack for a camping trip",
+      "baselineStory": "As a kid, I can see exactly what the packing list asks me to bring.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/packing-checklist.tsx#L17",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can see exactly what the packing list asks me to bring.",
+      "targetNotes": "Packing lists the defined item titles and emojis; the checklist is separate from chore-star and period-bonus targets.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/packing.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx",
+          "app/(chores)/chores/board.tsx"
+        ],
+        "verification": "Browser: 14 items, individual/family independence, progress, all-packed, clear and reset confirmation. Domain: shared persistence and parent reset. One-time local packing import."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K64",
+      "persona": "kid",
+      "group": "Kid: pack for a camping trip",
+      "baselineStory": "As a kid, I can check an item as I pack it and uncheck it if needed.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/packing-checklist.tsx#L271",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can check an item as I pack it and uncheck it if needed.",
+      "targetNotes": "Check or uncheck a packing item through a shared-state command; packing itself does not award chore stars.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/packing.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx",
+          "app/(chores)/chores/board.tsx"
+        ],
+        "verification": "Browser: 14 items, individual/family independence, progress, all-packed, clear and reset confirmation. Domain: shared persistence and parent reset. One-time local packing import."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K65",
+      "persona": "kid",
+      "group": "Kid: pack for a camping trip",
+      "baselineStory": "As a kid, I can see my packing count and progress bar.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/packing-checklist.tsx#L187",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can see my packing count and progress bar.",
+      "targetNotes": "Show the packed item count and progress bar for that child.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/packing.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx",
+          "app/(chores)/chores/board.tsx"
+        ],
+        "verification": "Browser: 14 items, individual/family independence, progress, all-packed, clear and reset confirmation. Domain: shared persistence and parent reset. One-time local packing import."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K66",
+      "persona": "kid",
+      "group": "Kid: pack for a camping trip",
+      "baselineStory": "As a kid, I can mark my entire packing list packed at once.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/packing-checklist.tsx#L249",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can mark my entire packing list packed at once.",
+      "targetNotes": "All packed marks every defined packing item for that child.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/packing.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx",
+          "app/(chores)/chores/board.tsx"
+        ],
+        "verification": "Browser: 14 items, individual/family independence, progress, all-packed, clear and reset confirmation. Domain: shared persistence and parent reset. One-time local packing import."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K67",
+      "persona": "kid",
+      "group": "Kid: pack for a camping trip",
+      "baselineStory": "As a kid, I can clear my packing list and start again.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/packing-checklist.tsx#L249",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can clear my packing list and start again.",
+      "targetNotes": "Clear mine clears that child’s packing list.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/packing.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx",
+          "app/(chores)/chores/board.tsx"
+        ],
+        "verification": "Browser: 14 items, individual/family independence, progress, all-packed, clear and reset confirmation. Domain: shared persistence and parent reset. One-time local packing import."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K68",
+      "persona": "kid",
+      "group": "Kid: pack for a camping trip",
+      "baselineStory": "As a kid, I can reset everyone’s packing lists for a new trip.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/packing-checklist.tsx#L133",
+      "disposition": "retained",
+      "priority": "normal",
+      "targetStory": "As a kid, I can reset everyone’s packing lists for a new trip.",
+      "targetNotes": "New trip for everyone asks for confirmation before clearing all packing lists; cancelling preserves them.",
+      "basis": "unchanged capability",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/packing.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx",
+          "app/(chores)/chores/board.tsx"
+        ],
+        "verification": "Browser: 14 items, individual/family independence, progress, all-packed, clear and reset confirmation. Domain: shared persistence and parent reset. One-time local packing import."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": []
+    },
+    {
+      "id": "K69",
+      "persona": "kid",
+      "group": "Kid: pack for a camping trip",
+      "baselineStory": "As a kid, I can return to my packing progress in the same browser.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/packing-checklist.tsx#L85",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a kid, I can return to my shared packing progress from another authorized device.",
+      "targetNotes": "Packing is shared in Redis across authorized devices and agents. A one-time import can carry over the old browser checklist; subsequent progress does not depend on that browser’s local storage.",
+      "basis": "shared packing retained for devices and parent agents",
+      "channel": "kid_board",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/board.tsx",
+          "app/(chores)/chores/panels.tsx",
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/repository.ts"
+        ],
+        "verification": "Shared packing commands, one-time local import, and packing browser flow; current catalog exposes packing to parent tools."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N25"]
+    },
+    {
+      "id": "P01",
+      "persona": "parent",
+      "group": "Parent: understand the family’s work and balances",
+      "baselineStory": "As a parent, I can unlock a shared family device for the chores product.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/components/password-form.tsx#L23",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can make a shared family device ready for the kid board.",
+      "targetNotes": "Open /chores on an iPad already unlocked with the site password, or enter that same password. No dedicated parent setup page or transferred link is required. Optional invitations grant scoped kid sessions; parent MCP authorization remains separate.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "device_setup_mechanism_unspecified",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/auth.ts",
+          "app/(chores)/chores/login-form.tsx",
+          "app/api/chores/login/route.ts"
+        ],
+        "verification": "Login browser suite: existing site cookie, password entry/persistence, invalid password, origin checks, kid-only commands. Optional invitation sessions remain compatible."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18", "N19", "N21", "N28"]
+    },
+    {
+      "id": "P02",
+      "persona": "parent",
+      "group": "Parent: understand the family’s work and balances",
+      "baselineStory": "As a parent, I can see each kid’s open chores, completed chores, daily progress, and current stars.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L472",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can ask an agent for each kid’s chores, completions, progress, and stars.",
+      "targetNotes": "Provide readable results in ChatGPT through MCP; Telegram only delivers notifications.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/service.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Authenticated MCP transport test, catalog/history/day snapshots, named command validation. Domain tests: CRUD, assignments, orders, metadata, reward archival and historical prices."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18", "N19"]
+    },
+    {
+      "id": "P03",
+      "persona": "parent",
+      "group": "Parent: understand the family’s work and balances",
+      "baselineStory": "As a parent, I can inspect previous days and preview future scheduled work.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/page.tsx#L39",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can ask an agent to inspect past activity and future schedules.",
+      "targetNotes": "Parent read access to history is allowed. It does not enable late/future completion or expose old timed cards to kids.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/service.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Authenticated MCP transport test, catalog/history/day snapshots, named command validation. Domain tests: CRUD, assignments, orders, metadata, reward archival and historical prices."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18"]
+    },
+    {
+      "id": "P04",
+      "persona": "parent",
+      "group": "Parent: understand the family’s work and balances",
+      "baselineStory": "As a parent, I can distinguish the daily work target from each kid’s spendable balance.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/utils.ts#L416",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can ask an agent to distinguish daily progress from spendable stars.",
+      "targetNotes": "Daily summaries distinguish task counts from ledger credits/debits and current spendable balances. Day/occurrence/submission/approval timestamps remain inspectable through tools; daily counts do not offer a +10 bonus.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/service.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Authenticated MCP transport test, catalog/history/day snapshots, named command validation. Domain tests: CRUD, assignments, orders, metadata, reward archival and historical prices."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N09", "N18"]
+    },
+    {
+      "id": "P05",
+      "persona": "parent",
+      "group": "Parent: understand the family’s work and balances",
+      "baselineStory": "As a parent, I can rename each of the three kid columns.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L881",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can rename kid columns through an agent.",
+      "targetNotes": "Keep identity and history stable when changing a display name.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/service.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Authenticated MCP transport test, catalog/history/day snapshots, named command validation. Domain tests: CRUD, assignments, orders, metadata, reward archival and historical prices."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18"]
+    },
+    {
+      "id": "P06",
+      "persona": "parent",
+      "group": "Parent: understand the family’s work and balances",
+      "baselineStory": "As a parent, I can set a kid’s identifying color.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/kid-board.tsx#L902",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can set a kid’s color through an agent.",
+      "targetNotes": "The kid-facing color picker remains; no parent settings screen.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/service.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Authenticated MCP transport test, catalog/history/day snapshots, named command validation. Domain tests: CRUD, assignments, orders, metadata, reward archival and historical prices."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18"]
+    },
+    {
+      "id": "P07",
+      "persona": "parent",
+      "group": "Parent: define and change chores",
+      "baselineStory": "As a parent, I can create a chore with a title, emoji, and star value.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L392",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can create a chore with its title, emoji, and star value through an agent.",
+      "targetNotes": "Retain the underlying configuration capability.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/service.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Authenticated MCP transport test, catalog/history/day snapshots, named command validation. Domain tests: CRUD, assignments, orders, metadata, reward archival and historical prices."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18"]
+    },
+    {
+      "id": "P08",
+      "persona": "parent",
+      "group": "Parent: define and change chores",
+      "baselineStory": "As a parent, I can assign one chore to one kid or several kids.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L1008",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can assign a chore to one or more kids through an agent.",
+      "targetNotes": "Each kid has independent occurrences and credit.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/service.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Authenticated MCP transport test, catalog/history/day snapshots, named command validation. Domain tests: CRUD, assignments, orders, metadata, reward archival and historical prices."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18"]
+    },
+    {
+      "id": "P09",
+      "persona": "parent",
+      "group": "Parent: define and change chores",
+      "baselineStory": "As a parent, I can create a one-off chore.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L392",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can create a one-off chore through an agent.",
+      "targetNotes": "Give it an eligible date/time or untimed occurrence; do not automatically carry a missed occurrence into later dates/windows.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/service.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N05", "N06", "N18"]
+    },
+    {
+      "id": "P10",
+      "persona": "parent",
+      "group": "Parent: define and change chores",
+      "baselineStory": "As a parent, I can schedule or reschedule a one-off chore for a particular date.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L1042",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can schedule or reschedule a one-off chore through an agent.",
+      "targetNotes": "Only create an eligible current/future opportunity. Rescheduling cannot manufacture completion credit for a missed past occurrence.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/service.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N05", "N06", "N18"]
+    },
+    {
+      "id": "P11",
+      "persona": "parent",
+      "group": "Parent: define and change chores",
+      "baselineStory": "As a parent, I can create a routine that repeats daily.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L392",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can create daily routines through an agent.",
+      "targetNotes": "Each scheduled day/window is a distinct opportunity.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/service.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18"]
+    },
+    {
+      "id": "P12",
+      "persona": "parent",
+      "group": "Parent: define and change chores",
+      "baselineStory": "As a parent, I can create a routine for selected weekdays.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L771",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can schedule routines for selected weekdays through an agent.",
+      "targetNotes": "Show the occurrence only when its current time/date eligibility permits it.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/service.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18"]
+    },
+    {
+      "id": "P13",
+      "persona": "parent",
+      "group": "Parent: define and change chores",
+      "baselineStory": "As a parent, I can create a chore that can be earned repeatedly.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/utils.ts#L228",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can create a repeatable chore through an agent.",
+      "targetNotes": "Untimed repeatable chores stay available anytime; timed ones remain window-gated.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/service.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18"]
+    },
+    {
+      "id": "P14",
+      "persona": "parent",
+      "group": "Parent: define and change chores",
+      "baselineStory": "As a parent, I can place a chore in Morning, Afternoon, Evening, Night, or the untimed Bonus group.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L948",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can assign a chore to a named time window or make it an untimed Bonus chore through an agent.",
+      "targetNotes": "The untimed option is explicitly retained. Named windows do not overlap in the kid experience.",
+      "basis": "explicit answer: untimed Bonus chores remain available anytime",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/service.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N04", "N18"]
+    },
+    {
+      "id": "P15",
+      "persona": "parent",
+      "group": "Parent: define and change chores",
+      "baselineStory": "As a parent, I can require my approval whenever a chore is completed.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L795",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can require approval for a chore through an agent.",
+      "targetNotes": "Kids must submit during eligibility. On-time requests remain approvable later.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/service.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N05", "N18"]
+    },
+    {
+      "id": "P16",
+      "persona": "parent",
+      "group": "Parent: define and change chores",
+      "baselineStory": "As a parent, I can edit a chore’s title, emoji, and future star value.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L795",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can edit chore titles, emoji, and star values through an agent.",
+      "targetNotes": "Preserve recorded occurrence/submission facts and earned amounts; do not rewrite history accidentally.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/service.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Authenticated MCP transport test, catalog/history/day snapshots, named command validation. Domain tests: CRUD, assignments, orders, metadata, reward archival and historical prices."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18"]
+    },
+    {
+      "id": "P17",
+      "persona": "parent",
+      "group": "Parent: define and change chores",
+      "baselineStory": "As a parent, I can change a chore’s type and repeat schedule.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L795",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can change chore types and repeat schedules through an agent.",
+      "targetNotes": "Reconcile future eligibility safely; no stale global completed flag trapping new assignees.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/service.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18"]
+    },
+    {
+      "id": "P18",
+      "persona": "parent",
+      "group": "Parent: define and change chores",
+      "baselineStory": "As a parent, I can change which kids a chore is assigned to.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L1008",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can change chore assignments through an agent.",
+      "targetNotes": "Changes must not lose recorded credit or make an expired occurrence completable.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/service.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Domain suite covers new marker, daily/weekday/one-off scheduling, assignments, pause/resume/reappear, cooldown, on-time pending/late approval. Redis integration covers notification failures."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18"]
+    },
+    {
+      "id": "P19",
+      "persona": "parent",
+      "group": "Parent: define and change chores",
+      "baselineStory": "As a parent, I can remove a chore from the active catalog.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L924",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can remove a chore from availability through an agent.",
+      "targetNotes": "Archive/remove an assignment or change eligibility through an agent while retaining its occurrence, submission, and ledger history. If hidden for today, it stops counting toward the relevant requirement, even after opening.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/service.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "domain.test.ts covers hidden started work, undone/pending history, remaining nonempty-period awards, empty periods, exclusive reappearance, cutoff-safe resume, late approval and exact undo/re-earn. Live September 21 bed mute was verified without a second debit."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N11", "N18"]
+    },
+    {
+      "id": "P20",
+      "persona": "parent",
+      "group": "Parent: pause routines and make exceptions",
+      "baselineStory": "As a parent, I can pause a repeated chore through a chosen day.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L659",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can pause a repeated chore through an agent.",
+      "targetNotes": "Parent pauses hide the affected work and exclude it from completion targets immediately, even after opening or an undone submission. pausedUntil is inclusive; snoozedUntil and per-child snoozedForKids are exclusive reappear dates. This gives no chore credit; completed remaining nonempty periods may earn +2.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/service.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "domain.test.ts covers hidden started work, undone/pending history, remaining nonempty-period awards, empty periods, exclusive reappearance, cutoff-safe resume, late approval and exact undo/re-earn. Live September 21 bed mute was verified without a second debit."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N07", "N11", "N18"]
+    },
+    {
+      "id": "P21",
+      "persona": "parent",
+      "group": "Parent: pause routines and make exceptions",
+      "baselineStory": "As a parent, I can resume a paused repeated chore.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L659",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can resume a repeated chore through an agent.",
+      "targetNotes": "Clear the relevant pause/snooze subject to remaining restrictions. Resume before cutoff restores the requirement and reconciles its period award; resume after cutoff cannot reinstate expired work. The next eligible day has its normal requirement again.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/service.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "domain.test.ts covers hidden started work, undone/pending history, remaining nonempty-period awards, empty periods, exclusive reappearance, cutoff-safe resume, late approval and exact undo/re-earn. Live September 21 bed mute was verified without a second debit."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N11", "N18"]
+    },
+    {
+      "id": "P22",
+      "persona": "parent",
+      "group": "Parent: pause routines and make exceptions",
+      "baselineStory": "As a parent, I can pause all current chores through a chosen day.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L674",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can pause the family’s chores through an agent.",
+      "targetNotes": "pause_all sets an exclusive reappear date on the current catalog. Hidden work is excluded from targets; an empty period earns no bonus. No chore is marked completed or skipped, and recorded submissions are preserved.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/service.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "domain.test.ts covers hidden started work, undone/pending history, remaining nonempty-period awards, empty periods, exclusive reappearance, cutoff-safe resume, late approval and exact undo/re-earn. Live September 21 bed mute was verified without a second debit."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N07", "N10", "N11", "N18"]
+    },
+    {
+      "id": "P23",
+      "persona": "parent",
+      "group": "Parent: pause routines and make exceptions",
+      "baselineStory": "As a parent, I can resume all chores affected by the global pause.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L674",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can resume the family’s chores through an agent.",
+      "targetNotes": "Clearing pause_all removes the global snoozes it set. Separate inclusive pauses and child-specific snoozes still apply; only work that remains eligible before its cutoff returns.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/service.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "domain.test.ts covers hidden started work, undone/pending history, remaining nonempty-period awards, empty periods, exclusive reappearance, cutoff-safe resume, late approval and exact undo/re-earn. Live September 21 bed mute was verified without a second debit."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N11", "N18"]
+    },
+    {
+      "id": "P24",
+      "persona": "parent",
+      "group": "Parent: pause routines and make exceptions",
+      "baselineStory": "As a parent, I can arrange for a chore to disappear until a chosen return date for one kid or everyone assigned.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/data.ts#L17",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can change a chore’s availability for one kid or all assignees through an agent.",
+      "targetNotes": "Merge existing per-child snoozes when updating that map. Hidden work is waived from targets even with pending/undone submissions, without deleting history or awarding chore stars. An on-time accepted request can still be reviewed later.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/service.ts",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "domain.test.ts covers hidden started work, undone/pending history, remaining nonempty-period awards, empty periods, exclusive reappearance, cutoff-safe resume, late approval and exact undo/re-earn. Live September 21 bed mute was verified without a second debit."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N07", "N11", "N18"]
+    },
+    {
+      "id": "P25",
+      "persona": "parent",
+      "group": "Parent: pause routines and make exceptions",
+      "baselineStory": "As a parent, I can excuse a kid’s chore today using the board’s skip flow.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L706",
+      "disposition": "removed",
+      "priority": "none",
+      "targetStory": null,
+      "targetNotes": "Remove the parent version of the board skip action. Agent scheduling/pauses remain separate from completion credit.",
+      "basis": "explicit removal or directly implied dependency",
+      "channel": "none",
+      "implementation": {
+        "status": "excluded",
+        "files": [
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Excluded from the current product by explicit scope decisions; retained legacy code is not evidence of a current capability. See the referenced not-current-behavior rules."
+      },
+      "isCurrentBehavior": false,
+      "notBehaviorRefs": ["N07", "N18"],
+      "notBehavior": "As a parent, I cannot excuse a kid’s chore today using the board’s skip flow."
+    },
+    {
+      "id": "P26",
+      "persona": "parent",
+      "group": "Parent: approve work and correct credit",
+      "baselineStory": "As a parent, I can receive a request when a kid needs chore approval.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L505",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can receive on-time approval requests in Telegram.",
+      "targetNotes": "Identify the child, chore, occurrence, submission time, and expected award.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "telegram_notifications",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/notifications.ts",
+          "app/lib/chores/repository.ts",
+          "app/api/chores/notifications/route.ts"
+        ],
+        "verification": "Domain: exact approval/undo/manual ledger; no early/late submission even for parents. Real Redis integration: concurrent writes, retries, outbox claiming and failure. Telegram plain text; QStash signed retry drain."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18", "N19"]
+    },
+    {
+      "id": "P27",
+      "persona": "parent",
+      "group": "Parent: approve work and correct credit",
+      "baselineStory": "As a parent, I can open an approval link without awarding stars just by opening it.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/approve/[choreId]/route.ts#L98",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can review a request in Telegram without approving it merely by reading it.",
+      "targetNotes": "Approval requires an explicit instruction to ChatGPT through MCP; Telegram is notification-only, with no action buttons or web approval page.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "telegram_notifications",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/notifications.ts",
+          "app/lib/chores/repository.ts",
+          "app/api/chores/notifications/route.ts"
+        ],
+        "verification": "Domain: exact approval/undo/manual ledger; no early/late submission even for parents. Real Redis integration: concurrent writes, retries, outbox claiming and failure. Telegram plain text; QStash signed retry drain."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18", "N19"]
+    },
+    {
+      "id": "P28",
+      "persona": "parent",
+      "group": "Parent: approve work and correct credit",
+      "baselineStory": "As a parent, I can see when an approval link targets a day other than today.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/approve/[choreId]/route.ts#L98",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can see which occurrence an approval request belongs to and when it was submitted.",
+      "targetNotes": "Differentiate a valid pending request from an attempted new late submission, including after midnight.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/notifications.ts",
+          "app/lib/chores/repository.ts",
+          "app/api/chores/notifications/route.ts"
+        ],
+        "verification": "Domain: exact approval/undo/manual ledger; no early/late submission even for parents. Real Redis integration: concurrent writes, retries, outbox claiming and failure. Telegram plain text; QStash signed retry drain."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18"]
+    },
+    {
+      "id": "P29",
+      "persona": "parent",
+      "group": "Parent: approve work and correct credit",
+      "baselineStory": "As a parent, I can approve the chore and award its stars for the requested day.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L478",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can approve an on-time submission later through ChatGPT and MCP.",
+      "targetNotes": "Approval can follow the window/day cutoff. Preserve the original occurrence and submission time; do not reopen its old kid card.",
+      "basis": "explicit answer: on-time submissions remain approvable later",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/notifications.ts",
+          "app/lib/chores/repository.ts",
+          "app/api/chores/notifications/route.ts"
+        ],
+        "verification": "Domain: exact approval/undo/manual ledger; no early/late submission even for parents. Real Redis integration: concurrent writes, retries, outbox claiming and failure. Telegram plain text; QStash signed retry drain."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N05", "N18", "N19"]
+    },
+    {
+      "id": "P30",
+      "persona": "parent",
+      "group": "Parent: approve work and correct credit",
+      "baselineStory": "As a parent, I can see when an approval made no change or could not find the target.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/approve/[choreId]/route.ts#L98",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can see whether an approval succeeded, was already handled, or failed.",
+      "targetNotes": "Report the authoritative result in ChatGPT and prevent duplicate credit; Telegram may receive a notification.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/notifications.ts",
+          "app/lib/chores/repository.ts",
+          "app/api/chores/notifications/route.ts"
+        ],
+        "verification": "Domain: exact approval/undo/manual ledger; no early/late submission even for parents. Real Redis integration: concurrent writes, retries, outbox claiming and failure. Telegram plain text; QStash signed retry drain."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18", "N19"]
+    },
+    {
+      "id": "P31",
+      "persona": "parent",
+      "group": "Parent: approve work and correct credit",
+      "baselineStory": "As a parent, I can directly record a kid’s completion with parent authority.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L478",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can record an eligible current completion through an agent.",
+      "targetNotes": "No generic parent backdate/future-date bypass. Later review of an existing on-time request is allowed separately.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/notifications.ts",
+          "app/lib/chores/repository.ts",
+          "app/api/chores/notifications/route.ts"
+        ],
+        "verification": "Domain: exact approval/undo/manual ledger; no early/late submission even for parents. Real Redis integration: concurrent writes, retries, outbox claiming and failure. Telegram plain text; QStash signed retry drain."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N05", "N18"]
+    },
+    {
+      "id": "P32",
+      "persona": "parent",
+      "group": "Parent: approve work and correct credit",
+      "baselineStory": "As a parent, I can undo a completion from its notification.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/undo/[completionId]/route.ts#L96",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can undo an exact completion through ChatGPT and MCP.",
+      "targetNotes": "Resolve the exact submission from the day/approval tools, then undo it once. The original amount and any affected +2 bonus are reversed atomically. Do not also make a manual star deduction for that same completion; no Telegram or parent-web undo buttons exist.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/notifications.ts",
+          "app/lib/chores/repository.ts",
+          "app/api/chores/notifications/route.ts"
+        ],
+        "verification": "Domain: exact approval/undo/manual ledger; no early/late submission even for parents. Real Redis integration: concurrent writes, retries, outbox claiming and failure. Telegram plain text; QStash signed retry drain."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18", "N19"]
+    },
+    {
+      "id": "P33",
+      "persona": "parent",
+      "group": "Parent: approve work and correct credit",
+      "baselineStory": "As a parent, I can undo a completion directly from the board.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L540",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can ask an agent to correct a recorded completion.",
+      "targetNotes": "Historical undo/correction is distinct from newly completing a past occurrence. No parent board controls.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/notifications.ts",
+          "app/lib/chores/repository.ts",
+          "app/api/chores/notifications/route.ts"
+        ],
+        "verification": "Domain: exact approval/undo/manual ledger; no early/late submission even for parents. Real Redis integration: concurrent writes, retries, outbox claiming and failure. Telegram plain text; QStash signed retry drain."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18"]
+    },
+    {
+      "id": "P34",
+      "persona": "parent",
+      "group": "Parent: approve work and correct credit",
+      "baselineStory": "As a parent, I can give or take away stars independently of a chore.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L962",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can add or remove stars through an agent.",
+      "targetNotes": "Record manual adjustments explicitly; do not disguise them as completion of a missed chore.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/notifications.ts",
+          "app/lib/chores/repository.ts",
+          "app/api/chores/notifications/route.ts"
+        ],
+        "verification": "Domain: exact approval/undo/manual ledger; no early/late submission even for parents. Real Redis integration: concurrent writes, retries, outbox claiming and failure. Telegram plain text; QStash signed retry drain."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18"]
+    },
+    {
+      "id": "P35",
+      "persona": "parent",
+      "group": "Parent: define rewards",
+      "baselineStory": "As a parent, I can create a reward with a title, emoji, and star cost.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L1057",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can create and price rewards through an agent.",
+      "targetNotes": "The kid reward UI remains.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/service.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Authenticated MCP transport test, catalog/history/day snapshots, named command validation. Domain tests: CRUD, assignments, orders, metadata, reward archival and historical prices."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18"]
+    },
+    {
+      "id": "P36",
+      "persona": "parent",
+      "group": "Parent: define rewards",
+      "baselineStory": "As a parent, I can make a reward available to one kid or several kids.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L1127",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can assign rewards to kids through an agent.",
+      "targetNotes": "Retain independent eligibility and balances.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/service.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Authenticated MCP transport test, catalog/history/day snapshots, named command validation. Domain tests: CRUD, assignments, orders, metadata, reward archival and historical prices."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18"]
+    },
+    {
+      "id": "P37",
+      "persona": "parent",
+      "group": "Parent: define rewards",
+      "baselineStory": "As a parent, I can choose whether a reward is once per kid or repeatable.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/utils.ts#L508",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can choose once-per-kid or repeatable rewards through an agent.",
+      "targetNotes": "Retain the reward types; no parent reward-configuration UI.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/service.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Authenticated MCP transport test, catalog/history/day snapshots, named command validation. Domain tests: CRUD, assignments, orders, metadata, reward archival and historical prices."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18"]
+    },
+    {
+      "id": "P38",
+      "persona": "parent",
+      "group": "Parent: define rewards",
+      "baselineStory": "As a parent, I can change a reward’s title, emoji, price, type, or assignments.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L1148",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can edit reward details, prices, types, and assignments through an agent.",
+      "targetNotes": "Preserve transaction history and authoritative purchase prices.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/service.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Authenticated MCP transport test, catalog/history/day snapshots, named command validation. Domain tests: CRUD, assignments, orders, metadata, reward archival and historical prices."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18"]
+    },
+    {
+      "id": "P39",
+      "persona": "parent",
+      "group": "Parent: define rewards",
+      "baselineStory": "As a parent, I can remove a reward from the catalog.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L1102",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can remove a reward from availability through an agent.",
+      "targetNotes": "Removal must not silently destroy the history needed to explain spending.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/service.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Authenticated MCP transport test, catalog/history/day snapshots, named command validation. Domain tests: CRUD, assignments, orders, metadata, reward archival and historical prices."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18"]
+    },
+    {
+      "id": "P40",
+      "persona": "parent",
+      "group": "Parent: define rewards",
+      "baselineStory": "As a parent, I can redeem a reward for a kid using the same rules as the kid board.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L1190",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can redeem an eligible reward for a kid through an agent.",
+      "targetNotes": "Use the same balance and eligibility rules as the kid action.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/service.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Authenticated MCP transport test, catalog/history/day snapshots, named command validation. Domain tests: CRUD, assignments, orders, metadata, reward archival and historical prices."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18"]
+    },
+    {
+      "id": "P41",
+      "persona": "parent",
+      "group": "Parent: recognize last night’s bedtime behavior",
+      "baselineStory": "As a parent, I can record which kids were ready and in bed before Alexa’s bedtime announcement.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/bedtime-approval/constants.ts#L1",
+      "disposition": "removed",
+      "priority": "none",
+      "targetStory": null,
+      "targetNotes": "Remove the special last-night in-bed achievement template and workflow.",
+      "basis": "explicit removal or directly implied dependency",
+      "channel": "none",
+      "implementation": {
+        "status": "excluded",
+        "files": [
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Excluded from the current product by explicit scope decisions; retained legacy code is not evidence of a current capability. See the referenced not-current-behavior rules."
+      },
+      "isCurrentBehavior": false,
+      "notBehaviorRefs": ["N18", "N20"],
+      "notBehavior": "As a parent, I cannot record which kids were ready and in bed before Alexa’s bedtime announcement."
+    },
+    {
+      "id": "P42",
+      "persona": "parent",
+      "group": "Parent: recognize last night’s bedtime behavior",
+      "baselineStory": "As a parent, I can record which kids had a delightful bedtime through waking up.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/bedtime-approval/constants.ts#L1",
+      "disposition": "removed",
+      "priority": "none",
+      "targetStory": null,
+      "targetNotes": "Remove the special delightful-night achievement template and workflow.",
+      "basis": "explicit removal or directly implied dependency",
+      "channel": "none",
+      "implementation": {
+        "status": "excluded",
+        "files": [
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Excluded from the current product by explicit scope decisions; retained legacy code is not evidence of a current capability. See the referenced not-current-behavior rules."
+      },
+      "isCurrentBehavior": false,
+      "notBehaviorRefs": ["N18", "N20"],
+      "notBehavior": "As a parent, I cannot record which kids had a delightful bedtime through waking up."
+    },
+    {
+      "id": "P43",
+      "persona": "parent",
+      "group": "Parent: recognize last night’s bedtime behavior",
+      "baselineStory": "As a parent, I can turn the selected bedtime achievements into today’s morning chores.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L1264",
+      "disposition": "removed",
+      "priority": "none",
+      "targetStory": null,
+      "targetNotes": "Remove automatic creation of morning chores from last-night bedtime recognition.",
+      "basis": "explicit removal or directly implied dependency",
+      "channel": "none",
+      "implementation": {
+        "status": "excluded",
+        "files": [
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Excluded from the current product by explicit scope decisions; retained legacy code is not evidence of a current capability. See the referenced not-current-behavior rules."
+      },
+      "isCurrentBehavior": false,
+      "notBehaviorRefs": ["N18", "N20"],
+      "notBehavior": "As a parent, I cannot turn the selected bedtime achievements into today’s morning chores."
+    },
+    {
+      "id": "P44",
+      "persona": "parent",
+      "group": "Parent: recognize last night’s bedtime behavior",
+      "baselineStory": "As a parent, I can see which bedtime achievements already have chores for today.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/bedtime-approval/page.tsx#L64",
+      "disposition": "removed",
+      "priority": "none",
+      "targetStory": null,
+      "targetNotes": "Remove bedtime selections and duplicate-template discovery.",
+      "basis": "explicit removal or directly implied dependency",
+      "channel": "none",
+      "implementation": {
+        "status": "excluded",
+        "files": [
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Excluded from the current product by explicit scope decisions; retained legacy code is not evidence of a current capability. See the referenced not-current-behavior rules."
+      },
+      "isCurrentBehavior": false,
+      "notBehaviorRefs": ["N18", "N20"],
+      "notBehavior": "As a parent, I cannot see which bedtime achievements already have chores for today."
+    },
+    {
+      "id": "P45",
+      "persona": "parent",
+      "group": "Parent: recognize last night’s bedtime behavior",
+      "baselineStory": "As a parent, I can see the outcome of a bedtime submission.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/bedtime-approval/form.tsx#L17",
+      "disposition": "removed",
+      "priority": "none",
+      "targetStory": null,
+      "targetNotes": "Remove bedtime submission/status/result UI and its specialized action.",
+      "basis": "explicit removal or directly implied dependency",
+      "channel": "none",
+      "implementation": {
+        "status": "excluded",
+        "files": [
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Excluded from the current product by explicit scope decisions; retained legacy code is not evidence of a current capability. See the referenced not-current-behavior rules."
+      },
+      "isCurrentBehavior": false,
+      "notBehaviorRefs": ["N18", "N20"],
+      "notBehavior": "As a parent, I cannot see the outcome of a bedtime submission."
+    },
+    {
+      "id": "P46",
+      "persona": "parent",
+      "group": "Parent: recognize last night’s bedtime behavior",
+      "baselineStory": "As a parent, I can receive a morning reminder to record bedtime stars when the reminder endpoint is scheduled externally.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/api/cron/bedtime-approval/route.ts#L25",
+      "disposition": "removed",
+      "priority": "none",
+      "targetStory": null,
+      "targetNotes": "Remove dedicated bedtime reminder delivery, endpoint, and scheduling requirements.",
+      "basis": "explicit removal or directly implied dependency",
+      "channel": "none",
+      "implementation": {
+        "status": "excluded",
+        "files": [
+          "app/lib/chores/commands.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx"
+        ],
+        "verification": "Excluded from the current product by explicit scope decisions; retained legacy code is not evidence of a current capability. See the referenced not-current-behavior rules."
+      },
+      "isCurrentBehavior": false,
+      "notBehaviorRefs": ["N18", "N20"],
+      "notBehavior": "As a parent, I cannot receive a morning reminder to record bedtime stars when the reminder endpoint is scheduled externally."
+    },
+    {
+      "id": "P47",
+      "persona": "parent",
+      "group": "Parent: stay informed and use the shared display",
+      "baselineStory": "As a parent, I can receive Telegram updates when kids complete or undo chores.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L330",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can receive Telegram updates for completed and undone chores.",
+      "targetNotes": "New completion messages show the child, chore emoji/title, +stars and total balance. They have no [Chores] prefix or trailing Completion label/ID. Undo updates remain supported; exact submission IDs are looked up through tools, not copied from completion messages.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "telegram_notifications",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/notifications.ts"
+        ],
+        "verification": "Current domain notification templates and a local in-memory completion/bonus preview verified September 21; domain suite and production build passed. No synthetic chore was completed on live data."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18", "N19", "N23"]
+    },
+    {
+      "id": "P48",
+      "persona": "parent",
+      "group": "Parent: stay informed and use the shared display",
+      "baselineStory": "As a parent, I can receive separate Telegram updates for skips, daily bonuses, and reward redemptions.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L706",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can receive Telegram updates for period bonuses and reward redemptions.",
+      "targetNotes": "A bonus message says the child earned +2 bonus stars for completing the period and includes the resulting total balance, without the occurrence date. Reward redemption updates include the cost and resulting balance. No daily-bonus, skip, or dedicated bedtime-recognition updates are generated.",
+      "basis": "September 19 clarification: period bonuses replace the daily bonus",
+      "channel": "telegram_notifications",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/notifications.ts"
+        ],
+        "verification": "Current domain notification templates and a local in-memory completion/bonus preview verified September 21; domain suite and production build passed. No synthetic chore was completed on live data."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N07", "N09", "N18", "N19", "N23"]
+    },
+    {
+      "id": "P49",
+      "persona": "parent",
+      "group": "Parent: stay informed and use the shared display",
+      "baselineStory": "As a parent, I can have recorded chores and star changes survive a notification delivery failure.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/actions.ts#L330",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can have recorded changes survive Telegram delivery failures.",
+      "targetNotes": "Commit the domain change and durable notification outbox together. Delivery retries do not duplicate stars or redemptions. Telegram delivery is at least once, so a delivery/receipt crash can repeat a message; do not promise exactly-once messages.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "telegram_notifications",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/mcp.ts",
+          "app/lib/chores/domain.ts",
+          "app/lib/chores/notifications.ts",
+          "app/lib/chores/repository.ts",
+          "app/api/chores/notifications/route.ts"
+        ],
+        "verification": "Domain: exact approval/undo/manual ledger; no early/late submission even for parents. Real Redis integration: concurrent writes, retries, outbox claiming and failure. Telegram plain text; QStash signed retry drain."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18", "N19"]
+    },
+    {
+      "id": "P50",
+      "persona": "parent",
+      "group": "Parent: stay informed and use the shared display",
+      "baselineStory": "As a parent, I can leave the main board on a shared display that refreshes and darkens when idle.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/screen-saver.tsx#L9",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can leave the kid board on a shared display that refreshes and handles inactivity.",
+      "targetNotes": "The shared kid board refreshes, returns idle secondary panels to current chores, and uses the five-minute pure-black idle screen only from 8:30pm to 6am Pacific. It wakes automatically at 6am and accepts tap-to-wake overnight. This is not a parent dashboard or hardware brightness control.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "shared_kid_display",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/board.tsx",
+          "app/(chores)/chores.css",
+          "app/lib/chores/time.ts"
+        ],
+        "verification": "time.test.ts covers 8:30pm/6am and DST. browser.spec.ts covers daytime inactivity, exact boundaries, tap-to-wake and Tokyo device time zone; production browser verification passed September 21."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N17", "N18", "N19", "N28"]
+    },
+    {
+      "id": "P51",
+      "persona": "parent",
+      "group": "Parent: stay informed and use the shared display",
+      "baselineStory": "As a parent, I can see the same saved chores, stars, rewards, and colors on another unlocked device.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/data.ts#L207",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can have changes made through agents appear on the family’s kid devices.",
+      "targetNotes": "Agents manage /chores via chores_* MCP or pnpm chores. The legacy board and its tools are deleted. The existing data, balances, history, pending approvals and receipt keys remain authoritative; no reimport or synchronization occurs.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/(chores)/chores/board.tsx",
+          "app/(chores)/chores/kid-column.tsx",
+          "app/(chores)/chores/use-board.ts",
+          "app/lib/chores/domain.ts"
+        ],
+        "verification": "Browser suite: three columns at 1024×680, emoji, current-only payload, exact save/undo/retry, late-response cutoff. Domain suite: server windows and order."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18", "N19", "N22"]
+    },
+    {
+      "id": "P52",
+      "persona": "parent",
+      "group": "Parent: help the family pack",
+      "baselineStory": "As a parent, I can review each kid’s camping packing progress and the family total.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/packing/page.tsx#L25",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can ask an agent for individual and family packing progress.",
+      "targetNotes": "Requires agent-accessible packing state rather than relying solely on one browser’s local storage.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/packing.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx",
+          "app/(chores)/chores/board.tsx"
+        ],
+        "verification": "Browser: 14 items, individual/family independence, progress, all-packed, clear and reset confirmation. Domain: shared persistence and parent reset. One-time local packing import."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18", "N25"]
+    },
+    {
+      "id": "P53",
+      "persona": "parent",
+      "group": "Parent: help the family pack",
+      "baselineStory": "As a parent, I can help pack by toggling items, marking a kid all packed, or clearing their list.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/packing-checklist.tsx#L249",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can ask an agent to update a kid’s packing checklist.",
+      "targetNotes": "Retain individual, all-packed, and clear operations without a dedicated parent checklist UI.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/packing.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx",
+          "app/(chores)/chores/board.tsx"
+        ],
+        "verification": "Browser: 14 items, individual/family independence, progress, all-packed, clear and reset confirmation. Domain: shared persistence and parent reset. One-time local packing import."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18", "N25"]
+    },
+    {
+      "id": "P54",
+      "persona": "parent",
+      "group": "Parent: help the family pack",
+      "baselineStory": "As a parent, I can reset all packing checklists for another trip.",
+      "baselineSource": "https://github.com/mxstbr/mxstbr.com/blob/18910b2799e21b6fa5481d838e99cfea064013cd/app/(os)/chores/packing-checklist.tsx#L133",
+      "disposition": "revised",
+      "priority": "normal",
+      "targetStory": "As a parent, I can reset packing for another trip through an agent.",
+      "targetNotes": "The kid packing UI remains. Remote operation needs access to its authoritative state.",
+      "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
+      "channel": "chatgpt_mcp",
+      "implementation": {
+        "status": "implemented",
+        "files": [
+          "app/lib/chores/packing.ts",
+          "app/lib/chores/domain.ts",
+          "app/(chores)/chores/panels.tsx",
+          "app/(chores)/chores/board.tsx"
+        ],
+        "verification": "Browser: 14 items, individual/family independence, progress, all-packed, clear and reset confirmation. Domain: shared persistence and parent reset. One-time local packing import."
+      },
+      "isCurrentBehavior": true,
+      "notBehaviorRefs": ["N18", "N25"]
+    }
+  ],
+  "auditedAt": "2026-09-21",
+  "auditedSourceCommit": "a2346a2 (with the September 21 legacy-removal and canonical-name changes)",
+  "currentDocument": "inventory.md",
+  "legacyDocument": "legacy-inventory.md",
+  "notCurrentBehaviors": [
+    {
+      "id": "N01",
+      "title": "Small-screen child selection",
+      "notBehavior": "A phone/portrait layout, one-child selector, or deep link selecting a child is not current behavior or a rebuild requirement.",
+      "currentBehavior": "Use three persistent columns on the shared old iPad in landscape.",
+      "featureIds": ["K03", "K04", "K05"],
+      "basis": "explicit_decision"
+    },
+    {
+      "id": "N02",
+      "title": "Other-day chore browsing",
+      "notBehavior": "Navigating dates must not display past/future chore lists or their completion controls.",
+      "currentBehavior": "Daily history is counts-only; the actionable board stays on today and the current period.",
+      "featureIds": ["K06", "K07", "K08", "K09", "K12", "K32"],
+      "basis": "explicit_decision"
+    },
+    {
+      "id": "N03",
+      "title": "Opening other time groups",
+      "notBehavior": "Expanding/collapsing other named groups, keeping them open manually, and group recollapse timers are not current behavior.",
+      "currentBehavior": "Only the current named period and eligible untimed Bonus chores are reachable.",
+      "featureIds": ["K12", "K15", "K17", "K18", "K19"],
+      "basis": "explicit_decision"
+    },
+    {
+      "id": "N04",
+      "title": "Overlapping Evening and Night",
+      "notBehavior": "The old 7pm Night opening and simultaneous Evening/Night display are not current behavior.",
+      "currentBehavior": "Evening ends and Night begins at 8:15pm Pacific; all named windows are non-overlapping.",
+      "featureIds": ["K16", "K17", "P14"],
+      "basis": "explicit_decision"
+    },
+    {
+      "id": "N05",
+      "title": "Late or backdated completions",
+      "notBehavior": "Neither kids nor parents can create an early, previous-day, or elapsed-window completion/request, including through an approval escape hatch.",
+      "currentBehavior": "An actually accepted on-time submission can be approved later without reopening its old chore.",
+      "featureIds": [
+        "K25",
+        "K27",
+        "K36",
+        "K37",
+        "K38",
+        "K41",
+        "P09",
+        "P10",
+        "P15",
+        "P29",
+        "P31"
+      ],
+      "basis": "explicit_decision"
+    },
+    {
+      "id": "N06",
+      "title": "Automatic overdue one-off carryover",
+      "notBehavior": "An unfinished one-off does not remain completable indefinitely after its scheduled date or window.",
+      "currentBehavior": "A parent can explicitly reschedule current/future work without inventing past credit.",
+      "featureIds": ["K25", "P09", "P10"],
+      "basis": "explicit_decision"
+    },
+    {
+      "id": "N07",
+      "title": "Skipping and skip credit",
+      "notBehavior": "Skip, skip confirmation/cancellation, per-kid skip/unskip, skipped progress, skipped bonus credit, and skip notifications are not current behavior for kids or parents.",
+      "currentBehavior": "Parents may mute through scheduling; this excludes requirements without completing them or awarding chore stars.",
+      "featureIds": [
+        "K26",
+        "K30",
+        "K38",
+        "K42",
+        "K43",
+        "K44",
+        "K45",
+        "P20",
+        "P22",
+        "P24",
+        "P25",
+        "P48"
+      ],
+      "basis": "explicit_decision"
+    },
+    {
+      "id": "N08",
+      "title": "Automatic chore sorting",
+      "notBehavior": "Sorting chores by type, newest-first creation order, title, stars, or model priority is not current behavior.",
+      "currentBehavior": "Use the saved parent-specified sequence; filtering and temporary choice do not reorder it.",
+      "featureIds": ["K20", "P55"],
+      "basis": "explicit_decision"
+    },
+    {
+      "id": "N09",
+      "title": "Extra ten-star daily award",
+      "notBehavior": "The +10 full-day bonus, its target/progress offer, celebration dialog, and new notification are not current behavior.",
+      "currentBehavior": "Exactly +2 per completed nonempty named period replaces it. Preserve historical credits already recorded.",
+      "featureIds": ["K21", "K30", "K31", "K34", "K70", "P04", "P48"],
+      "basis": "explicit_decision"
+    },
+    {
+      "id": "N10",
+      "title": "Empty-period or Bonus-period payout",
+      "notBehavior": "An empty period or untimed Bonus list does not earn a period-completion payout.",
+      "currentBehavior": "A named period must have at least one remaining required task; pending work must first be approved.",
+      "featureIds": ["K21", "K30", "K70", "P22"],
+      "basis": "explicit_decision"
+    },
+    {
+      "id": "N11",
+      "title": "Hidden work still required",
+      "notBehavior": "A parent-hidden chore must not remain in the period target just because its window opened or it has pending/undone history.",
+      "currentBehavior": "Exclude it immediately while preserving history. Completed remaining nonempty periods can earn +2. Unmuted missed work is still missed.",
+      "featureIds": [
+        "K21",
+        "K30",
+        "K34",
+        "K70",
+        "P19",
+        "P20",
+        "P21",
+        "P22",
+        "P23",
+        "P24"
+      ],
+      "basis": "explicit_decision"
+    },
+    {
+      "id": "N12",
+      "title": "Automatic Bonus assignment",
+      "notBehavior": "Finishing required chores must not automatically assign an untimed Bonus chore as the next obligation.",
+      "currentBehavior": "Bonus is an optional explicit choice available anytime.",
+      "featureIds": ["K15", "K22"],
+      "basis": "accepted_design"
+    },
+    {
+      "id": "N13",
+      "title": "Indistinguishable all-clear and active cards",
+      "notBehavior": "Finished/empty columns must not look like outstanding chore cards; pending approval, failure, or loading must not be presented as completed work.",
+      "currentBehavior": "Use subdued finished/empty/pending states and colorful outstanding cards. Only a confirmed current all-clear invites Go play.",
+      "featureIds": ["K22", "K28", "K40"],
+      "basis": "explicit_decision"
+    },
+    {
+      "id": "N14",
+      "title": "Dedicated Choose another button",
+      "notBehavior": "A separate Choose another button is not current behavior.",
+      "currentBehavior": "Tap the Finish this {timeframe} period card to open the chore picker.",
+      "featureIds": ["K15", "K20", "K26", "K70"],
+      "basis": "explicit_decision"
+    },
+    {
+      "id": "N15",
+      "title": "Duplicate completion count",
+      "notBehavior": "A second 0 of N done line directly beneath the card repeating its progress is not current behavior.",
+      "currentBehavior": "Keep progress inside the period card.",
+      "featureIds": ["K21"],
+      "basis": "explicit_decision"
+    },
+    {
+      "id": "N16",
+      "title": "Chore-title read-aloud",
+      "notBehavior": "Hear it, open/completed-title speech, and the chore speech endpoint are not current behavior.",
+      "currentBehavior": "The kids read their chores; completion and redemption sound effects remain.",
+      "featureIds": ["K26", "K57", "K58"],
+      "basis": "explicit_decision"
+    },
+    {
+      "id": "N17",
+      "title": "Daytime blackout or visible sleep decoration",
+      "notBehavior": "All-day five-minute blackout and a visible moon/text on the black screen are not current behavior.",
+      "currentBehavior": "Only 8:30pm–6am San Francisco time permits the pure-black idle screen; it clears at 6am. This does not control iPad hardware brightness.",
+      "featureIds": ["K60", "P50"],
+      "basis": "explicit_decision"
+    },
+    {
+      "id": "N18",
+      "title": "Dedicated parent interface",
+      "notBehavior": "Parent dashboards, forms/settings pages, PIN gates, approval/undo pages, and a dedicated parent packing/setup portal are not current behavior.",
+      "currentBehavior": "Parents talk to ChatGPT using authenticated current MCP/CLI tools; they can still look at the shared kid display.",
+      "featureIds": [
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P10",
+        "P11",
+        "P12",
+        "P13",
+        "P14",
+        "P15",
+        "P16",
+        "P17",
+        "P18",
+        "P19",
+        "P20",
+        "P21",
+        "P22",
+        "P23",
+        "P24",
+        "P25",
+        "P26",
+        "P27",
+        "P28",
+        "P29",
+        "P30",
+        "P31",
+        "P32",
+        "P33",
+        "P34",
+        "P35",
+        "P36",
+        "P37",
+        "P38",
+        "P39",
+        "P40",
+        "P41",
+        "P42",
+        "P43",
+        "P44",
+        "P45",
+        "P46",
+        "P47",
+        "P48",
+        "P49",
+        "P50",
+        "P51",
+        "P52",
+        "P53",
+        "P54",
+        "P55"
+      ],
+      "basis": "explicit_decision"
+    },
+    {
+      "id": "N19",
+      "title": "Clippy or Telegram management",
+      "notBehavior": "Clippy, conversational Telegram commands, and approval/undo action buttons in Telegram are not the current management workflow.",
+      "currentBehavior": "ChatGPT is the parent interaction surface; Telegram delivers notifications only.",
+      "featureIds": [
+        "P01",
+        "P02",
+        "P26",
+        "P27",
+        "P29",
+        "P30",
+        "P32",
+        "P47",
+        "P48",
+        "P49",
+        "P50",
+        "P51"
+      ],
+      "basis": "explicit_decision"
+    },
+    {
+      "id": "N20",
+      "title": "Last-night bedtime recognition",
+      "notBehavior": "Special in-bed/delightful-night templates, selections, generated morning chores, result screens, and dedicated recognition reminders/schedules are not current behavior.",
+      "currentBehavior": "Ordinary evening/night chores, including a manually defined bedtime chore, remain possible.",
+      "featureIds": ["P41", "P42", "P43", "P44", "P45", "P46"],
+      "basis": "explicit_decision"
+    },
+    {
+      "id": "N21",
+      "title": "Required transferred setup link",
+      "notBehavior": "A transferred invitation link is not required to unlock the family iPads.",
+      "currentBehavior": "Reuse the existing site-password login; invitations are optional compatibility support.",
+      "featureIds": ["K01", "P01"],
+      "basis": "explicit_decision"
+    },
+    {
+      "id": "N22",
+      "title": "Shared live legacy data or ongoing resync",
+      "notBehavior": "The current and legacy boards do not share mutable chore/reward/ledger state or continually resynchronize balances.",
+      "currentBehavior": "Use only the existing live chores dataset. Legacy records remain archived history, with no executable legacy board or writers and no ongoing synchronization.",
+      "featureIds": ["K35", "P51"],
+      "basis": "explicit_decision"
+    },
+    {
+      "id": "N23",
+      "title": "Verbose completion and bonus logs",
+      "notBehavior": "New notifications do not add [Chores], a trailing Completion label/ID, or the occurrence date in the bonus message.",
+      "currentBehavior": "Completions show +stars and total; period bonuses show +2 bonus stars and total. Approval-request identifying details remain available.",
+      "featureIds": ["P47", "P48"],
+      "basis": "explicit_decision"
+    },
+    {
+      "id": "N24",
+      "title": "Refresh that only refetches data",
+      "notBehavior": "The manual Refresh button must not merely refetch the board API.",
+      "currentBehavior": "It reloads the browser document with window.location.reload().",
+      "featureIds": ["K10"],
+      "basis": "explicit_decision"
+    },
+    {
+      "id": "N25",
+      "title": "Browser-only packing",
+      "notBehavior": "A single browser’s local storage is not the authoritative current packing store.",
+      "currentBehavior": "Share packing through the current dataset; retain one-time legacy import.",
+      "featureIds": ["K69", "P52", "P53", "P54"],
+      "basis": "implemented_replacement"
+    },
+    {
+      "id": "N26",
+      "title": "Whole-list primary chore screen",
+      "notBehavior": "Showing every chore as the primary interface or requiring ordinary completion through a details dialog is not the accepted current interface.",
+      "currentBehavior": "One emoji-led next-action card per child, with a period-card picker.",
+      "featureIds": ["K15", "K26"],
+      "basis": "accepted_design"
+    },
+    {
+      "id": "N27",
+      "title": "No shared Rewards tab",
+      "notBehavior": "Leaving children without a shared Rewards tab is not current behavior.",
+      "currentBehavior": "The header has Chores/Rewards and each balance also opens that child’s rewards.",
+      "featureIds": ["K02", "K46"],
+      "basis": "explicit_decision"
+    },
+    {
+      "id": "N28",
+      "title": "Retired implementation and names",
+      "notBehavior": "The old board, prototype, dedicated admin/approval pages, old MCP tools, legacy CLI/importer, balance-cutover scripts, speech and bedtime-reminder endpoints are not supported or executable. The trial product names are not current routes or tool names.",
+      "currentBehavior": "There is one /chores board, /api/chores/* API, pnpm chores CLI and chores_* MCP tool set. Minimal compatibility for stored identifiers preserves existing sessions, accepted submissions and command receipts. Retain the existing Redis schema namespace and financial history.",
+      "featureIds": ["K01", "P01", "P50"],
+      "basis": "explicit_decision"
+    }
+  ],
+  "notCurrentBehaviorCount": 28
+}

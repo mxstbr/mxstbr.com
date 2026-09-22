@@ -47,9 +47,6 @@ importers:
       '@octokit/rest':
         specifier: ^20.1.1
         version: 20.1.2
-      '@openai/apps-sdk-ui':
-        specifier: ^0.2.1
-        version: 0.2.1(@types/react-dom@19.0.2(@types/react@19.0.1))(@types/react@19.0.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(tailwindcss@4.1.17)
       '@tailwindcss/forms':
         specifier: ^0.5.10
         version: 0.5.10(tailwindcss@4.1.17)
@@ -131,9 +128,6 @@ importers:
       react-hot-toast:
         specifier: ^2.4.1
         version: 2.6.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
-      react-rewards:
-        specifier: ^2.0.3
-        version: 2.1.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       react-tweet:
         specifier: ^3.2.1
         version: 3.2.2(react-dom@19.2.1(react@19.2.1))(react@19.2.1)

@@ -10,11 +10,10 @@
     "reflect-append-daily-note": "tsm reflect-append-daily-note.ts",
     "set-telegram-webhook": "tsm set-telegram-webhook.ts",
     "chores": "tsm scripts/chores.ts",
-    "chores2": "tsm scripts/chores2.ts",
-    "test:chores2": "tsm --test app/lib/chores2/*.test.ts",
     "test:e2e": "playwright test",
     "format": "prettier --write .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:chores": "tsm --test app/lib/chores/*.test.ts"
   },
   "dependencies": {
     "@ai-sdk/mcp": "1.0.0-beta.43",
@@ -30,7 +29,6 @@
     "@next/env": "^16.0.8",
     "@next/mdx": "^16.0.8",
     "@octokit/rest": "^20.1.1",
-    "@openai/apps-sdk-ui": "^0.2.1",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.19",
     "@types/mdx": "^2.0.13",
@@ -58,7 +56,6 @@
     "react-dom": "^19.0.0",
     "react-feather": "^2.0.10",
     "react-hot-toast": "^2.4.1",
-    "react-rewards": "^2.0.3",
     "react-tweet": "^3.2.1",
     "recharts": "^3.1.2",
     "remark-gfm": "^4.0.0",

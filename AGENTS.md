@@ -14,19 +14,22 @@ pnpm dev               # run Next.js in dev mode with hot reload
 pnpm build             # production build and sync essays to GitHub
 pnpm start             # serve the production build locally
 pnpm update-essay-views# refresh Upstash-backed essay view counts
-pnpm chores2 help      # manage the current kids chores/rewards
+pnpm chores help       # manage the current kids chores/rewards
+pnpm test:chores       # run deterministic chores checks
 ```
 
 Run commands from the repo root. Prefer `pnpm dev` for iterative changes; use `pnpm build` before shipping to ensure MDX and dynamic routes compile.
 
 ## Kids Chores
 
-- **Default to current `/chores`:** use `pnpm chores2` or authenticated `chores2_*` MCP tools (`chores:mxstbr:v2` Redis keys). The old `/chores2` board uses `pnpm chores` and unprefixed MCP tools; those do not manage the current system. If only legacy MCP tools are available, use the CLI from this repository.
-- **Read before changing:** `pnpm chores2 catalog`, `day YYYY-MM-DD`, and `approvals` resolve exact IDs. Apply JSON with `pnpm chores2 command /private/tmp/command.json REQUEST_ID`; see `app/lib/chores2/commands.ts` for the schema. Reuse the same request ID after an uncertain response. Telegram is notification-only; look up completion IDs in the day record.
+- **One chores system:** `/chores` uses `pnpm chores`, authenticated `chores_*` MCP tools, and `/api/chores/*`. The legacy implementation and tools are deleted. If a connector lists retired tools, refresh it or use the CLI. Keep the existing `chores:mxstbr:v2` storage keys and saved data; the suffix is a schema version, not another product.
+- **Read before changing:** `pnpm chores catalog`, `day YYYY-MM-DD`, and `approvals` resolve exact IDs. Apply JSON with `pnpm chores command /private/tmp/command.json REQUEST_ID`; see `app/lib/chores/commands.ts` for the schema. Reuse the same request ID after an uncertain response. Telegram is notification-only; look up completion IDs in the day record.
 - **Mute/resume:** `update_chore` fields `snoozedUntil`/`snoozedForKids[kidId]` and `pause_all.until` are exclusive reappear dates; `pausedUntil` is inclusive. To hide September 21 and return September 22, use `2026-09-22`. Clear with `null`; merge existing per-child snoozes before replacing that map. Hidden chores are not required, even after opening. Only nonempty completed periods earn +2; there is no +10 daily bonus.
 - **Stars/history:** use `undo` with the exact submission ID to reverse an incorrect completion, never an additional manual deduction for the same event. `review` can approve an on-time submission later; new late completions are forbidden. Keep history and balances; do not reimport, resync legacy balances, or write Redis directly.
 - **Routines:** `archivedFrom` is the first inactive Pacific day; `scheduledFor` is the first active day. Preserve old records and untimed Bonus chores when replacing routines. Use `schedule.daysOfWeek: [1,2,3,4,5]` for weekdays and `set_order` for each child's time group.
-- **Verify:** inspect the affected day and reappear day; for routine replacements also check the prior day and weekend. Confirm the live board when relevant. More details: [Managing chores](docs/chores2/managing.md).
+- **Verify:** inspect the affected day and reappear day; for routine replacements also check the prior day and weekend. Confirm the live board when relevant. More details: [Managing chores](docs/chores/managing.md).
+
+- **Keep behaviors current:** whenever chores behavior changes, update [the behavior inventory](docs/chores/inventory.md) in the same commit. Edit `docs/chores/rebuild-features.json`, run `node scripts/render-chores-behaviors.mjs`, and update the affected scope, UI and management docs. Preserve stable IDs and explicitly mark rejected/removed behavior as **Not current behavior**; do not silently restore it.
 
 ## Coding Style & Naming Conventions
 
@@ -36,7 +39,7 @@ Run commands from the repo root. Prefer `pnpm dev` for iterative changes; use `p
 
 ## Testing Guidelines
 
-- No formal automated test suite yet; verify key flows manually (`pnpm dev`), especially new routes, forms, and RSS/sitemap generation.
+- Chores has domain, Redis concurrency, MCP and iPad browser checks; see [verification commands](docs/chores/implementation.md). Use `pnpm test:chores` for deterministic checks. Verify other site flows as appropriate, especially routes, forms and RSS/sitemap generation.
 - For data-related changes, confirm `pnpm build` succeeds and inspect generated output where relevant (e.g., Open Graph images in `app/og`).
 - If adding tests, colocate them near the feature and align names with the route or component (e.g., `component-name.test.tsx`).
 

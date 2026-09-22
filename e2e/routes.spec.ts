@@ -97,16 +97,7 @@ test.describe('Personal pages require the password', () => {
       .addCookies([{ name: 'password', value: CAL_PASSWORD, url: baseURL }])
   }
 
-  const personalRoutes = [
-    '/cal',
-    '/chores',
-    '/chores2',
-    '/chores2/rewards',
-    '/chores2/admin',
-    '/finance',
-    '/reminder',
-    '/stats',
-  ]
+  const personalRoutes = ['/cal', '/chores', '/finance', '/reminder', '/stats']
 
   for (const path of personalRoutes) {
     test(`${path} renders with the password`, async ({ page }, testInfo) => {

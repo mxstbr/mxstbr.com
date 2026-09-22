@@ -1,7 +1,7 @@
 import { registerAllTools } from 'app/lib/mcp/register-all-tools'
 import { createMcpHandler } from 'mcp-handler'
 import { NextRequest, NextResponse } from 'next/server'
-import { withParentContext } from 'app/lib/chores2/auth'
+import { withParentContext } from 'app/lib/chores/auth'
 
 export const maxDuration = 800
 
@@ -17,17 +17,11 @@ const handler = createMcpHandler(
     instructions: `This MCP server powers Maxie and Minnie workflows.
 
 Chores workflow:
-- The current /chores board uses chores2_catalog, chores2_inspect_day, chores2_pending_approvals, chores2_command, chores2_device and chores2_notification_status. Use these tools by default for Max’s chores. Their chores2 prefix is retained for compatibility after promotion. They require this authenticated MCP connection; browser cookies grant kid actions only. The old board is now at /chores2. All unprefixed chore tools listed below manage ONLY that legacy board; use them only when Max explicitly asks about the old/legacy board.
-- Use get_chore_board for the UI-shaped state of a Pacific day (today by default). It returns each kid's current star balance, open chores, completed chores, and daily progress.
-- Use search_chores and search_rewards for the durable catalogs, including definitions that may not appear on today's board. Use list_kids for the small canonical kid roster.
-- Resolve canonical IDs with those read tools before mutating. Never invent an existing kid, chore, reward, or completion ID.
-- Use create_chore/update_chore/archive_chore for chore definitions. update_chore also handles assignments, recurrence, one-off dates, time of day, approval, and a single repeated chore's pause.
-- complete_chore and undo_chore_completion operate on today's Pacific date. Use completion IDs from get_chore_board when selecting a specific completion to undo.
-- pause_all_chores uses an inclusive paused_until date; pass an empty string to resume all chores.
-- Use create_reward/update_reward/archive_reward/redeem_reward for rewards, update_kid for kid metadata, and adjust_kid_stars for manual ledger adjustments.
-- Mutations return the affected entity and required machine-readable status fields in structuredContent.result, but not a board snapshot. Call get_chore_board or a search tool afterward only when refreshed read state is needed.
-- Business-rule failures return isError=true with structuredContent.result.status=error, a stable code, and a message. Treat structuredContent as authoritative; text content is only a concise summary.
-- All date inputs are Pacific dates in YYYY-MM-DD format.`,
+- Manage /chores with chores_catalog, chores_inspect_day, chores_pending_approvals, chores_command, chores_device and chores_notification_status. There is only one chores implementation; the old board and legacy tools have been removed. These tools require this authenticated MCP connection; browser cookies grant kid actions only.
+- Resolve exact IDs with catalog/day/approvals before changing anything. Use a unique requestId per logical command and reuse it after an uncertain response. Inspect the affected day afterward.
+- submit only accepts current eligible occurrences. review can approve an on-time submission later; undo targets the exact submission. Never subtract stars manually as well as undoing the same completion.
+- Dates are Pacific YYYY-MM-DD. snoozedUntil, snoozedForKids and pause_all.until are exclusive reappear dates; pausedUntil is inclusive. Merge per-child snoozes before replacing the map. Hidden chores are not required, even after opening. Only nonempty completed periods earn +2; no +10 daily bonus.
+- Preserve saved routine order with set_order. Preserve history and balances; do not import or synchronize retired data. Parents use ChatGPT and MCP; Telegram delivers notifications only. No skips, past completions, parent UI or bedtime-recognition workflow.`,
   },
   {
     basePath: '/api', // this needs to match where the [transport] is located.
