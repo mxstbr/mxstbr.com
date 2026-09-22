@@ -19,7 +19,7 @@ There is one implementation at `/chores`, with `/api/chores/*` and `app/lib/chor
 - **As a kid, I can reach untimed Bonus chores anytime**, subject to assignment/date/recurrence rules. Completing the required routine never automatically assigns Bonus work.
 - **As a kid, I can tell at a glance whether I have outstanding work.** Active columns are colorful and raised. Finished, empty, and awaiting-parent states are subdued and distinct; errors, loading, and unconfirmed saves never claim an all-clear.
 - **As a kid, I can browse and redeem my rewards** through the shared Chores/Rewards tabs or my own star balance. Packing and counts-only daily history remain available as secondary panels.
-- **As a kid, I can refresh the entire document** with Refresh, and have secondary panels return to current chores after 90 idle seconds. An API-only manual refresh is **not current behavior**.
+- **As a kid, I can refresh the entire document** with Refresh, and have secondary panels return to current chores after 90 idle seconds. An API-only manual refresh is **not current behavior**. The board also detects changed deployments and incompatible API responses and reloads automatically when no save is busy or uncertain, limited to once per five minutes per tab. Reads time out after 10 seconds; wake/reconnect/pageshow replaces suspended reads, and ordinary network failures keep retrying data without a document reload.
 
 Chore-title read-aloud, Hear it controls, and the speech endpoint are **not current behavior**. Short completion/redemption sound effects and celebrations remain. The accepted one-chore interface is implemented; it is no longer merely a design proposal.
 

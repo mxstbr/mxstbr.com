@@ -1,9 +1,14 @@
 import { ChoresError } from 'app/lib/chores/types'
+import { choresAppVersion } from 'app/lib/chores/app-version'
 
 export function json(value: unknown, status = 200) {
   return Response.json(value, {
     status,
-    headers: { 'Cache-Control': 'private, no-store', Vary: 'Cookie' },
+    headers: {
+      'Cache-Control': 'private, no-store',
+      Vary: 'Cookie',
+      'X-Chores-Version': choresAppVersion(),
+    },
   })
 }
 export function errorResponse(error: unknown) {

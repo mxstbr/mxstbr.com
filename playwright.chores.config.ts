@@ -3,7 +3,9 @@ import { defineConfig } from '@playwright/test'
 const login = process.env.CHORES_LOGIN_TEST === '1'
 export default defineConfig({
   testDir: './app/lib/chores',
-  testMatch: login ? 'login.browser.spec.ts' : 'browser.spec.ts',
+  testMatch: login
+    ? 'login.browser.spec.ts'
+    : ['browser.spec.ts', 'recovery.browser.spec.ts'],
   workers: 1,
   timeout: 60000,
   use: {

@@ -27,9 +27,17 @@ class ColumnBoundary extends Component<
     )
   }
 }
-export function ChoresBoard({ initial }: { initial: Board }) {
-  const { board, stale, error, pending, act, refresh, dismiss } =
-    useBoard(initial)
+export function ChoresBoard({
+  initial,
+  version,
+}: {
+  initial: Board
+  version: string
+}) {
+  const { board, stale, error, pending, act, refresh, dismiss } = useBoard(
+    initial,
+    version,
+  )
   const [packing, setPacking] = useState(0)
   const [tab, setTab] = useState<'now' | 'rewards'>('now')
   const [asleep, setAsleep] = useState(false)

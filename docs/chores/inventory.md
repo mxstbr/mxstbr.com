@@ -30,7 +30,7 @@ Use [scope and acceptance rules](rebuild-scope.md), [current iPad interface](ipa
 - **hiddenRequirements:** Merge existing per-child snoozes when updating that map. Hidden work is waived from targets even with pending/undone submissions, without deleting history or awarding chore stars. An on-time accepted request can still be reviewed later.
 - **blackout:** Five idle minutes can trigger pure black only from 8:30pm inclusive until 6am exclusive in America/Los_Angeles, automatically following DST. At 8:30pm an already-idle board can black out; at 6am it clears automatically. Tapping wakes and refreshes. Focus/visibility return rechecks the schedule. No visible moon or text appears; webpage blackout does not change the hardware backlight.
 - **quietAllClear:** Outstanding chores keep colorful raised columns, a solid card, emoji, and action button. Finished, empty, or awaiting-parent columns are subdued and say All done for now, Nothing to do right now, or Your part is done, with Go play only when the current state is confirmed. Pending approval uses a clock; failures/loading do not show an all-clear. This concerns the current window, not the whole day.
-- **refresh:** The shared Refresh button calls window.location.reload(), loading a fresh document and app code. Automatic data refresh and the Reconnect action remain separate.
+- **refresh:** The shared Refresh button reloads the document and app code. Visible boards poll every 15 seconds and replace hung reads after 10 seconds. Focus, online, visibility return and pageshow restart the read. A deployment-version change or missing/non-JSON/malformed API response triggers a guarded document reload, at most once per five minutes per tab. Automatic reload waits for all busy or uncertain saves to resolve so their exact retry IDs survive. Network failures retry data and show a friendly reconnecting message.
 - **rewardsNavigation:** The shared header has Chores and Rewards tabs and a Packing button. Rewards opens all three catalogs; a child’s star balance opens only that child’s catalog. Secondary panels remain inside the child’s column.
 - **progressDisplay:** The period card contains progress stamps and the +2 offer or earned/pending state. No second “0 of 5 done” line appears below it. Daily history is counts-only. Parent-hidden occurrences are excluded from targets; pending approval is not completion. Empty periods offer no bonus.
 - **telegramCompletion:** New completion messages show the child, chore emoji/title, +stars and total balance. They have no [Chores] prefix or trailing Completion label/ID. Undo updates remain supported; exact submission IDs are looked up through tools, not copied from completion messages.
@@ -317,7 +317,7 @@ Applies to K02, K46. Basis: explicit decision.
 
 **Not current behavior:** The old board, prototype, dedicated admin/approval pages, old MCP tools, legacy CLI/importer, balance-cutover scripts, speech and bedtime-reminder endpoints are not supported or executable. The trial product names are not current routes or tool names.
 
-**Current behavior:** There is one /chores board, /api/chores/\_ API, pnpm chores CLI and chores\_\_ MCP tool set. Minimal compatibility for stored identifiers preserves existing sessions, accepted submissions and command receipts. Retain the existing Redis schema namespace and financial history.
+**Current behavior:** There is one /chores board, /api/chores/_ API, pnpm chores CLI and chores\__ MCP tool set. Minimal compatibility for stored identifiers preserves existing sessions, accepted submissions and command receipts. Retain the existing Redis schema namespace and financial history.
 
 Applies to K01, P01, P50. Basis: explicit decision.
 
@@ -361,11 +361,11 @@ Applies to K01, P01, P50. Basis: explicit decision.
 
 <a id="k10"></a>
 
-- **K10 — As a kid, I can refresh the chore board manually.** _Current behavior · retained._ The shared Refresh button calls window.location.reload(), loading a fresh document and app code. Automatic data refresh and the Reconnect action remain separate. **Not current behavior:** [N24: Refresh that only refetches data](inventory.md#n24).
+- **K10 — As a kid, I can refresh the chore board manually.** _Current behavior · retained._ The shared Refresh button reloads the full document. Reconnect retries the board request; deployment or incompatible-response detection can also recover the document automatically under the K11 safety rules. **Not current behavior:** [N24: Refresh that only refetches data](inventory.md#n24).
 
 <a id="k11"></a>
 
-- **K11 — As a kid, I can have my board reflect the current time window and changes made through ChatGPT and MCP.** _Current behavior · revised._ Refresh the data while visible, recheck after reconnect/focus/visibility return, and switch at authoritative Pacific boundaries. Server eligibility governs writes even if the device clock or a stale screen disagrees.
+- **K11 — As a kid, I can have my board reflect the current time window and changes made through ChatGPT and MCP.** _Current behavior · revised._ The shared Refresh button reloads the document and app code. Visible boards poll every 15 seconds and replace hung reads after 10 seconds. Focus, online, visibility return and pageshow restart the read. A deployment-version change or missing/non-JSON/malformed API response triggers a guarded document reload, at most once per five minutes per tab. Automatic reload waits for all busy or uncertain saves to resolve so their exact retry IDs survive. Network failures retry data and show a friendly reconnecting message. Server eligibility remains authoritative at Pacific boundaries, including overnight wake.
 
 ## Kid: understand what needs doing
 

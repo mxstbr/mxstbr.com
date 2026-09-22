@@ -3,6 +3,25 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Board, CommandResult } from 'app/lib/chores/types'
 import type { Command } from 'app/lib/chores/commands'
 
+class BoardReloadRequired extends Error {}
+const reconnectMessage = 'Reconnecting… Your chores will return automatically.'
+const reloadKey = 'chores:last-automatic-reload'
+
+async function readJson(response: Response) {
+  if (
+    response.status === 404 ||
+    response.status === 410 ||
+    !response.headers.get('content-type')?.includes('application/json')
+  )
+    throw new BoardReloadRequired(reconnectMessage)
+  try {
+    return await response.json()
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') throw error
+    throw new BoardReloadRequired(reconnectMessage)
+  }
+}
+
 export type PendingAction = {
   command: Command
   requestId: string
@@ -17,7 +36,7 @@ export function requestId() {
     .map((n) => n.toString(16).padStart(2, '0'))
     .join('')
 }
-export function useBoard(initial: Board) {
+export function useBoard(initial: Board, version: string) {
   const [board, setBoard] = useState(initial)
   const boardRef = useRef(initial)
   const [stale, setStale] = useState(true)
@@ -26,8 +45,35 @@ export function useBoard(initial: Board) {
     Record<string, PendingAction | undefined>
   >({})
   const pendingRef = useRef<Record<string, PendingAction | undefined>>({})
-  const refreshing = useRef(false)
+  const refreshing = useRef<AbortController | null>(null)
+  const needsReload = useRef(false)
+  const reloading = useRef(false)
   const received = useRef(0)
+  const recoverApp = useCallback(() => {
+    needsReload.current = true
+    setStale(true)
+    // An uncertain write owns its request ID until it is retried/resolved.
+    // Reloading here would discard it, potentially submitting the chore twice.
+    if (Object.values(pendingRef.current).some(Boolean)) {
+      setError(
+        'An update is ready. Finish or retry your last save to reconnect.',
+      )
+      return
+    }
+    setError(reconnectMessage)
+    if (reloading.current || !navigator.onLine || document.hidden) return
+    try {
+      const last = sessionStorage.getItem(reloadKey)
+      if (last && Date.now() - Number(last) < 5 * 60000) return
+      sessionStorage.setItem(reloadKey, String(Date.now()))
+    } catch {
+      // Without a persistent guard, a broken deployment could reload forever.
+      setError('Please tap Refresh to reconnect.')
+      return
+    }
+    reloading.current = true
+    window.location.reload()
+  }, [])
   const apply = useCallback((next: Board, startedAt: number) => {
     if (
       next.revision < boardRef.current.revision ||
@@ -45,29 +91,49 @@ export function useBoard(initial: Board) {
     )
     setError('')
   }, [])
-  const refresh = useCallback(async () => {
-    if (refreshing.current) return
-    refreshing.current = true
-    const startedAt = performance.now()
-    try {
-      const r = await fetch('/api/chores/board', { cache: 'no-store' })
-      const data = await r.json()
-      if (!r.ok) throw new Error(data.error?.message || 'Could not refresh.')
-      apply(data, startedAt)
-    } catch (e) {
-      setStale(true)
-      setError(e instanceof Error ? e.message : 'Reconnecting…')
-    } finally {
-      refreshing.current = false
-    }
-  }, [apply])
+  const refresh = useCallback(
+    async (restart = false) => {
+      if (reloading.current) return
+      if (refreshing.current) {
+        if (!restart) return
+        refreshing.current.abort()
+      }
+      const controller = new AbortController()
+      refreshing.current = controller
+      const timeout = setTimeout(() => controller.abort(), 10000)
+      const startedAt = performance.now()
+      try {
+        const r = await fetch('/api/chores/board', {
+          cache: 'no-store',
+          signal: controller.signal,
+        })
+        const currentVersion = r.headers.get('X-Chores-Version')
+        if (currentVersion && currentVersion !== version)
+          throw new BoardReloadRequired(reconnectMessage)
+        const data = await readJson(r)
+        if (refreshing.current !== controller) return
+        if (!r.ok) throw new Error(data.error?.message || 'Could not refresh.')
+        needsReload.current = false
+        apply(data, startedAt)
+      } catch (e) {
+        if (refreshing.current !== controller) return
+        setStale(true)
+        if (e instanceof BoardReloadRequired) recoverApp()
+        else setError(reconnectMessage)
+      } finally {
+        clearTimeout(timeout)
+        if (refreshing.current === controller) refreshing.current = null
+      }
+    },
+    [apply, recoverApp, version],
+  )
   useEffect(() => {
     received.current = performance.now()
     void refresh()
     const wake = () => {
       if (!document.hidden) {
         setStale(true)
-        void refresh()
+        void refresh(true)
       }
     }
     const offline = () => {
@@ -75,6 +141,7 @@ export function useBoard(initial: Board) {
       setError('You’re offline. Reconnect to save your chores.')
     }
     window.addEventListener('focus', wake)
+    window.addEventListener('pageshow', wake)
     window.addEventListener('online', wake)
     window.addEventListener('offline', offline)
     document.addEventListener('visibilitychange', wake)
@@ -83,7 +150,11 @@ export function useBoard(initial: Board) {
     }, 15000)
     return () => {
       clearInterval(timer)
+      const current = refreshing.current
+      refreshing.current = null
+      current?.abort()
       window.removeEventListener('focus', wake)
+      window.removeEventListener('pageshow', wake)
       window.removeEventListener('online', wake)
       window.removeEventListener('offline', offline)
       document.removeEventListener('visibilitychange', wake)
@@ -129,7 +200,7 @@ export function useBoard(initial: Board) {
             requestId: item.requestId,
           }),
         })
-        const data = await r.json()
+        const data = await readJson(r)
         if (!r.ok) {
           retryable = r.status >= 500 || r.status === 409
           if (
@@ -149,6 +220,7 @@ export function useBoard(initial: Board) {
         apply(data.board, startedAt)
         delete pendingRef.current[kidId]
         setPending({ ...pendingRef.current })
+        if (needsReload.current) void refresh()
         return data.result
       } catch (e) {
         pendingRef.current[kidId] = {
