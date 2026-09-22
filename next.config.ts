@@ -1,8 +1,14 @@
 import type { NextConfig } from 'next'
 import createMDX from '@next/mdx'
+import { randomUUID } from 'node:crypto'
 import { getNotes } from './app/(public)/notes/hashnode'
 
 const nextConfig: NextConfig = {
+  // Bake one identity into both server bundles even when the hosting project
+  // does not expose its deployment environment variables at runtime.
+  env: {
+    CHORES_APP_VERSION: randomUUID(),
+  },
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
   turbopack: {},
   experimental: {

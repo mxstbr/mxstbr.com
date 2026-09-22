@@ -31,6 +31,7 @@ test('an open board loads new app code after deployment', async ({ page }) => {
   await ready(page)
   const response = await page.request.get('/api/chores/board')
   expect(response.headers()['x-chores-version']).toBeTruthy()
+  expect(response.headers()['x-chores-version']).not.toBe('development')
   await page.route(
     endpoint,
     async (route) => {

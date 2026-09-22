@@ -346,9 +346,10 @@
           "app/(chores)/chores/use-board.ts",
           "app/(chores)/chores/page.tsx",
           "app/lib/chores/app-version.ts",
-          "app/api/chores/http.ts"
+          "app/api/chores/http.ts",
+          "next.config.ts"
         ],
-        "verification": "Chromium/WebKit recovery tests: deployment, HTML/JSON failures, reload limit, timeout/wake, day rollover, retry IDs and network recovery. Existing browser/domain tests cover eligibility, cutoff, save/undo."
+        "verification": "Chromium/WebKit recovery tests: real build identity, deployment, HTML/JSON failures, reload limit, timeout/wake, day rollover, retry IDs and network recovery. Existing tests cover eligibility, cutoff and save/undo."
       },
       "isCurrentBehavior": true,
       "notBehaviorRefs": []
