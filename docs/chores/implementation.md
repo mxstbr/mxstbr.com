@@ -22,6 +22,14 @@ Notification retries use the existing QStash account and a single `chores-notifi
 
 Verification: 33 deterministic checks, five iPad browser flows, four real-authentication checks, one authenticated MCP transport check, and one disposable Redis concurrency/outbox check passed. The final clean production build passed after all legacy removals. Against that build, 11 retired URLs returned 404, the six canonical MCP tools and authenticated board worked, and the live catalog, orders, packing and balances matched the pre-cleanup snapshot. Production deployment `97b3f32` is READY. Read-only production checks confirmed all 11 retired URLs return 404, the canonical board/API and six MCP tools work, and catalog/order/packing/balances remain unchanged. The existing QStash account now has one active `chores-notification-drain` schedule at `/api/chores/notifications`; the former destination is removed. No test completions, redemptions or Telegram messages were sent. Browser tests use a 1024×680 viewport, not a new physical-iPad check.
 
+## September 23: draft MCP Events
+
+The existing authenticated `/api/mcp` endpoint advertises Events and serves `events/list`, `events/poll` and request-scoped SSE `events/stream`. The single `chores.notification` event mirrors every newly committed Telegram notification's ID, text and available occurrence/submission metadata. Its bounded Redis journal is written atomically with the domain operation and Telegram outbox. Command retries cannot duplicate journal entries; Telegram delivery cannot consume another client's replay history. Storage remains in the existing namespace. See [the pinned draft and operating contract](mcp-events.md).
+
+Verification adds deterministic protocol/cursor/stream tests, disposable Redis concurrency and failure checks, and actual HTTP MCP discovery plus kid-command-to-stream-to-replay tests. The fixture board also renders with its normal controls and no error overlay. These checks do not send Telegram messages or create live chore completions.
+
+The 48 deterministic checks and disposable Redis check passed after integrating the current master scheduling fix. The two HTTP MCP checks also passed. The clean production build passed; read-only checks against that build confirmed Events discovery, all six canonical chores tools, three kids, valid polling cursors, rejected kid-cookie access, SSE confirmation and a heartbeat from the real Redis-backed path.
+
 ## Current verification commands
 
 ```sh

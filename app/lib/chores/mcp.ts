@@ -32,6 +32,8 @@ async function result(operation: () => Promise<unknown>) {
   }
 }
 export function registerChoresTools(server: McpServer) {
+  // Draft Events capability. The event methods are served by events-http.ts.
+  server.server.registerCapabilities({ events: { listChanged: false } })
   server.registerTool(
     'chores_catalog',
     {

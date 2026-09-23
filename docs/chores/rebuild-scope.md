@@ -1,6 +1,6 @@
 # Current chores scope and acceptance rules
 
-Updated September 21, 2026 against the legacy-removal and canonical-name implementation `97b3f32`. The [current inventory](inventory.md) and its [structured records](rebuild-features.json) enumerate all 123 original IDs and two added requirements. The [legacy audit](legacy-inventory.md) is historical evidence, not the current contract. Explicit exclusions are labeled **Not current behavior** in every current index.
+Updated September 23, 2026 for MCP Events, following the legacy-removal and canonical-name implementation `97b3f32`. The [current inventory](inventory.md) and its [structured records](rebuild-features.json) enumerate all 123 original IDs and three added requirements. The [legacy audit](legacy-inventory.md) is historical evidence, not the current contract. Explicit exclusions are labeled **Not current behavior** in every current index.
 
 ## Product and access
 
@@ -9,6 +9,8 @@ The current product is `/chores`, displayed on the existing old iPad in landscap
 Already-unlocked iPads reuse the existing site-password cookie; otherwise enter the same password. Invitation links remain optional. Requiring a transferred setup link or introducing a parent setup portal is **not current behavior**. A shared unlocked board grants kid actions for the authorized children; parent mutations require authenticated tools.
 
 Parents talk to ChatGPT using `chores_*` MCP tools or `pnpm chores`. Telegram delivers notifications. Dedicated parent screens, PIN/admin workflows, Clippy, conversational Telegram commands, and Telegram approval/undo buttons are **not current behavior**. These exclusions apply even where a parent capability (such as editing a chore) is retained through tools.
+
+Authenticated clients supporting the [draft MCP Events contract](mcp-events.md) can also receive those notifications through `events/poll` or `events/stream` as `chores.notification`. The event journal is committed atomically with the domain change, independently of Telegram. Clients retain cursors and deduplicate event IDs; up to 5,000 events from seven days can be replayed, with gaps reported by `truncated`. Webhook delivery is not offered. Kid cookies do not authorize events, and receiving an event never approves a chore.
 
 There is one implementation at `/chores`, with `/api/chores/*` and `app/lib/chores`. The retired board, prototype, legacy MCP tools and CLI, importer, and balance-cutover code are deleted. The existing `chores:mxstbr:v2` Redis namespace is a storage schema version; it stays in place with all live balances, history, catalogs and pending approvals. Compatibility for stored submission sources, device cookies and CLI receipt identity preserves existing operations. Reimporting, resetting data, continuing legacy synchronization, or restoring the retired implementation is **not current behavior**.
 

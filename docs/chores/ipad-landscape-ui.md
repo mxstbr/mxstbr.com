@@ -31,6 +31,8 @@ Use the existing Next.js client components with plain CSS, system fonts, and res
 
 Chore-title read-aloud is removed: the kids can read their chores. Completion and reward sound effects remain.
 
+Parent MCP Events clients can receive the same completion/approval/bonus/redemption updates as Telegram in the background. The kid board keeps its existing save and approval feedback; the notification-retrying indicator refers to Telegram delivery, while MCP clients track their own cursors. There is no subscription control on the shared iPad, and its kid cookies do not grant parent event access.
+
 After five idle minutes, the display can become pure black only from 8:30pm inclusive until 6am exclusive in America/Los_Angeles, with no visible moon or text. At 8:30pm an already-idle display can black out; at 6am it clears automatically. Daylight saving time and focus/visibility return are handled explicitly. Daytime blackout is **not current behavior**. The page background and browser theme color also turn black while asleep to avoid bright edges; the original theme returns on waking. The full-screen black area remains an accessible “Tap to wake up” button and refreshes before revealing the board. This is a webpage blackout, not control over the iPad's hardware brightness or backlight.
 
 Packing and counts-only daily progress remain available through secondary access. Progress stamps stay inside the period card; a second duplicate count line and the old +10 daily reward are **not current behavior**. Parent-hidden work is excluded from the requirement even after the window opens. Ordinary expired unmuted work remains missed.

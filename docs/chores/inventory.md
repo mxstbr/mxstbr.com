@@ -6,7 +6,7 @@ Audited 2026-09-21 against application commit `97b3f32f1a02c09cc7062fb7060bcace0
 
 This is the current behavior reference for a rebuild. Positive capabilities describe the shipped system. **Not current behavior** explicitly rejects an old or superseded behavior; it must not be rebuilt merely because legacy code or an old prototype contains it. Lower-priority capabilities are still implemented unless marked removed.
 
-123 original IDs + 2 added requirements = 125 records; 105 current capabilities, 20 removed capabilities, and 28 explicit not-current-behavior rules.
+123 original IDs + 3 added requirements = 126 records; 106 current capabilities, 20 removed capabilities, and 28 explicit not-current-behavior rules.
 
 Use [scope and acceptance rules](rebuild-scope.md), [current iPad interface](ipad-landscape-ui.md), [coverage/evidence](coverage.md), and [agent operations](managing.md) for supporting detail. The [annotated legacy audit](legacy-inventory.md) preserves the historical source without presenting it as current behavior.
 
@@ -38,6 +38,7 @@ Use [scope and acceptance rules](rebuild-scope.md), [current iPad interface](ipa
 - **packingPersistence:** Packing is shared in Redis across authorized devices and agents. A one-time import can carry over the old browser checklist; subsequent progress does not depend on that browser’s local storage.
 - **featurePriority:** K07–K09 counts-only summaries and K59 system appearance remain implemented at lower priority. K04/K05 small-screen selection was superseded by the accepted landscape-only target and is excluded.
 - **canonicalNames:** Use pnpm chores, chores\__ MCP tools, /api/chores/_, app/lib/chores, app/(chores), and docs/chores. The old board and API routes no longer exist. Stored pre-rename submission sources, device cookies and CLI receipt identity remain compatible to preserve accepted requests, sessions and deduplication.
+- **mcpEvents:** Authenticated MCP clients can receive the same new notifications as Telegram through the draft events/list, events/poll and events/stream methods under chores.notification. Payloads retain the exact notification text and stable notification ID, with occurrence day/submission ID when present. The journal is committed atomically with the domain change, independent of Telegram delivery, with up to 5,000 events from seven days available for replay. Clients own cursors, deduplicate eventId, reconnect streams and inspect authoritative state after truncated. Webhooks are not offered; kid cookies never grant event access.
 
 ## Explicitly not current behavior
 
@@ -219,7 +220,7 @@ Applies to K60, P50. Basis: explicit decision.
 
 **Current behavior:** Parents talk to ChatGPT using authenticated current MCP/CLI tools; they can still look at the shared kid display.
 
-Applies to P01, P02, P03, P04, P05, P06, P07, P08, P09, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22, P23, P24, P25, P26, P27, P28, P29, P30, P31, P32, P33, P34, P35, P36, P37, P38, P39, P40, P41, P42, P43, P44, P45, P46, P47, P48, P49, P50, P51, P52, P53, P54, P55. Basis: explicit decision.
+Applies to P01, P02, P03, P04, P05, P06, P07, P08, P09, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22, P23, P24, P25, P26, P27, P28, P29, P30, P31, P32, P33, P34, P35, P36, P37, P38, P39, P40, P41, P42, P43, P44, P45, P46, P47, P48, P49, P50, P51, P52, P53, P54, P55, P56. Basis: explicit decision.
 
 <a id="n19"></a>
 
@@ -229,7 +230,7 @@ Applies to P01, P02, P03, P04, P05, P06, P07, P08, P09, P10, P11, P12, P13, P14,
 
 **Current behavior:** ChatGPT is the parent interaction surface; Telegram delivers notifications only.
 
-Applies to P01, P02, P26, P27, P29, P30, P32, P47, P48, P49, P50, P51. Basis: explicit decision.
+Applies to P01, P02, P26, P27, P29, P30, P32, P47, P48, P49, P50, P51, P56. Basis: explicit decision.
 
 <a id="n20"></a>
 
@@ -317,7 +318,7 @@ Applies to K02, K46. Basis: explicit decision.
 
 **Not current behavior:** The old board, prototype, dedicated admin/approval pages, old MCP tools, legacy CLI/importer, balance-cutover scripts, speech and bedtime-reminder endpoints are not supported or executable. The trial product names are not current routes or tool names.
 
-**Current behavior:** There is one /chores board, /api/chores/_ API, pnpm chores CLI and chores\__ MCP tool set. Minimal compatibility for stored identifiers preserves existing sessions, accepted submissions and command receipts. Retain the existing Redis schema namespace and financial history.
+**Current behavior:** There is one /chores board, /api/chores/\_ API, pnpm chores CLI and chores\_\_ MCP tool set. Minimal compatibility for stored identifiers preserves existing sessions, accepted submissions and command receipts. Retain the existing Redis schema namespace and financial history.
 
 Applies to K01, P01, P50. Basis: explicit decision.
 
@@ -483,7 +484,7 @@ Applies to K01, P01, P50. Basis: explicit decision.
 
 <a id="k39"></a>
 
-- **K39 — As a kid, I can see whether my valid approval submission was accepted and whether sending its notification needs retrying.** _Current behavior · revised._ Separate durable request acceptance from Telegram delivery so notification failures do not lose an on-time submission. Closing a prompt does not retract it.
+- **K39 — As a kid, I can see whether my valid approval submission was accepted and whether sending its notification needs retrying.** _Current behavior · revised._ Separate durable request acceptance from Telegram delivery so notification failures do not lose an on-time submission. Closing a prompt does not retract it. The existing notification status refers to Telegram delivery; MCP clients track their own cursor independently.
 
 <a id="k40"></a>
 
@@ -821,7 +822,7 @@ Applies to K01, P01, P50. Basis: explicit decision.
 
 <a id="p49"></a>
 
-- **P49 — As a parent, I can have recorded changes survive Telegram delivery failures.** _Current behavior · revised._ Commit the domain change and durable notification outbox together. Delivery retries do not duplicate stars or redemptions. Telegram delivery is at least once, so a delivery/receipt crash can repeat a message; do not promise exactly-once messages. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N19: Clippy or Telegram management](inventory.md#n19).
+- **P49 — As a parent, I can have recorded changes survive Telegram delivery failures.** _Current behavior · revised._ Commit the domain change and durable notification outbox together. Delivery retries do not duplicate stars or redemptions. Telegram delivery is at least once, so a delivery/receipt crash can repeat a message; do not promise exactly-once messages. The same transaction also records an independent MCP event journal; Telegram retries and receipts cannot consume those events or repeat a domain change. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N19: Clippy or Telegram management](inventory.md#n19).
 
 <a id="p50"></a>
 
@@ -854,3 +855,7 @@ Applies to K01, P01, P50. Basis: explicit decision.
 <a id="p55"></a>
 
 - **P55 — As a parent, I can set the order of each child’s chores within a time period through ChatGPT and MCP.** _Current behavior · added._ Persist explicit order per child/time group; changes appear without rewriting occurrence/submission facts. The September 8 list in routine-order.md was the initial order. Later explicit parent order changes become authoritative; weekday filtering and temporary kid selections preserve that sequence. **Not current behavior:** [N08: Automatic chore sorting](inventory.md#n08); [N18: Dedicated parent interface](inventory.md#n18).
+
+<a id="p56"></a>
+
+- **P56 — As a parent, I can receive chore notifications in an MCP Events-capable client.** _Current behavior · added._ Authenticated MCP clients can receive the same new notifications as Telegram through the draft events/list, events/poll and events/stream methods under chores.notification. Payloads retain the exact notification text and stable notification ID, with occurrence day/submission ID when present. The journal is committed atomically with the domain change, independent of Telegram delivery, with up to 5,000 events from seven days available for replay. Clients own cursors, deduplicate eventId, reconnect streams and inspect authoritative state after truncated. Webhooks are not offered; kid cookies never grant event access. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N19: Clippy or Telegram management](inventory.md#n19).

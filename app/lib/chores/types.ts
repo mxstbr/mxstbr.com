@@ -166,6 +166,9 @@ export type RequestIdentity = {
   fingerprint: string
 }
 export type Repository = {
+  readNotificationEvents(
+    after: number | null,
+  ): Promise<import('./events').EventHistory>
   readCore(): Promise<Core>
   readDay(day: string): Promise<Day | null>
   transact<T>(
