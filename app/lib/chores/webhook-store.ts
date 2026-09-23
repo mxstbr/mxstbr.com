@@ -1,7 +1,8 @@
 import { randomUUID } from 'node:crypto'
+import { McpError } from '@modelcontextprotocol/sdk/types.js'
 import { setTimeout as delay } from 'node:timers/promises'
 import { redisClient, PREFIX } from './repository'
-import type { EventRecord } from './events'
+import type { EventRecord, ReplayFloor } from './events'
 import type { CallbackError } from './webhook-http'
 
 export type WebhookDelivery = {
@@ -23,11 +24,19 @@ export type WebhookSubscription = {
   expiresAt: number
   watermark: number
   readPosition: number
+  replayFloor?: ReplayFloor
   queue: WebhookDelivery[]
   lastDeliveryAt?: string
   lastError?: CallbackError
   failedSince?: string
 }
+
+export const MAX_WEBHOOK_SUBSCRIPTIONS = 64
+export const subscriptionLimit = () =>
+  new McpError(-32013, 'ResourceExhausted', {
+    limit: 'subscriptions',
+    max: MAX_WEBHOOK_SUBSCRIPTIONS,
+  })
 export type SubscriptionLease = {
   read(): Promise<WebhookSubscription | null>
   save(value: WebhookSubscription): Promise<void>
@@ -48,7 +57,7 @@ export interface WebhookStore {
 const WRITE = `
 if redis.call('GET', KEYS[1]) ~= ARGV[1] then return 0 end
 redis.call('ZREMRANGEBYSCORE', KEYS[3], '-inf', ARGV[4])
-if redis.call('EXISTS', KEYS[2]) == 0 and redis.call('ZCARD', KEYS[3]) >= 64 then return -1 end
+if redis.call('EXISTS', KEYS[2]) == 0 and redis.call('ZCARD', KEYS[3]) >= ${MAX_WEBHOOK_SUBSCRIPTIONS} then return -1 end
 local remaining = tonumber(ARGV[3]) - tonumber(ARGV[4])
 if remaining <= 0 then return 0 end
 redis.call('SET', KEYS[2], ARGV[2], 'PX', remaining)
@@ -108,6 +117,7 @@ export class RedisWebhookStore implements WebhookStore {
             Date.now(),
             id,
           ])
+          if (Number(result) === -1) throw subscriptionLimit()
           if (Number(result) !== 1)
             throw new Error('Webhook subscription could not be saved')
         },
@@ -123,7 +133,7 @@ export class RedisWebhookStore implements WebhookStore {
   async activeIds() {
     const key = this.key('active')
     await this.redis.zremrangebyscore(key, 0, Date.now())
-    return this.redis.zrange<string[]>(key, 0, 63)
+    return this.redis.zrange<string[]>(key, 0, MAX_WEBHOOK_SUBSCRIPTIONS - 1)
   }
   async verified(key: string) {
     return Boolean(await this.redis.get(this.key(`verified:${key}`)))

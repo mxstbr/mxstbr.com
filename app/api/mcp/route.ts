@@ -49,15 +49,21 @@ const routeWithAuth = async (req: NextRequest) => {
       (pwd === calendarPassword || bearerToken === calendarPassword)) ||
     (!!automationToken && bearerToken === automationToken)
 
-  if (process.env.NODE_ENV !== 'development' && !isAuthorized) {
-    return new NextResponse('Unauthorized', { status: 401 })
-  }
-
   const eventResponse = await handleChoreEvents(req, {
     principal: () => mcpEventPrincipal(req),
     webhooks: choreWebhooks,
     afterSubscribe: () => after(() => choreWebhooks().drain()),
   })
+  if (process.env.NODE_ENV !== 'development' && !isAuthorized) {
+    // Retain HTTP authentication semantics while exposing the draft's required
+    // Forbidden JSON-RPC error to webhook clients.
+    return eventResponse
+      ? new NextResponse(eventResponse.body, {
+          status: 401,
+          headers: eventResponse.headers,
+        })
+      : new NextResponse('Unauthorized', { status: 401 })
+  }
   return eventResponse ?? withParentContext(isAuthorized, () => handler(req))
 }
 

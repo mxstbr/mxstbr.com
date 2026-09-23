@@ -32,6 +32,8 @@ Verification covers deterministic fixture-command parity, webhook protocol/authe
 
 The webhook revision passed 56 deterministic checks, two disposable Redis integration checks, two HTTP MCP checks, and a clean production build. Read-only checks against that build confirmed webhook-only discovery, all six chores tools, parent authentication, input validation, and explicit rejection of polling/SSE. No callback subscriptions or live chore changes were created by those checks.
 
+The subsequent [webhook conformance audit](mcp-events-conformance.md) checked the latest merged draft and the working group's draft requirement map. It corrected missing-subscription/quota errors, TTL clamping, unsupported-mode errors, production Forbidden responses and a `maxAgeMs` replay edge case. Sixty deterministic checks and two disposable Redis integration checks passed, including signature verification with the official Standard Webhooks library. The isolated `pnpm exec next build` passed compilation, TypeScript and all 67 static pages. Read-only HTTP checks against that production build passed discovery, existing tools, negative inputs, missing subscriptions, and HTTP 401 plus JSON-RPC Forbidden. No callback subscription or chore change was created. The build-only command deliberately omits this repository's separate essay-sync step.
+
 ## Current verification commands
 
 ```sh

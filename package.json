@@ -74,6 +74,7 @@
     "baseline-browser-mapping": "^2.9.5",
     "husky": "^9.1.7",
     "postcss": "^8.4.41",
+    "standardwebhooks": "^1.1.1",
     "tailwindcss": "^4.1.17"
   }
 }

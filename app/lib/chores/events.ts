@@ -15,6 +15,7 @@ export type EventRecord = {
   >
 }
 export type EventHistory = { head: number; records: EventRecord[] }
+export type ReplayFloor = { since: number; through: number }
 export const eventArguments = z.object({}).strict()
 export const eventParams = z.object({
   name: z.string(),
@@ -107,7 +108,7 @@ export class ChoreEvents {
     readonly now: () => number = Date.now,
   ) {}
 
-  async read(input: z.input<typeof journalParams>) {
+  async read(input: z.input<typeof journalParams>, replayFloor?: ReplayFloor) {
     const params = parseEventParams(journalParams, input)
     checkEventName(params.name)
     const position =
@@ -118,17 +119,21 @@ export class ChoreEvents {
     let truncated = false
     let hasMore = false
     const records: EventRecord[] = []
+    const floor =
+      this.now() -
+      Math.min(params.maxAgeMs ?? EVENT_MAX_AGE_MS, EVENT_MAX_AGE_MS)
     if (
       position !== null &&
       (await this.repository.readCore()).notificationsEnabled
     ) {
       const earliest = history.records[0]?.position ?? history.head + 1
       truncated = position < earliest - 1
-      const floor =
-        this.now() -
-        Math.min(params.maxAgeMs ?? EVENT_MAX_AGE_MS, EVENT_MAX_AGE_MS)
       for (const record of history.records) {
-        if (Date.parse(record.notification.createdAt) < floor) {
+        const minimumTime =
+          replayFloor && record.position <= replayFloor.through
+            ? Math.max(floor, replayFloor.since)
+            : floor
+        if (Date.parse(record.notification.createdAt) < minimumTime) {
           through = record.position
           truncated = true
           continue
@@ -149,6 +154,7 @@ export class ChoreEvents {
       hasMore,
       // Delivery adapters need per-occurrence positions, kept inside the delivery adapter.
       records,
+      replayFloor: { since: floor, through: history.head },
     }
   }
 }

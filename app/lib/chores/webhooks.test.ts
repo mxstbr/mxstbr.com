@@ -2,6 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { createHmac } from 'node:crypto'
 import { McpError } from '@modelcontextprotocol/sdk/types.js'
+import { Webhook, WebhookVerificationError } from 'standardwebhooks'
 import { fixture } from './fixtures'
 import { MemoryRepository } from './repository'
 import { notify } from './domain'
@@ -270,7 +271,9 @@ test('failed endpoint verification and invalid parameters never activate deliver
   assert.equal(s.store.states.size, 0)
   await assert.rejects(
     s.hooks.subscribe('parent-a', INPUT),
-    (error: McpError) => error.code === -32015,
+    (error: McpError) =>
+      error.code === -32013 &&
+      error.data?.limit === 'verificationRequestsPerHost',
   )
   assert.equal(
     s.calls.length,
@@ -293,7 +296,6 @@ test('failed endpoint verification and invalid parameters never activate deliver
       (e: McpError) => e.code === -32602,
     )
   for (const extra of [
-    { ttlMs: -1 },
     { ttlMs: 1.5 },
     { cursor: 'garbage' },
     { cursor: eventCursor(999) },
@@ -308,6 +310,128 @@ test('failed endpoint verification and invalid parameters never activate deliver
     (e: McpError) => e.code === -32011,
   )
   assert.equal(s.calls.length, 1)
+})
+
+test('webhook protocol uses the draft errors for missing subscriptions, quotas and unsupported delivery', async () => {
+  const s = setup()
+  const options = { principal: () => 'parent-a', webhooks: () => s.hooks }
+  const call = async (method: string, params: unknown) =>
+    (await handleChoreEvents(request(method, params), options))!.json()
+  const key = { name: CHORE_EVENT, delivery: { url: INPUT.delivery.url } }
+  assert.deepEqual((await call('events/unsubscribe', key)).error, {
+    code: -32011,
+    message: 'NotFound',
+    data: { kind: 'subscription' },
+  })
+  for (const mode of ['poll', 'push'])
+    assert.deepEqual(
+      (
+        await call('events/subscribe', {
+          ...INPUT,
+          delivery: { ...INPUT.delivery, mode },
+        })
+      ).error,
+      {
+        code: -32014,
+        message: 'Unsupported',
+        data: { feature: 'deliveryMode', value: mode },
+      },
+    )
+  const first = await s.hooks.subscribe('parent-a', INPUT)
+  const template = s.store.states.get(first.id)!
+  for (let i = 1; i < 64; i++) {
+    const url = `${INPUT.delivery.url}/${i}`,
+      id = subscriptionId('parent-a', url)
+    s.store.states.set(id, { ...structuredClone(template), id, url })
+  }
+  assert.deepEqual(
+    (
+      await call('events/subscribe', {
+        ...INPUT,
+        delivery: { ...INPUT.delivery, url: `${INPUT.delivery.url}/full` },
+      })
+    ).error,
+    {
+      code: -32013,
+      message: 'ResourceExhausted',
+      data: { limit: 'subscriptions', max: 64 },
+    },
+  )
+  assert.equal(
+    s.calls.length,
+    1,
+    'Capacity is checked before callback verification',
+  )
+  assert.equal((await s.hooks.subscribe('parent-a', INPUT)).id, first.id)
+  await s.hooks.unsubscribe('parent-a', key)
+  assert.equal((await call('events/unsubscribe', key)).error.code, -32011)
+  await assert.rejects(
+    s.hooks.unsubscribe('parent-b', {
+      ...key,
+      delivery: { url: `${INPUT.delivery.url}/1` },
+    }),
+    (error: McpError) => error.code === -32011,
+  )
+  assert.equal(s.store.states.size, 63)
+})
+
+test('integer TTL suggestions always negotiate a finite grant, including extreme values', async () => {
+  const s = setup()
+  for (const ttlMs of [
+    -1e100,
+    -1,
+    0,
+    1,
+    3600000,
+    30 * 86400000,
+    1e100,
+    null,
+    undefined,
+  ]) {
+    const result = await s.hooks.subscribe('parent-a', { ...INPUT, ttlMs })
+    assert.equal(
+      Date.parse(result.refreshBefore) - s.now(),
+      Math.max(60000, Math.min(ttlMs ?? 3600000, 86400000)),
+    )
+  }
+  assert.equal(s.calls.length, 1)
+})
+
+test('maxAge applies to the entire replay even when concurrent commits have nonmonotonic timestamps', async () => {
+  const s = setup()
+  await s.emit('Recent first')
+  await s.emit('Old concurrent commit', NOW - 100000)
+  await s.emit('Recent last')
+  const subscribed = await s.hooks.subscribe('parent-a', {
+    ...INPUT,
+    cursor: eventCursor(0),
+    maxAgeMs: 500,
+  })
+  assert.equal(subscribed.truncated, true)
+  assert.equal(subscribed.cursor, eventCursor(0))
+  // A different worker must retain the initial time floor, not recalculate it
+  // from its delivery time or assume timestamps have the journal's ordering.
+  s.tick(10000)
+  const restart = new ChoreWebhooks(s.events, s.store, s.send, s.now, s.accepts)
+  await restart.drain()
+  assert.deepEqual(
+    s.calls
+      .map((call) => JSON.parse(call.body))
+      .filter((body) => !body.type)
+      .map((body) => body.data.text),
+    ['Recent first', 'Recent last'],
+  )
+  assert.equal(
+    (await restart.subscribe('parent-a', INPUT)).cursor,
+    eventCursor(3),
+  )
+  // maxAge bounds the requested historical replay, not future occurrences.
+  await s.emit('New delayed occurrence', NOW - 100000)
+  await restart.drain()
+  assert.equal(
+    JSON.parse(s.calls.at(-1)!.body).data.text,
+    'New delayed occurrence',
+  )
 })
 
 test('independent retries retain a safe watermark when later deliveries succeed first', async () => {
@@ -723,6 +847,56 @@ test('the callback timeout covers DNS resolution and cannot connect after its de
   })
   await new Promise((done) => setTimeout(done, 5))
   assert(!connected)
+})
+
+test('the official Standard Webhooks receiver verifies event/control bytes, rotation and retries', async () => {
+  const s = setup()
+  s.tick(Date.now() - NOW)
+  const first = await s.hooks.subscribe('parent-a', INPUT)
+  await s.emit('Chores 🌟 — exact Unicode bytes')
+  s.receiver(async () => ({ status: 503, body: '' }))
+  await s.hooks.drain()
+  await s.hooks.subscribe('parent-a', {
+    ...INPUT,
+    cursor: first.cursor,
+    delivery: { ...INPUT.delivery, secret: NEW_SECRET },
+  })
+  s.tick(30000)
+  s.receiver(async () => ({ status: 200, body: '' }))
+  await s.hooks.drain()
+  s.revoke()
+  await s.hooks.drain()
+  for (const call of s.calls) {
+    const payload = new Webhook(SECRET).verify(
+      Buffer.from(call.body),
+      call.headers,
+    )
+    assert.deepEqual(payload, JSON.parse(call.body))
+    assert.throws(
+      () => new Webhook(SECRET).verify(`${call.body} `, call.headers),
+      WebhookVerificationError,
+    )
+  }
+  const retry = s.calls.find((call) =>
+    call.headers['webhook-signature'].includes(' '),
+  )!
+  assert(retry)
+  assert.deepEqual(
+    new Webhook(NEW_SECRET).verify(Buffer.from(retry.body), retry.headers),
+    JSON.parse(retry.body),
+  )
+  const old = s.calls[0]
+  const staleHeaders = webhookHeaders(
+    first.id,
+    old.headers['webhook-id'],
+    old.body,
+    [SECRET],
+    Date.now() - 301000,
+  )
+  assert.throws(
+    () => new Webhook(SECRET).verify(old.body, staleHeaders),
+    WebhookVerificationError,
+  )
 })
 
 test('public subscription IDs exclude credential revisions and a rotated credential establishes fresh consent', async () => {

@@ -1,6 +1,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { randomUUID, createHmac } from 'node:crypto'
+import { McpError } from '@modelcontextprotocol/sdk/types.js'
 import nextEnv from '@next/env'
 import { fixture } from './fixtures'
 import { notify } from './domain'
@@ -118,10 +119,13 @@ test(
         (await hooks().subscribe('fixture-parent', input)).cursor,
         eventCursor(2),
       )
-      await hooks().unsubscribe('different-parent', {
-        name: CHORE_EVENT,
-        delivery: { url: input.delivery.url },
-      })
+      await assert.rejects(
+        hooks().unsubscribe('different-parent', {
+          name: CHORE_EVENT,
+          delivery: { url: input.delivery.url },
+        }),
+        (error: McpError) => error.code === -32011,
+      )
       assert.deepEqual(await store.activeIds(), [a.id])
       // A stale worker cannot overwrite a subscription after losing its lease.
       await store.withLease(a.id, true, async (lease) => {
@@ -141,14 +145,46 @@ test(
         name: CHORE_EVENT,
         delivery: { url: input.delivery.url },
       })
-      await hooks().unsubscribe('fixture-parent', {
-        name: CHORE_EVENT,
-        delivery: { url: input.delivery.url },
-      })
+      await assert.rejects(
+        hooks().unsubscribe('fixture-parent', {
+          name: CHORE_EVENT,
+          delivery: { url: input.delivery.url },
+        }),
+        (error: McpError) => error.code === -32011,
+      )
       assert.equal((await store.activeIds()).length, 0)
       assert.equal(
         await redis.exists(`${prefix}:events:webhooks:subscription:${a.id}`),
         0,
+      )
+      // Exercise the atomic capacity guard too, since concurrent creates can
+      // both pass the service's early check before either saves its grant.
+      await redis.zadd(
+        `${prefix}:events:webhooks:active`,
+        { score: Date.now() + 60000, member: 'quota-0' },
+        ...Array.from({ length: 63 }, (_, i) => ({
+          score: Date.now() + 60000,
+          member: `quota-${i + 1}`,
+        })),
+      )
+      await assert.rejects(
+        store.withLease('quota-new', true, (lease) =>
+          lease.save({
+            id: 'quota-new',
+            principal: 'fixture-parent',
+            url: input.delivery.url,
+            secret,
+            expiresAt: Date.now() + 60000,
+            watermark: 0,
+            readPosition: 0,
+            queue: [],
+          }),
+        ),
+        (error: McpError) => {
+          assert.equal(error.code, -32013)
+          assert.deepEqual(error.data, { limit: 'subscriptions', max: 64 })
+          return true
+        },
       )
     } finally {
       let cursor = 0

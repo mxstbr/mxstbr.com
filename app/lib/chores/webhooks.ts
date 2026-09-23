@@ -28,6 +28,8 @@ import {
 } from './webhook-http'
 import {
   RedisWebhookStore,
+  MAX_WEBHOOK_SUBSCRIPTIONS,
+  subscriptionLimit,
   type WebhookStore,
   type WebhookSubscription,
 } from './webhook-store'
@@ -38,17 +40,11 @@ import {
 
 export const subscribeParams = eventParams.extend({
   delivery: z.object({
-    mode: z.literal('webhook'),
+    mode: z.enum(['webhook', 'poll', 'push']),
     url: z.string().max(2048),
     secret: z.string().max(100),
   }),
-  ttlMs: z
-    .number()
-    .int()
-    .nonnegative()
-    .max(Number.MAX_SAFE_INTEGER)
-    .nullable()
-    .optional(),
+  ttlMs: z.number().int().finite().nullable().optional(),
 })
 export const unsubscribeParams = z.object({
   name: z.string(),
@@ -99,6 +95,11 @@ export class ChoreWebhooks {
     if (!this.allowed(principal)) throw new McpError(-32012, 'Forbidden')
     const params = parseEventParams(subscribeParams, input)
     checkEventName(params.name)
+    if (params.delivery.mode !== 'webhook')
+      throw new McpError(-32014, 'Unsupported', {
+        feature: 'deliveryMode',
+        value: params.delivery.mode,
+      })
     callbackUrl(params.delivery.url)
     secretBytes(params.delivery.secret)
     // Validate even a redundant cursor, without allowing a refresh to skip
@@ -121,15 +122,25 @@ export class ChoreWebhooks {
         expiresAt: 0,
         watermark: start,
         readPosition: start,
+        ...(params.cursor !== null && params.maxAgeMs !== undefined
+          ? { replayFloor: batch.replayFloor }
+          : {}),
         queue: [],
       }
       if (!existing) {
+        if (
+          !stored &&
+          (await this.store.activeIds()).length >= MAX_WEBHOOK_SUBSCRIPTIONS
+        )
+          throw subscriptionLimit()
         const key = digest(JSON.stringify([principal, subscription.url]))
         if (!(await this.store.verified(key))) {
           const host = digest(callbackUrl(subscription.url).hostname)
           if (!(await this.store.claimVerification(host)))
-            throw new McpError(-32015, 'CallbackEndpointError', {
-              reason: 'challenge_failed',
+            throw new McpError(-32013, 'ResourceExhausted', {
+              limit: 'verificationRequestsPerHost',
+              max: 1,
+              retryAfterMs: 10000,
             })
           const challenge = randomBytes(32).toString('base64url')
           try {
@@ -205,7 +216,11 @@ export class ChoreWebhooks {
     await this.store.withLease(
       subscriptionId(principal, params.delivery.url),
       true,
-      (lease) => lease.remove(),
+      async (lease) => {
+        if (!(await lease.read()))
+          throw new McpError(-32011, 'NotFound', { kind: 'subscription' })
+        await lease.remove()
+      },
     )
     return {}
   }
@@ -271,11 +286,14 @@ export class ChoreWebhooks {
           item.done = true
       advance()
       if (subscription.queue.length < 100) {
-        const batch = await this.events.read({
-          name: CHORE_EVENT,
-          cursor: eventCursor(subscription.readPosition),
-          maxEvents: Math.min(50, 100 - subscription.queue.length),
-        })
+        const batch = await this.events.read(
+          {
+            name: CHORE_EVENT,
+            cursor: eventCursor(subscription.readPosition),
+            maxEvents: Math.min(50, 100 - subscription.queue.length),
+          },
+          subscription.replayFloor,
+        )
         if (batch.truncated) {
           const position = batch.records.length
             ? batch.records[0].position - 1
@@ -296,6 +314,11 @@ export class ChoreWebhooks {
             nextAttemptAt: 0,
           })
         subscription.readPosition = cursorPosition(batch.cursor)
+        if (
+          subscription.replayFloor &&
+          subscription.readPosition >= subscription.replayFloor.through
+        )
+          delete subscription.replayFloor
       }
       advance()
       const due = subscription.queue
