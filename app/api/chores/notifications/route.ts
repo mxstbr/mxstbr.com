@@ -1,6 +1,6 @@
 import { Receiver } from '@upstash/qstash'
 import { automationAuthorized } from 'app/lib/chores/auth'
-import { drainNotifications } from 'app/lib/chores/notifications'
+import { drainAllNotifications } from 'app/lib/chores/notifications'
 import { errorResponse, json } from '../http'
 
 export const maxDuration = 60
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
         },
         401,
       )
-    return json(await drainNotifications())
+    return json(await drainAllNotifications())
   } catch (error) {
     return errorResponse(error)
   }

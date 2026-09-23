@@ -6,7 +6,7 @@ Audited 2026-09-21 against application commit `97b3f32f1a02c09cc7062fb7060bcace0
 
 This is the current behavior reference for a rebuild. Positive capabilities describe the shipped system. **Not current behavior** explicitly rejects an old or superseded behavior; it must not be rebuilt merely because legacy code or an old prototype contains it. Lower-priority capabilities are still implemented unless marked removed.
 
-123 original IDs + 3 added requirements = 126 records; 106 current capabilities, 20 removed capabilities, and 28 explicit not-current-behavior rules.
+123 original IDs + 3 added requirements = 126 records; 106 current capabilities, 20 removed capabilities, and 29 explicit not-current-behavior rules.
 
 Use [scope and acceptance rules](rebuild-scope.md), [current iPad interface](ipad-landscape-ui.md), [coverage/evidence](coverage.md), and [agent operations](managing.md) for supporting detail. The [annotated legacy audit](legacy-inventory.md) preserves the historical source without presenting it as current behavior.
 
@@ -38,7 +38,7 @@ Use [scope and acceptance rules](rebuild-scope.md), [current iPad interface](ipa
 - **packingPersistence:** Packing is shared in Redis across authorized devices and agents. A one-time import can carry over the old browser checklist; subsequent progress does not depend on that browser’s local storage.
 - **featurePriority:** K07–K09 counts-only summaries and K59 system appearance remain implemented at lower priority. K04/K05 small-screen selection was superseded by the accepted landscape-only target and is excluded.
 - **canonicalNames:** Use pnpm chores, `chores_*` MCP tools, `/api/chores/*`, app/lib/chores, app/(chores), and docs/chores. The old board and API routes no longer exist. Stored pre-rename submission sources, device cookies and CLI receipt identity remain compatible to preserve accepted requests, sessions and deduplication.
-- **mcpEvents:** Authenticated MCP clients can receive the same new notifications as Telegram through the draft events/list, events/poll and events/stream methods under chores.notification. Payloads retain the exact notification text and stable notification ID, with occurrence day/submission ID when present. The journal is committed atomically with the domain change, independent of Telegram delivery, with up to 5,000 events from seven days available for replay. Clients own cursors, deduplicate eventId, reconnect streams and inspect authoritative state after truncated. Webhooks are not offered; kid cookies never grant event access.
+- **mcpEvents:** Authenticated MCP clients receive the same new notifications as Telegram through webhook-only draft events/list, events/subscribe and events/unsubscribe under chores.notification. Verified HTTPS receivers use client-supplied Standard Webhooks secrets. Subscriptions are isolated by authenticated principal and URL, expire after a negotiated one-minute to one-day grant, and retain signed independent retries in Redis. Payloads preserve the exact notification text and stable ID. The journal is committed atomically with the domain change, independent of Telegram, with up to 5,000 events from seven days for replay. Clients refresh before expiry, retain safe cursors, deduplicate eventId and inspect authoritative state after truncated or gap. Public polling and SSE Events delivery are not current behavior; kid cookies never grant event access.
 
 ## Explicitly not current behavior
 
@@ -321,6 +321,16 @@ Applies to K02, K46. Basis: explicit decision.
 **Current behavior:** There is one /chores board, `/api/chores/*` API, pnpm chores CLI and `chores_*` MCP tool set. Minimal compatibility for stored identifiers preserves existing sessions, accepted submissions and command receipts. Retain the existing Redis schema namespace and financial history.
 
 Applies to K01, P01, P50. Basis: explicit decision.
+
+<a id="n29"></a>
+
+### N29 — MCP polling and push delivery
+
+**Not current behavior:** Public events/poll, events/stream, SSE event notifications and heartbeat delivery are not current behavior.
+
+**Current behavior:** MCP Events advertises only webhook delivery; authenticated clients subscribe verified HTTPS callbacks, refresh their finite grants and unsubscribe using the same scoped key.
+
+Applies to P56. Basis: explicit September 23 webhook-only request.
 
 ## Kid: get to my board
 
@@ -858,4 +868,4 @@ Applies to K01, P01, P50. Basis: explicit decision.
 
 <a id="p56"></a>
 
-- **P56 — As a parent, I can receive chore notifications in an MCP Events-capable client.** _Current behavior · added._ Authenticated MCP clients can receive the same new notifications as Telegram through the draft events/list, events/poll and events/stream methods under chores.notification. Payloads retain the exact notification text and stable notification ID, with occurrence day/submission ID when present. The journal is committed atomically with the domain change, independent of Telegram delivery, with up to 5,000 events from seven days available for replay. Clients own cursors, deduplicate eventId, reconnect streams and inspect authoritative state after truncated. Webhooks are not offered; kid cookies never grant event access. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N19: Clippy or Telegram management](inventory.md#n19).
+- **P56 — As a parent, I can receive chore notifications in an MCP Events-capable client.** _Current behavior · added._ Authenticated MCP clients receive the same new notifications as Telegram through webhook-only draft events/list, events/subscribe and events/unsubscribe under chores.notification. Verified HTTPS receivers use client-supplied Standard Webhooks secrets. Subscriptions are isolated by authenticated principal and URL, expire after a negotiated one-minute to one-day grant, and retain signed independent retries in Redis. Payloads preserve the exact notification text and stable ID. The journal is committed atomically with the domain change, independent of Telegram, with up to 5,000 events from seven days for replay. Clients refresh before expiry, retain safe cursors, deduplicate eventId and inspect authoritative state after truncated or gap. Public polling and SSE Events delivery are not current behavior; kid cookies never grant event access. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N19: Clippy or Telegram management](inventory.md#n19); [N29: MCP polling and push delivery](inventory.md#n29).

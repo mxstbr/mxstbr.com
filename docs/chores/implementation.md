@@ -24,17 +24,19 @@ Verification: 33 deterministic checks, five iPad browser flows, four real-authen
 
 ## September 23: draft MCP Events
 
-The existing authenticated `/api/mcp` endpoint advertises Events and serves `events/list`, `events/poll` and request-scoped SSE `events/stream`. The single `chores.notification` event mirrors every newly committed Telegram notification's ID, text and available occurrence/submission metadata. Its bounded Redis journal is written atomically with the domain operation and Telegram outbox. Command retries cannot duplicate journal entries; Telegram delivery cannot consume another client's replay history. Storage remains in the existing namespace. See [the pinned draft and operating contract](mcp-events.md).
+The existing authenticated `/api/mcp` endpoint advertises `chores.notification` with webhook delivery only, using `events/list`, `events/subscribe` and `events/unsubscribe`. The journal still commits the same notification ID/text/metadata atomically with domain changes and Telegram's outbox. Verified HTTPS callbacks receive Standard Webhooks signatures, finite TTL grants, secret rotation and independent durable retries. The existing QStash minute drain and command background work process both channels. No new infrastructure or live-data migration is required. See [the pinned draft and operating contract](mcp-events.md).
 
-Verification adds deterministic protocol/cursor/stream tests, disposable Redis concurrency and failure checks, and actual HTTP MCP discovery plus kid-command-to-stream-to-replay tests. The fixture board also renders with its normal controls and no error overlay. These checks do not send Telegram messages or create live chore completions.
+**Not current behavior:** public polling and SSE Events delivery. Removed methods return Unsupported; the normal MCP tool transport remains available. Kid cookies do not authorize subscription operations. Redis leases serialize subscribe/refresh/unsubscribe with workers, and callback DNS is validated and pinned on every request.
 
-The 48 deterministic checks and disposable Redis check passed after integrating the current master scheduling fix. The two HTTP MCP checks also passed. The clean production build passed; read-only checks against that build confirmed Events discovery, all six canonical chores tools, three kids, valid polling cursors, rejected kid-cookie access, SSE confirmation and a heartbeat from the real Redis-backed path.
+Verification covers deterministic fixture-command parity, webhook protocol/authentication, signed verification, retries and safe cursors, principal isolation, TTL/secret rotation, replay/gaps and SSRF restrictions. Disposable Redis tests exercise atomic fan-out, concurrent worker claims and fenced subscription writes. HTTP MCP checks cover capability discovery, existing parent tools and webhook-only delivery. Tests use injected receivers and disposable records, without live chore completions or Telegram test messages.
+
+The webhook revision passed 56 deterministic checks, two disposable Redis integration checks, two HTTP MCP checks, and a clean production build. Read-only checks against that build confirmed webhook-only discovery, all six chores tools, parent authentication, input validation, and explicit rejection of polling/SSE. No callback subscriptions or live chore changes were created by those checks.
 
 ## Current verification commands
 
 ```sh
 pnpm test:chores
-CHORES_REDIS_TEST=1 pnpm exec tsm --test app/lib/chores/repository.integration.test.ts
+CHORES_REDIS_TEST=1 pnpm exec tsm --test app/lib/chores/repository.integration.test.ts app/lib/chores/webhooks.integration.test.ts
 pnpm exec playwright test --config playwright.chores.config.ts
 CHORES_HTTP_TEST=1 pnpm exec tsm --test app/lib/chores/mcp.integration.test.ts
 CHORES_LOGIN_TEST=1 pnpm exec playwright test --config playwright.chores.config.ts

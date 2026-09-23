@@ -1,12 +1,45 @@
 # Chores MCP Events
 
-The authenticated `/api/mcp` endpoint implements the [Events working-group draft at commit 6682596](https://github.com/modelcontextprotocol/experimental-ext-triggers-events/blob/6682596d65eec778fe0b8b1f43b4e89d2fe2c546/docs/design-sketch-proposal.md), checked September 23, 2026. This is an experimental protocol surface; clients need support for that draft. Existing MCP tools and Telegram delivery continue to work.
+The authenticated `/api/mcp` endpoint implements the [Events working-group draft at commit 6682596](https://github.com/modelcontextprotocol/experimental-ext-triggers-events/blob/6682596d65eec778fe0b8b1f43b4e89d2fe2c546/docs/design-sketch-proposal.md), checked September 23, 2026. Clients need support for that experimental draft. **Webhooks are the only MCP Events delivery method.** Existing MCP tools and Telegram notifications continue to work.
 
-Initialization advertises `capabilities.events: {"listChanged": false}`. `events/list` returns the single event type `chores.notification`, its input/payload schemas, and `delivery: ["poll", "push"]`. These are protocol methods, not additional LLM tools. Event arguments are an empty object. The fixed catalog has one page and emits no list-change notifications.
+Initialization advertises `capabilities.events: {"listChanged": false}`. `events/list` returns `chores.notification`, its input/payload schemas, and `delivery: ["webhook"]`. The fixed catalog has one page. These are protocol methods, not additional LLM tools. Event arguments are an empty object.
 
-Every newly committed Telegram notification also enters the event journal in the same Redis transaction as its chore operation. This covers approval requests, completions, approval updates, undo, period bonuses and reward redemptions whenever the domain produces those messages. Telegram success/failure has no effect on the journal. No historical import is performed; collection begins with this deployment. Saved balances, history, pending approvals and the existing `chores:mxstbr:v2` keys are preserved.
+Every newly committed Telegram notification also enters the event journal in the same Redis transaction as its chore operation. This covers approval requests, completions, approval updates, undo, period bonuses and reward redemptions whenever the domain produces those messages. Telegram success/failure cannot consume webhook events or affect callback retries. No historical import occurs; the journal began with the September 23 Events deployment. Existing balances, history, approvals and storage keys are preserved.
 
-An event has this shape:
+## Subscribe and refresh
+
+POST JSON-RPC to `/api/mcp` using the same parent bearer credential used for chores tools. The receiver generates a random Standard Webhooks secret (`whsec_` plus base64 of 24–64 random bytes) and has it ready before subscribing. The server never generates or returns that secret.
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "events/subscribe",
+  "params": {
+    "name": "chores.notification",
+    "arguments": {},
+    "delivery": {
+      "mode": "webhook",
+      "url": "https://receiver.example/hooks/chores",
+      "secret": "whsec_<base64-of-32-random-bytes>"
+    },
+    "cursor": null,
+    "ttlMs": 86400000
+  }
+}
+```
+
+Before activation, the server sends a signed `{"type":"verification","challenge":"..."}` POST. The receiver verifies its signature and echoes `{"challenge":"..."}` in a `2xx` response within five seconds. A reachable endpoint that fails the challenge produces `-32015 CallbackEndpointError` with `data.reason: "challenge_failed"`; network failures use a sanitized category. No chore data is delivered until verification succeeds. Verification is cached for up to one day per authenticated principal and exact callback URL; attempts are limited to one per destination host per ten seconds. No allowlist or well-known-document setup is needed: this implementation uses the challenge mechanism.
+
+The subscribe result contains a deterministic `id`, `refreshBefore`, `cursor` and `truncated`. Repeat the request with the same credential, exact URL, event name and arguments before `refreshBefore`; pass the last cursor received. A live refresh continues pending delivery and cannot skip unacknowledged events, even if it supplies a newer cursor. It refreshes expiry and can replace the signing secret. Deliveries carry signatures for both old and new secrets for five minutes after rotation.
+
+The default grant is one hour, with a one-minute minimum and one-day maximum. `ttlMs: null` receives the finite default; no-expiry subscriptions are not granted. Always follow the returned `refreshBefore`. Subscriptions and pending retries are retained in Redis for the grant, including across serverless workers and deployments. The server permits up to 64 active subscriptions. Site-password and automation credentials have separate subscription identities; knowing an ID does not authorize refreshing or deleting it. Rotating/removing the originating credential ends its subscriptions on the next drain.
+
+Refresh responses also include `deliveryStatus` with `active`, `lastDeliveryAt`, and `lastError` (plus `failedSince` when applicable). Error values are categories such as `timeout` or `http_5xx`; callback response bodies, headers, URLs and secrets are never returned. This implementation does not suspend subscriptions after a handful of failures: it bounds each event's retries and keeps the subscription active until expiry, unsubscribe or revoked authorization.
+
+## Receive deliveries
+
+Each event is a plain JSON POST, not a JSON-RPC notification:
 
 ```json
 {
@@ -18,54 +51,48 @@ An event has this shape:
     "text": "The exact same text as the Telegram notification.",
     "day": "2026-09-23",
     "submissionId": "present only when the source notification has one"
-  }
+  },
+  "cursor": "opaque-safe-replay-watermark"
 }
 ```
 
-`day` and `submissionId` are optional. In particular, ordinary completion messages do not acquire a submission ID merely by being sent through MCP; resolve exact submissions through the day/approval tools. Payloads are untrusted data, with the same treatment as tool results. Receiving an event does not approve a request or grant any new mutation authority.
+`day` and `submissionId` are optional. Ordinary completion messages do not acquire a submission ID merely by being sent through MCP; resolve exact submissions through the day/approval tools. Payloads are untrusted data and do not approve requests or grant mutation authority.
 
-## Poll
+Every POST includes `Content-Type: application/json`, `webhook-id`, `webhook-timestamp`, `webhook-signature`, and `X-MCP-Subscription-Id`. Signatures follow [Standard Webhooks](https://github.com/standard-webhooks/standard-webhooks/blob/main/spec/standard-webhooks.md): HMAC-SHA256 over `webhook-id + "." + webhook-timestamp + "." + rawBody`, using the base64-decoded secret bytes and a `v1,` base64 signature. Verify the **raw bytes**, accept any valid signature during rotation, reject old timestamps, and deduplicate `webhook-id`/`eventId`. Control messages use IDs beginning with `msg_verification_`, `msg_gap_` or `msg_terminated_` and the same headers/signature scheme.
 
-POST standard JSON-RPC to `/api/mcp` with the same bearer credential used for parent tools:
+Durably accept or forward a delivery before returning `2xx`. Each event retries independently, so later notifications may arrive before an older failed delivery. Its cursor is a safe watermark that never skips an earlier unacknowledged event. Persist cursors from both deliveries and refresh results, and forward cursors/control messages to the consuming MCP client. Repeated delivery after a response/worker crash is possible; delivery is at least once with bounded retries, not exactly once.
+
+A callback has five seconds to respond. Retry delays are 30, 60, 120 and 240 seconds, with at most five attempts and a fifteen-minute retry window. The existing minute drain may round these delays upward. `410 Gone` and `413 Payload Too Large` abandon only that delivery immediately. Exhausted deliveries are abandoned for cursor advancement; they can be recovered within journal retention by creating a fresh subscription with an earlier saved cursor. A quiet or paused system does not need an open MCP connection.
+
+Callbacks must use HTTPS. Every verification and delivery resolves the hostname, rejects private/special-purpose addresses, and pins the connection to the validated IP while preserving TLS certificate checks and the original hostname. Redirects are never followed. Bodies are capped at 256 KiB. Receivers should use HMAC authentication rather than require a fixed Vercel egress IP.
+
+## Replay, gaps and cleanup
+
+A null or omitted cursor on a **new** subscription means start from now. To recover after expiry, re-subscribe with the saved cursor. Replay retains at most 5,000 notifications from seven days; `maxAgeMs` can shorten initial replay. `truncated: true` in the subscribe response signals skipped history. A gap discovered while the subscription is active sends a signed `{"type":"gap","cursor":"..."}` control message. Persist the cursor and inspect authoritative chores state after a gap. Global notification pause stops both Telegram and webhook delivery without advancing an existing subscriber past its queue; history still has its normal retention limit.
+
+Explicit cleanup uses the same key; the returned subscription `id` is not an input:
 
 ```json
 {
   "jsonrpc": "2.0",
-  "id": 1,
-  "method": "events/poll",
+  "id": 2,
+  "method": "events/unsubscribe",
   "params": {
     "name": "chores.notification",
     "arguments": {},
-    "cursor": null,
-    "maxEvents": 50,
-    "maxAgeMs": 300000
+    "delivery": { "url": "https://receiver.example/hooks/chores" }
   }
 }
 ```
 
-A null or omitted cursor starts from now: the first response contains no events and a fresh cursor. Persist that opaque cursor and supply it on subsequent polls. Results contain `events`, `cursor`, `truncated`, `hasMore`, and `nextPollMs`. Poll after 15 seconds, or immediately when `hasMore` is true. The default page size is 50, with a server cap of 1,000; a larger requested cap still returns pages without discarding events. Poll event occurrences do not carry individual cursors.
+Unsubscribe is idempotent. Otherwise, stop refreshing and the grant expires. Revoked authorization removes the subscription and attempts a signed `terminated` control message containing a `Forbidden` error, without chore data.
 
-Each client owns its cursor and deduplicates by `eventId`. Polling does not consume events for another client. At most the newest 5,000 notifications from the last seven days can be replayed. `maxAgeMs` can shorten that window. If history has expired, the size limit has evicted entries, or an age limit skips events, `truncated: true` reports the gap and delivery resumes from retained history. Persist the returned cursor and use the chores inspection tools to recover authoritative state when needed. The global notification pause also pauses MCP delivery without advancing an existing subscriber past queued events.
-
-## Push
-
-Send `events/stream` with the same `name`, `arguments`, `cursor` and optional `maxAgeMs`, with `Accept: application/json, text/event-stream`. The POST response is an SSE stream scoped to this one subscription:
-
-- `notifications/events/active` confirms the cursor and any initial gap before replay begins.
-- `notifications/events/event` carries an occurrence and its cursor. The durable journal is checked every two seconds.
-- `notifications/events/heartbeat` carries the last checked cursor during quiet periods, approximately every 15 seconds.
-- `notifications/events/error` reports a temporary failure; the stream retries from its existing cursor. Storage reads time out after 10 seconds.
-- Another `notifications/events/active` with `truncated: true` signals a gap detected while streaming.
-- `notifications/events/terminated` ends delivery when authorization is revoked.
-
-Every notification includes `params._meta["io.modelcontextprotocol/subscriptionId"]` equal to the parent request ID. Simultaneous clients may use the same JSON-RPC ID without sharing a stream. Abort the HTTP response to unsubscribe; cancellation releases the stream loop. Streams finish after 55 seconds with the draft's empty `StreamEventsResult` before the serverless request limit. Reopen `events/stream` with the last persisted cursor after closure or connection loss. Replayed events retain their IDs for deduplication.
-
-Invalid subscriptions return JSON-RPC errors before SSE opens. Bad arguments/cursors use `-32602`; unknown event names use `-32011` with `data.kind: "event"`; unauthenticated event calls use `-32012` in development, while production's outer endpoint authentication rejects them with HTTP 401. Kid/site-login cookies never authorize event reads. The existing parent bearer credentials and password-query compatibility apply; prefer bearer authentication.
-
-Webhook delivery is not advertised. `events/subscribe` and `events/unsubscribe` return `-32014` with `data: {"feature":"deliveryMode","value":"webhook"}`. A client must support polling or push to receive these events. No webhook endpoint, signing secret or subscription registry is needed.
+**Not current behavior:** public `events/poll`, `events/stream`, SSE event notifications and heartbeats. Both removed methods return `-32014 Unsupported` with the requested delivery mode. Normal MCP tool transport is unaffected. Bad arguments/cursors use `-32602`; unknown event names use `-32011` with `data.kind: "event"`. Kid/site-login cookies do not authorize Events. Production's outer authentication rejects unauthenticated requests with HTTP 401; the development protocol adapter uses `-32012`.
 
 ## Operations and verification
 
-`chores_notification_status` continues to inspect Telegram's outbox. MCP delivery is driven by each client's saved cursor, with no server-side subscription list. The existing QStash drain remains responsible for Telegram retries; MCP reads the independent journal directly. The journal uses `:events:log` and `:events:sequence` under the existing namespace. Its sequence survives journal expiry so stale clients get an explicit gap instead of silently restarting at zero.
+After each committed command, Telegram and webhooks drain independently in background work. Successful subscribe/refresh also kicks the webhook drain. The existing signed QStash `chores-notification-drain` runs every minute at `/api/chores/notifications` and retries both channels; there is no new schedule or infrastructure. The drain response reports each channel separately. `chores_notification_status` still reports Telegram's outbox; webhook clients inspect their own refresh responses. The draft intentionally has no subscription-list method.
 
-`events.test.ts` covers notification parity, replay/pagination, pauses, age/retention gaps, authentication and protocol errors, SSE routing, heartbeats, cancellation, transient errors and revocation. The disposable Redis integration test checks atomic notification fan-out during concurrent/retried commands and after Telegram failure/success. The HTTP MCP test checks capability discovery, a real fixture kid command, SSE delivery, heartbeat and cursor replay after disconnect. All mutation tests use fixtures or disposable Redis keys and injected Telegram senders.
+The journal remains at `:events:log` and `:events:sequence` under `chores:mxstbr:v2`. Expiring subscription, retry, lease and verification records use `:events:webhooks:*` in the same namespace. Signing secrets live only in TTL-scoped subscription records, never in the event journal, API results or logs. Durable leases serialize worker delivery with refresh/unsubscribe and fence stale writers.
+
+Deterministic checks cover real fixture-command notification parity, signed verification, independent retries and safe watermarks, principal isolation, TTL/secret rotation, pauses, revocation, replay/gaps, URL/DNS restrictions, and removal of poll/push. Disposable Redis integration checks atomic journal/outbox fan-out and webhook concurrency, worker recreation, refreshes and lease fencing. HTTP MCP tests check capability discovery, existing parent authentication and the webhook-only descriptor. Tests use fixture chores, disposable Redis keys and injected receivers; they do not send real Telegram notifications or complete live chores.

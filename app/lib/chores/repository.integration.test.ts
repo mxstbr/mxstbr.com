@@ -31,7 +31,7 @@ test(
       await redis.set(`${prefix}:core`, JSON.stringify(f.core))
       for (const d of Object.values(f.days))
         await redis.set(`${prefix}:day:${d.day}`, JSON.stringify(d))
-      const initialCursor = (await events.poll({ name: CHORE_EVENT })).cursor
+      const initialCursor = (await events.read({ name: CHORE_EVENT })).cursor
       const b = await service.getBoard(actor),
         dev = b.kids.find((k) => k.id === 'kid-3')!
       const rid = randomUUID()
@@ -74,7 +74,7 @@ test(
       const due = `${prefix}:outbox:due`
       const before = await redis.zcard(due)
       assert(before >= 4)
-      const mirrored = await events.poll({
+      const mirrored = await events.read({
         name: CHORE_EVENT,
         cursor: initialCursor,
       })
@@ -87,7 +87,7 @@ test(
       assert.equal(await redis.zcard(due), before)
       assert.equal((await repo.readCore()).balances['kid-3'], 10)
       assert.deepEqual(
-        (await events.poll({ name: CHORE_EVENT, cursor: initialCursor }))
+        (await events.read({ name: CHORE_EVENT, cursor: initialCursor }))
           .events,
         mirrored.events,
       )
@@ -112,13 +112,13 @@ test(
       assert.equal((await repo.readCore()).balances['kid-3'], 10)
       // Telegram delivery and receipt expiry cannot consume another client's events.
       assert.deepEqual(
-        (await events.poll({ name: CHORE_EVENT, cursor: initialCursor }))
+        (await events.read({ name: CHORE_EVENT, cursor: initialCursor }))
           .events,
         mirrored.events,
       )
       const originalCount = await redis.zcard(`${prefix}:events:log`)
       await redis.del(`${prefix}:events:log`)
-      const expired = await events.poll({
+      const expired = await events.read({
         name: CHORE_EVENT,
         cursor: initialCursor,
       })

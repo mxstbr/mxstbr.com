@@ -53,8 +53,8 @@
       "priority": "normal",
       "channel": "chatgpt_mcp",
       "targetStory": "As a parent, I can receive chore notifications in an MCP Events-capable client.",
-      "targetNotes": "Authenticated MCP clients can receive the same new notifications as Telegram through the draft events/list, events/poll and events/stream methods under chores.notification. Payloads retain the exact notification text and stable notification ID, with occurrence day/submission ID when present. The journal is committed atomically with the domain change, independent of Telegram delivery, with up to 5,000 events from seven days available for replay. Clients own cursors, deduplicate eventId, reconnect streams and inspect authoritative state after truncated. Webhooks are not offered; kid cookies never grant event access.",
-      "basis": "explicit September 23 request for the draft MCP Events specification and Telegram notification parity",
+      "targetNotes": "Authenticated MCP clients receive the same new notifications as Telegram through webhook-only draft events/list, events/subscribe and events/unsubscribe under chores.notification. Verified HTTPS receivers use client-supplied Standard Webhooks secrets. Subscriptions are isolated by authenticated principal and URL, expire after a negotiated one-minute to one-day grant, and retain signed independent retries in Redis. Payloads preserve the exact notification text and stable ID. The journal is committed atomically with the domain change, independent of Telegram, with up to 5,000 events from seven days for replay. Clients refresh before expiry, retain safe cursors, deduplicate eventId and inspect authoritative state after truncated or gap. Public polling and SSE Events delivery are not current behavior; kid cookies never grant event access.",
+      "basis": "explicit September 23 request for draft MCP Events and Telegram notification parity, followed by webhook-only delivery",
       "implementation": {
         "status": "implemented",
         "files": [
@@ -62,12 +62,18 @@
           "app/lib/chores/events-http.ts",
           "app/lib/chores/repository.ts",
           "app/lib/chores/mcp.ts",
-          "app/api/mcp/route.ts"
+          "app/api/mcp/route.ts",
+          "app/lib/chores/webhooks.ts",
+          "app/lib/chores/webhook-http.ts",
+          "app/lib/chores/webhook-auth.ts",
+          "app/lib/chores/webhook-store.ts",
+          "app/lib/chores/webhook-runtime.ts",
+          "app/lib/chores/notifications.ts"
         ],
-        "verification": "events.test.ts checks notification parity, command idempotency, cursor pagination, retention/maxAge gaps, auth, replay, isolated SSE streams, cancellation, retry and termination. Disposable Redis verifies atomic journal/outbox fan-out during concurrent commands and Telegram failures. Real HTTP MCP tests verify discovery, kid command delivery, heartbeat and replay after disconnect."
+        "verification": "Deterministic checks cover fixture-command parity, challenge verification and signatures, independent retries and safe cursors, refresh/expiry/rotation, principal isolation, pause/revocation, replay/gaps and URL/DNS restrictions. Disposable Redis checks concurrent subscriptions/workers, durable retries and lease fencing. HTTP MCP checks discovery, parent authentication and explicit rejection of poll/push. No live chore changes or Telegram test messages."
       },
       "isCurrentBehavior": true,
-      "notBehaviorRefs": ["N18", "N19"]
+      "notBehaviorRefs": ["N18", "N19", "N29"]
     }
   ],
   "newFeatureCount": 3,
@@ -99,7 +105,7 @@
     "packingPersistence": "Packing is shared in Redis across authorized devices and agents. A one-time import can carry over the old browser checklist; subsequent progress does not depend on that browser’s local storage.",
     "featurePriority": "K07–K09 counts-only summaries and K59 system appearance remain implemented at lower priority. K04/K05 small-screen selection was superseded by the accepted landscape-only target and is excluded.",
     "canonicalNames": "Use pnpm chores, `chores_*` MCP tools, `/api/chores/*`, app/lib/chores, app/(chores), and docs/chores. The old board and API routes no longer exist. Stored pre-rename submission sources, device cookies and CLI receipt identity remain compatible to preserve accepted requests, sessions and deduplication.",
-    "mcpEvents": "Authenticated MCP clients can receive the same new notifications as Telegram through the draft events/list, events/poll and events/stream methods under chores.notification. Payloads retain the exact notification text and stable notification ID, with occurrence day/submission ID when present. The journal is committed atomically with the domain change, independent of Telegram delivery, with up to 5,000 events from seven days available for replay. Clients own cursors, deduplicate eventId, reconnect streams and inspect authoritative state after truncated. Webhooks are not offered; kid cookies never grant event access."
+    "mcpEvents": "Authenticated MCP clients receive the same new notifications as Telegram through webhook-only draft events/list, events/subscribe and events/unsubscribe under chores.notification. Verified HTTPS receivers use client-supplied Standard Webhooks secrets. Subscriptions are isolated by authenticated principal and URL, expire after a negotiated one-minute to one-day grant, and retain signed independent retries in Redis. Payloads preserve the exact notification text and stable ID. The journal is committed atomically with the domain change, independent of Telegram, with up to 5,000 events from seven days for replay. Clients refresh before expiry, retain safe cursors, deduplicate eventId and inspect authoritative state after truncated or gap. Public polling and SSE Events delivery are not current behavior; kid cookies never grant event access."
   },
   "counts": {
     "retained": 26,
@@ -3493,7 +3499,15 @@
       "currentBehavior": "There is one /chores board, `/api/chores/*` API, pnpm chores CLI and `chores_*` MCP tool set. Minimal compatibility for stored identifiers preserves existing sessions, accepted submissions and command receipts. Retain the existing Redis schema namespace and financial history.",
       "featureIds": ["K01", "P01", "P50"],
       "basis": "explicit_decision"
+    },
+    {
+      "id": "N29",
+      "title": "MCP polling and push delivery",
+      "notBehavior": "Public events/poll, events/stream, SSE event notifications and heartbeat delivery are not current behavior.",
+      "currentBehavior": "MCP Events advertises only webhook delivery; authenticated clients subscribe verified HTTPS callbacks, refresh their finite grants and unsubscribe using the same scoped key.",
+      "featureIds": ["P56"],
+      "basis": "explicit September 23 webhook-only request"
     }
   ],
-  "notCurrentBehaviorCount": 28
+  "notCurrentBehaviorCount": 29
 }

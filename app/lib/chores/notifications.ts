@@ -114,3 +114,18 @@ export async function notificationStatus(repository = new RedisRepository()) {
     submissionId: n!.submissionId,
   }))
 }
+
+// Each channel owns its delivery state. A failed channel must neither consume
+// another channel's events nor turn an already-committed chore into a failure.
+export async function drainAllNotifications() {
+  const { choreWebhooks } = await import('./webhook-runtime')
+  const [telegram, webhooks] = await Promise.allSettled([
+    drainNotifications(),
+    Promise.resolve().then(() => choreWebhooks().drain()),
+  ])
+  const outcome = (result: PromiseSettledResult<unknown>) =>
+    result.status === 'fulfilled'
+      ? result.value
+      : { failed: true, message: 'Delivery will retry on the next drain.' }
+  return { telegram: outcome(telegram), webhooks: outcome(webhooks) }
+}

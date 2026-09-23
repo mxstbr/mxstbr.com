@@ -4,7 +4,7 @@ import { after } from 'next/server'
 import { inviteDevice, listDevices, parentActor, revokeDevice } from './auth'
 import { commandSchema, daySchema } from './commands'
 import { choresService, developmentFixture } from './runtime'
-import { drainNotifications, notificationStatus } from './notifications'
+import { drainAllNotifications, notificationStatus } from './notifications'
 import { ChoresError, fail } from './types'
 import { pacificDay } from './time'
 
@@ -85,7 +85,7 @@ export function registerChoresTools(server: McpServer) {
           requestId,
           command,
         )
-        if (!developmentFixture()) after(() => drainNotifications())
+        if (!developmentFixture()) after(() => drainAllNotifications())
         return value
       }),
   )

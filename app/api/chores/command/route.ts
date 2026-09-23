@@ -3,7 +3,7 @@ import { requireDevice, verifySameOrigin } from 'app/lib/chores/auth'
 import { requestSchema } from 'app/lib/chores/commands'
 import { choresService, developmentFixture } from 'app/lib/chores/runtime'
 import { fail } from 'app/lib/chores/types'
-import { drainNotifications } from 'app/lib/chores/notifications'
+import { drainAllNotifications } from 'app/lib/chores/notifications'
 import { errorResponse, json } from '../http'
 
 export async function POST(request: Request) {
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       payload.data.requestId,
       payload.data.command,
     )
-    if (!developmentFixture()) after(() => drainNotifications())
+    if (!developmentFixture()) after(() => drainAllNotifications())
     return json({ result, board: await choresService().getBoard(actor) })
   } catch (error) {
     return errorResponse(error)

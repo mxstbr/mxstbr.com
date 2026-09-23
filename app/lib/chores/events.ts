@@ -7,7 +7,6 @@ import type { Notification, Repository } from './types'
 export const CHORE_EVENT = 'chores.notification'
 export const EVENT_HISTORY_LIMIT = 5000
 export const EVENT_MAX_AGE_MS = 7 * 86400000
-export const EVENT_POLL_MS = 15000
 export type EventRecord = {
   position: number
   notification: Pick<
@@ -28,7 +27,7 @@ export const eventParams = z.object({
     .max(Number.MAX_SAFE_INTEGER)
     .optional(),
 })
-export const pollParams = eventParams.extend({
+export const journalParams = eventParams.extend({
   maxEvents: z
     .number()
     .int()
@@ -41,7 +40,7 @@ export const choreEventDescriptor = {
   name: CHORE_EVENT,
   description:
     'The same parent notifications sent to Telegram: chore submissions, completions, reviews, undo, period bonuses and reward redemptions. data.text is the unchanged notification text. Save the cursor and deduplicate by eventId. Up to 5,000 events from the last seven days can be replayed; truncated signals a gap. Read authoritative state with the chores tools.',
-  delivery: ['poll', 'push'],
+  delivery: ['webhook'],
   inputSchema: { type: 'object', properties: {}, additionalProperties: false },
   payloadSchema: {
     type: 'object',
@@ -108,8 +107,8 @@ export class ChoreEvents {
     readonly now: () => number = Date.now,
   ) {}
 
-  async poll(input: z.input<typeof pollParams>) {
-    const params = parseEventParams(pollParams, input)
+  async read(input: z.input<typeof journalParams>) {
+    const params = parseEventParams(journalParams, input)
     checkEventName(params.name)
     const position =
       params.cursor === null ? null : cursorPosition(params.cursor)
@@ -148,8 +147,7 @@ export class ChoreEvents {
       cursor: eventCursor(through),
       truncated,
       hasMore,
-      nextPollMs: EVENT_POLL_MS,
-      // Delivery adapters need per-occurrence positions, never exposed in poll results.
+      // Delivery adapters need per-occurrence positions, kept inside the delivery adapter.
       records,
     }
   }
