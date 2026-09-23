@@ -6,7 +6,7 @@ The visual is designed around a 1024px-wide 4:3 iPad and a roughly 680px usable 
 
 ## Layout
 
-- A small shared header names the current period and its cutoff; today's date sits quietly at the right. There is no navigation to other periods.
+- A small shared header names the current period and its cutoff; today's date sits quietly at the right. Morning shows “Until 7:30 AM,” then switches to “Before lunch” with “Until 12:00 PM.” The remaining cutoffs are 5pm, 8:15pm and 10pm, all Pacific. There is no navigation to other periods.
 - A visible Chores / Rewards switch opens each child's reward catalog in their own column. Children can see their balance, compare costs, and confirm a redemption; unaffordable rewards show the remaining stars needed. After 90 seconds without interaction, the board returns to Chores. The Refresh button performs a full browser reload, including loading new app code.
 - Each column has the child's name and a stable color. A small star balance opens that child's Rewards.
 - The main area shows exactly one actionable chore from the parent's saved sequence. **Its existing assigned emoji is a large visual reminder**, paired with the full title, including the long school-clothes instruction. Reuse the same emoji in current choices and Done/Waiting; do not substitute randomly chosen artwork.

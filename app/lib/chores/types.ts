@@ -1,6 +1,12 @@
 import type { PRE_RENAME_SOURCE } from './compatibility'
 
-export const PERIODS = ['morning', 'afternoon', 'evening', 'night'] as const
+export const PERIODS = [
+  'morning',
+  'before-lunch',
+  'afternoon',
+  'evening',
+  'night',
+] as const
 export type Period = (typeof PERIODS)[number]
 export type Group = Period | 'bonus'
 export type Kid = { id: string; name: string; color: string }
@@ -54,6 +60,9 @@ export type Submission = {
   occurrenceId: string
   kidId: string
   submittedAt: string
+  // Keep the window under which this submission was accepted, even if the
+  // family's current deadlines change before a parent reviews it.
+  acceptedWindow?: { opensAt: string; closesAt: string }
   stars: number
   notifiedAt?: string
   notificationRetrying?: boolean

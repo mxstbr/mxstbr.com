@@ -1,11 +1,83 @@
 import { test, expect } from '@playwright/test'
 import type { Board } from './types'
 
+test('7:30am switches Morning to Before lunch with matching deadlines and readable labels', async ({
+  page,
+}) => {
+  const initial: Board = await (
+    await page.request.get('/api/chores/board')
+  ).json()
+  expect(initial.serverNow).toBe('2026-09-09T14:15:00.000Z')
+  const morning: Board = {
+    ...initial,
+    revision: initial.revision + 1000,
+    serverNow: '2026-09-09T14:29:59.000Z',
+    boundary: '2026-09-09T14:30:00.000Z',
+    period: 'morning',
+  }
+  const beforeLunch: Board = {
+    ...morning,
+    revision: morning.revision + 1,
+    period: 'before-lunch',
+    serverNow: '2026-09-09T14:30:00.000Z',
+    boundary: '2026-09-09T19:00:00.000Z',
+    kids: morning.kids.map((k) => ({
+      ...k,
+      completed: [],
+      chores:
+        k.id === 'kid-3'
+          ? [{ ...k.chores[0], title: 'Read a chapter', group: 'before-lunch' }]
+          : [],
+      periodProgress: {
+        total: k.id === 'kid-3' ? 1 : 0,
+        completed: 0,
+        pending: 0,
+        missed: 0,
+        stars: 2,
+        earned: false,
+      },
+    })),
+  }
+  let current = morning
+  await page.route('**/api/chores/board', (route) =>
+    route.fulfill({ json: current }),
+  )
+  await page.clock.install({ time: new Date(morning.serverNow) })
+  await page.goto('/chores')
+  await expect(
+    page.getByRole('heading', { name: 'Morning', exact: true }),
+  ).toBeVisible()
+  await expect(page.getByText('Until 7:30 AM', { exact: true })).toBeVisible()
+  await expect(
+    page.getByRole('heading', { name: 'Make your bed', exact: true }),
+  ).toHaveCount(3)
+  current = beforeLunch
+  await page.clock.runFor(1100)
+  await expect(
+    page.getByRole('heading', { name: 'Before lunch', exact: true }),
+  ).toBeVisible()
+  await expect(page.getByText('Until 12:00 PM', { exact: true })).toBeVisible()
+  await expect(
+    page.getByRole('heading', { name: 'Make your bed', exact: true }),
+  ).toHaveCount(0)
+  await expect(
+    page.getByRole('heading', { name: 'Read a chapter', exact: true }),
+  ).toBeVisible()
+  await expect(
+    page.getByText('Finish before lunch', { exact: true }),
+  ).toBeVisible()
+  await expect(
+    page.getByText('Nothing to do right now.', { exact: true }),
+  ).toHaveCount(2)
+  await expect(page.locator('.chores-period-reward')).toHaveCount(1)
+  await page.screenshot({ path: '/private/tmp/chores-before-lunch.png' })
+})
+
 test('idle panels return to now without daytime blackout', async ({ page }) => {
   await page.clock.install({ time: new Date('2026-09-10T01:52:00Z') })
   await page.goto('/chores')
   const board = await (await page.request.get('/api/chores/board')).json()
-  expect(board.serverNow).toBe('2026-09-09T15:00:00.000Z')
+  expect(board.serverNow).toBe('2026-09-09T14:15:00.000Z')
   const dilan = page.locator('[data-kid="kid-1"]')
   await dilan.locator('.chores-wallet').click()
   await expect(
@@ -118,7 +190,7 @@ test('landscape iPad: focus, stars, exact undo, rewards, packing, color, summary
   await page.goto('/chores')
   const initial = await (await page.request.get('/api/chores/board')).json()
   // This suite must never mutate a live board.
-  expect(initial.serverNow).toBe('2026-09-09T15:00:00.000Z')
+  expect(initial.serverNow).toBe('2026-09-09T14:15:00.000Z')
   const devina = page.locator('[data-kid="kid-3"]')
   const dilan = page.locator('[data-kid="kid-1"]')
   await expect(
@@ -311,7 +383,7 @@ test('landscape iPad: focus, stars, exact undo, rewards, packing, color, summary
   const late = {
     ...initial,
     revision: 999999,
-    boundary: '2026-09-09T15:00:00.100Z',
+    boundary: '2026-09-09T14:15:00.100Z',
   }
   await page.route('**/api/chores/board', async (route) => {
     await new Promise((resolve) => setTimeout(resolve, 250))
@@ -331,7 +403,7 @@ test('a glance separates outstanding chores from empty, finished and pending wor
   const scene: Board = await (
     await page.request.get('/api/chores/board')
   ).json()
-  expect(scene.serverNow).toBe('2026-09-09T15:00:00.000Z')
+  expect(scene.serverNow).toBe('2026-09-09T14:15:00.000Z')
   scene.revision += 100
   const empty = scene.kids[1],
     done = scene.kids[2]

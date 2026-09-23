@@ -1,13 +1,33 @@
 import { PERIODS, type Group, type Period } from './types'
 
 export const TIME_ZONE = 'America/Los_Angeles'
-// Retain the existing 7am morning opening; evening and night no longer overlap.
+// Pacific windows share their boundaries so the board and command checks agree.
 export const WINDOWS: Record<Period, [number, number]> = {
-  morning: [7 * 60, 12 * 60],
+  morning: [7 * 60, 7 * 60 + 30],
+  'before-lunch': [7 * 60 + 30, 12 * 60],
   afternoon: [12 * 60, 17 * 60],
   evening: [17 * 60, 20 * 60 + 15],
   night: [20 * 60 + 15, 22 * 60],
 }
+export const PERIOD_LABELS: Record<Group, string> = {
+  morning: 'Morning',
+  'before-lunch': 'Before lunch',
+  afternoon: 'Afternoon',
+  evening: 'Evening',
+  night: 'Night',
+  bonus: 'Bonus',
+}
+const boundaries = Array.from(
+  new Set([...Object.values(WINDOWS).flat(), 1440]),
+).sort((a, b) => a - b)
+const clockTime = (minutes: number) =>
+  `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`
+export const TIME_WINDOWS = PERIODS.map((id) => ({
+  id,
+  name: PERIOD_LABELS[id],
+  opensAt: clockTime(WINDOWS[id][0]),
+  closesAt: clockTime(WINDOWS[id][1]),
+}))
 const formatter = new Intl.DateTimeFormat('en-US', {
   timeZone: TIME_ZONE,
   year: 'numeric',
@@ -71,7 +91,7 @@ export function currentTime(now: Date) {
   const period =
     PERIODS.find((p) => minutes >= WINDOWS[p][0] && minutes < WINDOWS[p][1]) ??
     null
-  const next = [420, 720, 1020, 1215, 1320, 1440].find((n) => n > minutes)!
+  const next = boundaries.find((n) => n > minutes)!
   return { day, period, boundary: pacificInstant(day, next) }
 }
 

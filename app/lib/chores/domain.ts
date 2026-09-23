@@ -1,7 +1,13 @@
 import { PRE_RENAME_SOURCE } from './compatibility'
 import { randomUUID } from 'node:crypto'
 import { PACKING_ITEMS } from './packing'
-import { currentTime, pacificDay, weekday, windowFor } from './time'
+import {
+  currentTime,
+  pacificDay,
+  weekday,
+  windowFor,
+  PERIOD_LABELS,
+} from './time'
 import {
   fail,
   PERIODS,
@@ -110,6 +116,20 @@ export function ensurePlan(core: Core, day: Day) {
 // occurrence and submission snapshots so approval and undo retain their facts.
 export function amendPlan(core: Core, day: Day, now: Date) {
   for (const o of day.occurrences) {
+    // Existing current/future plans must follow new family-wide deadlines too.
+    // Preserve each earlier submission's accepted window before changing it.
+    if (day.day >= pacificDay(now)) {
+      const window = windowFor(day.day, o.group)
+      if (o.opensAt !== window.opensAt || o.closesAt !== window.closesAt) {
+        for (const s of day.submissions)
+          if (s.occurrenceId === o.id)
+            s.acceptedWindow ??= {
+              opensAt: o.opensAt,
+              closesAt: o.closesAt,
+            }
+        Object.assign(o, window)
+      }
+    }
     const definition = core.chores.find((c) => c.id === o.choreId)
     const eligible =
       definition &&
@@ -271,7 +291,7 @@ export function reconcileBonuses(
         p.stars,
         'period-bonus',
         `${day.day}:${key}`,
-        `${group} completion bonus`,
+        `${PERIOD_LABELS[group]} completion bonus`,
         now,
       )
       day.awards[key] = entry.id
@@ -279,7 +299,7 @@ export function reconcileBonuses(
       const kid = tx.core.kids.find((k) => k.id === kidId)!
       notify(
         tx,
-        `${kid.name} earned +${p.stars} bonus stars for completing every task in the ${group} (${tx.core.balances[kidId]} total).`,
+        `${kid.name} earned +${p.stars} bonus stars for completing every task in ${PERIOD_LABELS[group]} (${tx.core.balances[kidId]} total).`,
         now,
         day.day,
       )
@@ -293,7 +313,7 @@ export function reconcileBonuses(
         -(original?.amount ?? p.stars),
         'reversal',
         `${day.day}:${key}`,
-        `${group} bonus reversed because required work is incomplete`,
+        `${PERIOD_LABELS[group]} bonus reversed because required work is incomplete`,
         now,
         current,
       )
@@ -363,6 +383,7 @@ export function submit(
     occurrenceId: id,
     kidId: o.kidId,
     submittedAt: now.toISOString(),
+    acceptedWindow: { opensAt: o.opensAt, closesAt: o.closesAt },
     stars: o.chore.stars,
     status: o.chore.requiresApproval ? 'pending' : 'approved',
     source: 'chores',
@@ -373,7 +394,7 @@ export function submit(
     tx.core.pending[s.id] = day.day
     notify(
       tx,
-      `${kid.name} asks for approval: ${o.chore.emoji} ${o.chore.title} (+${s.stars} stars). Occurrence: ${day.day}, ${o.group}. Submitted on time at ${s.submittedAt}. Request: ${s.id}. Ask ChatGPT to approve this exact Chores request.`,
+      `${kid.name} asks for approval: ${o.chore.emoji} ${o.chore.title} (+${s.stars} stars). Occurrence: ${day.day}, ${PERIOD_LABELS[o.group]}. Submitted on time at ${s.submittedAt}. Request: ${s.id}. Ask ChatGPT to approve this exact Chores request.`,
       now,
       day.day,
       s.id,
@@ -434,11 +455,12 @@ export function review(
       message: `This submission is already ${s.status}.`,
     }
   const o = day.occurrences.find((o) => o.id === s.occurrenceId)!
+  const acceptedWindow = s.acceptedWindow ?? o
   // Approval checks the immutable accepted submission, never today's window.
   if (
     (s.source !== 'chores' && s.source !== PRE_RENAME_SOURCE) ||
-    Date.parse(s.submittedAt) < Date.parse(o.opensAt) ||
-    Date.parse(s.submittedAt) >= Date.parse(o.closesAt)
+    Date.parse(s.submittedAt) < Date.parse(acceptedWindow.opensAt) ||
+    Date.parse(s.submittedAt) >= Date.parse(acceptedWindow.closesAt)
   )
     fail('INVALID_SUBMISSION', 'This is not an accepted on-time submission.')
   s.reviewedAt = now.toISOString()
@@ -471,7 +493,7 @@ export function review(
   const bonuses = reconcileBonuses(tx, day, actor, s.kidId, now)
   notify(
     tx,
-    `${tx.core.kids.find((k) => k.id === s.kidId)!.name}'s ${o.chore.title} was approved (+${s.stars} stars). Submitted ${s.submittedAt}; approved ${s.reviewedAt}; occurrence ${day.day}, ${o.group}.`,
+    `${tx.core.kids.find((k) => k.id === s.kidId)!.name}'s ${o.chore.title} was approved (+${s.stars} stars). Submitted ${s.submittedAt}; approved ${s.reviewedAt}; occurrence ${day.day}, ${PERIOD_LABELS[o.group]}.`,
     now,
     day.day,
   )

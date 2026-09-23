@@ -31,12 +31,17 @@ Chore-title read-aloud, Hear it controls, and the speech endpoint are **not curr
 
 | Pacific period | Opens (inclusive) | Closes (exclusive) |
 | -------------- | ----------------- | ------------------ |
-| Morning        | 7am               | noon               |
+| Morning        | 7am               | 7:30am             |
+| Before lunch   | 7:30am            | noon               |
 | Afternoon      | noon              | 5pm                |
 | Evening        | 5pm               | 8:15pm             |
 | Night          | 8:15pm            | 10pm               |
 
-Between 10pm and 7am only eligible untimed Bonus work is available. Other named time groups, previews, expansion controls, persistent-open groups, and the old Evening/Night overlap are **not current behavior**. A boundary removes previous timed cards and resets stale selections. The service enforces current eligibility independently of URLs, client clocks, or stale screens.
+These windows apply to all three children. Before lunch uses `before-lunch` in commands and per-child ordering. Existing Morning assignments keep their group; no chores move into the new window automatically. The catalog publishes `timeZone` and `timeWindows` with the same labels and clock boundaries used by the UI.
+
+Between 10pm and 7am only eligible untimed Bonus work is available. Other named time groups, previews, expansion controls, persistent-open groups, the former noon Morning deadline, and the old Evening/Night overlap are **not current behavior**. A boundary removes previous timed cards and resets stale selections. The service enforces current eligibility independently of URLs, client clocks, or stale screens.
+
+Current and future saved plans adopt changed family deadlines. Before changing an occurrence's window, save the original window on every earlier submission that lacks one. Review uses that accepted window, so a request valid under the previous noon deadline stays approvable. Completed stars, IDs, timestamps and historical days remain intact; the old cutoff cannot authorize a new late completion.
 
 Use the saved per-child/per-group order. The [September 8 list](routine-order.md) was the initial sequence; subsequent explicit parent edits are authoritative. Weekday/availability filtering preserves relative order. Sorting by stars, title, type, newest-first creation time, or model priority is **not current behavior**.
 

@@ -1,5 +1,6 @@
 import z from 'zod/v3'
 import { validDay } from './time'
+import { PERIODS } from './types'
 
 export const daySchema = z
   .string()
@@ -35,10 +36,7 @@ const choreFields = {
   stars: z.number().int().min(0).max(10000),
   kidIds: kids,
   type: z.enum(['one-off', 'repeated', 'perpetual']),
-  timeOfDay: z
-    .enum(['morning', 'afternoon', 'evening', 'night'])
-    .nullable()
-    .optional(),
+  timeOfDay: z.enum(PERIODS).nullable().optional(),
   requiresApproval: z.boolean().optional(),
   scheduledFor: daySchema.optional(),
   archivedFrom: daySchema.nullable().optional(),
@@ -136,7 +134,7 @@ export const commandSchema = z.discriminatedUnion('action', [
     .object({
       action: z.literal('set_order'),
       kidId: id,
-      group: z.enum(['morning', 'afternoon', 'evening', 'night', 'bonus']),
+      group: z.enum([...PERIODS, 'bonus']),
       choreIds: z.array(id).max(200),
     })
     .strict(),

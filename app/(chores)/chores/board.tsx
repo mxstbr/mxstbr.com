@@ -1,7 +1,7 @@
 'use client'
 import { Component, useEffect, useRef, useState, type ReactNode } from 'react'
 import type { Board } from 'app/lib/chores/types'
-import { blackoutWindow } from 'app/lib/chores/time'
+import { blackoutWindow, PERIOD_LABELS } from 'app/lib/chores/time'
 import { KidColumn } from './kid-column'
 import { useBoard } from './use-board'
 
@@ -132,9 +132,7 @@ export function ChoresBoard({
       /* A browser without legacy packing simply starts with a blank list. */
     }
   }, [board.packingImported, board.kids, act])
-  const name = board.period
-    ? board.period[0].toUpperCase() + board.period.slice(1)
-    : 'Right now'
+  const name = board.period ? PERIOD_LABELS[board.period] : 'Right now'
   const cutoff = board.period
     ? new Date(board.boundary).toLocaleTimeString('en-US', {
         timeZone: 'America/Los_Angeles',

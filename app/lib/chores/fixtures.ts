@@ -1,8 +1,8 @@
-import type { Chore, Core, Kid, Reward } from './types'
+import type { Chore, Core, Kid, Period, Reward } from './types'
 import { emptyDay, ensurePlan, updateOrders } from './domain'
 import { pacificDay } from './time'
 
-export function fixture(now = new Date('2026-09-09T15:00:00Z')) {
+export function fixture(now = new Date('2026-09-09T14:15:00Z')) {
   const catalog: { kids: Kid[]; chores: Chore[]; rewards: Reward[] } = {
     kids: [
       { id: 'kid-1', name: 'Dilan', color: '#2870c6' },
@@ -17,7 +17,7 @@ export function fixture(now = new Date('2026-09-09T15:00:00Z')) {
     id: string,
     title: string,
     emoji: string,
-    timeOfDay: 'morning' | 'afternoon' | 'evening' | 'night' | undefined,
+    timeOfDay: Period | undefined,
     kidIds = all,
     weekdays = false,
   ) =>

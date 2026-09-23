@@ -25,6 +25,14 @@ Read the catalog to resolve child/chore/reward IDs. Read the applicable Pacific 
 
 - A weekly schedule must include at least one `daysOfWeek` value (0 = Sunday through 6 = Saturday); creation and updates reject an empty or omitted list. Existing malformed weekly definitions stay ineligible until corrected. Daily schedules may omit weekdays or use an empty list for every day; a nonempty list filters them to those days.
 
+## Time windows
+
+All children use Pacific time: Morning **7am–7:30am**, Before lunch **7:30am–noon**, Afternoon **noon–5pm**, Evening **5pm–8:15pm**, and Night **8:15pm–10pm**. Closing boundaries are exclusive. Untimed Bonus chores remain available during their eligible day. The catalog returns `timeZone` and `timeWindows` as the authoritative clock schedule.
+
+Use `timeOfDay: "before-lunch"` when creating or updating a Before lunch chore, and `group: "before-lunch"` with `set_order`. Existing Morning assignments remain Morning. An empty Before lunch period earns no bonus; a nonempty completed one earns the usual +2.
+
+Saved current/future plans adopt the new deadline. Earlier submissions preserve their original `acceptedWindow` for late approval; past days, recorded stars and completion timestamps are retained. **Not current behavior:** new Morning completions between 7:30am and noon.
+
 ## Stars, approval, and verification
 
 - To reverse an incorrect completion, use `undo` with its exact submission ID. This reverses its original stars and recalculates its period bonus. Do not also subtract stars manually for the same completion.

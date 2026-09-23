@@ -6,7 +6,7 @@ Audited 2026-09-21 against application commit `97b3f32f1a02c09cc7062fb7060bcace0
 
 This is the current behavior reference for a rebuild. Positive capabilities describe the shipped system. **Not current behavior** explicitly rejects an old or superseded behavior; it must not be rebuilt merely because legacy code or an old prototype contains it. Lower-priority capabilities are still implemented unless marked removed.
 
-123 original IDs + 3 added requirements = 126 records; 106 current capabilities, 20 removed capabilities, and 29 explicit not-current-behavior rules.
+123 original IDs + 3 added requirements = 126 records; 106 current capabilities, 20 removed capabilities, and 30 explicit not-current-behavior rules.
 
 Use [scope and acceptance rules](rebuild-scope.md), [current iPad interface](ipad-landscape-ui.md), [coverage/evidence](coverage.md), and [agent operations](managing.md) for supporting detail. The [annotated legacy audit](legacy-inventory.md) preserves the historical source without presenting it as current behavior.
 
@@ -17,16 +17,16 @@ Use [scope and acceptance rules](rebuild-scope.md), [current iPad interface](ipa
 - **periodBonus:** Award exactly +2 per child/Pacific day/nonempty named period once all remaining required work is approved. Parent-hidden work is excluded, including after opening; hiding itself grants no chore stars. Ordinary missed work remains unfulfilled. Late approval of an on-time request can settle its original period. Undo or restored requirements reconcile the award without duplicate net credit. No extra daily bonus, empty-period payout, or Bonus-period award.
 - **timedChores:** Only the active named window is kid-visible and accepts new submissions.
 - **untimedBonusChores:** Remain available anytime, subject to date/assignment/recurrence eligibility.
-- **approvalAfterCutoff:** An on-time accepted submission remains approvable later, including after its day ends.
+- **approvalAfterCutoff:** An on-time accepted submission remains approvable later, including after its day ends or the family changes a deadline. Its original acceptance window is preserved separately from the current schedule.
 - **pastCompletion:** No new backdated or elapsed-window submissions; later review of an on-time request is distinct.
 - **skip:** Removed; no skip progress, bonus, or notification behavior.
 - **parentSurface:** ChatGPT through MCP for parent management and approvals. Telegram only delivers notifications; no Clippy, Telegram conversation or action buttons, or dedicated parent UI.
 - **bedtimeRecognition:** Dedicated last-night recognition/templates/generated chores/reminders removed.
 - **dataIsolation:** There is one /chores implementation, using the existing chores:mxstbr:v2 storage schema and live data. The retired board, prototype, admin/approval pages, old MCP tools, import and balance-cutover scripts are deleted. The original import and promotion remain recorded history; no reimport, reset or balance synchronization occurs. No new infrastructure.
 - **deviceAccess:** Reuse the existing site-password login; already-unlocked iPads open /chores directly. Otherwise enter the same password. Invitation links remain optional.
-- **choreSwitcher:** Tap the Finish this {timeframe} card to choose a current chore. No separate Choose another button. My progress remains inside the picker.
+- **choreSwitcher:** Tap the period completion card (Finish this morning, Finish before lunch, etc.) to choose a current chore. No separate Choose another button. My progress remains inside the picker.
 - **choreSpeech:** Removed: the kids can read their chores; no Hear it control or speech endpoint.
-- **namedWindows:** Pacific windows are Morning 7am–noon, Afternoon noon–5pm, Evening 5pm–8:15pm, and Night 8:15pm–10pm, with exclusive closing boundaries. Between 10pm and 7am only eligible untimed Bonus work is available. Old timed cards and secondary selections close at a boundary; accepted pending requests remain recorded.
+- **namedWindows:** Pacific windows are Morning 7am–7:30am, Before lunch 7:30am–noon, Afternoon noon–5pm, Evening 5pm–8:15pm, and Night 8:15pm–10pm, with exclusive closing boundaries. Between 10pm and 7am only eligible untimed Bonus work is available. Current/future saved plans adopt these cutoffs; each earlier submission retains its accepted window for later review. Old timed cards and secondary selections close at a boundary. Existing Morning assignments keep their group; Before lunch starts empty until explicitly assigned.
 - **hiddenRequirements:** Merge existing per-child snoozes when updating that map. Hidden work is waived from targets even with pending/undone submissions, without deleting history or awarding chore stars. An on-time accepted request can still be reviewed later.
 - **blackout:** Five idle minutes can trigger pure black only from 8:30pm inclusive until 6am exclusive in America/Los_Angeles, automatically following DST. At 8:30pm an already-idle board can black out; at 6am it clears automatically. Tapping wakes and refreshes. Focus/visibility return rechecks the schedule. No visible moon or text appears; webpage blackout does not change the hardware backlight.
 - **quietAllClear:** Outstanding chores keep colorful raised columns, a solid card, emoji, and action button. Finished, empty, or awaiting-parent columns are subdued and say All done for now, Nothing to do right now, or Your part is done, with Go play only when the current state is confirmed. Pending approval uses a clock; failures/loading do not show an all-clear. This concerns the current window, not the whole day.
@@ -332,6 +332,16 @@ Applies to K01, P01, P50. Basis: explicit decision.
 
 Applies to P56. Basis: explicit September 23 webhook-only request.
 
+<a id="n30"></a>
+
+### N30 — Morning chores through noon
+
+**Not current behavior:** The former 7am–noon Morning window and a four-period schedule are not current behavior. A saved noon cutoff cannot authorize a new Morning completion after 7:30am.
+
+**Current behavior:** Morning is 7am–7:30am Pacific. Before lunch is a separate 7:30am–noon group. Current/future plans adopt the new deadlines while earlier accepted submissions retain their original review windows and recorded stars.
+
+Applies to K16, K17, P14. Basis: explicit September 23 morning deadline and Before lunch naming request.
+
 ## Kid: get to my board
 
 <a id="k01"></a>
@@ -398,11 +408,11 @@ Applies to P56. Basis: explicit September 23 webhook-only request.
 
 <a id="k16"></a>
 
-- **K16 — As a kid, I can see when my current chore window ends.** _Current behavior · revised._ New submissions stop at the cutoff. Untimed Bonus work has no time-group cutoff, but remains subject to its date/recurrence eligibility. **Not current behavior:** [N04: Overlapping Evening and Night](inventory.md#n04).
+- **K16 — As a kid, I can see when my current chore window ends.** _Current behavior · revised._ Morning closes at 7:30am Pacific; Before lunch closes at noon. Header cutoffs and command eligibility use the same schedule. New submissions stop at the cutoff. Untimed Bonus work has no time-group cutoff, but remains subject to its date/recurrence eligibility. **Not current behavior:** [N04: Overlapping Evening and Night](inventory.md#n04); [N30: Morning chores through noon](inventory.md#n30).
 
 <a id="k17"></a>
 
-- **K17 — As a kid, I can have the next time window’s chores replace the previous window’s chores automatically.** _Current behavior · revised._ Pacific windows are Morning 7am–noon, Afternoon noon–5pm, Evening 5pm–8:15pm, and Night 8:15pm–10pm, with exclusive closing boundaries. Between 10pm and 7am only eligible untimed Bonus work is available. Old timed cards and secondary selections close at a boundary; accepted pending requests remain recorded. **Not current behavior:** [N03: Opening other time groups](inventory.md#n03); [N04: Overlapping Evening and Night](inventory.md#n04).
+- **K17 — As a kid, I can have the next time window’s chores replace the previous window’s chores automatically.** _Current behavior · revised._ Pacific windows are Morning 7am–7:30am, Before lunch 7:30am–noon, Afternoon noon–5pm, Evening 5pm–8:15pm, and Night 8:15pm–10pm, with exclusive closing boundaries. Between 10pm and 7am only eligible untimed Bonus work is available. Current/future saved plans adopt these cutoffs; each earlier submission retains its accepted window for later review. Old timed cards and secondary selections close at a boundary. Existing Morning assignments keep their group; Before lunch starts empty until explicitly assigned. **Not current behavior:** [N03: Opening other time groups](inventory.md#n03); [N04: Overlapping Evening and Night](inventory.md#n04); [N30: Morning chores through noon](inventory.md#n30).
 
 <a id="k18"></a>
 
@@ -682,7 +692,7 @@ Applies to P56. Basis: explicit September 23 webhook-only request.
 
 <a id="p14"></a>
 
-- **P14 — As a parent, I can assign a chore to a named time window or make it an untimed Bonus chore through an agent.** _Current behavior · revised._ The untimed option is explicitly retained. Named windows do not overlap in the kid experience. **Not current behavior:** [N04: Overlapping Evening and Night](inventory.md#n04); [N18: Dedicated parent interface](inventory.md#n18).
+- **P14 — As a parent, I can assign a chore to a named time window or make it an untimed Bonus chore through an agent.** _Current behavior · revised._ Choose Morning, Before lunch, Afternoon, Evening or Night; use before-lunch in command inputs and per-child ordering. Catalog timeWindows advertises names and exact Pacific clock boundaries. The untimed Bonus option remains available. Named windows do not overlap, and no chores move into Before lunch automatically. **Not current behavior:** [N04: Overlapping Evening and Night](inventory.md#n04); [N18: Dedicated parent interface](inventory.md#n18); [N30: Morning chores through noon](inventory.md#n30).
 
 <a id="p15"></a>
 
@@ -860,7 +870,7 @@ Applies to P56. Basis: explicit September 23 webhook-only request.
 
 <a id="k70"></a>
 
-- **K70 — As a kid, I can earn two extra stars by completing every task in a nonempty time period and see my progress toward that bonus.** _Current behavior · added._ Award exactly +2 per child/Pacific day/nonempty named period once all remaining required work is approved. Parent-hidden work is excluded, including after opening; hiding itself grants no chore stars. Ordinary missed work remains unfulfilled. Late approval of an on-time request can settle its original period. Undo or restored requirements reconcile the award without duplicate net credit. No extra daily bonus, empty-period payout, or Bonus-period award. **Not current behavior:** [N09: Extra ten-star daily award](inventory.md#n09); [N10: Empty-period or Bonus-period payout](inventory.md#n10); [N11: Hidden work still required](inventory.md#n11); [N14: Dedicated Choose another button](inventory.md#n14).
+- **K70 — As a kid, I can earn two extra stars by completing every task in a nonempty time period and see my progress toward that bonus.** _Current behavior · added._ Award exactly +2 per child/Pacific day/nonempty named period once all remaining required work is approved. Parent-hidden work is excluded, including after opening; hiding itself grants no chore stars. Ordinary missed work remains unfulfilled. Late approval of an on-time request can settle its original period. Undo or restored requirements reconcile the award without duplicate net credit. No extra daily bonus, empty-period payout, or Bonus-period award. Before lunch is a named period with the same nonempty +2 rule. **Not current behavior:** [N09: Extra ten-star daily award](inventory.md#n09); [N10: Empty-period or Bonus-period payout](inventory.md#n10); [N11: Hidden work still required](inventory.md#n11); [N14: Dedicated Choose another button](inventory.md#n14).
 
 <a id="p55"></a>
 

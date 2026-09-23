@@ -39,7 +39,7 @@ export function registerChoresTools(server: McpServer) {
     {
       title: 'Chores catalog',
       description:
-        'Read the current /chores board: canonical kid/chore/reward IDs, exact balances, explicit routine order, packing and migration provenance.',
+        'Read the current /chores board: canonical kid/chore/reward IDs, exact balances, explicit routine order, Pacific timeWindows with inclusive opensAt and exclusive closesAt, packing and migration provenance. Before lunch uses the before-lunch group.',
       inputSchema: z.object({}),
     },
     () => result(() => choresService().catalog(parentActor())),

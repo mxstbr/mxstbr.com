@@ -34,6 +34,16 @@ The webhook revision passed 56 deterministic checks, two disposable Redis integr
 
 The subsequent [webhook conformance audit](mcp-events-conformance.md) checked the latest merged draft and the working group's draft requirement map. It corrected missing-subscription/quota errors, TTL clamping, unsupported-mode errors, production Forbidden responses and a `maxAgeMs` replay edge case. Sixty deterministic checks and two disposable Redis integration checks passed, including signature verification with the official Standard Webhooks library. The isolated `pnpm exec next build` passed compilation, TypeScript and all 67 static pages. Read-only HTTP checks against that production build passed discovery, existing tools, negative inputs, missing subscriptions, and HTTP 401 plus JSON-RPC Forbidden. No callback subscription or chore change was created. The build-only command deliberately omits this repository's separate essay-sync step.
 
+## September 23: earlier Morning cutoff and Before lunch
+
+Morning now opens at 7am and closes at 7:30am Pacific for every child. The new `before-lunch` period covers 7:30am–noon; Afternoon, Evening and Night keep their existing windows. Shared window/label definitions drive the board header, next-boundary refresh, command schemas, catalog metadata and period notifications. The current-period card says “Finish before lunch.” Existing Morning assignments remain in place; the new group starts empty until a parent assigns work.
+
+Current/future saved day plans refresh their cutoffs through the existing transaction path. Before changing a saved occurrence, earlier submissions retain its original window as `acceptedWindow`; new submissions record that window on acceptance. Parent review uses it, keeping previously on-time requests approvable after a deadline change without reopening late submissions. Past days, saved completions, balances and ledger entries are preserved. Before lunch follows the existing nonempty +2 period-bonus rule.
+
+Verification includes both DST seasons, exact 7:30am/noon boundaries, assignment/order/bonus behavior, rejection of stale Morning submissions, preservation of earlier acceptance windows/history, and the UI transition with both deadline labels.
+
+All 63 deterministic checks, one disposable Redis integration check, two HTTP MCP checks and 13 Chromium browser flows passed. The new 7:30am transition also passed in WebKit at the iPad viewport. TypeScript and the isolated production build passed. Browser checks are automated, not a new physical-iPad test; fixture completions do not alter live chores or send Telegram messages.
+
 ## Current verification commands
 
 ```sh

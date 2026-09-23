@@ -12,7 +12,7 @@ import {
   EVENT_MAX_AGE_MS,
 } from './events'
 
-const NOW = Date.parse('2026-09-09T15:00:00Z')
+const NOW = Date.parse('2026-09-09T14:15:00Z')
 const input = { name: CHORE_EVENT, arguments: {} }
 function setup() {
   const f = fixture()

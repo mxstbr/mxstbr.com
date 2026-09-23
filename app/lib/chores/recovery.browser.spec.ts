@@ -20,7 +20,7 @@ const navigationType = (page: Page) =>
 
 async function scene(page: Page): Promise<Board> {
   const board = await (await page.request.get('/api/chores/board')).json()
-  expect(board.serverNow).toBe('2026-09-09T15:00:00.000Z')
+  expect(board.serverNow).toBe('2026-09-09T14:15:00.000Z')
   board.revision += 1000 // Fixture reads advance revision, including the page render.
   return board
 }
@@ -136,7 +136,7 @@ test('morning wake replaces last night without a document refresh', async ({
     day: '2026-09-10',
     period: 'morning',
     serverNow: '2026-09-10T14:00:00.000Z',
-    boundary: '2026-09-10T19:00:00.000Z',
+    boundary: '2026-09-10T14:30:00.000Z',
   }
   let current = night
   await page.route(endpoint, (route) => route.fulfill({ json: current }))

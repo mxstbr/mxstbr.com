@@ -10,6 +10,7 @@ import type { Command } from 'app/lib/chores/commands'
 import { ChildPanel, type PanelName } from './panels'
 import type { PendingAction } from './use-board'
 import { useChoreSounds } from './sounds'
+import { PERIOD_LABELS } from 'app/lib/chores/time'
 
 type Props = {
   kid: KidView
@@ -299,7 +300,9 @@ export function KidColumn({
                     ? 'Bonus earned!'
                     : allSubmitted && waiting
                       ? 'Waiting for approval'
-                      : `Finish this ${period}`}
+                      : period === 'before-lunch'
+                        ? 'Finish before lunch'
+                        : `Finish this ${period ? PERIOD_LABELS[period].toLowerCase() : 'period'}`}
                 </span>
                 <strong>{kid.periodProgress.earned ? '✓ ' : ''}+2 ★</strong>
               </span>

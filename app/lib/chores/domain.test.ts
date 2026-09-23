@@ -6,7 +6,12 @@ import { PRE_RENAME_SOURCE, CLI_ACTOR_ID } from './compatibility'
 import { MemoryRepository } from './repository'
 import { ChoresService } from './service'
 import { currentTime, pacificDay, pacificInstant } from './time'
-import { ChoresError, type Actor, type Board } from './types'
+import {
+  ChoresError,
+  type Actor,
+  type Board,
+  type CommandResult,
+} from './types'
 
 const parent: Actor = { kind: 'parent', id: 'test-parent' }
 const child: Actor = {
@@ -14,7 +19,7 @@ const child: Actor = {
   id: 'test-device',
   kidIds: ['kid-1', 'kid-2', 'kid-3'],
 }
-function setup(iso = '2026-09-09T15:00:00Z') {
+function setup(iso = '2026-09-09T14:15:00Z') {
   let now = new Date(iso)
   const f = fixture(now),
     repo = new MemoryRepository(f.core, f.days)
@@ -51,7 +56,7 @@ test('pre-rename on-time submissions remain approvable and exactly reversible', 
   )!
   assert.equal(saved.source, 'chores')
   saved.source = PRE_RENAME_SOURCE
-  t.clock('2026-09-10T15:00:00Z')
+  t.clock('2026-09-10T14:15:00Z')
   const reviewed = await t.run(
     { action: 'review', submissionId: saved.id, decision: 'approve' },
     parent,
@@ -90,7 +95,9 @@ test('Pacific windows are exclusive at every boundary and handle DST and midnigh
   for (const [iso, expected] of [
     ['2026-09-09T13:59:59Z', null],
     ['2026-09-09T14:00:00Z', 'morning'],
-    ['2026-09-09T18:59:59Z', 'morning'],
+    ['2026-09-09T14:29:59Z', 'morning'],
+    ['2026-09-09T14:30:00Z', 'before-lunch'],
+    ['2026-09-09T18:59:59Z', 'before-lunch'],
     ['2026-09-09T19:00:00Z', 'afternoon'],
     ['2026-09-10T00:00:00Z', 'evening'],
     ['2026-09-10T03:15:00Z', 'night'],
@@ -117,7 +124,7 @@ test('only the current group reaches the kid payload; real order and weekend fil
   )
   assert(!JSON.stringify(b).includes('Bring your lunch bag'))
   assert.equal(kid(b).bonus[0].choreId, 'bonus')
-  t.clock('2026-09-12T15:00:00Z')
+  t.clock('2026-09-12T14:15:00Z')
   assert(
     !kid(await t.board(), 'kid-1').chores.some((c) =>
       c.choreId.includes('school-clothes'),
@@ -149,7 +156,7 @@ test('late, early, forged-date and unauthorized child submissions are rejected o
     t.run({ action: 'submit', occurrenceId: id }),
     rejected('WINDOW_CLOSED'),
   )
-  t.clock('2026-09-10T15:00:00Z')
+  t.clock('2026-09-10T14:15:00Z')
   await assert.rejects(
     t.run({ action: 'submit', occurrenceId: id }),
     rejected('WINDOW_CLOSED'),
@@ -220,7 +227,7 @@ test('on-time approval survives midnight, edits and notification failure; retry 
     },
     parent,
   )
-  t.clock('2026-09-10T15:00:00Z')
+  t.clock('2026-09-10T14:15:00Z')
   assert.equal(
     (
       await t.run(
@@ -319,7 +326,7 @@ test('approving the final on-time chore after midnight awards only its period bo
   let last: string | undefined
   for (const c of evening)
     last = (await t.run({ action: 'submit', occurrenceId: c.occurrenceId })).id
-  t.clock('2026-09-10T15:00:00Z')
+  t.clock('2026-09-10T14:15:00Z')
   const result = await t.run(
     { action: 'review', submissionId: last, decision: 'approve' },
     parent,
@@ -441,7 +448,7 @@ test('a stored mute with an undone submission is repaired on board read without 
   assert.deepEqual(day.ledger.slice(0, before.ledger.length), before.ledger)
   assert.equal(day.ledger.length, before.ledger.length + 1)
   assert.equal(day.ledger.at(-1)!.kind, 'period-bonus')
-  t.clock('2026-09-10T15:00:00Z')
+  t.clock('2026-09-10T14:15:00Z')
   assert.equal(kid(await t.board()).periodProgress.total, 2)
   assert(kid(await t.board()).chores.some((c) => c.choreId === bed.choreId))
   assert.equal(
@@ -464,7 +471,7 @@ test('per-child mute applies before and after opening; resume cannot restore exp
       parent,
     )
   await mute('2026-09-10')
-  t.clock('2026-09-09T15:00:00Z')
+  t.clock('2026-09-09T14:15:00Z')
   assert.equal(kid(await t.board()).periodProgress.total, 1)
   assert.equal(kid(await t.board(), 'kid-1').periodProgress.total, 5)
   await mute(null)
@@ -479,7 +486,7 @@ test('per-child mute applies before and after opening; resume cannot restore exp
     )!.waived,
     true,
   )
-  t.clock('2026-09-10T15:00:00Z')
+  t.clock('2026-09-10T14:15:00Z')
   assert.equal(kid(await t.board()).periodProgress.total, 2)
 })
 test('muted on-time submissions remain approvable later using the original stars and snapshot', async () => {
@@ -507,7 +514,7 @@ test('muted on-time submissions remain approvable later using the original stars
   assert.equal(kid(await t.board()).balance, 29)
   assert.equal(kid(await t.board()).periodProgress.pending, 0)
   assert.equal((await t.service.approvals(parent)).length, 1)
-  t.clock('2026-09-10T15:00:00Z')
+  t.clock('2026-09-10T14:15:00Z')
   const approved = await t.run(
     { action: 'review', submissionId: submission.id, decision: 'approve' },
     parent,
@@ -673,7 +680,7 @@ test('one-off opportunities are date and child specific; a missed opportunity ne
   assert(
     kid(await t.board(), 'kid-1').chores.some((c) => c.choreId === created.id),
   )
-  t.clock('2026-09-10T15:00:00Z')
+  t.clock('2026-09-10T14:15:00Z')
   assert(
     !kid(await t.board(), 'kid-1').chores.some((c) => c.choreId === created.id),
   )
@@ -709,7 +716,7 @@ test('parent order changes persist while per-child pause, resume and exclusive r
   assert(
     kid(await t.board(), 'kid-1').chores.some((c) => c.choreId === bed.choreId),
   )
-  t.clock('2026-09-10T15:00:00Z')
+  t.clock('2026-09-10T14:15:00Z')
   assert(kid(await t.board()).chores.some((c) => c.choreId === bed.choreId))
   await t.run({ action: 'pause_all', until: '2026-09-11' }, parent)
   t.clock('2026-09-11T01:00:00Z')
@@ -774,5 +781,165 @@ test('summary browsing exposes counts only; parent metadata and reward archival 
   await assert.rejects(
     t.run({ action: 'skip', kidId: 'kid-3' }),
     rejected('INVALID_INPUT'),
+  )
+})
+
+test('Before lunch supports assignment, ordering, exclusive cutoffs and its own nonempty bonus', async () => {
+  const t = setup('2026-09-23T14:29:59Z')
+  const morning = kid(await t.board()).chores[0]
+  const added: string[] = []
+  for (const title of ['Read a chapter', 'Set the table']) {
+    const result = await t.run(
+      {
+        action: 'create_chore',
+        chore: {
+          title,
+          emoji: '📖',
+          stars: 1,
+          kidIds: ['kid-3'],
+          type: 'repeated',
+          timeOfDay: 'before-lunch',
+          schedule: { cadence: 'daily' },
+        },
+      },
+      parent,
+    )
+    added.push(result.id!)
+  }
+  await t.run(
+    {
+      action: 'set_order',
+      kidId: 'kid-3',
+      group: 'before-lunch',
+      choreIds: [...added].reverse(),
+    },
+    parent,
+  )
+  assert(!kid(await t.board()).chores.some((c) => added.includes(c.choreId)))
+  const catalog = await t.service.catalog(parent)
+  assert.equal(catalog.timeZone, 'America/Los_Angeles')
+  assert.deepEqual(
+    catalog.timeWindows.find((w) => w.id === 'before-lunch'),
+    {
+      id: 'before-lunch',
+      name: 'Before lunch',
+      opensAt: '07:30',
+      closesAt: '12:00',
+    },
+  )
+  t.clock('2026-09-23T14:30:00Z')
+  const beforeLunch = await t.board()
+  assert.equal(beforeLunch.period, 'before-lunch')
+  assert.equal(beforeLunch.boundary, '2026-09-23T19:00:00.000Z')
+  assert.deepEqual(
+    kid(beforeLunch).chores.map((c) => c.choreId),
+    [...added].reverse(),
+  )
+  assert.equal(kid(beforeLunch, 'kid-1').periodProgress.total, 0)
+  assert.equal(kid(beforeLunch, 'kid-1').periodProgress.earned, false)
+  for (const actor of [child, parent])
+    await assert.rejects(
+      t.run({ action: 'submit', occurrenceId: morning.occurrenceId }, actor),
+      rejected('WINDOW_CLOSED'),
+    )
+  const completions: CommandResult[] = []
+  for (const c of kid(beforeLunch).chores)
+    completions.push(
+      await t.run({ action: 'submit', occurrenceId: c.occurrenceId }),
+    )
+  assert.equal(completions[1].periodBonus, 2)
+  assert.equal(kid(await t.board()).balance, 30)
+  assert(t.repo.days['2026-09-23'].awards['kid-3:before-lunch'])
+  assert(t.repo.notifications.some((n) => n.text.includes('Before lunch')))
+  await t.run({ action: 'undo', submissionId: completions[0].id })
+  t.clock('2026-09-23T19:00:00Z')
+  assert.equal((await t.board()).period, 'afternoon')
+  await assert.rejects(
+    t.run({
+      action: 'submit',
+      occurrenceId: kid(beforeLunch).chores[0].occurrenceId,
+    }),
+    rejected('WINDOW_CLOSED'),
+  )
+})
+
+test('saved noon deadlines update uniformly while accepted submissions and historical days keep their facts', async () => {
+  const t = setup('2026-09-23T14:15:00Z')
+  const initial = await t.board()
+  const [bed, teeth] = kid(initial).chores
+  const day = t.repo.days[initial.day]
+  day.occurrences.find(
+    (o) => o.id === teeth.occurrenceId,
+  )!.chore.requiresApproval = true
+  const completed = await t.run({
+    action: 'submit',
+    occurrenceId: bed.occurrenceId,
+  })
+  const pending = await t.run({
+    action: 'submit',
+    occurrenceId: teeth.occurrenceId,
+  })
+  // A day saved by the former schedule: noon cutoffs and 8am submissions,
+  // before acceptedWindow existed. All such submissions were valid then.
+  const saved = t.repo.days[initial.day]
+  for (const o of saved.occurrences)
+    if (o.group === 'morning') o.closesAt = '2026-09-23T19:00:00.000Z'
+  for (const s of saved.submissions) {
+    s.submittedAt = '2026-09-23T15:00:00.000Z'
+    delete s.acceptedWindow
+  }
+  const historical = structuredClone(saved)
+  historical.day = '2026-09-22'
+  t.repo.days[historical.day] = historical
+  const before = structuredClone(t.repo.core.balances)
+  const ledger = structuredClone(saved.ledger)
+  t.clock('2026-09-23T17:00:00Z')
+  const updated = await t.board()
+  assert.equal(updated.period, 'before-lunch')
+  assert.deepEqual(t.repo.core.balances, before)
+  assert.deepEqual(t.repo.days[initial.day].ledger, ledger)
+  const inspected = await t.service.inspect(parent, initial.day)
+  assert(
+    inspected.occurrences
+      .filter((o) => o.group === 'morning')
+      .every((o) => o.closesAt === '2026-09-23T14:30:00.000Z'),
+  )
+  for (const s of inspected.submissions) {
+    assert.equal(s.submittedAt, '2026-09-23T15:00:00.000Z')
+    assert.deepEqual(s.acceptedWindow, {
+      opensAt: '2026-09-23T14:00:00.000Z',
+      closesAt: '2026-09-23T19:00:00.000Z',
+    })
+  }
+  assert.equal(
+    inspected.submissions.find((s) => s.id === completed.id)!.status,
+    'approved',
+  )
+  assert.equal(
+    (
+      await t.run(
+        { action: 'review', submissionId: pending.id, decision: 'approve' },
+        parent,
+      )
+    ).status,
+    'approved',
+  )
+  assert.equal(t.repo.core.balances['kid-3'], 30)
+  await t.service.inspect(parent, historical.day)
+  assert.deepEqual(t.repo.days[historical.day], historical)
+  // An old tab cannot use its former noon cutoff for a new submission.
+  const staleMorning = initial.kids[0].chores[0]
+  await assert.rejects(
+    t.run(
+      { action: 'submit', occurrenceId: staleMorning.occurrenceId },
+      parent,
+    ),
+    rejected('WINDOW_CLOSED'),
+  )
+  // Repeated reads do not overwrite the preserved acceptance window.
+  await t.board()
+  assert.equal(
+    t.repo.days[initial.day].submissions[0].acceptedWindow!.closesAt,
+    '2026-09-23T19:00:00.000Z',
   )
 })

@@ -15,7 +15,7 @@ test(
     const board = await (await fetch(`${base}/api/chores/board`)).json()
     assert.equal(
       board.serverNow,
-      '2026-09-09T15:00:00.000Z',
+      '2026-09-09T14:15:00.000Z',
       'Only run against the development fixture',
     )
     assert(
@@ -109,7 +109,7 @@ test(
     nextEnv.loadEnvConfig(process.cwd())
     const base = 'http://127.0.0.1:3022'
     const board = await (await fetch(`${base}/api/chores/board`)).json()
-    assert.equal(board.serverNow, '2026-09-09T15:00:00.000Z')
+    assert.equal(board.serverNow, '2026-09-09T14:15:00.000Z')
     for (const [method, mode] of [
       ['events/poll', 'poll'],
       ['events/stream', 'push'],

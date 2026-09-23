@@ -28,13 +28,13 @@ function chore(schedule?: Chore['schedule']): Chore {
     kidIds: ['kid-3'],
     type: 'repeated',
     timeOfDay: 'morning',
-    createdAt: '2026-09-01T15:00:00Z',
+    createdAt: '2026-09-01T14:15:00Z',
     scheduledFor: '2026-09-01',
     schedule,
   }
 }
 function setup() {
-  let now = new Date('2026-09-09T15:00:00Z')
+  let now = new Date('2026-09-09T14:15:00Z')
   const f = fixture(now)
   const repo = new MemoryRepository(f.core, f.days)
   const service = new ChoresService(repo, () => now)
@@ -43,7 +43,7 @@ function setup() {
     service,
     run: (input: unknown) => service.execute(parent, randomUUID(), input),
     clock: (day: string) => {
-      now = new Date(day + 'T15:00:00Z')
+      now = new Date(day + 'T14:15:00Z')
     },
     board: () => service.getBoard(child),
   }
@@ -121,19 +121,11 @@ test('weekly scheduling requires matching weekdays while daily and other chore t
   const weekly = chore({ cadence: 'weekly', daysOfWeek: [3] })
   assert.equal(scheduled(weekly, 'other-kid', '2026-09-16'), false)
   assert.equal(
-    scheduled(
-      { ...weekly, scheduledFor: '2026-09-17' },
-      'kid-3',
-      '2026-09-16',
-    ),
+    scheduled({ ...weekly, scheduledFor: '2026-09-17' }, 'kid-3', '2026-09-16'),
     false,
   )
   assert.equal(
-    scheduled(
-      { ...weekly, archivedFrom: '2026-09-16' },
-      'kid-3',
-      '2026-09-16',
-    ),
+    scheduled({ ...weekly, archivedFrom: '2026-09-16' }, 'kid-3', '2026-09-16'),
     false,
   )
   const oneOff = {
@@ -189,8 +181,14 @@ test('valid weekly and daily schedules keep their board visibility across a full
     const day = dates[index]
     t.clock(day)
     const cards = (await t.board()).kids[0].chores
-    assert.equal(cards.some((c) => c.choreId === weekly.id), index === 3)
-    assert.equal(cards.some((c) => c.choreId === daily.id), true)
+    assert.equal(
+      cards.some((c) => c.choreId === weekly.id),
+      index === 3,
+    )
+    assert.equal(
+      cards.some((c) => c.choreId === daily.id),
+      true,
+    )
   }
   await t.run({
     action: 'update_chore',

@@ -18,9 +18,9 @@ test(
       prefix = `${PREFIX}:verify:${randomUUID()}`
     const f = fixture(),
       repo = new RedisRepository(redis, prefix),
-      service = new ChoresService(repo, () => new Date('2026-09-09T15:00:00Z'))
+      service = new ChoresService(repo, () => new Date('2026-09-09T14:15:00Z'))
     const events = new ChoreEvents(repo, () =>
-      Date.parse('2026-09-09T15:00:00Z'),
+      Date.parse('2026-09-09T14:15:00Z'),
     )
     const actor: Actor = {
       kind: 'kid',

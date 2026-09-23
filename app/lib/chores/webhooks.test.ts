@@ -28,7 +28,7 @@ import type {
 } from './webhook-store'
 import { mcpEventPrincipal, webhookPrincipalAllowed } from './webhook-auth'
 
-const NOW = Date.parse('2026-09-09T15:00:00Z')
+const NOW = Date.parse('2026-09-09T14:15:00Z')
 const SECRET = `whsec_${Buffer.alloc(32, 17).toString('base64')}`
 const NEW_SECRET = `whsec_${Buffer.alloc(32, 29).toString('base64')}`
 const INPUT = {

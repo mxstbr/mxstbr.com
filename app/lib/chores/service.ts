@@ -19,7 +19,7 @@ import {
   undo,
 } from './domain'
 import { PACKING_ITEMS } from './packing'
-import { pacificDay, validDay } from './time'
+import { pacificDay, validDay, TIME_ZONE, TIME_WINDOWS } from './time'
 import {
   fail,
   type Actor,
@@ -287,6 +287,8 @@ export class ChoresService {
       orders: c.orders,
       packing: c.packing,
       packingItems: PACKING_ITEMS,
+      timeZone: TIME_ZONE,
+      timeWindows: TIME_WINDOWS,
       migration: c.migration,
     }
   }

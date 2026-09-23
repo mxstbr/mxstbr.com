@@ -68,7 +68,7 @@ Preserve the common tasks in their written sequence, then append that child's li
 
 **Night:** no required tasks specified.
 
-The source instruction also moves the Evening cutoff to **8:15pm Pacific**. In the rebuild's non-overlapping windows, Night starts then. The implemented Morning window opens at 7am Pacific. Untimed Bonus chores retain their existing definitions and do not enter these period targets.
+The source instruction also moves the Evening cutoff to **8:15pm Pacific**. In the rebuild's non-overlapping windows, Night starts then. The September 23 update changes Morning to **7am–7:30am Pacific** and adds **Before lunch, 7:30am–noon**. Existing Morning assignments retain their group. Before lunch accepts its own assignments and per-child order, but the time-window change does not move or create any chores. Untimed Bonus chores retain their existing definitions and do not enter these period targets.
 
 ## Two-star period completion bonus
 
