@@ -37,7 +37,7 @@ Use [scope and acceptance rules](rebuild-scope.md), [current iPad interface](ipa
 - **telegramBonus:** A bonus message says the child earned +2 bonus stars for completing the period and includes the resulting total balance, without the occurrence date. Reward redemption updates include the cost and resulting balance. No daily-bonus, skip, or dedicated bedtime-recognition updates are generated.
 - **packingPersistence:** Packing is shared in Redis across authorized devices and agents. A one-time import can carry over the old browser checklist; subsequent progress does not depend on that browser’s local storage.
 - **featurePriority:** K07–K09 counts-only summaries and K59 system appearance remain implemented at lower priority. K04/K05 small-screen selection was superseded by the accepted landscape-only target and is excluded.
-- **canonicalNames:** Use pnpm chores, chores\__ MCP tools, /api/chores/_, app/lib/chores, app/(chores), and docs/chores. The old board and API routes no longer exist. Stored pre-rename submission sources, device cookies and CLI receipt identity remain compatible to preserve accepted requests, sessions and deduplication.
+- **canonicalNames:** Use pnpm chores, `chores_*` MCP tools, `/api/chores/*`, app/lib/chores, app/(chores), and docs/chores. The old board and API routes no longer exist. Stored pre-rename submission sources, device cookies and CLI receipt identity remain compatible to preserve accepted requests, sessions and deduplication.
 - **mcpEvents:** Authenticated MCP clients can receive the same new notifications as Telegram through the draft events/list, events/poll and events/stream methods under chores.notification. Payloads retain the exact notification text and stable notification ID, with occurrence day/submission ID when present. The journal is committed atomically with the domain change, independent of Telegram delivery, with up to 5,000 events from seven days available for replay. Clients own cursors, deduplicate eventId, reconnect streams and inspect authoritative state after truncated. Webhooks are not offered; kid cookies never grant event access.
 
 ## Explicitly not current behavior
@@ -318,7 +318,7 @@ Applies to K02, K46. Basis: explicit decision.
 
 **Not current behavior:** The old board, prototype, dedicated admin/approval pages, old MCP tools, legacy CLI/importer, balance-cutover scripts, speech and bedtime-reminder endpoints are not supported or executable. The trial product names are not current routes or tool names.
 
-**Current behavior:** There is one /chores board, /api/chores/\_ API, pnpm chores CLI and chores\_\_ MCP tool set. Minimal compatibility for stored identifiers preserves existing sessions, accepted submissions and command receipts. Retain the existing Redis schema namespace and financial history.
+**Current behavior:** There is one /chores board, `/api/chores/*` API, pnpm chores CLI and `chores_*` MCP tool set. Minimal compatibility for stored identifiers preserves existing sessions, accepted submissions and command receipts. Retain the existing Redis schema namespace and financial history.
 
 Applies to K01, P01, P50. Basis: explicit decision.
 
@@ -830,7 +830,7 @@ Applies to K01, P01, P50. Basis: explicit decision.
 
 <a id="p51"></a>
 
-- **P51 — As a parent, I can have changes made through agents appear on the family’s kid devices.** _Current behavior · revised._ Agents manage /chores via chores\_\* MCP or pnpm chores. The legacy board and its tools are deleted. The existing data, balances, history, pending approvals and receipt keys remain authoritative; no reimport or synchronization occurs. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N19: Clippy or Telegram management](inventory.md#n19); [N22: Shared live legacy data or ongoing resync](inventory.md#n22).
+- **P51 — As a parent, I can have changes made through agents appear on the family’s kid devices.** _Current behavior · revised._ Agents manage /chores via `chores_*` MCP or pnpm chores. The legacy board and its tools are deleted. The existing data, balances, history, pending approvals and receipt keys remain authoritative; no reimport or synchronization occurs. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N19: Clippy or Telegram management](inventory.md#n19); [N22: Shared live legacy data or ongoing resync](inventory.md#n22).
 
 ## Parent: help the family pack
 
