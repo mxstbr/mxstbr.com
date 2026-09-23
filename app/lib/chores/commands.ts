@@ -21,6 +21,14 @@ const schedule = z
     daysOfWeek: z.array(z.number().int().min(0).max(6)).max(7).optional(),
   })
   .strict()
+  .superRefine((value, ctx) => {
+    if (value.cadence === 'weekly' && !value.daysOfWeek?.length)
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['daysOfWeek'],
+        message: 'Weekly cadence requires at least one weekday.',
+      })
+  })
 const choreFields = {
   title: z.string().trim().min(1).max(200),
   emoji: z.string().trim().min(1).max(24),

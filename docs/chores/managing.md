@@ -23,6 +23,8 @@ Read the catalog to resolve child/chore/reward IDs. Read the applicable Pacific 
 - Resuming before the window closes restores the requirement and recalculates its bonus. Resuming after the cutoff cannot reinstate expired requirements. An ordinary missed chore that was never muted remains missed.
 - Use `archivedFrom` for the first inactive Pacific day and `scheduledFor` for the first active day. Preserve old definitions and history when replacing a routine. Preserve untimed Bonus work unless the request includes it. Use `set_order` for each child/time group to preserve Max's chosen sequence.
 
+- A weekly schedule must include at least one `daysOfWeek` value (0 = Sunday through 6 = Saturday); creation and updates reject an empty or omitted list. Existing malformed weekly definitions stay ineligible until corrected. Daily schedules may omit weekdays or use an empty list for every day; a nonempty list filters them to those days.
+
 ## Stars, approval, and verification
 
 - To reverse an incorrect completion, use `undo` with its exact submission ID. This reverses its original stars and recalculates its period bonus. Do not also subtract stars manually for the same completion.

@@ -660,7 +660,7 @@
       "disposition": "revised",
       "priority": "normal",
       "targetStory": "As a kid, I can see a weekly chore when its next scheduled occurrence is eligible.",
-      "targetNotes": "Honor scheduled weekdays plus the current time window or untimed eligibility; no overdue catch-up path.",
+      "targetNotes": "Honor scheduled weekdays plus the current time window or untimed eligibility; no overdue catch-up path. Weekly schedules with no selected weekday are ineligible, including malformed saved definitions; they never fall back to daily work.",
       "basis": "consequence of requested changes",
       "channel": "kid_board",
       "implementation": {
@@ -2060,7 +2060,7 @@
       "disposition": "revised",
       "priority": "normal",
       "targetStory": "As a parent, I can schedule routines for selected weekdays through an agent.",
-      "targetNotes": "Show the occurrence only when its current time/date eligibility permits it.",
+      "targetNotes": "Show the occurrence only when its current time/date eligibility permits it. Weekly cadence requires at least one weekday (0 = Sunday through 6 = Saturday). Daily schedules with omitted or empty weekdays remain everyday routines.",
       "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
       "channel": "chatgpt_mcp",
       "implementation": {
@@ -2185,7 +2185,7 @@
       "disposition": "revised",
       "priority": "normal",
       "targetStory": "As a parent, I can change chore types and repeat schedules through an agent.",
-      "targetNotes": "Reconcile future eligibility safely; no stale global completed flag trapping new assignees.",
+      "targetNotes": "Reconcile future eligibility safely; no stale global completed flag trapping new assignees. Weekly schedule updates require selected weekdays; daily schedule semantics are unchanged.",
       "basis": "explicit removal of parent UI; ChatGPT and MCP handle parent commands, Telegram only delivers notifications",
       "channel": "chatgpt_mcp",
       "implementation": {

@@ -29,6 +29,16 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - run: pnpm test:chores
+
+      - run: pnpm exec tsc --noEmit
+
+      - name: Verify generated chore behavior docs
+        run: |
+          node scripts/render-chores-behaviors.mjs
+          pnpm exec prettier --write docs/chores/inventory.md docs/chores/rebuild-features.md docs/chores/coverage.md
+          git diff --exit-code -- docs/chores
+
       - run: pnpm exec playwright install --with-deps chromium
 
       - run: pnpm test:e2e

@@ -36,6 +36,8 @@ Between 10pm and 7am only eligible untimed Bonus work is available. Other named 
 
 Use the saved per-child/per-group order. The [September 8 list](routine-order.md) was the initial sequence; subsequent explicit parent edits are authoritative. Weekday/availability filtering preserves relative order. Sorting by stars, title, type, newest-first creation time, or model priority is **not current behavior**.
 
+Weekly routines require one or more selected weekdays. A stored weekly routine with no weekdays is ineligible, not an everyday routine. Daily routines retain their existing behavior: omitted or empty weekdays mean every day; nonempty weekdays filter eligibility.
+
 ## Completion, muting, and stars
 
 New early, past-day, or elapsed-window completions/approval requests are **not current behavior**, for either kids or parents. An unfinished one-off does not automatically carry overdue work forward. A request actually accepted on time remains approvable later, including after midnight. Later approval uses the original occurrence, timestamp, and star amount without reopening its kid card.

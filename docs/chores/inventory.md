@@ -37,7 +37,7 @@ Use [scope and acceptance rules](rebuild-scope.md), [current iPad interface](ipa
 - **telegramBonus:** A bonus message says the child earned +2 bonus stars for completing the period and includes the resulting total balance, without the occurrence date. Reward redemption updates include the cost and resulting balance. No daily-bonus, skip, or dedicated bedtime-recognition updates are generated.
 - **packingPersistence:** Packing is shared in Redis across authorized devices and agents. A one-time import can carry over the old browser checklist; subsequent progress does not depend on that browser’s local storage.
 - **featurePriority:** K07–K09 counts-only summaries and K59 system appearance remain implemented at lower priority. K04/K05 small-screen selection was superseded by the accepted landscape-only target and is excluded.
-- **canonicalNames:** Use pnpm chores, chores\__ MCP tools, /api/chores/_, app/lib/chores, app/(chores), and docs/chores. The old board and API routes no longer exist. Stored pre-rename submission sources, device cookies and CLI receipt identity remain compatible to preserve accepted requests, sessions and deduplication.
+- **canonicalNames:** Use pnpm chores, chores_* MCP tools, /api/chores/*, app/lib/chores, app/(chores), and docs/chores. The old board and API routes no longer exist. Stored pre-rename submission sources, device cookies and CLI receipt identity remain compatible to preserve accepted requests, sessions and deduplication.
 
 ## Explicitly not current behavior
 
@@ -317,7 +317,7 @@ Applies to K02, K46. Basis: explicit decision.
 
 **Not current behavior:** The old board, prototype, dedicated admin/approval pages, old MCP tools, legacy CLI/importer, balance-cutover scripts, speech and bedtime-reminder endpoints are not supported or executable. The trial product names are not current routes or tool names.
 
-**Current behavior:** There is one /chores board, /api/chores/_ API, pnpm chores CLI and chores\__ MCP tool set. Minimal compatibility for stored identifiers preserves existing sessions, accepted submissions and command receipts. Retain the existing Redis schema namespace and financial history.
+**Current behavior:** There is one /chores board, /api/chores/* API, pnpm chores CLI and chores_* MCP tool set. Minimal compatibility for stored identifiers preserves existing sessions, accepted submissions and command receipts. Retain the existing Redis schema namespace and financial history.
 
 Applies to K01, P01, P50. Basis: explicit decision.
 
@@ -419,7 +419,7 @@ Applies to K01, P01, P50. Basis: explicit decision.
 
 <a id="k24"></a>
 
-- **K24 — As a kid, I can see a weekly chore when its next scheduled occurrence is eligible.** _Current behavior · revised._ Honor scheduled weekdays plus the current time window or untimed eligibility; no overdue catch-up path.
+- **K24 — As a kid, I can see a weekly chore when its next scheduled occurrence is eligible.** _Current behavior · revised._ Honor scheduled weekdays plus the current time window or untimed eligibility; no overdue catch-up path. Weekly schedules with no selected weekday are ineligible, including malformed saved definitions; they never fall back to daily work.
 
 <a id="k25"></a>
 
@@ -663,7 +663,7 @@ Applies to K01, P01, P50. Basis: explicit decision.
 
 <a id="p12"></a>
 
-- **P12 — As a parent, I can schedule routines for selected weekdays through an agent.** _Current behavior · revised._ Show the occurrence only when its current time/date eligibility permits it. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
+- **P12 — As a parent, I can schedule routines for selected weekdays through an agent.** _Current behavior · revised._ Show the occurrence only when its current time/date eligibility permits it. Weekly cadence requires at least one weekday (0 = Sunday through 6 = Saturday). Daily schedules with omitted or empty weekdays remain everyday routines. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
 
 <a id="p13"></a>
 
@@ -683,7 +683,7 @@ Applies to K01, P01, P50. Basis: explicit decision.
 
 <a id="p17"></a>
 
-- **P17 — As a parent, I can change chore types and repeat schedules through an agent.** _Current behavior · revised._ Reconcile future eligibility safely; no stale global completed flag trapping new assignees. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
+- **P17 — As a parent, I can change chore types and repeat schedules through an agent.** _Current behavior · revised._ Reconcile future eligibility safely; no stale global completed flag trapping new assignees. Weekly schedule updates require selected weekdays; daily schedule semantics are unchanged. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
 
 <a id="p18"></a>
 
@@ -829,7 +829,7 @@ Applies to K01, P01, P50. Basis: explicit decision.
 
 <a id="p51"></a>
 
-- **P51 — As a parent, I can have changes made through agents appear on the family’s kid devices.** _Current behavior · revised._ Agents manage /chores via chores\_\* MCP or pnpm chores. The legacy board and its tools are deleted. The existing data, balances, history, pending approvals and receipt keys remain authoritative; no reimport or synchronization occurs. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N19: Clippy or Telegram management](inventory.md#n19); [N22: Shared live legacy data or ongoing resync](inventory.md#n22).
+- **P51 — As a parent, I can have changes made through agents appear on the family’s kid devices.** _Current behavior · revised._ Agents manage /chores via chores_* MCP or pnpm chores. The legacy board and its tools are deleted. The existing data, balances, history, pending approvals and receipt keys remain authoritative; no reimport or synchronization occurs. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18); [N19: Clippy or Telegram management](inventory.md#n19); [N22: Shared live legacy data or ongoing resync](inventory.md#n22).
 
 ## Parent: help the family pack
 
