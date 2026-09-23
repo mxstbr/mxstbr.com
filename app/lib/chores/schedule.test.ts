@@ -93,7 +93,8 @@ test('weekly scheduling requires matching weekdays while daily and other chore t
     for (const day of dates)
       assert.equal(scheduled(chore(schedule), 'kid-3', day), false)
 
-  for (const [index, day] of dates.entries()) {
+  for (let index = 0; index < dates.length; index++) {
+    const day = dates[index]
     assert.equal(
       scheduled(
         chore({ cadence: 'weekly', daysOfWeek: [0, 3, 6] }),
@@ -184,7 +185,8 @@ test('valid weekly and daily schedules keep their board visibility across a full
     action: 'create_chore',
     chore: input({ cadence: 'daily', daysOfWeek: [] }),
   })
-  for (const [index, day] of dates.entries()) {
+  for (let index = 0; index < dates.length; index++) {
+    const day = dates[index]
     t.clock(day)
     const cards = (await t.board()).kids[0].chores
     assert.equal(cards.some((c) => c.choreId === weekly.id), index === 3)
@@ -230,4 +232,54 @@ test('stored malformed weekly schedules never become daily work and existing his
   assert.deepEqual(t.repo.days['2026-09-09'], originalDay)
   assert.deepEqual(t.repo.core.balances, originalBalances)
   assert.deepEqual(t.repo.core.chores.slice(-2), malformed)
+})
+
+test('already-planned malformed weekly work is waived without erasing accepted history', async () => {
+  const t = setup()
+  const cards = (await t.board()).kids[0].chores
+  const [bed, teeth] = cards
+  t.repo.days['2026-09-09'].occurrences.find(
+    (o) => o.id === bed.occurrenceId,
+  )!.chore.requiresApproval = true
+  const accepted = await t.service.execute(child, randomUUID(), {
+    action: 'submit',
+    occurrenceId: bed.occurrenceId,
+  })
+  assert.equal(accepted.status, 'pending')
+  t.repo.core.chores.find((c) => c.id === bed.choreId)!.schedule = {
+    cadence: 'weekly',
+    daysOfWeek: [],
+  }
+  t.repo.core.chores.find((c) => c.id === teeth.choreId)!.schedule = {
+    cadence: 'weekly',
+  }
+  const before = structuredClone(t.repo.days['2026-09-09'])
+  const balances = structuredClone(t.repo.core.balances)
+  const board = await t.board()
+  assert.equal(board.kids[0].chores.length, 0)
+  assert.equal(board.kids[0].periodProgress.total, 0)
+  for (const card of cards)
+    assert.equal(
+      t.repo.days['2026-09-09'].occurrences.find(
+        (o) => o.id === card.occurrenceId,
+      )!.waived,
+      true,
+    )
+  await assert.rejects(
+    t.service.execute(child, randomUUID(), {
+      action: 'submit',
+      occurrenceId: teeth.occurrenceId,
+    }),
+    (error: unknown) =>
+      error instanceof ChoresError && error.code === 'UNAVAILABLE',
+  )
+  const after = t.repo.days['2026-09-09']
+  assert.deepEqual(after.submissions, before.submissions)
+  assert.deepEqual(after.ledger, before.ledger)
+  assert.deepEqual(
+    after.occurrences.map((o) => o.chore),
+    before.occurrences.map((o) => o.chore),
+  )
+  assert.deepEqual(t.repo.core.balances, balances)
+  assert.equal((await t.service.approvals(parent))[0].id, accepted.id)
 })

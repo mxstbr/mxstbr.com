@@ -19,7 +19,7 @@ function setup(iso = '2026-09-09T15:00:00Z') {
   const f = fixture(now),
     repo = new MemoryRepository(f.core, f.days)
   const service = new ChoresService(repo, () => now)
-  const run = (command: unknown, actor = child, id = randomUUID()) =>
+  const run = (command: unknown, actor = child, id: string = randomUUID()) =>
     service.execute(actor, id, command)
   return {
     f,
