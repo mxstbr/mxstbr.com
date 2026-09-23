@@ -8,7 +8,7 @@ Each child has a permanent landscape-iPad column. Their assigned chore emoji is 
 
 A confirmed completion gives brief local star/sound feedback, then returns to the next eligible action. A failed write keeps its exact request for retry and does not celebrate. Another child’s selection, feedback, and secondary panel remain independent.
 
-Tapping the period completion card (“Finish this morning,” “Finish before lunch,” and so on) opens only the current chore picker. Morning runs 7am–7:30am Pacific; Before lunch runs 7:30am–noon. At 7:30am the header, cutoff, current chores and secondary selection switch together. A temporary choice neither skips nor reorders anything. My progress is inside the picker, with a direct fallback when no period card is shown. **Not current behavior:** a dedicated Choose another button, another period’s chore list, an ordinary task-detail/skip dialog, or Hear it/read-aloud.
+Tapping the period completion card (“Finish this morning,” “Finish before lunch,” and so on) opens only the current chore picker. Morning runs 6am–7:30am Pacific; Before lunch runs 7:30am–noon. At 7:30am the header, cutoff, current chores and secondary selection switch together. A temporary choice neither skips nor reorders anything. My progress is inside the picker, with a direct fallback when no period card is shown. **Not current behavior:** a dedicated Choose another button, another period’s chore list, an ordinary task-detail/skip dialog, or Hear it/read-aloud.
 
 ## Clear visual states
 

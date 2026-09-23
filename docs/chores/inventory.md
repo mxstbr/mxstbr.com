@@ -26,7 +26,7 @@ Use [scope and acceptance rules](rebuild-scope.md), [current iPad interface](ipa
 - **deviceAccess:** Reuse the existing site-password login; already-unlocked iPads open /chores directly. Otherwise enter the same password. Invitation links remain optional.
 - **choreSwitcher:** Tap the period completion card (Finish this morning, Finish before lunch, etc.) to choose a current chore. No separate Choose another button. My progress remains inside the picker.
 - **choreSpeech:** Removed: the kids can read their chores; no Hear it control or speech endpoint.
-- **namedWindows:** Pacific windows are Morning 7am–7:30am, Before lunch 7:30am–noon, Afternoon noon–5pm, Evening 5pm–8:15pm, and Night 8:15pm–10pm, with exclusive closing boundaries. Between 10pm and 7am only eligible untimed Bonus work is available. Current/future saved plans adopt these cutoffs; each earlier submission retains its accepted window for later review. Old timed cards and secondary selections close at a boundary. Existing Morning assignments keep their group; Before lunch starts empty until explicitly assigned.
+- **namedWindows:** Pacific windows are Morning 6am–7:30am, Before lunch 7:30am–noon, Afternoon noon–5pm, Evening 5pm–8:15pm, and Night 8:15pm–10pm, with exclusive closing boundaries. Between 10pm and 6am only eligible untimed Bonus work is available. Current/future saved plans adopt these cutoffs; each earlier submission retains its accepted window for later review. Old timed cards and secondary selections close at a boundary. Existing Morning assignments keep their group; Before lunch starts empty until explicitly assigned.
 - **hiddenRequirements:** Merge existing per-child snoozes when updating that map. Hidden work is waived from targets even with pending/undone submissions, without deleting history or awarding chore stars. An on-time accepted request can still be reviewed later.
 - **blackout:** Five idle minutes can trigger pure black only from 8:30pm inclusive until 6am exclusive in America/Los_Angeles, automatically following DST. At 8:30pm an already-idle board can black out; at 6am it clears automatically. Tapping wakes and refreshes. Focus/visibility return rechecks the schedule. No visible moon or text appears; webpage blackout does not change the hardware backlight.
 - **quietAllClear:** Outstanding chores keep colorful raised columns, a solid card, emoji, and action button. Finished, empty, or awaiting-parent columns are subdued and say All done for now, Nothing to do right now, or Your part is done, with Go play only when the current state is confirmed. Pending approval uses a clock; failures/loading do not show an all-clear. This concerns the current window, not the whole day.
@@ -334,11 +334,11 @@ Applies to P56. Basis: explicit September 23 webhook-only request.
 
 <a id="n30"></a>
 
-### N30 — Morning chores through noon
+### N30 — Former Morning windows
 
-**Not current behavior:** The former 7am–noon Morning window and a four-period schedule are not current behavior. A saved noon cutoff cannot authorize a new Morning completion after 7:30am.
+**Not current behavior:** The former 7am Morning opening, noon Morning cutoff and four-period schedule are not current behavior. A saved noon cutoff cannot authorize a new Morning completion after 7:30am.
 
-**Current behavior:** Morning is 7am–7:30am Pacific. Before lunch is a separate 7:30am–noon group. Current/future plans adopt the new deadlines while earlier accepted submissions retain their original review windows and recorded stars.
+**Current behavior:** Morning is 6am–7:30am Pacific. Before lunch is a separate 7:30am–noon group. Current/future plans adopt the new deadlines while earlier accepted submissions retain their original review windows and recorded stars.
 
 Applies to K16, K17, P14. Basis: explicit September 23 morning deadline and Before lunch naming request.
 
@@ -408,11 +408,11 @@ Applies to K16, K17, P14. Basis: explicit September 23 morning deadline and Befo
 
 <a id="k16"></a>
 
-- **K16 — As a kid, I can see when my current chore window ends.** _Current behavior · revised._ Morning closes at 7:30am Pacific; Before lunch closes at noon. Header cutoffs and command eligibility use the same schedule. New submissions stop at the cutoff. Untimed Bonus work has no time-group cutoff, but remains subject to its date/recurrence eligibility. **Not current behavior:** [N04: Overlapping Evening and Night](inventory.md#n04); [N30: Morning chores through noon](inventory.md#n30).
+- **K16 — As a kid, I can see when my current chore window ends.** _Current behavior · revised._ Morning closes at 7:30am Pacific; Before lunch closes at noon. Header cutoffs and command eligibility use the same schedule. New submissions stop at the cutoff. Untimed Bonus work has no time-group cutoff, but remains subject to its date/recurrence eligibility. **Not current behavior:** [N04: Overlapping Evening and Night](inventory.md#n04); [N30: Former Morning windows](inventory.md#n30).
 
 <a id="k17"></a>
 
-- **K17 — As a kid, I can have the next time window’s chores replace the previous window’s chores automatically.** _Current behavior · revised._ Pacific windows are Morning 7am–7:30am, Before lunch 7:30am–noon, Afternoon noon–5pm, Evening 5pm–8:15pm, and Night 8:15pm–10pm, with exclusive closing boundaries. Between 10pm and 7am only eligible untimed Bonus work is available. Current/future saved plans adopt these cutoffs; each earlier submission retains its accepted window for later review. Old timed cards and secondary selections close at a boundary. Existing Morning assignments keep their group; Before lunch starts empty until explicitly assigned. **Not current behavior:** [N03: Opening other time groups](inventory.md#n03); [N04: Overlapping Evening and Night](inventory.md#n04); [N30: Morning chores through noon](inventory.md#n30).
+- **K17 — As a kid, I can have the next time window’s chores replace the previous window’s chores automatically.** _Current behavior · revised._ Pacific windows are Morning 6am–7:30am, Before lunch 7:30am–noon, Afternoon noon–5pm, Evening 5pm–8:15pm, and Night 8:15pm–10pm, with exclusive closing boundaries. Between 10pm and 6am only eligible untimed Bonus work is available. Current/future saved plans adopt these cutoffs; each earlier submission retains its accepted window for later review. Old timed cards and secondary selections close at a boundary. Existing Morning assignments keep their group; Before lunch starts empty until explicitly assigned. **Not current behavior:** [N03: Opening other time groups](inventory.md#n03); [N04: Overlapping Evening and Night](inventory.md#n04); [N30: Former Morning windows](inventory.md#n30).
 
 <a id="k18"></a>
 
@@ -692,7 +692,7 @@ Applies to K16, K17, P14. Basis: explicit September 23 morning deadline and Befo
 
 <a id="p14"></a>
 
-- **P14 — As a parent, I can assign a chore to a named time window or make it an untimed Bonus chore through an agent.** _Current behavior · revised._ Choose Morning, Before lunch, Afternoon, Evening or Night; use before-lunch in command inputs and per-child ordering. Catalog timeWindows advertises names and exact Pacific clock boundaries. The untimed Bonus option remains available. Named windows do not overlap, and no chores move into Before lunch automatically. **Not current behavior:** [N04: Overlapping Evening and Night](inventory.md#n04); [N18: Dedicated parent interface](inventory.md#n18); [N30: Morning chores through noon](inventory.md#n30).
+- **P14 — As a parent, I can assign a chore to a named time window or make it an untimed Bonus chore through an agent.** _Current behavior · revised._ Choose Morning, Before lunch, Afternoon, Evening or Night; use before-lunch in command inputs and per-child ordering. Catalog timeWindows advertises names and exact Pacific clock boundaries. The untimed Bonus option remains available. Named windows do not overlap, and no chores move into Before lunch automatically. **Not current behavior:** [N04: Overlapping Evening and Night](inventory.md#n04); [N18: Dedicated parent interface](inventory.md#n18); [N30: Former Morning windows](inventory.md#n30).
 
 <a id="p15"></a>
 

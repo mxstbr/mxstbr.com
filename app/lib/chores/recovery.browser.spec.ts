@@ -120,7 +120,7 @@ test('a hung refresh times out and waking replaces an unfinished request', async
   await expect(page.locator('.chores-connection')).toHaveCount(0)
 })
 
-test('morning wake replaces last night without a document refresh', async ({
+test('6am morning wake replaces last night without a document refresh', async ({
   page,
 }) => {
   const board = await scene(page)
@@ -135,7 +135,7 @@ test('morning wake replaces last night without a document refresh', async ({
     ...board,
     day: '2026-09-10',
     period: 'morning',
-    serverNow: '2026-09-10T14:00:00.000Z',
+    serverNow: '2026-09-10T13:00:00.000Z',
     boundary: '2026-09-10T14:30:00.000Z',
   }
   let current = night
@@ -157,8 +157,10 @@ test('morning wake replaces last night without a document refresh', async ({
     page.getByRole('heading', { name: 'Morning', exact: true }),
   ).toBeVisible()
   await expect(page.locator('.chores-date')).toHaveText('Thu, Sep 10')
+  await expect(page.getByText('Until 7:30 AM', { exact: true })).toBeVisible()
   await ready(page)
   expect(documents).toBe(0)
+  await page.screenshot({ path: '/private/tmp/chores-6am-morning.png' })
 })
 
 test('deployment recovery preserves a busy or uncertain save and its exact retry ID', async ({

@@ -93,8 +93,8 @@ test('renamed CLI preserves the receipt identity of an uncertain earlier command
 
 test('Pacific windows are exclusive at every boundary and handle DST and midnight', () => {
   for (const [iso, expected] of [
-    ['2026-09-09T13:59:59Z', null],
-    ['2026-09-09T14:00:00Z', 'morning'],
+    ['2026-09-09T12:59:59Z', null],
+    ['2026-09-09T13:00:00Z', 'morning'],
     ['2026-09-09T14:29:59Z', 'morning'],
     ['2026-09-09T14:30:00Z', 'before-lunch'],
     ['2026-09-09T18:59:59Z', 'before-lunch'],
@@ -104,8 +104,8 @@ test('Pacific windows are exclusive at every boundary and handle DST and midnigh
     ['2026-09-10T05:00:00Z', null],
   ] as const)
     assert.equal(currentTime(new Date(iso)).period, expected)
-  assert.equal(pacificInstant('2026-03-08', 420), '2026-03-08T14:00:00.000Z')
-  assert.equal(pacificInstant('2026-11-01', 420), '2026-11-01T15:00:00.000Z')
+  assert.equal(pacificInstant('2026-03-08', 360), '2026-03-08T13:00:00.000Z')
+  assert.equal(pacificInstant('2026-11-01', 360), '2026-11-01T14:00:00.000Z')
   assert.equal(pacificInstant('2026-03-08', 1440), '2026-03-09T07:00:00.000Z')
   assert.equal(pacificDay(new Date('2026-09-10T06:59:59Z')), '2026-09-09')
 })
@@ -150,6 +150,19 @@ test('late, early, forged-date and unauthorized child submissions are rejected o
       occurrenceId: '2026-09-09:kid-1:routine-2026-09-09-lunch',
     }),
     rejected('WINDOW_CLOSED'),
+  )
+  t.clock('2026-09-09T12:59:59Z')
+  await assert.rejects(
+    t.run({ action: 'submit', occurrenceId: id }),
+    rejected('WINDOW_CLOSED'),
+  )
+  // A saved plan from the former 7am opening must also allow the new 6am start.
+  t.repo.days['2026-09-09'].occurrences.find((o) => o.id === id)!.opensAt =
+    '2026-09-09T14:00:00.000Z'
+  t.clock('2026-09-09T13:00:00Z')
+  assert.equal(
+    (await t.run({ action: 'submit', occurrenceId: id })).status,
+    'completed',
   )
   t.clock('2026-09-09T19:00:00Z')
   await assert.rejects(
@@ -879,11 +892,14 @@ test('saved noon deadlines update uniformly while accepted submissions and histo
     action: 'submit',
     occurrenceId: teeth.occurrenceId,
   })
-  // A day saved by the former schedule: noon cutoffs and 8am submissions,
+  // A day saved by the former schedule: 7am openings, noon cutoffs and 8am submissions,
   // before acceptedWindow existed. All such submissions were valid then.
   const saved = t.repo.days[initial.day]
   for (const o of saved.occurrences)
-    if (o.group === 'morning') o.closesAt = '2026-09-23T19:00:00.000Z'
+    if (o.group === 'morning') {
+      o.opensAt = '2026-09-23T14:00:00.000Z'
+      o.closesAt = '2026-09-23T19:00:00.000Z'
+    }
   for (const s of saved.submissions) {
     s.submittedAt = '2026-09-23T15:00:00.000Z'
     delete s.acceptedWindow
@@ -902,7 +918,11 @@ test('saved noon deadlines update uniformly while accepted submissions and histo
   assert(
     inspected.occurrences
       .filter((o) => o.group === 'morning')
-      .every((o) => o.closesAt === '2026-09-23T14:30:00.000Z'),
+      .every(
+        (o) =>
+          o.opensAt === '2026-09-23T13:00:00.000Z' &&
+          o.closesAt === '2026-09-23T14:30:00.000Z',
+      ),
   )
   for (const s of inspected.submissions) {
     assert.equal(s.submittedAt, '2026-09-23T15:00:00.000Z')

@@ -27,7 +27,7 @@ Read the catalog to resolve child/chore/reward IDs. Read the applicable Pacific 
 
 ## Time windows
 
-All children use Pacific time: Morning **7am–7:30am**, Before lunch **7:30am–noon**, Afternoon **noon–5pm**, Evening **5pm–8:15pm**, and Night **8:15pm–10pm**. Closing boundaries are exclusive. Untimed Bonus chores remain available during their eligible day. The catalog returns `timeZone` and `timeWindows` as the authoritative clock schedule.
+All children use Pacific time: Morning **6am–7:30am**, Before lunch **7:30am–noon**, Afternoon **noon–5pm**, Evening **5pm–8:15pm**, and Night **8:15pm–10pm**. Closing boundaries are exclusive. Untimed Bonus chores remain available during their eligible day. The catalog returns `timeZone` and `timeWindows` as the authoritative clock schedule.
 
 Use `timeOfDay: "before-lunch"` when creating or updating a Before lunch chore, and `group: "before-lunch"` with `set_order`. Existing Morning assignments remain Morning. An empty Before lunch period earns no bonus; a nonempty completed one earns the usual +2.
 

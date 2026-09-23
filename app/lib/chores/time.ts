@@ -3,7 +3,7 @@ import { PERIODS, type Group, type Period } from './types'
 export const TIME_ZONE = 'America/Los_Angeles'
 // Pacific windows share their boundaries so the board and command checks agree.
 export const WINDOWS: Record<Period, [number, number]> = {
-  morning: [7 * 60, 7 * 60 + 30],
+  morning: [6 * 60, 7 * 60 + 30],
   'before-lunch': [7 * 60 + 30, 12 * 60],
   afternoon: [12 * 60, 17 * 60],
   evening: [17 * 60, 20 * 60 + 15],
