@@ -419,7 +419,7 @@ Applies to K01, P01, P50. Basis: explicit decision.
 
 <a id="k24"></a>
 
-- **K24 — As a kid, I can see a weekly chore when its next scheduled occurrence is eligible.** _Current behavior · revised._ Honor scheduled weekdays plus the current time window or untimed eligibility; no overdue catch-up path.
+- **K24 — As a kid, I can see a weekly chore when its next scheduled occurrence is eligible.** _Current behavior · revised._ Honor scheduled weekdays plus the current time window or untimed eligibility; no overdue catch-up path. Weekly schedules with no selected weekday are ineligible, including malformed saved definitions; they never fall back to daily work.
 
 <a id="k25"></a>
 
@@ -663,7 +663,7 @@ Applies to K01, P01, P50. Basis: explicit decision.
 
 <a id="p12"></a>
 
-- **P12 — As a parent, I can schedule routines for selected weekdays through an agent.** _Current behavior · revised._ Show the occurrence only when its current time/date eligibility permits it. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
+- **P12 — As a parent, I can schedule routines for selected weekdays through an agent.** _Current behavior · revised._ Show the occurrence only when its current time/date eligibility permits it. Weekly cadence requires at least one weekday (0 = Sunday through 6 = Saturday). Daily schedules with omitted or empty weekdays remain everyday routines. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
 
 <a id="p13"></a>
 
@@ -683,7 +683,7 @@ Applies to K01, P01, P50. Basis: explicit decision.
 
 <a id="p17"></a>
 
-- **P17 — As a parent, I can change chore types and repeat schedules through an agent.** _Current behavior · revised._ Reconcile future eligibility safely; no stale global completed flag trapping new assignees. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
+- **P17 — As a parent, I can change chore types and repeat schedules through an agent.** _Current behavior · revised._ Reconcile future eligibility safely; no stale global completed flag trapping new assignees. Weekly schedule updates require selected weekdays; daily schedule semantics are unchanged. **Not current behavior:** [N18: Dedicated parent interface](inventory.md#n18).
 
 <a id="p18"></a>
 

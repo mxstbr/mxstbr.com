@@ -21,6 +21,8 @@ When a child's work is done, that column says “All done for now. Go play.” O
 
 The whole column signals whether that child has something to do, even at a glance while running past. Outstanding chores keep their colorful, raised column, solid chore card, large emoji, and prominent completion button. Finished, empty, and awaiting-parent columns become flat, neutral gray-green, with a large muted check (or clock for pending approval), centered text, and no solid chore card. Their balance, progress stamps, and earned bonus are quiet too; the child's name keeps its identity color. An explicitly selected Bonus chore restores the active treatment. Loading, offline status, or an unconfirmed save must never show the quiet all-clear or “Go play.” Apply the distinction in both light and dark mode without dimming the entire column or making secondary controls unreadable.
 
+Weekly chores appear only on selected weekdays. A saved weekly chore without weekdays does not appear as daily work or count toward current requirements; correct its schedule through the parent tools. Daily chores keep their existing weekday filtering.
+
 ## Implemented visual behavior
 
 Max accepted the information architecture as worth trying, including one chore at a time, and asked for a more fun visual treatment. The current interface uses colorful child columns, rounded lettering, large chore-emoji stickers, tactile completion buttons, and small gold completion stamps toward the explicit +2-star period reward. Feedback is local to the child who finishes: a brief star burst after confirmed completion, with no celebration for pending approval or empty periods. Respect reduced motion. The emoji is the main picture; decoration must not compete with identifying the current chore.
