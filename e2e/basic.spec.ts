@@ -8,9 +8,9 @@ test('home page renders key sections', async ({ page }) => {
   ).toBeVisible()
   const about = page.getByRole('region', { name: 'Some things about me:' })
   await expect(about).toBeVisible()
-  await expect(
-    about.getByRole('link', { name: 'Shopify', exact: true }),
-  ).toHaveAttribute('href', 'https://shopify.com')
+  const shopify = about.getByRole('link', { name: 'Shopify', exact: true })
+  await expect(shopify).toBeVisible()
+  await expect(shopify).toHaveAttribute('href', 'https://shopify.com')
   await expect(
     page.getByRole('region', { name: 'Some things I believe:' }),
   ).toBeVisible()
