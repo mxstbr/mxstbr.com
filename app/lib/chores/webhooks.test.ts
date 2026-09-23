@@ -273,7 +273,7 @@ test('failed endpoint verification and invalid parameters never activate deliver
     s.hooks.subscribe('parent-a', INPUT),
     (error: McpError) =>
       error.code === -32013 &&
-      error.data?.limit === 'verificationRequestsPerHost',
+      error.data?.['limit'] === 'verificationRequestsPerHost',
   )
   assert.equal(
     s.calls.length,
