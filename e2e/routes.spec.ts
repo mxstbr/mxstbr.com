@@ -78,6 +78,31 @@ test.describe('Public pages render', () => {
     }
   })
 
+  test('homepage / emits social preview (og:* + twitter:*) meta tags', async ({
+    page,
+  }) => {
+    await page.goto('/', { waitUntil: 'networkidle' })
+
+    const ogImage = page.locator('meta[property="og:image"]')
+    const twitterCard = page.locator('meta[name="twitter:card"]')
+    const ogTitle = page.locator('meta[property="og:title"]')
+    const twitterImage = page.locator('meta[name="twitter:image"]')
+
+    await expect(
+      ogImage,
+      'og:image must be present so / unfurls a preview card',
+    ).toHaveAttribute('content', 'https://mxstbr.com/og')
+    await expect(
+      twitterCard,
+      'twitter:card must be present so / unfurls a preview card',
+    ).toHaveAttribute('content', 'summary_large_image')
+    await expect(ogTitle).toHaveAttribute('content', 'Max Stoiber (@mxstbr)')
+    await expect(twitterImage).toHaveAttribute(
+      'content',
+      'https://mxstbr.com/og',
+    )
+  })
+
   test('renders /oss when GitHub access is configured', async ({ page }) => {
     test.skip(
       !process.env.GITHUB_ACCESS_TOKEN,

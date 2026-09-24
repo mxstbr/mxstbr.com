@@ -1,9 +1,36 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { size } from 'app/og/utils'
+import { prodUrl } from 'app/sitemap'
 
 export const metadata: Metadata = {
   title: 'Max Stoiber',
   description: 'A few things about Max Stoiber, and a few things he believes.',
+  openGraph: {
+    title: 'Max Stoiber (@mxstbr)',
+    description:
+      'A few things about Max Stoiber, and a few things he believes.',
+    url: prodUrl,
+    siteName: 'Max Stoiber (@mxstbr)',
+    locale: 'en_US',
+    type: 'website',
+    images: [
+      {
+        url: '/og',
+        alt: 'Max Stoiber (@mxstbr)',
+        ...size,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Max Stoiber (@mxstbr)',
+    description:
+      'A few things about Max Stoiber, and a few things he believes.',
+    site: '@mxstbr',
+    creator: '@mxstbr',
+    images: ['/og'],
+  },
 }
 
 export default function Home() {
