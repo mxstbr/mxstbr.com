@@ -83,14 +83,3 @@ export async function deleteHolding(index: number): Promise<void> {
     throw new Error('Failed to delete holding')
   }
 }
-
-// Get holding by index
-export async function getHoldingByIndex(index: number): Promise<StockHolding | null> {
-  try {
-    const holdings = await getHoldingsData()
-    return holdings[index] || null
-  } catch (error) {
-    console.error('Error getting holding by index:', error)
-    return null
-  }
-}
