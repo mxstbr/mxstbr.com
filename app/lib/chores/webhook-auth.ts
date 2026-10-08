@@ -6,8 +6,9 @@ import { McpError } from '@modelcontextprotocol/sdk/types.js'
 const principalFor = (kind: string, credential: string) =>
   `${kind}:${createHash('sha256').update('chores-mcp-parent:').update(credential).digest('hex')}`
 export const canonicalWebhookPrincipal = (principal: string) =>
-  /^(site-password|automation-token):[a-f0-9]{64}$/.exec(principal)?.[1] ??
-  principal
+  /^(site-password|automation-token|pebble-max|pebble-sue):[a-f0-9]{64}$/.exec(
+    principal,
+  )?.[1] ?? principal
 const matches = (
   candidate: string | null | undefined,
   expected: string | undefined,

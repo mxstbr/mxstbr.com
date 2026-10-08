@@ -1,5 +1,7 @@
 # Webhook conformance audit — September 23, 2026
 
+**October 8 addendum:** the merged WG draft remains at `6682596`. The existing endpoint now also implements ChatGPT's MCP 2.0 profile: modern discovery, request metadata/HTTP header checks, result type and server identity, stateless tool dispatch, idempotent modern unsubscribe, and suppression of unsupported gap/termination controls. Gaps remain observable on refresh. Legacy draft clients retain the September behavior. The delivery engine is shared with the two personal Pebble streams; their state and credentials are isolated. See [Pebble implementation and tests](../pebble-index.md) and the updated [wire contract](mcp-events.md). The September conclusion below concerns the original draft profile, not a claim that ChatGPT supports its optional controls.
+
 Scope: the server side of MCP Events webhooks, including discovery and shared occurrence/cursor rules. Poll and push remain disabled. This is a conformance review of an experimental draft, not certification against a ratified standard.
 
 ## Source and version

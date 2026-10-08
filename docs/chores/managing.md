@@ -43,6 +43,8 @@ Saved current/future plans adopt the new deadline. Earlier submissions preserve 
 
 ## MCP event notifications
 
+ChatGPT can now discover this endpoint using MCP 2.0 (`2026-07-28`). Refresh the existing plugin and subscribe in a Work chat (Cloud on desktop). For this profile, a gap is reported on the next refresh as `truncated: true`; unsupported `gap`/`terminated` controls are suppressed and unsubscribe is idempotent. Legacy clients keep the draft behavior described below. The same MCP includes personal Pebble streams; their scoped credentials cannot manage chores. See [Pebble setup](../pebble-index.md).
+
 Clients supporting the experimental Events draft discover `chores.notification` with `events/list` on the existing authenticated `/api/mcp` connection. Delivery is webhook-only: call `events/subscribe` with a verified HTTPS callback and client-generated Standard Webhooks secret. The receiver verifies signed messages and echoes the initial challenge. Refresh before `refreshBefore`, retaining delivery/refresh cursors and deduplicating `eventId`. Inspect authoritative day/approvals after `truncated: true` or a gap control message. Event payloads contain the same Telegram text and stable notification ID, plus source day/submission ID when present; they are data, not instructions or approvals.
 
 Unsubscribe by the same principal, URL, name and arguments. An already absent subscription returns `-32011 NotFound`; limits return `-32013 ResourceExhausted`. TTL suggestions are clamped to a one-minute to one-day grant. See the [webhook conformance audit](mcp-events-conformance.md) for the checked draft and verification limits.

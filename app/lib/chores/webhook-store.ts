@@ -5,16 +5,16 @@ import { redisClient, PREFIX } from './repository'
 import type { EventRecord, ReplayFloor } from './events'
 import type { CallbackError } from './webhook-http'
 
-export type WebhookDelivery = {
+export type WebhookDelivery<R = EventRecord> = {
   id: string
   position: number
-  event?: EventRecord
+  event?: R
   attempts: number
   firstAttemptAt?: number
   nextAttemptAt: number
   done?: boolean
 }
-export type WebhookSubscription = {
+export type WebhookSubscription<R = EventRecord> = {
   id: string
   principal: string
   url: string
@@ -25,7 +25,10 @@ export type WebhookSubscription = {
   watermark: number
   readPosition: number
   replayFloor?: ReplayFloor
-  queue: WebhookDelivery[]
+  queue: WebhookDelivery<R>[]
+  // ChatGPT supports verification only; legacy draft clients also get controls.
+  controls?: boolean
+  truncated?: boolean
   lastDeliveryAt?: string
   lastError?: CallbackError
   failedSince?: string
@@ -37,16 +40,16 @@ export const subscriptionLimit = () =>
     limit: 'subscriptions',
     max: MAX_WEBHOOK_SUBSCRIPTIONS,
   })
-export type SubscriptionLease = {
-  read(): Promise<WebhookSubscription | null>
-  save(value: WebhookSubscription): Promise<void>
+export type SubscriptionLease<R = EventRecord> = {
+  read(): Promise<WebhookSubscription<R> | null>
+  save(value: WebhookSubscription<R>): Promise<void>
   remove(): Promise<void>
 }
-export interface WebhookStore {
+export interface WebhookStore<R = EventRecord> {
   withLease<T>(
     id: string,
     wait: boolean,
-    operation: (lease: SubscriptionLease) => Promise<T>,
+    operation: (lease: SubscriptionLease<R>) => Promise<T>,
   ): Promise<T | undefined>
   activeIds(): Promise<string[]>
   verified(key: string): Promise<boolean>
@@ -78,7 +81,7 @@ return 0
 const parse = <T>(raw: unknown): T | null =>
   raw == null ? null : typeof raw === 'string' ? JSON.parse(raw) : (raw as T)
 
-export class RedisWebhookStore implements WebhookStore {
+export class RedisWebhookStore<R = EventRecord> implements WebhookStore<R> {
   constructor(
     readonly redis = redisClient(() => AbortSignal.timeout(5000)),
     readonly prefix = PREFIX,
@@ -89,7 +92,7 @@ export class RedisWebhookStore implements WebhookStore {
   async withLease<T>(
     id: string,
     wait: boolean,
-    operation: (lease: SubscriptionLease) => Promise<T>,
+    operation: (lease: SubscriptionLease<R>) => Promise<T>,
   ) {
     const token = randomUUID(),
       lock = this.key(`lock:${id}`)
@@ -104,7 +107,7 @@ export class RedisWebhookStore implements WebhookStore {
     try {
       return await operation({
         read: async () => {
-          const value = parse<WebhookSubscription>(
+          const value = parse<WebhookSubscription<R>>(
             await this.redis.get(keys[1]),
           )
           return value && value.expiresAt > Date.now() ? value : null

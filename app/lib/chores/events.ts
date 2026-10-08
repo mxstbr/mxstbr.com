@@ -103,6 +103,15 @@ export function eventOccurrence(record: EventRecord) {
 }
 
 export class ChoreEvents {
+  readonly name = CHORE_EVENT
+  readonly occurrence = eventOccurrence
+  readonly cursor = eventCursor
+  readonly position = cursorPosition
+
+  async enabled() {
+    return (await this.repository.readCore()).notificationsEnabled
+  }
+
   constructor(
     readonly repository: Repository,
     readonly now: () => number = Date.now,

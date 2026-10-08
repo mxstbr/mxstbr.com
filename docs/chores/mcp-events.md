@@ -1,5 +1,15 @@
 # Chores MCP Events
 
+## ChatGPT compatibility — October 8, 2026
+
+The same endpoint now supports MCP 2.0 (`2026-07-28`): `server/discover` advertises tools/events, every modern request validates its protocol metadata and mirrored HTTP headers, and responses include `resultType: complete`. Legacy initialization/tools remain supported. The family event catalog also includes [Max and Sue's Pebble recordings](../pebble-index.md); scoped Pebble credentials cannot access chores.
+
+For modern ChatGPT subscriptions, only verification control messages are delivered. **Not current behavior for ChatGPT:** `gap` and `terminated` webhook control messages. Gaps instead set `truncated: true` on the next refresh; revoked access removes the subscription without sending a control. `events/unsubscribe` is idempotent for modern clients. Legacy draft chores clients retain the gap/termination and missing-subscription behavior described below. Subscription IDs, cursors, storage keys and saved chores data are preserved. The generic delivery engine is now `app/lib/mcp/event-webhooks.ts`.
+
+The following wire examples omit MCP 2.0 metadata for readability and remain valid for legacy clients. Modern HTTP requests also require `MCP-Protocol-Version: 2026-07-28`, `Mcp-Method` matching the JSON-RPC method, and `params._meta` containing `io.modelcontextprotocol/protocolVersion` and `io.modelcontextprotocol/clientCapabilities`. Tool calls additionally require `Mcp-Name`. See the [current ChatGPT requirements](https://developers.openai.com/plugins/build/mcp-events).
+
+## Legacy draft contract
+
 The authenticated `/api/mcp` endpoint implements the [Events working-group draft at commit 6682596](https://github.com/modelcontextprotocol/experimental-ext-triggers-events/blob/6682596d65eec778fe0b8b1f43b4e89d2fe2c546/docs/design-sketch-proposal.md), checked September 23, 2026. Clients need support for that experimental draft. **Webhooks are the only MCP Events delivery method.** Existing MCP tools and Telegram notifications continue to work.
 
 The working group calls this an experimental design sketch, not a ratified MCP specification. The [webhook conformance audit](mcp-events-conformance.md) records the requirements checked, regression fixes, and remaining verification limits. The unmerged capability-negotiation proposal is tracked there separately from the merged draft.

@@ -1,5 +1,9 @@
 # Chores implementation and delivery history
 
+## October 8 — MCP 2.0 and personal Pebble events
+
+The existing `/api/mcp` endpoint now serves ChatGPT's MCP 2.0 tools/events profile while preserving legacy initialization, the six chores tools and all saved chores keys. The generic webhook worker moved to `app/lib/mcp/event-webhooks.ts`. Modern subscriptions suppress unsupported gap/termination controls, report gaps on refresh, and use idempotent unsubscribe. The existing minute notification drain also services two separately authorized Pebble recording streams. No kid UI or chore domain behavior changed. See [Pebble setup and verification](../pebble-index.md).
+
 The only supported product is [mxstbr.com/chores](https://mxstbr.com/chores). The [inventory](inventory.md), [scope](rebuild-scope.md), [coverage](coverage.md) and [management guide](managing.md) describe current behavior.
 
 ## September 22: recover always-open boards after deployment

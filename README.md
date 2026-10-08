@@ -61,4 +61,6 @@ Licensed under the MIT License. Feel free to use parts of the code in your own p
 
 ## Kids chores
 
+The central MCP also supports personal [Pebble Index recording events](docs/pebble-index.md) for Max and Sue. `pnpm pebble:setup` writes private setup instructions and scoped credentials to a gitignored file; `pnpm test:pebble` verifies that integration.
+
 The kids use [`/chores`](https://mxstbr.com/chores). Agents manage the same system with `pnpm chores` or authenticated `chores_*` MCP tools. See [behavior inventory](docs/chores/inventory.md), [management instructions](docs/chores/managing.md), and [implementation/verification](docs/chores/implementation.md). The legacy implementation is removed.

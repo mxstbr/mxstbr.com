@@ -13,7 +13,9 @@
     "test:e2e": "playwright test",
     "format": "prettier --write .",
     "prepare": "husky",
-    "test:chores": "tsm --test app/lib/chores/*.test.ts"
+    "test:chores": "tsm --test app/lib/chores/*.test.ts",
+    "test:pebble": "tsm --test app/lib/pebble/*.test.ts app/lib/mcp/*.test.ts",
+    "pebble:setup": "tsm scripts/pebble-index-setup.ts"
   },
   "dependencies": {
     "@ai-sdk/mcp": "1.0.0-beta.43",

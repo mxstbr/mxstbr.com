@@ -4,6 +4,8 @@ Updated September 23, 2026 for MCP Events, following the legacy-removal and cano
 
 ## Product and access
 
+October 8 MCP update: the existing endpoint supports MCP 2.0 discovery and stateless tools/events for ChatGPT. ChatGPT subscriptions report retention gaps through `truncated` on refresh and use idempotent unsubscribe; gap/terminated control delivery is **Not current behavior** for that profile. Legacy draft clients retain their prior behavior. Personal Pebble events share transport code, with separate credentials and storage, and do not change chore rules or the iPad workflow.
+
 The current product is `/chores`, displayed on the existing old iPad in landscape, with Dilan, Darian, and Devina in persistent columns. The user reported iPadOS 17.7.10; no exact hardware model is assumed. Verification uses a 1024×680 browser viewport. A separate phone layout, portrait layout, or child-selector deep link is **not current behavior**.
 
 Already-unlocked iPads reuse the existing site-password cookie; otherwise enter the same password. Invitation links remain optional. Requiring a transferred setup link or introducing a parent setup portal is **not current behavior**. A shared unlocked board grants kid actions for the authorized children; parent mutations require authenticated tools.

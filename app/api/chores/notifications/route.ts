@@ -1,6 +1,7 @@
 import { Receiver } from '@upstash/qstash'
 import { automationAuthorized } from 'app/lib/chores/auth'
 import { drainAllNotifications } from 'app/lib/chores/notifications'
+import { drainPebbleEvents } from 'app/lib/pebble/runtime'
 import { errorResponse, json } from '../http'
 
 export const maxDuration = 60
@@ -35,7 +36,11 @@ export async function POST(request: Request) {
         },
         401,
       )
-    return json(await drainAllNotifications())
+    const [chores, pebble] = await Promise.all([
+      drainAllNotifications(),
+      drainPebbleEvents(),
+    ])
+    return json({ ...chores, pebble })
   } catch (error) {
     return errorResponse(error)
   }
