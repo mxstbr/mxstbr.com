@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import type { ChoreCard, KidView } from 'app/lib/chores/types'
 import type { Command } from 'app/lib/chores/commands'
 import { PACKING_ITEMS } from 'app/lib/chores/packing'
+import { formatStarLabel, starUnit } from 'app/lib/chores/stars'
 
 export type PanelName =
   | 'now'
@@ -157,7 +158,7 @@ export function ChildPanel({
                           : c.notificationStatus === 'queued'
                             ? 'Request saved · notification queued'
                             : 'Waiting for your parent'
-                        : `${c.stars} ${c.stars === 1 ? 'star' : 'stars'} earned`}
+                        : `${formatStarLabel(c.stars)} earned`}
                     </small>
                   </span>
                   {c.status === 'approved' && (
@@ -179,7 +180,9 @@ export function ChildPanel({
           ))}
         {view === 'rewards' && (
           <>
-            <p className="chores-panel-note">You have {kid.balance} stars.</p>
+            <p className="chores-panel-note">
+              You have {formatStarLabel(kid.balance)}.
+            </p>
             {kid.rewards.length ? (
               kid.rewards.map((r) => (
                 <button
@@ -196,7 +199,7 @@ export function ChildPanel({
                       {r.redeemed
                         ? 'Already yours ✓'
                         : kid.balance < r.cost
-                          ? `${r.cost - kid.balance} more stars to go`
+                          ? `${r.cost - kid.balance} more ${starUnit(r.cost - kid.balance)} to go`
                           : 'You can get this!'}
                     </small>
                   </span>
@@ -214,13 +217,13 @@ export function ChildPanel({
               {selectedReward.emoji}
             </span>
             <h3>{selectedReward.title}</h3>
-            <p>{selectedReward.cost} stars</p>
+            <p>{formatStarLabel(selectedReward.cost)}</p>
             <p className="chores-panel-note">
               {selectedReward.redeemed
                 ? 'You already have this one.'
                 : kid.balance >= selectedReward.cost
-                  ? `You’ll have ${kid.balance - selectedReward.cost} stars left.`
-                  : `${selectedReward.cost - kid.balance} more stars to go.`}
+                  ? `You’ll have ${formatStarLabel(kid.balance - selectedReward.cost)} left.`
+                  : `${selectedReward.cost - kid.balance} more ${starUnit(selectedReward.cost - kid.balance)} to go.`}
             </p>
             <button
               className="chores-primary"
@@ -414,8 +417,8 @@ export function ChildPanel({
                   </p>
                   {summaryDay <= day && (
                     <p className="chores-panel-note">
-                      {summary.earned} stars added · {summary.spent} stars used
-                      or undone
+                      {formatStarLabel(summary.earned)} added ·{' '}
+                      {formatStarLabel(summary.spent)} used or undone
                     </p>
                   )}
                 </>
