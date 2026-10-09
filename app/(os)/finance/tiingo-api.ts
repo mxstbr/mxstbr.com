@@ -187,25 +187,3 @@ export async function batchGetStockPrices(requests: Array<{ ticker: string; date
   
   return priceCache
 }
-
-// Legacy function for compatibility - generates historical prices
-export async function generateHistoricalPrices(): Promise<StockPrice[]> {
-  console.warn('generateHistoricalPrices is deprecated. Use batchGetStockPrices for better performance.')
-  
-  // This would be very inefficient with real API, but keeping for compatibility
-  const tickers = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA', 'AMZN', 'META']
-  const endDate = new Date().toISOString().split('T')[0]
-  const startDate = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-  
-  const allPrices: StockPrice[] = []
-  
-  for (const ticker of tickers) {
-    const prices = await fetchTickerPrices(ticker, startDate, endDate)
-    allPrices.push(...prices)
-    
-    // Rate limiting delay
-    await new Promise(resolve => setTimeout(resolve, 100))
-  }
-  
-  return allPrices
-}
